@@ -1,0 +1,65 @@
+phase_result:
+  status: complete
+
+  artifact_changes:
+    - artifact: product-sense-opus5.md
+      scope: whole artifact
+      summary: >-
+        Fresh draft of the authoritative Product Sense for the barbershop
+        rescheduling agent, covering all eight sections from product-idea.md as
+        the sole authoritative input. Responsibilities & Authority, Capabilities
+        & Behaviors, and Failure & Recovery are left explicitly open where no
+        authoritative truth exists; Open Questions is empty by design on a fresh
+        draft.
+
+  issues:
+    - id: I-001
+      statement: >-
+        Whether the customer's agreement to a specific new time is required
+        before the appointment is moved — and what counts as agreement — is not
+        established, so the agent's authority to commit a move and the
+        interaction semantics of the exchange cannot be stated.
+      evidence: >-
+        product-idea.md commits the agent to moving the appointment "to a slot
+        that works for both sides", which makes the customer's acceptance a
+        condition of a correct outcome, but it establishes no way for the agent
+        to determine the customer's side and no ordering between agreement and
+        the calendar change. The owner's side is fully determined by the stated
+        scheduling rules and the calendar; the customer's side is not.
+      affected_phase: P0
+      uncertainty: true
+      blocks_current_phase: false
+
+    - id: I-002
+      statement: >-
+        What the product must do when no time works for both sides — including
+        when the customer declines every time the scheduling rules and the
+        calendar allow — is not established, nor whether the exchange escalates
+        to the owner.
+      evidence: >-
+        The committed capability is conditional on a mutually workable slot
+        existing. In a one-chair shop open Tuesday to Saturday 10:00-18:00 with
+        45-minute appointments and no double-booking, requests that no free slot
+        satisfies are a normal case, and product-idea.md defines no terminating
+        behavior for it.
+      affected_phase: P0
+      uncertainty: true
+      blocks_current_phase: false
+
+    - id: I-003
+      statement: >-
+        What identification or verification is required before the agent may
+        move an appointment on the strength of an inbound text, and on what
+        basis an inbound message is tied to one particular existing appointment,
+        is not established.
+      evidence: >-
+        product-idea.md names the owner's calendar as the source of truth for
+        free slots only. It says nothing about how a texting customer is matched
+        to an existing booking or what authority a text confers. Moving an
+        appointment is correctness- and authority-sensitive and cannot be built
+        or verified without this.
+      affected_phase: P0
+      uncertainty: true
+      blocks_current_phase: false
+
+  invalidates: []

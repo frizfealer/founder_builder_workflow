@@ -1,0 +1,29 @@
+phase_result:
+  status: complete
+
+  artifact_changes:
+    - artifact: product-sense-gate2.md
+      scope: full artifact (fresh draft)
+      summary: First authoritative Product Sense drafted from product-idea.md, covering all eight sections; Responsibilities & Authority and Failure & Recovery are each left explicitly open on unresolved points reported as Issues.
+
+  issues:
+    - id: I-001
+      statement: Whether the agent may finalize a reschedule without the customer's explicit confirmation of the proposed slot — i.e., how "works for the customer" is established — is not derivable from the authoritative input.
+      evidence: product-idea.md commits the agent to moving the appointment to "a slot that works for both sides" but states no mechanism for establishing the customer's side; the claim failed the admission gate while drafting Responsibilities & Authority, which is left explicitly open on this point.
+      affected_phase: P0
+      uncertainty: true
+      blocks_current_phase: false
+    - id: I-002
+      statement: Whether the agent finalizes calendar moves on its own authority or requires per-move owner approval is not derivable from the authoritative input.
+      evidence: "AI stand-in for the owner" in product-idea.md is consistent with both autonomous action and owner-approved action; deciding between them needs a judgment call, so it is not a necessary implication, and Responsibilities & Authority is left explicitly open on this point.
+      affected_phase: P0
+      uncertainty: true
+      blocks_current_phase: false
+    - id: I-003
+      statement: Required behavior when no slot satisfying the scheduling rules works for both sides is not established.
+      evidence: The committed capability promises an outcome ("move the appointment to a slot that works for both sides") that a finite calendar cannot always provide; product-idea.md establishes no behavior for that branch of the committed interaction, and Failure & Recovery is left explicitly open on this point.
+      affected_phase: P0
+      uncertainty: true
+      blocks_current_phase: false
+
+  invalidates: []
