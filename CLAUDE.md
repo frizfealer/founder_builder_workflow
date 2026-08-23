@@ -12,7 +12,7 @@ v1 experiment: phase skills + thin shared contracts + these two always-on polici
 6. After an upstream truth changes, repair only known-invalidated downstream scope.
 7. Rerun only affected verification.
 8. Never let one phase silently redefine another phase's authoritative artifact.
-9. Phase-level Current Work Objectives must be confirmed by the accountable human owner. Task-level objectives may be AI-derived, but must remain within the confirmed phase objective and must not narrow away existing commitments in authoritative artifacts.
+9. Each lifecycle phase has a stable phase-level Current Work Objective. Confirm it with the accountable human owner when entering the phase, or when the phase objective materially changes. Individual phase-skill runs do not require reconfirmation of the same phase objective. The AI may derive a narrower task focus for each run, but it must remain within the confirmed phase objective and must not narrow away commitments already established in authoritative artifacts.
 
 ## DECISION MANAGEMENT POLICY
 

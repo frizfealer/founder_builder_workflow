@@ -11,12 +11,22 @@ Run one round of P0 phase work: converge the Product Idea and available business
 
 Routing around this phase — repairs, Decision Management, reruns — belongs to the always-on policies in `CLAUDE.md`. This skill only does P0 work and reports honestly what it found.
 
+## Phase objective
+
+P0's phase-level Current Work Objective is stable across runs. Unless the founder has confirmed a different one, it is:
+
+> Bring the authoritative Product Sense to the minimum sufficient state required for downstream Verification Design.
+
+Use it by default. Ask the founder to confirm the phase objective in exactly two cases (Lifecycle Policy 9): entering P0 with no phase objective confirmed yet, or a request that would materially change the P0 objective — for example, treating this round as a throwaway framing exercise not meant to feed P1. Do not reconfirm the same objective on every invocation.
+
+A Current Work Objective defines the outcome this phase must produce, not the procedure, routing policy, decision policy, or admission rules used to produce it. When proposing one, describe the target artifact and intended scope only; do not encode instructions such as what becomes an Issue, what must be omitted, how uncertainty is routed, or how product truth is admitted — those behaviors come from this skill and the always-on policies, and an objective must not restate or override them.
+
 ## Inputs
 
 Gather before touching the artifact:
 
-- **Current Work Objective** — the phase-level objective for this run. It must be confirmed by the founder (Lifecycle Policy 9): if the invocation doesn't state one, propose one and get explicit confirmation first. A Current Work Objective defines the outcome this phase run must produce, not the procedure, routing policy, decision policy, or admission rules used to produce it. When proposing one, describe the target artifact and intended scope only; do not encode instructions such as what becomes an Issue, what must be omitted, how uncertainty is routed, or how product truth is admitted — those behaviors come from this skill and the always-on policies, and an objective must not restate or override them.
-- **Authoritative inputs** — the Product Idea and any known business/domain context, from the invocation arguments or the product's directory.
+- **Task focus** — the concrete Product Sense work this run performs within the confirmed phase objective: creating the first Product Sense from the Product Idea, incorporating newly supplied business rules, applying a resolved decision, or updating only the sections a changed scope affects. Derive it from the invocation; it needs no accountable human owner confirmation. It may narrow what this run touches, but it can neither narrow the phase objective nor drop commitments already established in authoritative artifacts.
+- **Authoritative inputs** — the Product Idea and any business/domain context established as authoritative, supplied through the invocation or discovered in the product directory. Do not treat a nearby file as authoritative merely because it exists.
 - **Optional** — an existing `product-sense.md`, and a changed scope naming what moved.
 
 An existing Product Sense plus a changed scope means a scoped update: touch only the sections that scope affects and leave the rest untouched. No existing Product Sense means a fresh draft. The same steps below cover both; there is no separate repair mode.
@@ -32,7 +42,7 @@ Build or update `product-sense.md` section by section, in this order — later s
 5. **Business & Domain Rules** — the domain rules that make an outcome correct, and the invariants that must never break.
 6. **Failure & Recovery** — what the product does when things go wrong, and what it must never claim.
 7. **Acceptable Quality** — how good is good enough for this product to be correct.
-8. **Open Questions** — the questions this workflow has decided to keep open, with why each stays open. Only two things may enter this section: items the founder explicitly keeps open, and Issues Decision Management has classified DEFER. This skill never self-classifies a discovered question into Open Questions — deciding what is worth retaining is DROP/DEFER classification, which Decision Management owns. On a fresh draft this section is normally empty; unresolved findings leave the round as Issues in the PhaseResult.
+8. **Open Questions** — the questions this workflow has decided to keep open, with why each stays open. Only two things may enter this section: items the accountable human owner explicitly keeps open, and Issues Decision Management has classified DEFER. This skill never self-classifies a discovered question into Open Questions — deciding what is worth retaining is DROP/DEFER classification, which Decision Management owns. On a fresh draft this section is normally empty; unresolved findings leave the round as Issues in the PhaseResult.
 
 Use those section names as the artifact's headings so every run produces the same shape.
 
@@ -40,25 +50,49 @@ Every statement in the artifact is a product-level claim: what should be true, s
 
 **The admission gate.** Every normative statement in Product Sense must be traceable to an authoritative input or an accepted Decision Management resolution. Traceable does not mean annotated: state a derivation only where a reader could not reconstruct it. Run every candidate claim through this gate before writing it:
 
-1. **Explicitly stated** by an authoritative input or an accepted resolution → admit it.
-2. **Necessarily implied** by authoritative truth → admit the minimum claim the derivation supports, with no stronger semantics than it requires. The test is contradiction, not plausibility: a claim is necessarily implied only if denying it would contradict an authoritative input, and the mere absence of a stated constraint never establishes the opposite claim. A derivation that needs a judgment call is not an implication — fall through. Two overshoots this step refuses: sufficiency is not exclusivity — an input saying the user can reach the outcome through one path does not imply no other path exists — and relieving a person of knowing or applying a rule does not relieve the outcome of conforming to it.
-3. **Everything else is undecided**, however plausible, conventional, safe, or helpful — "reasonable" is not "decided," and it never enters the artifact. Undecided is also not the same as unresolved: an unsupported truth becomes an Issue only when something already committed — a behavior in an authoritative artifact, or the confirmed Current Work Objective — cannot be honestly stated, built, or verified without the answer:
-   - No commitment needs it → omit it, with no Issue. A question you can imagine is not a question the workflow has. "No threshold / model / policy for X is established by the authoritative inputs" is itself a complete product-level statement — write that and stop, rather than raising the missing value as an Issue. If a later phase finds it genuinely cannot proceed without the value, that phase reports the upstream Issue then. A broadly phrased objective ("full pass", "draft every section") does not convert every unstated value into an Issue — the objective sets what to draft, not a lower bar for this gate.
-   - A commitment needs it → report an Issue (`uncertainty: true`) and leave the affected section explicitly open. An unresolved truth that determines the correctness, authority, or required behavior of an already-committed capability always lands in this branch: report it this round, even when the round can otherwise complete honestly — a gap this phase has already seen is never left for a later phase to rediscover.
+1. **Explicitly stated.** If an authoritative input or an accepted resolution states the claim, admit it.
+2. **Necessarily implied.** If the claim is not explicit but is necessarily implied by authoritative truth, admit the minimum claim the derivation supports, with no stronger semantics than it requires. The test is contradiction, not plausibility: a claim is necessarily implied only if denying it would contradict an authoritative input, and the mere absence of a stated constraint never establishes the opposite claim. If the derivation requires a judgment call, it is not an implication; fall through to step 3. This step refuses two overshoots:
+   - **Sufficiency is not exclusivity.** An input saying the user can reach the outcome through one path does not imply that no other path exists.
+   - **Relieving a person of a rule does not relieve the outcome.** An input saying a person need not know or apply a rule does not mean the outcome may stop conforming to it.
+3. **Everything else is undecided**, however plausible, conventional, safe, or helpful. "Reasonable" is not "decided," and an undecided claim never enters the artifact. Undecided is also not the same as unresolved: an unsupported truth becomes an Issue only when an existing commitment cannot be honestly stated, built, or verified without the answer. A commitment here means a behavior recorded in an authoritative artifact, or the confirmed phase objective. That yields two branches:
+   - **No commitment needs it.** Omit it, with no Issue. A question you can imagine is not a question the workflow has. "No threshold / model / policy for X is established by the authoritative inputs" is itself a complete product-level statement — write that and stop, rather than raising the missing value as an Issue. If a later phase finds it genuinely cannot proceed without the value, that phase reports the upstream Issue then. A broadly phrased objective ("full pass", "draft every section") does not convert every unstated value into an Issue — the objective sets what to draft, not a lower bar for this gate.
+   - **A commitment needs it.** Report an Issue (`uncertainty: true`) and leave the affected section explicitly open. An unresolved truth that determines the correctness, authority, or required behavior of an already-committed capability always lands in this branch: report it this round, even when the round can otherwise complete honestly — a gap this phase has already seen is never left for a later phase to rediscover.
 
 The gate covers every kind of product truth equally. Domain models are the obvious case (tables and their capacities, ranked alternatives, escalation to staff); interaction and policy semantics are decided the same way and are easier to admit by accident: what authority the agent needs before it acts, what the product does on failure, which quality concern outranks another, whether state persists across visitors or sessions. Each of those is a product decision; each enters Product Sense only through the gate.
 
+The same gate in short form — the steps above govern; this is a recap, not a shortcut past them:
+
+```text
+For every candidate product claim:
+
+1. Explicitly stated?
+   → ADMIT.
+
+2. Not explicit, but denying it would contradict authoritative truth?
+   → ADMIT the minimum necessary implication.
+
+3. Otherwise it is undecided.
+   Does an already-committed capability or the confirmed phase objective
+   ultimately require the answer?
+   → YES: ISSUE.
+   → NO: OMIT.
+
+ADMIT = product truth already exists.
+ISSUE = product truth does not exist yet, but a commitment requires it.
+OMIT  = product truth does not exist, and no current commitment requires it.
+```
+
 ## When you hit something unresolved
 
-Do not ask the founder to resolve it. Report it as an Issue in the shape `workflow-contracts.md` defines, and carry on with the rest of the round. This skill asks the founder to resolve a product question in exactly one case: Decision Management routed a HUMAN-OWNED RESOLVE NOW decision back here for resolution. Confirming the Current Work Objective is objective-setting, not resolution — that still happens up front, as Inputs describes.
+Do not ask the accountable human owner to resolve it. Report it as an Issue in the shape `workflow-contracts.md` defines, and carry on with the rest of the round. This skill asks the accountable human owner to resolve a product question in exactly one case: Decision Management routed a HUMAN-OWNED RESOLVE NOW decision back here for resolution. Confirming the phase objective is objective-setting, not resolution — and it happens at phase entry, not on every run, as **Phase objective** describes.
 
 If Decision Management is unavailable, report the Issue and stop at the interface boundary; do not substitute local resolution.
 
 Three kinds of finding, three different homes:
 
-- **The founder deliberately keeps it open**, and the confirmed Current Work Objective doesn't need it answered this round → record it in **Open Questions**. That is product truth ("undecided by design"), not an Issue.
-- **What should be true is already derivable** from the Product Idea, business context, or the rest of the artifact → that's normal phase work or a clear defect (`uncertainty: false`); fix it or report it, no judgment call needed.
-- **The workflow needs a judgment no authoritative input provides** — the admission gate's Issue branch → report an Issue (`uncertainty: true`, `affected_phase: P0`) and leave the affected section explicitly open. Set `blocks_current_phase` by whether this round can honestly finish without the answer — leaving the section explicitly open often makes it `false`. The outer policy routes it; classification and resolution are not this skill's job.
+- **The accountable human owner deliberately keeps it open.** If the confirmed phase objective does not need it answered this round, record it in **Open Questions**. That is product truth ("undecided by design"), not an Issue.
+- **What should be true is already derivable.** If the Product Idea, business context, or the rest of the artifact already settles it, that is normal phase work or a clear defect (`uncertainty: false`). Fix it or report it; no judgment call is needed.
+- **The workflow needs a judgment no authoritative input provides.** This is the admission gate's Issue branch. Report an Issue (`uncertainty: true`, `affected_phase: P0`) and leave the affected section explicitly open. If the phase can still complete an honest artifact by marking the affected truth explicitly unresolved, set `blocks_current_phase: false`; otherwise set it to `true`. The outer policy routes it; classification and resolution are not this skill's job.
 
 Never write a PhaseResult Issue ID (`I-001`) into the artifact. IDs are operational to one run; the artifact is durable and must stand on its own. Where a section is left open, write that the value is unresolved and deliberately not stated — the ID stays in the PhaseResult.
 
@@ -77,6 +111,6 @@ Wayfinder (D4) never opens from inside this phase: uncertainty that large still 
 End the run with two outputs:
 
 1. The artifact changes, summarized at section level in the reply.
-2. A **PhaseResult** in the exact shape defined in `workflow-contracts.md` — read that file before emitting; the contract, not this skill, defines the fields. Write it to `phase-result.yaml` beside the artifact, overwriting any previous round's file, and present the same content in the reply. The file reports one round; durable truth lives only in the artifact. `artifact_changes` is a routing surface, not a changelog: a fresh draft is one entry covering the whole artifact; per-section entries belong to scoped updates, where `scope` tells the router what moved.
+2. A **PhaseResult** in the exact shape defined in `workflow-contracts.md` — read that file before emitting; the contract, not this skill, defines the fields. Write it to `phase-result.yaml` beside the artifact, replacing any previous round's file, and present the same content in the reply. Historical runs, when intentionally retained for regression or audit, are archived separately. The PhaseResult reports one run and is not a durable source of truth; durable truth belongs in the appropriate authoritative artifact. `artifact_changes` is a routing surface, not a changelog: for a fresh draft, use one entry covering the whole artifact; for a scoped update, report only the affected scope at the granularity useful for downstream routing rather than mechanically creating one entry per section.
 
 When an update changed semantics that already existed, ask: which downstream scope consumed the meaning I just changed? List those in `invalidates` — known-stale scopes only, per the contract.

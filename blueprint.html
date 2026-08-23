@@ -189,9 +189,32 @@ P3 learning is evidence, not automatically product truth.</pre><div class="back-
 6. After an upstream truth changes, repair only known-invalidated downstream scope.
 7. Rerun only affected verification.
 8. Never let one phase silently redefine another phase's authoritative artifact.
-9. Phase-level Current Work Objectives must be confirmed by the accountable human owner.
-   Task-level objectives may be AI-derived, but must remain within the confirmed phase objective
-   and must not narrow away commitments already established in authoritative artifacts.</pre><h3>5.2 Decision Management Policy</h3><pre>DECISION MANAGEMENT POLICY
+9. Each lifecycle phase has a stable phase-level Current Work Objective.
+   Confirm it with the accountable human owner when entering the phase,
+   or when the phase objective materially changes.
+
+   Individual phase-skill runs do not require reconfirmation of the same
+   phase objective. The AI may derive a narrower task focus for each run,
+   but it must remain within the confirmed phase objective and must not
+   narrow away commitments already established in authoritative artifacts.</pre><div class="callout green"><strong>Vocabulary：</strong>兩層不要混用同一個名字。</div>
+<pre>PHASE-LEVEL CURRENT WORK OBJECTIVE
+= stable outcome for the lifecycle phase
+= confirmed at phase entry, or when it materially changes
+= reused across phase-skill runs
+
+TASK FOCUS
+= the specific slice being worked on in this invocation
+= usually AI-derived
+= does not require human confirmation
+= cannot redefine the phase objective or committed truth</pre>
+<pre>P0 PHASE CWO
+Bring Product Sense to the minimum sufficient authoritative
+state required for Verification Design.
+
+Run 1 task focus  Create the initial Product Sense.
+Run 2 task focus  Patch booking rules after authoritative context is supplied.
+Run 3 task focus  Apply the resolved reservation-authorization decision.</pre>
+<h3>5.2 Decision Management Policy</h3><pre>DECISION MANAGEMENT POLICY
 
 When genuine unresolved uncertainty appears:
 
@@ -211,7 +234,12 @@ When genuine unresolved uncertainty appears:
 <p>把 Product Idea + available business/domain context 收斂成 authoritative Product Sense。
   v1 已用 Sunrise Café 與 barbershop reschedule 兩個 fixture 做 regression；目前 freeze，不再為單一案例持續 tuning。</p>
 <h3>Input contract</h3>
-<pre>Current Work Objective
+<pre>Confirmed P0 phase objective
+    usually implicit / reused across runs
+
+Task focus
+    derived from the invocation
+
 Authoritative inputs:
 - Product Idea
 - known business/domain context
@@ -220,9 +248,10 @@ Optional:
 - existing Product Sense
 - changed scope</pre>
 <div class="callout green"><strong>CWO purity：</strong>
-  Phase-level Current Work Objective 只描述這一輪要產生的 outcome / target artifact / scope；
+  Phase-level Current Work Objective 只描述這個 phase 要產生的 outcome / target artifact / scope；
   不把 Product Truth Admission、Issue routing、Decision Management 或其他 procedure 偷塞進 objective。
-  例如：<code>Produce the first authoritative Product Sense covering all eight sections using product-idea.md as the sole authoritative input.</code></div>
+  例如：<code>Bring the authoritative Product Sense to the minimum sufficient state required for downstream Verification Design.</code>
+  這個 objective 在 P0 entry 確認一次即可，後續 <code>/product-definition</code> runs 直接沿用，只有 task focus 每次不同。</div>
 <h3>Phase-specific work</h3>
 <ol>
 <li>Product Framing：user / problem / desired outcome / why AI / initial boundary。</li>
@@ -286,7 +315,7 @@ When a genuine unresolved product truth should be routed:
 → outer policy / Decision Management owns routing
 
 Direct founder interaction is still allowed for:
-→ phase-level CWO confirmation
+→ phase objective confirmation at P0 entry, or when it materially changes
 → locating/providing authoritative inputs
 → HUMAN-OWNED RESOLVE NOW decisions routed back by Decision Management</pre>
 <h3>Output</h3>
@@ -299,7 +328,9 @@ PhaseResult</pre>
   A targeted Gate-2 regression confirmed that absence of a constraint does not establish its opposite.</div>
 <div class="back-top"><a href="#top">↑ 回到最上面</a></div>
 </section>
-<section class="card" id="p1"><span class="kicker impl">Phase skill</span><h2>7. P1 — <code>/verification-design</code></h2><h3>目的</h3><p>把 authoritative Product Sense 轉成足以判斷產品是否正確的 verification design。</p><h3>Input contract</h3><pre>Current Work Objective
+<section class="card" id="p1"><span class="kicker impl">Phase skill</span><h2>7. P1 — <code>/verification-design</code></h2><h3>目的</h3><p>把 authoritative Product Sense 轉成足以判斷產品是否正確的 verification design。</p><h3>Input contract</h3><pre>Confirmed P1 phase objective
+Task focus (derived per run)
+
 Authoritative input:
 - Product Sense
 
