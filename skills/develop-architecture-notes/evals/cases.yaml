@@ -1,0 +1,142 @@
+# Authored behavior-evaluation scenarios. No live model runs are included in this package.
+version: "3.0"
+status: not-run
+cases:
+  - id: E01
+    title: Thin tracer, novice user
+    input: Create Architecture Notes for the local Café Create Reservation tracer. I do not know architecture terminology.
+    must:
+      - Produce Scope, Drivers, Architecture Vision, Significant Decisions, and Risks / Unknowns.
+      - Ask only consequence/priority questions that block a significant decision.
+      - Reach readiness without requiring the user to choose an architecture pattern.
+    must_not:
+      - Require hexagonal architecture, microservices, repository pattern, or event-driven architecture.
+      - Enumerate all future architecture questions.
+
+  - id: E02
+    title: WHAT does not uniquely determine HOW
+    input: Use CR-3 and CR-4 to derive the architecture for Create Reservation.
+    must:
+      - Keep CR-3/CR-4 as drivers.
+      - Explain that several execution structures could satisfy them.
+    must_not:
+      - Claim the requirements uniquely imply AuthorizationService or a global executor.
+
+  - id: E03
+    title: Zero new decisions is valid
+    input: Existing architecture already supports a formatting-validation change in an existing tracer.
+    must:
+      - Allow no architecture change.
+      - Preserve the existing vision and decisions.
+    must_not:
+      - Invent a new layer or boundary to fill the template.
+
+  - id: E04
+    title: Stop before the decision frontier is empty
+    input: The next tracer has a coherent application boundary, but restart recovery and future multi-region deployment are unanswered.
+    must:
+      - Defer non-blocking future questions to Risks / Unknowns.
+      - Stop once the current tracer can be built without accidental significant architecture choices.
+    must_not:
+      - Continue grilling until all future architecture decisions are resolved.
+
+  - id: E05
+    title: Route factual unknown to research
+    input: Real provider retry semantics are required for the next tracer, but the user does not know them.
+    must:
+      - Treat provider semantics as a factual unknown.
+      - Route to primary-source research or a bounded probe and block the affected tracer if necessary.
+    must_not:
+      - Ask the user to guess.
+      - Assume exactly-once/idempotency behavior.
+
+  - id: E06
+    title: Interface design only after boundary is justified
+    input: The application boundary is accepted; now its interface is the remaining blocker.
+    must:
+      - Route interface/seam design to codebase-design or equivalent focused reasoning.
+    must_not:
+      - Use interface design to retroactively justify unnecessary boundaries.
+
+  - id: E07
+    title: Large foggy effort routes out
+    input: Architect a global reservation platform with payments, notifications, analytics, multi-region failover, admin, and restaurants.
+    must:
+      - Recognize that one thin tracer is not yet scoped.
+      - Route to wayfinder/broader planning first when available.
+    must_not:
+      - Produce dozens of Architecture Notes decisions for the whole platform.
+
+  - id: E08
+    title: One coherent vision, not a decision database
+    input: Produce first-version architecture notes for the Café local tracer.
+    must:
+      - Include a low-resolution responsibility/interaction view.
+      - Keep significant decisions to the minimum needed now.
+    must_not:
+      - Create hypothesis, implementation-status, check-state, or supersession ledgers.
+
+  - id: E09
+    title: Evidence does not automatically cause redesign
+    input: A tracer completed successfully and produced new observations, but no driver or significant design pressure changed.
+    must:
+      - Return no architecture change.
+    must_not:
+      - Rewrite Architecture Notes merely because another iteration completed.
+
+  - id: E10
+    title: Brownfield current architecture is evidence, not destiny
+    input: Existing code differs from the accepted Architecture Vision.
+    must:
+      - Report the mismatch and determine whether it matters to this tracer.
+      - Preserve intended architecture unless evidence justifies a decision change.
+    must_not:
+      - Rewrite the notes simply to match accidental code.
+
+  - id: E11
+    title: No helper skills available
+    input: Only ordinary chat and file reads are available.
+    must:
+      - Perform the minimal architecture-specific reasoning directly.
+      - Disclose that research/prototype/independent review was not delegated.
+    must_not:
+      - Claim unavailable skills ran.
+      - Install helpers automatically.
+
+  - id: E12
+    title: Significant decision count is a warning signal
+    input: The skill identifies seven architectural decisions for a supposedly thin Create Reservation tracer.
+    must:
+      - Recheck tracer scope and whether several decisions can be deferred or collapsed.
+      - Prefer 0-3 significant decisions when possible.
+    must_not:
+      - Treat seven decisions as normal merely because they fit the document.
+
+  - id: E13
+    title: Implicit characteristic is raised, not assumed
+    input: The Agent Spec says nothing about whether two users can book the same table at once, but the domain suggests shared inventory.
+    must:
+      - Raise shared inventory as a candidate driver with source "implicit, unconfirmed".
+      - Ask the user to confirm it if it could change state ownership for this tracer.
+    must_not:
+      - Treat the inferred characteristic as an authorized requirement.
+      - Ask about implicit characteristics that ordinary coding hygiene satisfies.
+
+  - id: E14
+    title: Product-wide constraint applies outside tracer scope
+    input: The product requires inventory shared across conversations; the next tracer is a single-user Create Reservation happy path.
+    must:
+      - Keep shared inventory as a driver for this tracer.
+      - Choose state ownership that does not conflict with sharing.
+    must_not:
+      - Pick conversation-local state ownership because the tracer has no concurrent bookings.
+
+  - id: E15
+    title: Why records the trade-off, not only the benefit
+    input: For a local, resettable tracer, the skill chooses a single in-process reservation store because it is simpler.
+    must:
+      - State what becomes simpler and which drivers need it.
+      - Name the accepted cost, such as data lost on restart.
+      - Name what the tracer therefore cannot prove, such as persistence or multi-process consistency.
+    must_not:
+      - Justify the decision only as "simpler".

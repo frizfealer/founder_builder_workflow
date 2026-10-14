@@ -1,0 +1,5 @@
+interface:
+  display_name: Develop Architecture Notes
+  short_description: Find the minimum architecture needed before the next thin tracer.
+policy:
+  allow_implicit_invocation: false
