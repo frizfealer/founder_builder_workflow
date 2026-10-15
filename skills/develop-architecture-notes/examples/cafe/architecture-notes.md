@@ -36,7 +36,7 @@ Reservation Application  (Create now, Cancel later)
 - Dialogue/orchestration gathers intent and presents choices, but does not directly perform a consequential booking write.
 - Reservation Application owns the Create and Cancel use-case flows and the transition from confirmed intent to execution.
 - Reservation Policy contains deterministic domain rules used by the application flow.
-- Booking Provider Boundary contains provider-facing execution and reservation lookup. Its results include confirmed, rejected, and unknown, so an unknown outcome is never collapsed into success or failure. The first tracer uses a controllable local stub.
+- Booking Provider Boundary contains provider-facing execution. Its results include confirmed, rejected, and unknown, so an unknown outcome is never collapsed into success or failure. Where Cancel looks up existing reservations depends on the system of record (R3). The first tracer uses a controllable local stub.
 
 ## Significant Decisions
 

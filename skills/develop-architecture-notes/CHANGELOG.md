@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1
+
+- The CR-5 driver example in step 2 no longer names a provider boundary. It now states only the pressure: the execution path keeps an unknown outcome separate from success and failure, and does not resubmit it automatically.
+- The Café Architecture Vision no longer places reservation lookup in the Booking Provider Boundary, because where Cancel looks up reservations depends on the open system-of-record risk (R3).
+
 ## 0.5.0
 
 - Added a first pass before to-tickets: a low-resolution Architecture Vision across every capability in the Agent Spec, deciding only questions that two tickets could answer in conflicting ways. It stops at "Ready for to-tickets: yes".

@@ -3,7 +3,7 @@ name: develop-architecture-notes
 description: Sketch a low-resolution architecture from the whole Agent Spec before to-tickets, then refine it for each thin tracer, recorded as Architecture Notes.
 disable-model-invocation: true
 metadata:
-  version: "0.5.0"
+  version: "0.5.1"
 ---
 
 # Develop Architecture Notes
@@ -49,7 +49,7 @@ Done when the Scope section names the capabilities covered by the vision and, in
 A driver states a pressure the design must satisfy and leaves the component choice open. From the Café fixture:
 
 - `CR-4` (material changes invalidate prior authorization) creates this pressure: the execution path must know exactly which action was authorized.
-- `CR-5` (unknown outcomes cannot be blindly retried) creates this pressure: the design must keep an unknown-outcome state across the provider boundary.
+- `CR-5` (unknown outcomes cannot be blindly retried) creates this pressure: the execution path must keep an unknown outcome separate from success and failure, and must not resubmit it automatically.
 
 Look for drivers in three places:
 

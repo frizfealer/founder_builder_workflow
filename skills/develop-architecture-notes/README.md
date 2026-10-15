@@ -1,6 +1,6 @@
 # develop-architecture-notes
 
-**v0.5.0**
+**v0.5.1**
 
 A thin architecture skill for tracer-first development.
 
