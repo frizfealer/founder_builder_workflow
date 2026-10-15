@@ -37,7 +37,8 @@ cancel existing reservations.
 Contract
 CR-01 — Required booking information
 Before creating a reservation, the agent must resolve the information required to identify the intended reservation.
-For this café, that includes: café, date, time, party size, reservation name
+This agent serves one café, Cafe Roma, so the café is fixed and the agent does not ask for it.
+The required information is: date, time, party size, reservation name
 The agent must not invent missing material information.
 CR-02 — Requested reservation unavailable
 If the requested reservation cannot be fulfilled, the agent may offer available alternatives.
@@ -68,12 +69,11 @@ Initial state
 Friday 7pm is available.
 No matching reservation exists.
 User
-"Book Cafe Roma this Friday at 7pm for two under Alex."
+"Book this Friday at 7pm for two under Alex."
 Expected
-The agent may verify availability and present the current proposal if confirmation is required by product policy.
+The agent may verify availability, then presents the current proposal and waits for the user's explicit confirmation (CR-03).
 After valid authorization:
 exactly one reservation exists
-café = Cafe Roma
 date = Friday
 time = 7pm
 party_size = 2
@@ -84,7 +84,7 @@ different reservation time
 unrelated reservation modification
 CR-S02 — Missing party size
 User
-"Book Cafe Roma Friday at 7pm under Alex."
+"Book Friday at 7pm under Alex."
 Party size is unknown.
 Expected
 The agent resolves the party size before booking.
@@ -99,7 +99,7 @@ Initial state
 Friday 7pm    unavailable
 Friday 7:30pm available
 User
-"Book Cafe Roma Friday at 7pm for two."
+"Book Friday at 7pm for two under Alex."
 Expected interaction
 The agent informs the user that 7pm is unavailable and may propose 7:30pm.
 The agent waits for the user's acceptance before booking 7:30pm.
@@ -160,12 +160,11 @@ The agent may report a reservation as cancelled only when the cancellation outco
 Scenarios
 CA-S01 — One matching reservation
 Existing state
-Cafe Roma
 Friday 7pm
 party of 2
 confirmation ABC123
 User
-"Cancel my Cafe Roma reservation Friday."
+"Cancel my Friday reservation."
 Only one reservation matches.
 Expected
 After valid cancellation authorization:
@@ -173,10 +172,10 @@ ABC123 is cancelled
 no other reservation changes
 CA-S02 — Multiple matching reservations
 Existing state
-Cafe Roma Friday 6pm
-Cafe Roma Friday 8pm
+Friday 6pm
+Friday 8pm
 User
-"Cancel my Cafe Roma reservation Friday."
+"Cancel my Friday reservation."
 Expected
 The agent asks which reservation the user means.
 Forbidden
