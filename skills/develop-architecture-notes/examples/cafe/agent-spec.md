@@ -58,7 +58,27 @@ a source of automatically approved new rules.
 
 ### Cancel Reservation
 
-A roadmap capability; rules are not yet defined and it is outside this tracer.
+#### Scope & Authority
+
+The agent may retrieve the user's existing reservations, identify which one the user
+intends to cancel, and cancel it after valid authorization. Cancel is outside the
+next tracer.
+
+#### Contract/Rules
+
+- **CA-1:** Identify the reservation the user intends to cancel before cancelling.
+  If several reservations plausibly match, resolve the ambiguity first.
+- **CA-2:** Discussing, locating, or asking about cancellation does not authorize it.
+  Cancel only with valid authorization for the identified reservation.
+- **CA-3:** Report a reservation as cancelled only when the cancellation is known to
+  have succeeded.
+
+#### Scenarios
+
+- **SC-4:** Exactly one reservation matches. After valid authorization, it is
+  cancelled and no other reservation changes.
+- **SC-5:** Two reservations match. The agent asks which one the user means and
+  does not choose one itself.
 
 ### Modify Reservation
 

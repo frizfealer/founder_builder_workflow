@@ -2,7 +2,9 @@
 
 ## Scope
 
-**Next thin tracer:** <one end-to-end slice>
+**Capabilities covered by the vision:** <every capability in the Agent Spec; mark roadmap capabilities that have no rules yet>
+
+**Next thin tracer:** <one end-to-end slice from to-tickets, or "not selected yet" after the first pass>
 
 **Out of scope for this tracer:**
 - <explicit non-goal>
@@ -17,7 +19,7 @@
 <small low-resolution responsibility / interaction sketch, optional>
 ```
 
-<3–7 short statements explaining the responsibilities and interactions that matter for this tracer.>
+<3–7 short statements explaining the responsibilities and interactions that matter across the capabilities in scope.>
 
 ## Significant Decisions
 
@@ -34,6 +36,6 @@
 ## Risks / Unknowns
 
 - **R1 — <risk or unknown>**
-  - **Blocks this tracer:** Yes | No
+  - **Resolve before:** <this tracer | a named later tracer | not yet known>
   - **Learn by:** research | prototype | tracer evidence | engineering eval | expert review | later human decision
   - **Next evidence:** <specific next observation or source>

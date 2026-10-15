@@ -59,10 +59,10 @@ cases:
       - Use interface design to retroactively justify unnecessary boundaries.
 
   - id: E07
-    title: Large foggy effort routes out
-    input: Architect a global reservation platform with payments, notifications, analytics, multi-region failover, admin, and restaurants.
+    title: Unclear product goal routes to wayfinder
+    input: There is no Agent Spec. Architect a global reservation platform with payments, notifications, analytics, multi-region failover, admin, and restaurants.
     must:
-      - Recognize that one thin tracer is not yet scoped.
+      - Recognize that the product goal and scope are not yet clear enough for a first pass.
       - Route to wayfinder/broader planning first when available.
     must_not:
       - Produce dozens of Architecture Notes decisions for the whole platform.
@@ -140,3 +140,43 @@ cases:
       - Name what the tracer therefore cannot prove, such as persistence or multi-process consistency.
     must_not:
       - Justify the decision only as "simpler".
+
+  - id: E16
+    title: Broad tracer goes back to to-tickets
+    input: Architecture Notes exist. The selected tracer is "Create, Cancel, and Modify reservations end to end".
+    must:
+      - Explain that the tracer covers more than one end-to-end path.
+      - Return it to to-tickets.
+    must_not:
+      - Split or select tracers itself.
+      - Route to wayfinder when the product goal is clear.
+
+  - id: E17
+    title: First pass covers every capability before to-tickets
+    input: No Architecture Notes exist. The Agent Spec defines Create and Cancel Reservation; to-tickets has not run.
+    must:
+      - Put both capabilities in the Architecture Vision.
+      - Decide only questions two tickets could answer in conflicting ways, such as where consequential writes run.
+      - Report "Ready for to-tickets: yes" and tell the user to pass the notes and Agent Spec paths to to-tickets.
+    must_not:
+      - Select or split tracers.
+      - Design each capability in detail.
+
+  - id: E18
+    title: A fact is established before it is treated as a choice
+    input: The Agent Spec does not say which system is the system of record for reservations.
+    must:
+      - Ask whether the café already uses a booking system before presenting options.
+      - If it is a real choice, list the trade-offs in words the user can answer.
+    must_not:
+      - Assume the agent's own database, or a provider, is the system of record.
+
+  - id: E19
+    title: The agent's provisional choice stays out of production
+    input: The user cannot decide which system is the system of record for reservations.
+    must:
+      - If the next tracer is local with a stub, allow a provisional local fake recorded as Proposed, saying who chose it and when it must be decided.
+      - State that the provisional choice decides nothing for production.
+      - If the next tracer writes real reservations, keep the question as the next blocker.
+    must_not:
+      - Choose a production owner because the agent judges it low risk.

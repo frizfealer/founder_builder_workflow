@@ -1,36 +1,48 @@
 ---
 name: develop-architecture-notes
-description: Find the minimum architecture the next thin tracer needs, record it as Architecture Notes, and stop once the tracer is safe to build.
+description: Sketch a low-resolution architecture from the whole Agent Spec before to-tickets, then refine it for each thin tracer, recorded as Architecture Notes.
 disable-model-invocation: true
 metadata:
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Develop Architecture Notes
 
-Answer one question:
+Keep one Architecture Notes file at two resolutions. Each pass puts one question to every open architecture question:
 
-> **What architecture must be known now so the next thin tracer can be built without the coding agent inventing a significant decision?**
+- **First pass**, before to-tickets, across every capability in the Agent Spec: *if this stays open, could two tickets answer it in conflicting ways?* For example, a Create ticket keeps reservations in conversation state while a Cancel ticket needs to look them up later.
+- **Tracer pass**, once to-tickets has chosen the next thin tracer: *if this stays open, would the coding agent have to invent a significant decision to build this tracer?*
 
-A **significant decision** is a choice the coding agent would otherwise have to invent while building the tracer: a boundary, an owner, a dependency direction, a data or failure responsibility, a deployment shape, or a hard-to-reverse technology choice. The coding agent makes every other choice locally.
+Decide now only what gets a yes. Everything else goes to Risks / Unknowns.
 
-The Agent Spec is the behavioral WHAT. Architecture Notes record only the significant HOW for the next tracer. Write only the Architecture Notes file. Agent Spec, product code, tests, ADRs, and deployment change only with separate authorization.
+A **significant decision** is a choice the coding agent would otherwise have to invent while building: a boundary, an owner, a dependency direction, a data or failure responsibility, a deployment shape, or any choice that would be costly to change later in code, data, or real-world effects. Choosing the system of record for reservations is one example. The coding agent makes every other choice locally.
 
-If Architecture Notes already exist and a tracer has just completed, go to [Updating after a tracer](#updating-after-a-tracer). Otherwise follow the steps.
+The Agent Spec is the behavioral WHAT. Architecture Notes record only the significant HOW. Write only the Architecture Notes file. Agent Spec, product code, tests, tickets, ADRs, and deployment change only with separate authorization.
+
+Pick the branch:
+
+- If no Architecture Notes exist, run the first pass. If a tracer is already selected, run the tracer pass right after it.
+- If the Agent Spec has gained or changed a capability since the notes were written, run the first pass for that change.
+- If Architecture Notes exist and to-tickets has selected the next tracer, run the tracer pass.
+- If a tracer has just completed, go to [Updating after a tracer](#updating-after-a-tracer).
 
 ## Output
 
 Write `docs/architecture/architecture-notes.md` from [the template](assets/architecture-notes.template.md). If the project already has an equivalent file or convention, use that instead. An empty Significant Decisions section is valid. For a filled-in example, see [the Café notes](examples/cafe/architecture-notes.md).
 
-## 1. Scope the tracer
+## 1. Scope
 
-Name the next thin tracer as one end-to-end slice, and list its non-goals. If the work cannot be described as one thin tracer, stop and route it to `wayfinder` (or another broader planning method) until it can.
+**First pass:** the scope is every capability in the Agent Spec. List them, marking roadmap capabilities that have no rules yet.
 
-Read the inputs that bear on this tracer: the Agent Spec rules, scenarios, and evals for the capability in scope, Quality WHAT, constraints, existing Architecture Notes and ADRs, and, for brownfield work, the affected code.
+**Tracer pass:** take the next thin tracer from to-tickets as given: its slice, acceptance criteria, and non-goals. If it covers more than one end-to-end path, or depends on a ticket that is not done, explain why and return it to to-tickets.
 
-Treat existing code as evidence of the current architecture. If it differs from the accepted Architecture Notes, report the mismatch and whether it matters to this tracer. Keep the intended architecture unless evidence justifies changing a decision.
+In either pass, if the product goal or scope itself is unclear, route to `wayfinder` (or another broader planning method) until it is clear.
 
-Done when the Scope section names one slice and its non-goals.
+Read the inputs that bear on the scope: the Agent Spec rules, scenarios, and evals for the capabilities in scope, Quality WHAT, constraints, existing Architecture Notes and ADRs, and, for brownfield work, the affected code.
+
+Treat existing code as evidence of the current architecture. If it differs from the accepted Architecture Notes, report the mismatch and whether it matters to this scope. Keep the intended architecture unless evidence justifies changing a decision.
+
+Done when the Scope section names the capabilities covered by the vision and, in the tracer pass, the tracer and its non-goals.
 
 ## 2. Extract drivers
 
@@ -53,59 +65,64 @@ An implicit characteristic you inferred is a **candidate driver** until the user
 
 Tracer scope limits what this tracer builds, not which constraints apply. A known product-wide constraint is a driver whenever a decision made now could conflict with it. For example, if inventory is shared across conversations, choose a state owner that allows sharing, even though a single-user tracer has no concurrent bookings.
 
+In the tracer pass, start from the drivers already in the notes and add any the tracer's rules reveal.
+
 Done when every explicit rule, quality goal, and constraint in scope, and every implicit characteristic the domain suggests, is either listed as a driver with its source or judged to need no special structure.
 
 ## 3. Sketch the Architecture Vision
 
-Describe the system at low resolution, so the human and the coding agent share one picture. Use 3–7 responsibilities and answer:
+Show the 3–7 major responsibilities at container/component level, how control and data flow between them, and the external systems at the edge. Classes, functions, and code-level interfaces are the coding agent's choice.
 
-- Which responsibilities does this tracer touch?
-- How do control and data flow between them?
-- Which external systems or volatile details sit at the edge?
+Keep the simplest shape the drivers allow: every responsibility, and every abstraction between them, traces to a current driver. Give parts that need clearly different characteristics, such as one serving many concurrent users and one serving a few, separate responsibilities.
 
-Derive responsibilities from the actors and actions in the in-scope scenarios, at component level; classes and functions are the coding agent's choice. State the top-level partitioning: by domain workflow or by technical layer. If two parts need clearly different characteristics, such as one serving many concurrent users and one serving a few, give them separate responsibilities.
+If the notes or the existing architecture already hold a vision, build on it and change it only where this scope shows it is insufficient.
 
-Keep the simplest shape the drivers allow: every responsibility, and every abstraction between them, traces to a current driver.
-
-Done when every driver lands on a responsibility in the vision.
+Done when every capability in scope touches at least one responsibility and every driver lands on one.
 
 ## 4. Decide what must be decided now
 
-List the open architecture questions the vision raises, plus every candidate driver awaiting confirmation. For each one, ask: if it stays open, would the coding agent have to invent a significant decision to build this tracer?
+List the open architecture questions the vision raises, plus every candidate driver awaiting confirmation. Put this pass's question, from the top of this file, to each one. If the answer is yes, resolve it in step 5. If no, record it under Risks / Unknowns in step 7.
 
-- If yes, resolve it in step 5 before the tracer.
-- If no, record it under Risks / Unknowns in step 7.
+Aim for 0–3 significant decisions per pass. If you reach more, recheck that the scope is right and whether some decisions can be deferred or collapsed.
 
-Aim for 0–3 significant decisions. If you reach more, recheck that the tracer is thin and whether some decisions can be deferred or collapsed.
-
-Done when every open question is classified.
+Done when every open question is marked yes or no.
 
 ## 5. Resolve blockers
 
-Pick the resolver by the kind of uncertainty. Return to this skill as soon as the blocker is resolved.
+Before treating a question as a choice, check whether it is already a fact: an existing system, contract, or owner. Take constraints and system ownership only from the spec, the user, or the existing system.
+
+Then pick the resolver by the kind of uncertainty. Return to this skill as soon as the blocker is resolved.
 
 | Uncertainty | Resolver |
 |---|---|
-| A fact about a provider, library, or existing code | `research`, or read the primary code and docs directly |
+| A fact about a provider, library, existing system, or existing code | `research`, ask the user, or read the primary code and docs directly |
 | A candidate driver | Ask the user to confirm it, stating what the design would do differently either way |
-| A trade-off only the human can make | `grilling` / `grill-me`, asking about consequences and priorities in words the user can answer without architecture vocabulary; for priorities, ask for the top three rather than a full ranking |
+| A trade-off only the human can make | `grilling` / `grill-me`, presenting each option's gains and costs in words the user can answer without architecture vocabulary; for priorities, ask for the top three rather than a full ranking |
 | A question only running code can answer | `prototype` |
 | The interface or seam of an already-justified boundary | `codebase-design` |
 | Ambiguous domain terms that could move a boundary | `domain-modeling` |
 
+If the user cannot decide a significant question, you may choose a provisional option only when all of these hold:
+
+- it is limited to non-production use;
+- it cannot change authoritative business data or cause real-world side effects;
+- it commits the system to no production ownership or external contract.
+
+Record it with `Status: Proposed`, say who chose it, and set **Revisit when** to the point it must be decided. Otherwise the question remains the next blocker.
+
 If a resolver is unavailable, do the minimum equivalent reasoning yourself and tell the user which resolver was unavailable. Report only delegation that actually ran.
 
-Done when every question marked "yes" in step 4 is resolved, or one remains as the next blocker (see step 8).
+Done when every question marked yes in step 4 is resolved, or one remains as the next blocker.
 
 ## 6. Record significant decisions
 
 Write each resolved decision as an `AD` entry from the template. State the **Decision** in an affirmative voice: "We will ...".
 
-**Why / Trade-off** records both sides: what the decision buys, which drivers need it, and what it gives up. Name the accepted cost concretely, including what this tracer's results therefore cannot prove. When simplicity is the reason, say what becomes simpler and what that costs. For example, on a local, resettable tracer:
+**Why / Trade-off** records both sides: what the decision buys, which drivers need it, and what it gives up. Name the accepted cost concretely, including what tracer results therefore cannot prove. When simplicity is the reason, say what becomes simpler and what that costs. For example, on a local, resettable tracer:
 
 > We will keep reservations in one in-process shared store, which lowers deployment and debugging cost. We accept that data is lost on restart, so this tracer is no evidence for persistence or for consistency across processes.
 
-Aim for the least worst option the drivers allow. **Revisit when** names an observable condition. Link an existing ADR when one applies. If a durable, surprising, hard-to-reverse trade-off deserves historical explanation, recommend an ADR to the user.
+Aim for the least worst option the drivers allow. **Revisit when** names an observable condition. Link an existing ADR when one applies. If a durable, surprising trade-off that is costly to change deserves historical explanation, recommend an ADR to the user.
 
 The notes hold the current view only. Version control and ADRs hold the history.
 
@@ -113,26 +130,18 @@ Done when every decision resolved in step 5 has an `AD` entry whose Why / Trade-
 
 ## 7. Record risks and unknowns
 
-Write each question marked "no" in step 4 as an `R` entry from the template: whether it blocks this tracer, and how it will be learned. Record the risk here and leave the learning to research, a prototype, or the tracer itself.
+Write each question marked no in step 4 as an `R` entry from the template: which tracer must resolve it, and how it will be learned. Record the risk here and leave the learning to research, a prototype, or the tracer itself.
 
-Done when every question marked "no" in step 4 has an `R` entry with a learning path.
+Done when every question marked no in step 4 has an `R` entry with a learning path.
 
-## 8. Stop designing when the tracer is safe
+## 8. Stop designing
 
-The tracer is safe to build when all four hold:
+Stop when every step's "Done when" holds and no question marked yes in step 4 is still open. Stop with the questions marked no still open; the tracers are how the remaining architecture gets learned.
 
-1. Scope is thin and explicit.
-2. The Architecture Vision is coherent enough to guide implementation.
-3. No open question would force the coding agent to invent a significant decision.
-4. Every remaining risk is non-blocking or has a learning path.
+- **First pass:** report **Ready for to-tickets: yes.** Tell the user to give to-tickets the paths of the Architecture Notes and the Agent Spec, because to-tickets reads only the references it is given.
+- **Tracer pass:** the tracer is safe to build. Report **Ready for thin tracer: yes.**
 
-Then stop and report:
-
-> **Ready for thin tracer: yes.**
-
-Stop with questions still open. The tracer itself is how the remaining architecture gets learned.
-
-If a blocker remains, report the single next blocker and its resolver from step 5.
+If a question marked yes is still open, report the single next blocker and its resolver from step 5 instead.
 
 ## Updating after a tracer
 
@@ -143,6 +152,6 @@ Read the new evidence and check four things:
 - Did evidence invalidate a significant decision or create a new one?
 - Did a risk become resolved, newly important, or blocking?
 
-If none apply, report **No architecture change.** and leave the notes as they are. Otherwise update only the affected driver, vision, decision, or risk, then apply the step 8 check to the next tracer.
+If none apply, report **No architecture change.** and leave the notes as they are. Otherwise update only the affected driver, vision, decision, or risk. Then run the tracer pass for the next ticket from to-tickets.
 
 For worked cases, see [the Café update walkthrough](examples/cafe/update-walkthrough.md).

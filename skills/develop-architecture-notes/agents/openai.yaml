@@ -1,5 +1,5 @@
 interface:
   display_name: Develop Architecture Notes
-  short_description: Find the minimum architecture needed before the next thin tracer.
+  short_description: Sketch a low-resolution architecture before to-tickets, then refine it per thin tracer.
 policy:
   allow_implicit_invocation: false

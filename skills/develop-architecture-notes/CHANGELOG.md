@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.0
+
+- Added a first pass before to-tickets: a low-resolution Architecture Vision across every capability in the Agent Spec, deciding only questions that two tickets could answer in conflicting ways. It stops at "Ready for to-tickets: yes".
+- Step 1 now takes the tracer from to-tickets as given. A tracer covering more than one end-to-end path, or depending on an unfinished ticket, goes back to to-tickets; an unclear product goal goes to wayfinder.
+- A significant decision now includes any choice costly to change later in code, data, or real-world effects, not only hard-to-reverse technology choices.
+- Step 5 checks whether a question is already a fact before treating it as a choice, and limits the agent's own provisional choices to non-production use with no real side effects and no production commitment.
+- Risk entries use "Resolve before" in place of "Blocks this tracer", so first-pass risks can name the tracer that must resolve them.
+- The Café fixture gained Cancel rules; the example notes cover Create and Cancel and record the system of record for reservations as an open risk.
+- Each pass's question is stated once, at the top of `SKILL.md`; step 4 applies it and step 8 stops when every step's "Done when" holds and no question marked yes is still open.
+- Simplified step 3 to responsibilities at container/component level, flows, and external systems, building on any existing vision; removed the actor/actions and top-level partitioning instructions.
+- Rewrote E07 for the wayfinder route and added eval cases E16–E19.
+
 ## 0.4.0
 
 - Rewrote `SKILL.md` for agent readers: defined "significant decision" once, reordered steps so the Architecture Vision comes before deciding, added a completion criterion to every step, and phrased rules positively.

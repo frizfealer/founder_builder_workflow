@@ -26,7 +26,7 @@ idempotency and query-by-key capabilities are unknown.
 
 ## Non-goals
 
-Cancel, Modify, multiple-instance write control, process-restart recovery, production
-rollout, cache, queue, and event sourcing are outside this round. Out of scope does
-not mean unimportant: reopen the relevant decisions and verification before real
+Building Cancel, Modify, multiple-instance write control, process-restart recovery, production
+rollout, cache, queue, and event sourcing are outside this round. Cancel's rules still
+shape the first-pass vision. Out of scope does not mean unimportant: reopen the relevant decisions and verification before real
 integration or deployment.

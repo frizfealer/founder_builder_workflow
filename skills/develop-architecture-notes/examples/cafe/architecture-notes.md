@@ -2,20 +2,24 @@
 
 ## Scope
 
+**Capabilities covered by the vision:** Create Reservation, Cancel Reservation. Modify Reservation is a roadmap capability with no rules yet.
+
 **Next thin tracer:** A local end-to-end Create Reservation path in which the user provides required reservation details, the agent validates the request, asks for explicit confirmation, and executes against a controllable local booking stub.
 
 **Out of scope for this tracer:**
+- building Cancel, whose rules shape the vision only;
 - real booking-provider timeout/idempotency semantics;
 - restart recovery and multi-instance concurrency;
-- Cancel and Modify architecture;
+- Modify architecture;
 - production persistence and deployment topology.
 
 ## Drivers
 
-- **D1 — Creation requires explicit authorization.** Source: `Create Reservation / Contract CR-3`.
+- **D1 — Creating or cancelling requires explicit authorization of that exact action.** Source: `Create Reservation / Contract CR-3`, `Cancel Reservation / Contract CA-2`.
 - **D2 — Material changes invalidate prior authorization.** Source: `Create Reservation / Contract CR-4`.
-- **D3 — Unknown execution outcomes must not be blindly retried.** Source: `Create Reservation / Contract CR-5`.
+- **D3 — Unknown execution outcomes are neither reported as success nor blindly retried.** Source: `Create Reservation / Contract CR-5`, `Cancel Reservation / Contract CA-3`.
 - **D4 — Core reservation behavior should be deterministically evaluable in the local tracer.** Source: project Quality WHAT / local-tracer constraint.
+- **D5 — Cancel must find the user's existing reservations and identify exactly one.** Source: `Cancel Reservation / Contract CA-1`.
 
 ## Architecture Vision
 
@@ -24,27 +28,27 @@ User
   ↓
 Dialogue / Agent Orchestration
   ↓
-Reservation Application
+Reservation Application  (Create now, Cancel later)
   ├─→ Reservation Policy
   └─→ Booking Provider Boundary → Local Stub (this tracer)
 ```
 
 - Dialogue/orchestration gathers intent and presents choices, but does not directly perform a consequential booking write.
-- Reservation Application owns the Create Reservation use-case flow and the transition from confirmed intent to execution.
+- Reservation Application owns the Create and Cancel use-case flows and the transition from confirmed intent to execution.
 - Reservation Policy contains deterministic domain rules used by the application flow.
-- Booking Provider Boundary contains provider-facing execution details; the first tracer uses a controllable local stub.
+- Booking Provider Boundary contains provider-facing execution and reservation lookup. Its results include confirmed, rejected, and unknown, so an unknown outcome is never collapsed into success or failure. The first tracer uses a controllable local stub.
 
 ## Significant Decisions
 
 ### AD-1 — Consequential writes pass through the Reservation Application
 
-**Decision:** We will execute the confirmed Create Reservation action through the Reservation Application, not directly from dialogue/tool-selection code.
+**Decision:** We will execute every confirmed consequential action, Create now and Cancel later, through the Reservation Application, not directly from dialogue/tool-selection code.
 
-**Why / Trade-off:** D1 and D2 require the execution path to know exactly what action was authorized before performing the consequential write. Keeping that responsibility at the use-case boundary keeps confirmation semantics out of prompt/tool code. We accept an extra hop between dialogue and the booking provider, and every future consequential action needs its own use-case entry point.
+**Why / Trade-off:** D1 and D2 require the execution path to know exactly what action was authorized before performing the consequential write. Without this decision, a Create ticket and a Cancel ticket could place that check in different layers. Keeping it at the use-case boundary keeps confirmation semantics out of prompt/tool code. We accept an extra hop between dialogue and the booking provider, and Cancel needs its own use-case entry point.
 
 **Status:** Proposed
 
-**Revisit when:** another consequential capability demonstrates that this boundary forces duplicated or contradictory authorization logic.
+**Revisit when:** Modify or a later consequential capability demonstrates that this boundary forces duplicated or contradictory authorization logic.
 
 ### AD-2 — Reservation Policy is deterministic and provider-independent for this tracer
 
@@ -59,11 +63,16 @@ Reservation Application
 ## Risks / Unknowns
 
 - **R1 — Real provider behavior after an ambiguous timeout is unknown.**
-  - **Blocks this tracer:** No — this tracer uses a controllable local stub.
-  - **Learn by:** research before the real-provider integration tracer.
+  - **Resolve before:** the real-provider integration tracer. This tracer uses a controllable local stub.
+  - **Learn by:** research.
   - **Next evidence:** provider primary documentation/API behavior for lookup, request identity, and retry semantics.
 
 - **R2 — The eventual representation of confirmed/rejected/unknown provider outcomes may need to be richer than the local stub.**
-  - **Blocks this tracer:** No.
+  - **Resolve before:** the real-provider integration tracer.
   - **Learn by:** next integration tracer evidence.
   - **Next evidence:** actual provider outcome/error model.
+
+- **R3 — The system of record for reservations is not established.** The project context plans a real booking provider but has not selected one, and nothing says whether the agent also keeps reservations of its own. Create and Cancel both depend on the answer. The local stub decides nothing for production.
+  - **Resolve before:** the first tracer that handles real reservations.
+  - **Learn by:** ask the user first whether the café already uses a booking system; only if it does not, present the trade-off as a human decision.
+  - **Next evidence:** the user's answer about an existing booking system.

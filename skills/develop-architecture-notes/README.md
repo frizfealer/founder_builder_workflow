@@ -1,10 +1,13 @@
 # develop-architecture-notes
 
-**v0.4.0**
+**v0.5.0**
 
 A thin architecture skill for tracer-first development.
 
-Its job is not to finish the architecture. Its job is to answer:
+Its job is not to finish the architecture. It keeps one Architecture Notes file at two resolutions:
+
+- **First pass**, before `to-tickets`: a low-resolution vision across every capability in the Agent Spec, deciding only what two tickets could otherwise decide in conflicting ways.
+- **Tracer pass**, once `to-tickets` has chosen the next tracer, answering:
 
 > **What architecture must be known now so the next thin tracer can be built without accidental significant design decisions?**
 
@@ -26,7 +29,7 @@ There is no YAML schema, architecture validator, readiness state machine, hypoth
 
 The primary stopping rule is:
 
-> Can the coding agent build this tracer without inventing an important boundary, owner, dependency direction, failure/data responsibility, deployment shape, or hard-to-reverse technology choice?
+> Can the coding agent build this tracer without inventing an important boundary, owner, dependency direction, failure/data responsibility, deployment shape, or choice that would be costly to change later in code, data, or real-world effects?
 
 If yes, stop designing and build the tracer.
 
@@ -40,7 +43,8 @@ If yes, stop designing and build the tracer.
 | `research` | Resolve factual unknowns from primary sources. |
 | `prototype` | Answer a question that needs executable evidence. |
 | `codebase-design` | Design a module/interface/seam after a boundary is already justified. |
-| `wayfinder` | Map a large, foggy, multi-session decision space. |
+| `wayfinder` | Map a large, foggy, multi-session decision space, used when the product goal or scope itself is unclear. |
+| `to-tickets` | Select and split thin tracers. It runs between the first pass and the tracer passes, and reads the Architecture Notes only when their path is passed to it. |
 | `develop-architecture-notes` | Select the architecture questions that must be resolved **before this tracer**, synthesize a low-resolution vision, and stop at sufficiency. |
 
 The architecture skill delegates to those primitives when they exist. It does not duplicate their process.
@@ -61,7 +65,24 @@ Capabilities
 
 Architecture Notes are a sibling HOW artifact. A rule can create architectural pressure without uniquely determining the implementation.
 
-## Example invocation
+## Example invocations
+
+First pass, before `to-tickets`:
+
+```text
+/develop-architecture-notes
+
+Agent Spec: docs/agent-spec.md
+No tracer selected yet. Produce the first-pass Architecture Notes for every capability.
+```
+
+Then pass both paths to `to-tickets`:
+
+```text
+/to-tickets docs/architecture/architecture-notes.md docs/agent-spec.md
+```
+
+Tracer pass:
 
 ```text
 /develop-architecture-notes
