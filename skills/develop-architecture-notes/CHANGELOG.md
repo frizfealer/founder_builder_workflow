@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.3
+
+- Step 5 now explains what it means for an open question to be already answered, with a Café fixture example, and says what to do in each case: record a found answer as a constraint, or resolve the question as a decision.
+- Step 5 now explains each condition for a provisional choice with Café examples, and sets **Revisit when** to the first observable event that would make one of those conditions false.
+- Step 6 splits the option, Revisit when, and ADR guidance into separate instructions. An existing ADR's path goes in **Why / Trade-off**. A new ADR is recommended when a decision replaces an accepted ADR, or when its reasoning is not visible from the code and it outlasts the tracer or constrains more than one capability.
+- Step 6 now says to rewrite a changed `AD` entry in place, asks **Why / Trade-off** to explain the choice when several options satisfy the drivers, and its "Done when" also checks **Revisit when** and the ADR recommendations. Step 8 lists those recommendations in either pass.
+- **Status** now has a rule in step 6. `Accepted` means the user made or confirmed the decision, or an accepted ADR records it, and the entry says which. Otherwise it is `Proposed` and says who chose it. A changed `Accepted` decision returns to `Proposed` until the user confirms it.
+- Step 5's "Done when" now says what resolved means: an existing fact answers the question, the user decided or confirmed it, or a provisional choice meets the three conditions. A resolver's recommendation alone no longer counts.
+- `Proposed` decisions are now followed up. Step 4 reopens one in a tracer pass when the tracer would make one of the provisional conditions false, step 8 lists each one with its **Revisit when**, and the update after a tracer checks whether the user accepted one or its **Revisit when** event happened.
+- The "No commitments" condition in step 5 refers to a production system of record again, so a local fake used only by the tracer still qualifies.
+- In the Café notes, AD-1 is `Accepted` by the user and AD-2 is a provisional `Proposed` choice whose **Revisit when** is the switch to a real booking provider. Step 6's **Revisit when** example now quotes AD-1.
+- Step 5's missing-resolver rule now gives examples of doing a resolver's job yourself, says that your own work can establish a fact but a decision still needs the user, and asks the report to name each missing resolver and what replaced it.
+- Added `assets/adr.template.md`, based on *Fundamentals of Software Architecture* ch. 19, with sections for alternatives considered and compliance. Drivers are stated in words because Architecture Notes IDs can change. Step 6 points the user to it with each ADR recommendation.
+
 ## 0.5.2
 
 - Step 4 now states both pass questions itself instead of pointing back to the top of `SKILL.md`, and explains why the first-pass question asks about two tickets: each ticket is built separately, often by an agent that sees only that ticket.

@@ -3,7 +3,7 @@ name: develop-architecture-notes
 description: Sketch a low-resolution architecture from the whole Agent Spec before to-tickets, then refine it for each thin tracer, recorded as Architecture Notes.
 disable-model-invocation: true
 metadata:
-  version: "0.5.2"
+  version: "0.5.3"
 ---
 
 # Develop Architecture Notes
@@ -88,15 +88,17 @@ List what is still undecided: every open architecture question the vision raises
 
 If the answer is yes, resolve it in step 5. If no, record it under Risks / Unknowns in step 7.
 
+In a tracer pass, also mark yes every `Proposed` decision for which this tracer would make one of the three provisional conditions in step 5 false. For example, mark a provisional local store yes when this tracer would write real reservations.
+
 Aim for 0–3 significant decisions per pass. If you reach more, recheck that the scope is right and whether some decisions can be deferred or collapsed.
 
 Done when every open question is marked yes or no.
 
 ## 5. Resolve blockers
 
-Before treating a question as a choice, check whether it is already a fact: an existing system, contract, or owner. Take constraints and system ownership only from the spec, the user, or the existing system.
+Some open questions are already answered by something that exists: a system in use, a contract with a provider, or a team that owns the data. For example, in the Café fixture, "does the Create tracer call a real booking API?" is already answered by the project context: it calls a simulated provider. For each open question, first look for such an answer in the spec, the user's statements, or the existing system. If one of them answers it, record the answer as a constraint and stop there. Otherwise, the question is a decision to resolve below. State a constraint or a system owner only when one of those three sources gives it.
 
-Then pick the resolver by the kind of uncertainty. Return to this skill as soon as the blocker is resolved.
+For each remaining decision, pick the resolver by the kind of uncertainty. Return to this skill as soon as the blocker is resolved.
 
 | Uncertainty | Resolver |
 |---|---|
@@ -107,31 +109,46 @@ Then pick the resolver by the kind of uncertainty. Return to this skill as soon 
 | The interface or seam of an already-justified boundary | `codebase-design` |
 | Ambiguous domain terms that could move a boundary | `domain-modeling` |
 
-If the user cannot decide a significant question, you may choose a provisional option only when all of these hold:
+If the user cannot decide a significant question, you may choose a provisional option when a wrong choice would cost nothing outside the tracer. That holds only when all three of these are true:
 
-- it is limited to non-production use;
-- it cannot change authoritative business data or cause real-world side effects;
-- it commits the system to no production ownership or external contract.
+- **Non-production only.** The choice is used only by a local tracer or a test, never by real customers.
+- **No real data or effects.** The choice leaves the business's authoritative data alone, such as the café's actual reservation book. It causes nothing outside the program: no table is booked, no message reaches a customer, no card is charged.
+- **No commitments.** The choice names no production system of record or owning team for any data, and it commits to no outside provider or its API.
 
-Record it with `Status: Proposed`, say who chose it, and set **Revisit when** to the point it must be decided. Otherwise the question remains the next blocker.
+If all three are true, make the provisional choice. Set its **Revisit when** to the first observable event that would make one of them false, such as "before the tracer receives real reservations" or "before we sign up with a booking provider." If any of them is false, leave the question open as the next blocker.
 
-If a resolver is unavailable, do the minimum equivalent reasoning yourself and tell the user which resolver was unavailable. Report only delegation that actually ran.
+If a resolver skill is not installed, do a small version of its job yourself, just enough to settle the question. For example, without `prototype`, write a few lines of throwaway code or trace the behavior step by step. Without `grilling`, ask the user the trade-off question directly. Your own work can establish a fact. A decision still needs the user, as the "Done when" below requires. In the report, name each resolver that was missing and what you did instead. Name a resolver as used only when it actually ran.
 
-Done when every question marked yes in step 4 is resolved, or one remains as the next blocker.
+Done when every question marked yes in step 4 is resolved in one of these ways, or one remains as the next blocker:
+
+- an existing fact answers it;
+- the user decided or confirmed it;
+- a provisional choice meets the three conditions above.
 
 ## 6. Record significant decisions
 
-Write each resolved decision as an `AD` entry from the template. State the **Decision** in an affirmative voice: "We will ...".
+Write each resolved decision as an `AD` entry from the template. AD entries record the current architectural direction. When a decision changes, rewrite its entry in place. Git keeps the earlier versions.
+
+State the **Decision** in an affirmative voice: "We will ...".
 
 **Why / Trade-off** records both sides: what the decision buys, which drivers need it, and what it gives up. Name the accepted cost concretely, including what tracer results therefore cannot prove. When simplicity is the reason, say what becomes simpler and what that costs. For example, on a local, resettable tracer:
 
 > We will keep reservations in one in-process shared store, which lowers deployment and debugging cost. We accept that data is lost on restart, so this tracer is no evidence for persistence or for consistency across processes.
 
-Aim for the least worst option the drivers allow. **Revisit when** names an observable condition. Link an existing ADR when one applies. If a durable, surprising trade-off that is costly to change deserves historical explanation, recommend an ADR to the user.
+If more than one option satisfies every driver the decision touches, also say why this option's accepted cost hurts least.
 
-The notes hold the current view only. Version control and ADRs hold the history.
+Set **Status** to `Accepted` when the user made or explicitly confirmed this decision, or an accepted ADR already records it, and say which. Otherwise set it to `Proposed` and say who chose it. `Accepted` means authorized for the scope the Decision states, not proven by a tracer. When you change an `Accepted` decision, set it to `Proposed` until the user confirms the new version.
 
-Done when every decision resolved in step 5 has an `AD` entry whose Why / Trade-off names an accepted cost.
+Write **Revisit when** as an event someone could observe, such as a test result, a new capability, or a provider constraint. For example, the café's AD-1 is revisited when "Modify or a later consequential capability demonstrates that this boundary forces duplicated or contradictory authorization logic."
+
+An ADR keeps why an important decision was made, even after the decision stops being current. If an existing ADR covers the same decision, give its path in **Why / Trade-off** instead of restating its reasoning. Recommend a new ADR when either of these holds:
+
+- **It replaces an accepted ADR.** Also recommend marking the old ADR as superseded and linking it to the new one.
+- **Its reasoning is not visible from the code.** A later reader would ask why it was done this way, and the decision is expected to outlast this tracer or constrain more than one capability.
+
+The user writes and updates ADRs. List each recommendation, with the condition it meets, in the step 8 report, and point the user to [the ADR template](assets/adr.template.md).
+
+Done when every decision resolved in step 5 has an `AD` entry whose **Why / Trade-off** names an accepted cost and whose **Revisit when** names an observable event, and every decision that meets an ADR condition is listed for the step 8 report.
 
 ## 7. Record risks and unknowns
 
@@ -146,15 +163,18 @@ Stop when every step's "Done when" holds and no question marked yes in step 4 is
 - **First pass:** report **Ready for to-tickets: yes.** Tell the user to give to-tickets the paths of the Architecture Notes and the Agent Spec, because to-tickets reads only the references it is given. List the question for each candidate driver still unconfirmed, so the user can answer it now or leave it open.
 - **Tracer pass:** the tracer is safe to build. Report **Ready for thin tracer: yes.**
 
+In either pass, also list each ADR recommendation from step 6. List each `Proposed` decision with its **Revisit when**, so the user can accept it now or leave it for later.
+
 If a question marked yes is still open, report the single next blocker and its resolver from step 5 instead.
 
 ## Updating after a tracer
 
-Read the new evidence and check four things:
+Read the new evidence and check five things:
 
 - Did a driver change, or did the user confirm or reject a candidate driver?
 - Did the implementation show that the Architecture Vision is materially wrong?
 - Did evidence invalidate a significant decision or create a new one?
+- Did the user accept a `Proposed` decision, or did its **Revisit when** event happen?
 - Did a risk become resolved, newly important, or blocking?
 
 If none apply, report **No architecture change.** and leave the notes as they are. Otherwise update only the affected driver, vision, decision, or risk. Then run the tracer pass for the next ticket from to-tickets.

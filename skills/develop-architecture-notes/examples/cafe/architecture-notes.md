@@ -46,7 +46,7 @@ Reservation Application  (Create now, Cancel later)
 
 **Why / Trade-off:** D1 and D2 require the execution path to know exactly what action was authorized before performing the consequential write. Without this decision, a Create ticket and a Cancel ticket could place that check in different layers. Keeping it at the use-case boundary keeps confirmation semantics out of prompt/tool code. We accept an extra hop between dialogue and the booking provider, and Cancel needs its own use-case entry point.
 
-**Status:** Proposed
+**Status:** Accepted. The user confirmed it in the first pass.
 
 **Revisit when:** Modify or a later consequential capability demonstrates that this boundary forces duplicated or contradictory authorization logic.
 
@@ -56,9 +56,9 @@ Reservation Application  (Create now, Cancel later)
 
 **Why / Trade-off:** D4 requires repeatable behavioral evaluation, and the current rules do not need provider-specific semantics. We accept that rules a real provider also enforces may end up checked twice, and the local tracer gives no evidence about provider-side validation.
 
-**Status:** Proposed
+**Status:** Proposed. The agent chose it provisionally because the user deferred the decision until a real provider is selected.
 
-**Revisit when:** a real provider constraint becomes genuine reservation-domain policy rather than an integration detail.
+**Revisit when:** before the tracer runs against a real booking provider.
 
 ## Risks / Unknowns
 
