@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.2
+
+- Step 4 now states both pass questions itself instead of pointing back to the top of `SKILL.md`, and explains why the first-pass question asks about two tickets: each ticket is built separately, often by an agent that sees only that ticket.
+- The step 8 first-pass report lists the question for each unconfirmed candidate driver, so the user can answer it now or leave it open.
+- Step 1 now names the Agent Spec section it means: it marks roadmap capabilities that have no `Contract/Rules` section yet, such as Modify Reservation.
+
 ## 0.5.1
 
 - The CR-5 driver example in step 2 no longer names a provider boundary. It now states only the pressure: the execution path keeps an unknown outcome separate from success and failure, and does not resubmit it automatically.

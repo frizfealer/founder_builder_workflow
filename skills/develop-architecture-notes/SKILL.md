@@ -3,19 +3,19 @@ name: develop-architecture-notes
 description: Sketch a low-resolution architecture from the whole Agent Spec before to-tickets, then refine it for each thin tracer, recorded as Architecture Notes.
 disable-model-invocation: true
 metadata:
-  version: "0.5.1"
+  version: "0.5.2"
 ---
 
 # Develop Architecture Notes
 
-Keep one Architecture Notes file at two resolutions. Each pass puts one question to every open architecture question:
+Keep one Architecture Notes file at two resolutions:
 
-- **First pass**, before to-tickets, across every capability in the Agent Spec: *if this stays open, could two tickets answer it in conflicting ways?* For example, a Create ticket keeps reservations in conversation state while a Cancel ticket needs to look them up later.
-- **Tracer pass**, once to-tickets has chosen the next thin tracer: *if this stays open, would the coding agent have to invent a significant decision to build this tracer?*
+- **First pass**, before to-tickets, across every capability in the Agent Spec.
+- **Tracer pass**, once to-tickets has chosen the next thin tracer, for that tracer.
 
-Decide now only what gets a yes. Everything else goes to Risks / Unknowns.
+Each pass decides now only the questions that pass its test in step 4. Everything else goes to Risks / Unknowns.
 
-A **significant decision** is a choice the coding agent would otherwise have to invent while building: a boundary, an owner, a dependency direction, a data or failure responsibility, a deployment shape, or any choice that would be costly to change later in code, data, or real-world effects. Choosing the system of record for reservations is one example. The coding agent makes every other choice locally.
+A **significant decision** is a choice the coding agent would otherwise have to invent while building: a boundary, an owner, a dependency direction, a data or failure responsibility, a deployment shape, or any choice that would be costly to change later in code, data, or real-world effects. Choosing the system of record for reservations is one example. Leave every other choice to the coding agent, which makes it while writing the code. Function names, data structures, and a module's internal layout are examples.
 
 The Agent Spec is the behavioral WHAT. Architecture Notes record only the significant HOW. Write only the Architecture Notes file. Agent Spec, product code, tests, tickets, ADRs, and deployment change only with separate authorization.
 
@@ -32,7 +32,7 @@ Write `docs/architecture/architecture-notes.md` from [the template](assets/archi
 
 ## 1. Scope
 
-**First pass:** the scope is every capability in the Agent Spec. List them, marking roadmap capabilities that have no rules yet.
+**First pass:** the scope is every capability in the Agent Spec. List them, marking roadmap capabilities that have no `Contract/Rules` section yet, such as Modify Reservation in the Café spec.
 
 **Tracer pass:** take the next thin tracer from to-tickets as given: its slice, acceptance criteria, and non-goals. If it covers more than one end-to-end path, or depends on a ticket that is not done, explain why and return it to to-tickets.
 
@@ -48,7 +48,7 @@ Done when the Scope section names the capabilities covered by the vision and, in
 
 A driver states a pressure the design must satisfy and leaves the component choice open. From the Café fixture:
 
-- `CR-4` (material changes invalidate prior authorization) creates this pressure: the execution path must know exactly which action was authorized.
+- `CR-4` (material changes invalidate prior authorization) creates this pressure: an authorization must record the terms it covers, and the execution path must check the action against those terms before running it. A bare "user said yes" flag would still read as authorized after the party size changes.
 - `CR-5` (unknown outcomes cannot be blindly retried) creates this pressure: the execution path must keep an unknown outcome separate from success and failure, and must not resubmit it automatically.
 
 Look for drivers in three places:
@@ -73,7 +73,7 @@ Done when every explicit rule, quality goal, and constraint in scope, and every 
 
 Show the 3–7 major responsibilities at container/component level, how control and data flow between them, and the external systems at the edge. Classes, functions, and code-level interfaces are the coding agent's choice.
 
-Keep the simplest shape the drivers allow: every responsibility, and every abstraction between them, traces to a current driver. Give parts that need clearly different characteristics, such as one serving many concurrent users and one serving a few, separate responsibilities.
+Keep the simplest shape the drivers allow: every responsibility, and every abstraction between them, traces to a current driver. When two parts need clearly different architecture characteristics, give each its own responsibility. For example, a part that must scale to many concurrent users and a part that serves a few staff need different scalability, so they are separate responsibilities.
 
 If the notes or the existing architecture already hold a vision, build on it and change it only where this scope shows it is insufficient.
 
@@ -81,7 +81,12 @@ Done when every capability in scope touches at least one responsibility and ever
 
 ## 4. Decide what must be decided now
 
-List the open architecture questions the vision raises, plus every candidate driver awaiting confirmation. Put this pass's question, from the top of this file, to each one. If the answer is yes, resolve it in step 5. If no, record it under Risks / Unknowns in step 7.
+List what is still undecided: every open architecture question the vision raises, and every candidate driver the user has not confirmed. Ask each one this pass's question:
+
+- **First pass:** *if this stays open, could two tickets answer it in conflicting ways?* Each ticket is built separately, often by an agent that sees only that ticket, so a question left open gets answered once per ticket. For example, a Create ticket keeps reservations in conversation state while a Cancel ticket needs to look them up later.
+- **Tracer pass:** *if this stays open, would the coding agent have to invent a significant decision to build this tracer?*
+
+If the answer is yes, resolve it in step 5. If no, record it under Risks / Unknowns in step 7.
 
 Aim for 0–3 significant decisions per pass. If you reach more, recheck that the scope is right and whether some decisions can be deferred or collapsed.
 
@@ -138,7 +143,7 @@ Done when every question marked no in step 4 has an `R` entry with a learning pa
 
 Stop when every step's "Done when" holds and no question marked yes in step 4 is still open. Stop with the questions marked no still open; the tracers are how the remaining architecture gets learned.
 
-- **First pass:** report **Ready for to-tickets: yes.** Tell the user to give to-tickets the paths of the Architecture Notes and the Agent Spec, because to-tickets reads only the references it is given.
+- **First pass:** report **Ready for to-tickets: yes.** Tell the user to give to-tickets the paths of the Architecture Notes and the Agent Spec, because to-tickets reads only the references it is given. List the question for each candidate driver still unconfirmed, so the user can answer it now or leave it open.
 - **Tracer pass:** the tracer is safe to build. Report **Ready for thin tracer: yes.**
 
 If a question marked yes is still open, report the single next blocker and its resolver from step 5 instead.

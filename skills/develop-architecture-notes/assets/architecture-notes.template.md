@@ -6,7 +6,7 @@
 
 **Next thin tracer:** <one end-to-end slice from to-tickets, or "not selected yet" after the first pass>
 
-**Out of scope for this tracer:**
+**Non-goals for this tracer:**
 - <explicit non-goal>
 
 ## Drivers

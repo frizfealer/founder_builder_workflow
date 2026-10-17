@@ -6,7 +6,7 @@
 
 **Next thin tracer:** A local end-to-end Create Reservation path in which the user provides required reservation details, the agent validates the request, asks for explicit confirmation, and executes against a controllable local booking stub.
 
-**Out of scope for this tracer:**
+**Non-goals for this tracer:**
 - building Cancel, whose rules shape the vision only;
 - real booking-provider timeout/idempotency semantics;
 - restart recovery and multi-instance concurrency;

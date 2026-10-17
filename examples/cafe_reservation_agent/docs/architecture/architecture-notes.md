@@ -8,7 +8,7 @@
 
 **Next thin tracer:** not selected yet.
 
-**Out of scope for this tracer:**
+**Non-goals for this tracer:**
 - Not applicable until to-tickets selects a tracer.
 
 ## Drivers
