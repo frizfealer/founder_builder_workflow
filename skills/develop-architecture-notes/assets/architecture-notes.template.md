@@ -36,6 +36,7 @@
 ## Risks / Unknowns
 
 - **R1 — <risk or unknown>**
-  - **Resolve before:** <this tracer | a named later tracer | not yet known>
-  - **Learn by:** research | prototype | tracer evidence | engineering eval | expert review | later human decision
+  - **Why safe to defer:** <why separate tickets cannot answer this in conflicting ways (first pass), or why this tracer can be built without inventing the answer (tracer pass)>
+  - **Resolve before:** <a named later tracer | the observable event that makes this blocking>
+  - **Learn by:** research | prototype | tracer evidence | engineering eval | expert review | ask the user | later human decision
   - **Next evidence:** <specific next observation or source>

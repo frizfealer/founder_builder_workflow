@@ -3,7 +3,7 @@ name: develop-architecture-notes
 description: Sketch a low-resolution architecture from the whole Agent Spec before to-tickets, then refine it for each thin tracer, recorded as Architecture Notes.
 disable-model-invocation: true
 metadata:
-  version: "0.5.3"
+  version: "0.5.4"
 ---
 
 # Develop Architecture Notes
@@ -152,9 +152,13 @@ Done when every decision resolved in step 5 has an `AD` entry whose **Why / Trad
 
 ## 7. Record risks and unknowns
 
-Write each question marked no in step 4 as an `R` entry from the template: which tracer must resolve it, and how it will be learned. Record the risk here and leave the learning to research, a prototype, or the tracer itself.
+Write each question marked no in step 4 as an `R` entry from the template. Record the risk here and leave the learning to research, a prototype, or the tracer itself.
 
-Done when every question marked no in step 4 has an `R` entry with a learning path.
+**Why safe to defer** gives the reason behind the no in step 4, in this pass's terms. In the first pass, say why separate tickets cannot answer the question in conflicting ways. In the tracer pass, say why the coding agent can build this tracer without inventing the answer. For example, the Café R3 is safe to defer because the tracer uses a local stub that commits to no system of record. If you cannot write the reason, the question is a blocker. Mark it yes in step 4 and resolve it in step 5.
+
+**Resolve before** names the tracer that needs the answer. If no such tracer is known yet, name the observable event that makes the question blocking, such as "before the agent writes real reservations."
+
+Done when every question marked no in step 4 has an `R` entry whose **Why safe to defer** answers this pass's step 4 question, whose **Resolve before** names a tracer or an observable event, whose **Learn by** names one of the methods the Architecture Notes template lists, such as research or a prototype, and whose **Next evidence** names the specific observation or source that would settle the question.
 
 ## 8. Stop designing
 

@@ -81,31 +81,37 @@ System of record (not chosen yet)
 ## Risks / Unknowns
 
 - **R1 — The system of record for reservations is not chosen.** The user confirmed the agent serves one café. It is not yet known whether the café already uses a booking system.
+  - **Why safe to defer:** AD-2 routes every reservation read and write through one Reservation Gateway, so every ticket uses the same interface whichever system sits behind it. No ticket chooses where reservations are stored.
   - **Resolve before:** the first tracer that writes real reservations.
   - **Learn by:** later human decision. Ask the user first whether the café already uses a booking system. Only if it does not, present building our own store as a trade-off.
   - **Next evidence:** the user's answer about the café's existing booking system.
 
 - **R2 — How to find a possibly created reservation after a timeout depends on the system of record.** If create accepts a request ID chosen by the caller, the lookup is exact. If the system only supports searching by owner and reservation fields, a reservation the user already had for the same slot could be mistaken for the new one.
+  - **Why safe to defer:** AD-1 already refuses another attempt while an outcome is unknown, and the lookup lives in the Reservation Gateway. Only the Gateway's lookup depends on the answer, so tickets cannot invent different retry behavior.
   - **Resolve before:** the tracer that implements `CR-05` against the real system.
   - **Learn by:** research.
   - **Next evidence:** the chosen system's API documentation for request IDs, lookup, and retry behavior.
 
 - **R3 — How the session identifies the user is only partly decided.** The user leans toward a guest session for guests and the chat account for signed-in users. A guest session usually lives in one browser, so a guest who returns on another device or after clearing the browser would not find their reservation. How such a guest proves a reservation is theirs, for example with the confirmation code, is still open.
+  - **Why safe to defer:** AD-3 already fixes that the identity comes from the session and is stored apart from the reservation name. The channel choice changes only how the session gets the identity, not any ticket's reservation logic.
   - **Resolve before:** the first tracer that runs on a real chat channel.
   - **Learn by:** later human decision.
   - **Next evidence:** the user's confirmation of guest session plus chat account, and their choice of how a guest without the original session can cancel.
 
 - **R4 — The model may record a confirmation the user did not give.** AD-1 checks that a confirmation was recorded, not that the user meant it. For example, "sure, but make it four" (`CR-S04`) is a change, not a confirmation.
+  - **Why safe to defer:** AD-1 fixes where a confirmation is recorded and checked, so tickets cannot place the check differently. Whether the model records confirmations correctly is measured by evaluation, not decided by structure.
   - **Resolve before:** production use.
   - **Learn by:** engineering eval.
   - **Next evidence:** repeated trials of `CR-S04` and other ambiguous replies, scored with the confirmation-before-booking milestone check. If false confirmations persist, consider a confirm button in the channel instead of free-text confirmation.
 
 - **R5 — Candidate driver D7 (shared availability) is unconfirmed.** If confirmed, a create can come back rejected because someone else just took the slot, and tests must cover that case. If not, the design stays the same, because AD-2 already keeps availability in the system of record.
+  - **Why safe to defer:** the design is the same either way. A slot taken by someone else arrives as a rejected outcome from the Gateway, which every ticket already handles.
   - **Resolve before:** the first tracer with more than one user.
   - **Learn by:** ask the user.
   - **Next evidence:** the user's confirmation that two customers can try to book the same slot at once.
 
 - **R6 — Candidate driver D8 (state survives restart) is unconfirmed.** If confirmed, the Reservation Application keeps proposals and pending outcomes in durable storage. If not, in-process state is enough, but after a restart the agent should search the user's reservations before creating a matching one, so a lost unknown outcome cannot become a duplicate.
+  - **Why safe to defer:** AD-1 keeps proposals and pending outcomes in the Reservation Application, so every ticket uses the same state owner. Making that state durable changes only how the Application stores it.
   - **Resolve before:** the first deployment that must survive restarts or runs as more than one process.
   - **Learn by:** ask the user.
   - **Next evidence:** the user's answer to "If the agent restarts mid-booking, is it acceptable that the user confirms again?"

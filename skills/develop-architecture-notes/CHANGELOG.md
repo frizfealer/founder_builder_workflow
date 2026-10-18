@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.4
+
+- `R` entries gain **Why safe to defer**, which gives the reason behind the no in step 4 in that pass's terms. If the reason cannot be written, step 7 sends the question back to step 4 as a blocker.
+- **Resolve before** now names a later tracer or the observable event that makes the question blocking. The options `this tracer` and `not yet known` are removed: a question this tracer needs is a blocker for step 5, and an unknown deadline is written as an event.
+- Both Café example notes fill in **Why safe to defer** for every risk.
+- **Learn by** gains `ask the user`, the resolver step 5 already uses for a candidate driver.
+
 ## 0.5.3
 
 - Step 5 now explains what it means for an open question to be already answered, with a Café fixture example, and says what to do in each case: record a found answer as a constraint, or resolve the question as a decision.

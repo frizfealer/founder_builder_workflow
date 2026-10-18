@@ -63,16 +63,19 @@ Reservation Application  (Create now, Cancel later)
 ## Risks / Unknowns
 
 - **R1 — Real provider behavior after an ambiguous timeout is unknown.**
+  - **Why safe to defer:** this tracer runs against a controllable local stub, so the coding agent builds the unknown path from the stub's behavior. The vision already keeps an unknown outcome separate from success and failure.
   - **Resolve before:** the real-provider integration tracer. This tracer uses a controllable local stub.
   - **Learn by:** research.
   - **Next evidence:** provider primary documentation/API behavior for lookup, request identity, and retry semantics.
 
 - **R2 — The eventual representation of confirmed/rejected/unknown provider outcomes may need to be richer than the local stub.**
+  - **Why safe to defer:** this tracer needs only the three outcomes the stub returns. A richer provider model changes what those outcomes carry inside the Booking Provider Boundary, not which responsibility handles them.
   - **Resolve before:** the real-provider integration tracer.
   - **Learn by:** next integration tracer evidence.
   - **Next evidence:** actual provider outcome/error model.
 
-- **R3 — The system of record for reservations is not established.** The project context plans a real booking provider but has not selected one, and nothing says whether the agent also keeps reservations of its own. Create and Cancel both depend on the answer. The local stub decides nothing for production.
+- **R3 — The system of record for reservations is not established.** The project context plans a real booking provider but has not selected one, and nothing says whether the agent also keeps reservations of its own. Create and Cancel both depend on the answer.
+  - **Why safe to defer:** this tracer writes only to the local stub, which commits to no system of record. Cancel, which needs to look reservations up, is a non-goal for this tracer.
   - **Resolve before:** the first tracer that handles real reservations.
   - **Learn by:** ask the user first whether the café already uses a booking system; only if it does not, present the trade-off as a human decision.
   - **Next evidence:** the user's answer about an existing booking system.

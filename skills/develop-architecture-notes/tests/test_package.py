@@ -9,7 +9,7 @@ class PackageIntegrityTests(unittest.TestCase):
     def test_skill_name_and_version(self):
         text = (ROOT / "SKILL.md").read_text()
         self.assertIn("name: develop-architecture-notes", text)
-        self.assertIn('version: "0.5.3"', text)
+        self.assertIn('version: "0.5.4"', text)
 
     def test_template_has_five_sections(self):
         text = (ROOT / "assets/architecture-notes.template.md").read_text()
