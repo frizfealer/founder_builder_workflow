@@ -1,0 +1,5 @@
+interface:
+  display_name: Agent Spec to pytest-bdd
+  short_description: Turn every Agent Spec scenario into pytest-bdd executable specifications with a drift check.
+policy:
+  allow_implicit_invocation: false

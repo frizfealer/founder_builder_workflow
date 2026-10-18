@@ -1,0 +1,162 @@
+# Authored behavior-evaluation scenarios against the Café Agent Spec
+# (examples/cafe_reservation_agent/agent_spec.md). No live model runs are recorded here.
+version: "1.0"
+status: not-run
+cases:
+  - id: E01
+    title: Every scenario is generated whatever the tracer scope
+    input: Generate executable specs for the Café spec. The current tracer is CR-S01 only.
+    must:
+      - Generate all seven spec scenarios, CR-S01 to CR-S05 and CA-S01 to CA-S02.
+      - Tag CR-S01 @active and every other scenario @planned.
+    must_not:
+      - Leave out a scenario because it is outside the tracer.
+
+  - id: E02
+    title: Illustrations are not approved scenarios
+    input: Generate executable specs for the Café spec.
+    must:
+      - Treat CR-04's inline "For example" conversation as an illustration of the rule.
+    must_not:
+      - Generate a Gherkin scenario from CR-04's example or from the template's "Rough examples".
+
+  - id: E03
+    title: A may gets no step
+    input: Generate CR-S03.
+    must:
+      - Assert that the agent informs the user that 7pm is unavailable.
+      - Assert that no 7:30pm reservation is created before the user accepts it.
+    must_not:
+      - Assert that the agent proposes 7:30pm.
+      - Assert that the agent does not propose 7:30pm.
+
+  - id: E04
+    title: An example response illustrates, it does not prescribe
+    input: Generate CR-S02.
+    must:
+      - Judge "The agent resolves the party size before booking." with the scenario text as context.
+    must_not:
+      - Require the reply to contain "How many people?".
+
+  - id: E05
+    title: An undefined required action blocks the scenario
+    input: Generate CA-S01.
+    must:
+      - Report that the spec does not say what counts as valid cancellation authorization.
+      - Start CA-S01 with "Given the spec answers I-<nn>" so it reports blocked.
+    must_not:
+      - Assume that "Yes, cancel it." authorizes the cancellation.
+      - Edit the Agent Spec to define cancellation authorization.
+
+  - id: E06
+    title: Global rules are asserted only where a scenario cites them
+    input: Generate executable specs for the Café spec.
+    must:
+      - Tag CR-S05 with G-04 and assert its no-blind-retry behavior.
+      - List G-01, G-02, and G-03 as rules no scenario cites.
+    must_not:
+      - Add a G-02 or G-03 assertion to a scenario that does not cite the rule.
+
+  - id: E07
+    title: Test data never changes a stated outcome
+    input: Generate CR-S01 and CA-S01.
+    must:
+      - Keep CR-S01's initial state free of other reservations, because "exactly one reservation exists" would be false otherwise if it counts every reservation.
+      - Record an issue that CR-S01's "unrelated reservation modification" cannot be observed until that reading is settled.
+      - Allow an unrelated, non-matching reservation in CA-S01 and list it in the report.
+    must_not:
+      - Seed CR-S01 with another reservation.
+      - Leave CR-S01's unrelated-modification check in place without an issue, as if it could fail.
+
+  - id: E08
+    title: An unconnected agent never passes
+    input: Run step 5 before the agent fixture is connected.
+    must:
+      - Report every scenario as not implemented or blocked.
+      - Fix any step that lets a scenario pass without the agent.
+    must_not:
+      - Leave a step body empty.
+      - Mark a scenario skipped or xfail to keep the run green.
+
+  - id: E09
+    title: Conditional outcomes become one scenario per condition
+    input: Generate CR-S05.
+    must:
+      - Write one Gherkin scenario for "the booking is found" and one for "the outcome cannot be determined", both tagged CR-S05 with the same source line.
+    must_not:
+      - Assert "report the verified booking" when the outcome cannot be determined.
+
+  - id: E10
+    title: A spec change regenerates only what changed
+    input: The spec's CR-S02 text changed, and the test session stopped with "Executable specs do not match". CR-S01 is @active.
+    must:
+      - Regenerate CR-S02 only, with its new source line.
+      - Keep CR-S01 @active and every other scenario as it was.
+    must_not:
+      - Regenerate or retag scenarios the message did not name.
+
+  - id: E11
+    title: A new tracer only retags
+    input: to-tickets selected a tracer covering CR-S01 and CR-S02. The spec has not changed.
+    must:
+      - Tag CR-S01 and CR-S02 @active and the rest @planned, then rerun step 5.
+    must_not:
+      - Rewrite steps or source lines.
+
+  - id: E12
+    title: A forbidden choice is checked on state as well as in the reply
+    input: Generate CA-S02.
+    must:
+      - Judge that the reply asks which reservation the user means.
+      - Assert that no reservation was cancelled, as necessarily implied by the forbidden choice.
+      - Judge that the reply avoids "choosing one of the two reservations itself".
+    must_not:
+      - Assert anything about cancellation authorization, which CA-S02 does not mention.
+
+  - id: E13
+    title: A scenario that starts after an agent turn is reached through the conversation
+    input: Generate CR-S04.
+    must:
+      - Send a booking request, then check with the judge that the reply proposes Friday 7pm for 2, before "Yes, book it.".
+      - List the booking request's café and name as test data.
+    must_not:
+      - Put the café or name in the feature file.
+      - Assume the agent proposed Friday 7pm for 2 without checking.
+
+  - id: E14
+    title: Negated statements are judged with avoids
+    input: Generate CR-S05's "the outcome cannot be determined" condition.
+    must:
+      - Write `the agent's reply avoids "claim success"` for "do not claim success".
+    must_not:
+      - Write `the agent's reply meets "do not claim success"`.
+
+  - id: E15
+    title: A contradiction is reported even when no step depends on it
+    input: Generate CR-S01.
+    must:
+      - Record an issue that CR-S01's "if confirmation is required by product policy" conflicts with CR-03, which always requires confirmation for Create.
+      - Perform "After valid authorization" as CR-03 defines it.
+    must_not:
+      - Drop the contradiction because no assertion depends on it.
+
+  - id: E16
+    title: Steps reach the fake only through the test controls
+    input: Generate executable specs for the Café spec. No product code exists yet.
+    must:
+      - Set up and read reservations, slots, timeouts, and calls only through the test controls.
+      - Give the fake the Reservation Gateway operations the Architecture Notes sketch, marked provisional.
+      - Record calls under the Architecture Notes' operation names, such as "create" and "lookup".
+      - List AD-3's limit on lookups to the requesting user as something a pass against the fake does not prove, if the fake leaves it out.
+    must_not:
+      - Read or write the fake's attributes from a step definition.
+      - Present the fake's operations as the Reservation Gateway's interface for the product code.
+
+  - id: E17
+    title: The product's gateway shapes the fake
+    input: Generate executable specs for the Café spec. The product code already defines ReservationGateway, whose lookup takes the session's user.
+    must:
+      - Make the fake implement the product's ReservationGateway.
+      - Write the same step definitions as E16, calling only the test controls.
+    must_not:
+      - Change the product's ReservationGateway to match the fake.

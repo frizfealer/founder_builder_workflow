@@ -1,0 +1,14 @@
+[project]
+name = "cafe-reservation-agent"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "anthropic>=1.15.0",
+    "pydantic>=2.14.1",
+    "pytest>=9.1.1",
+    "pytest-bdd>=9.0.0",
+    "python-dotenv>=1.2.4",
+]
