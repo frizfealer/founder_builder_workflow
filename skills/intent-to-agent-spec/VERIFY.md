@@ -11,7 +11,10 @@ Standard for `/verify-artifact` when the artifact is an Agent Spec produced by `
 - **Source** (for traceability): a `[PS §n: "…"]` citation whose quote exists in `product-sense.md` and supports the statement, or an `[EM: id]` citation whose card is `confirmed` and matches the statement.
 - **Write scope:** `agent_spec.md`, `example-map.md`, `phase-result.yaml`. On a scoped update, only the capabilities and scenarios the declared scope names.
 
-## Stage 1 — Mechanical checks (`verify_mechanical.py --kind agent-spec`; failures are Important, finders do not run until clean)
+## Stage 1 — Mechanical checks (failures are Important; finders do not run until clean)
+
+mechanical: `skills/intent-to-agent-spec/scripts/verify_mechanical.py --artifact agent_spec.md --sources product-sense.md [decisions.md] --example-map example-map.md [--phase-result …] [--prior … --scope …]`  
+then: `skills/verify-artifact/scripts/verify_generic.py phase-result …` and, on a scoped update, `… write-scope …`.
 
 - D-1 Sections present in order: Agent Requirements (4 blocks), Global Contract, Evaluation Policy, Capabilities; each capability has Scope & Authority, Contract, Scenarios.
 - D-2 IDs unique and well-formed: `G-\d\d`, `[A-Z]{2}-\d\d`, `[A-Z]{2}-S\d\d`, `EM-[a-z]+-\d\d`.

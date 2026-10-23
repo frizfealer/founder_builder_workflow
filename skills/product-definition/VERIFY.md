@@ -11,7 +11,10 @@ Standard for `/verify-artifact` when the artifact is a Product Sense produced by
 - **Source** (for traceability): a verbatim span from an authoritative input that explicitly states the statement, or a span whose denial the statement would contradict (the admission gate's step 2).
 - **Write scope:** `product-sense.md` and `phase-result.yaml` only. On a scoped update, only the sections the declared changed scope names.
 
-## Stage 1 — Mechanical checks (`verify_mechanical.py --kind product-sense`; failures are Important, finders do not run until clean)
+## Stage 1 — Mechanical checks (failures are Important; finders do not run until clean)
+
+mechanical: `skills/product-definition/scripts/verify_mechanical.py --artifact product-sense.md [--phase-result …] [--prior … --scope …]`  
+then: `skills/verify-artifact/scripts/verify_generic.py phase-result …` and, on a scoped update, `… write-scope …`.
 
 - D-1 Eight section headings present, in order: Product Framing, Product Scope, Responsibilities & Authority, Capabilities & Behaviors, Business & Domain Rules, Failure & Recovery, Acceptable Quality, Open Questions.
 - D-2 No Issue ID pattern (`I-\d{3}`) anywhere in `product-sense.md`.

@@ -6,7 +6,9 @@ argument-hint: <artifact path> <VERIFY.md path> [phase-result.yaml] [--prior <pr
 
 # /verify-artifact — shared verification mechanism
 
-One mechanism, many standards. This skill owns **how** verification runs. Each producing skill owns **what failure looks like** for its artifact, in a `VERIFY.md` beside its `SKILL.md`. Never verify without a `VERIFY.md`; never add a check that is not in it or in the four cross-artifact rules below.
+One mechanism, many standards. This skill owns **how** verification runs and nothing that is specific to one artifact kind. Each producing skill owns **what failure looks like** for its artifact — its `VERIFY.md` (the standard), its `scripts/verify_mechanical.py` (the D-checks), and its `fixtures/planted/` (the smoke test), all beside its `SKILL.md`. Never verify without a `VERIFY.md`; never add a check that is not in it or in the four cross-artifact rules below.
+
+What lives here, because it is identical for every artifact: `scripts/verify_lib.py` (quote lookup, section parsing, PhaseResult shape, write-scope diff, the finding Report) and `scripts/verify_generic.py` (findings quote-existence, PhaseResult, write-scope as CLI modes). A producing skill's checker imports `verify_lib`; nothing in this folder knows about Product Sense, Agent Spec, or any other kind.
 
 Design goal: give the producing agent a feedback signal it can loop on (produce → verify → fix → re-verify) whose source is, as far as possible, **not the same model's judgment**. Three consequences shape everything below: mechanical checks run first and gate the rest; finders are narrow and adversarial rather than general reviewers; the author has no path to close a finding by asserting it is fine.
 
@@ -36,7 +38,7 @@ Checked in every run in addition to `VERIFY.md`:
 
 ### Stage 1 — Mechanical checks (script)
 
-Run `scripts/verify_mechanical.py --kind <kind> --artifact … --sources … [--phase-result …] [--prior …]`. It implements the `VERIFY.md` **D-checks** for that kind: structure, ID patterns, citation quotes found verbatim in sources, PhaseResult shape and consistency, write scope against `--prior`. Any D-check failure is an **Important** finding with exact locations, written to the report before any model runs. The producing skill fixes these and re-runs Stage 1 until clean; Stage 2 does not start on a failing Stage 1. This is the fast, exact signal — spend model effort only on artifacts that already have the right shape.
+Run the script the artifact's `VERIFY.md` names on its `mechanical:` line (by convention `<producing skill>/scripts/verify_mechanical.py`), then `scripts/verify_generic.py phase-result` and, on a scoped update, `scripts/verify_generic.py write-scope`. The skill-owned script implements that kind's **D-checks** (structure, IDs, citation quotes found verbatim); the generic script covers what every PhaseResult and every scoped update must satisfy. Any failure is an **Important** finding with exact locations, written to the report before any model runs. The producing skill fixes these and re-runs Stage 1 until clean; Stage 2 does not start on a failing Stage 1. This is the fast, exact signal — spend model effort only on artifacts that already have the right shape.
 
 ### Stage 2 — Finders (fresh context, one per check family)
 
@@ -50,7 +52,7 @@ Where the workflow has a second model family available (the `codex-rescue` route
 
 Receives the artifact, sources, and the merged candidate list. For each candidate it runs:
 
-- (a) artifact quote exists verbatim — **scripted**, `verify_mechanical.py --findings`;
+- (a) artifact quote exists verbatim — **scripted**, `verify_generic.py findings`;
 - (b) source quote exists verbatim, or the `none` claim holds after a search of the sources — **scripted** for existence; the model only judges `none` claims that the script could not disprove;
 - (c) the quoted evidence supports the stated failure — model judgment.
 
