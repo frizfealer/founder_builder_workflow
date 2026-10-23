@@ -106,11 +106,21 @@ P0 owns product truth and nothing downstream of it. While drafting, expectations
 
 Wayfinder (D4) never opens from inside this phase: uncertainty that large still leaves here as an Issue, and reaches D4 only through `/decision-management` and its human-approval gate.
 
+## Review before output
+
+When the artifact draft is complete for this run's task focus, run `/review-artifact product-sense.md skills/product-definition/REVIEW.md phase-result.yaml`. `REVIEW.md` is the standard — what a Product Sense that failed the admission gate looks like; the reviewer only checks, it never decides product truth.
+
+- Every **Important** finding is fixed in the artifact or marked resolved with a one-line reason in `review-report.md`. The run does not end with an open Important.
+- **Pre-existing** findings (contradictory or ambiguous authoritative inputs) are merged into this run's PhaseResult `issues` as the reviewer drafted them (`affected_phase: P0`, `uncertainty: true`); they are not fixed in the artifact.
+- A finding that the artifact decided something the gate says is undecided is handled by the gate's own branches: OMIT or ISSUE, never a different guess.
+
+The review is Lifecycle Policy 10(a). Owner confirmation of the artifact, 10(b), happens after this run ends and is not this skill's work; this skill only reports honestly so the owner confirms a reviewed artifact. On a scoped update, the review covers the changed scope only.
+
 ## Output
 
 End the run with two outputs:
 
-1. The artifact changes, summarized at section level in the reply.
+1. The artifact changes, summarized at section level in the reply, with the review status (Important open / resolved, Pre-existing routed).
 2. A **PhaseResult** in the exact shape defined in `workflow-contracts.md` — read that file before emitting; the contract, not this skill, defines the fields. Write it to `phase-result.yaml` beside the artifact, replacing any previous round's file, and present the same content in the reply. Historical runs, when intentionally retained for regression or audit, are archived separately. The PhaseResult reports one run and is not a durable source of truth; durable truth belongs in the appropriate authoritative artifact. `artifact_changes` is a routing surface, not a changelog: for a fresh draft, use one entry covering the whole artifact; for a scoped update, report only the affected scope at the granularity useful for downstream routing rather than mechanically creating one entry per section.
 
 When an update changed semantics that already existed, ask: which downstream scope consumed the meaning I just changed? List those in `invalidates` — known-stale scopes only, per the contract.

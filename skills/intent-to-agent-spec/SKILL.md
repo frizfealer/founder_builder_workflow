@@ -110,8 +110,8 @@ Write the common policy once (template default: every required Expected holds, e
 ### Step 7 — Review, then confirm
 
 1. Run `reference/checklist.md`; fix or convert each failure to an Issue.
-2. Run `/review-artifact` with this skill's `REVIEW.md`. Close every Important.
-3. Present the spec to the owner for confirmation. On confirmation, set `Status: Confirmed` only if open issues = 0.
+2. Run `/review-artifact` with this skill's `REVIEW.md`. Close every Important; merge the report's Drafted Issues into `phase-result.yaml`. This is Lifecycle Policy 10(a).
+3. Present the spec and the closed review report to the owner for confirmation (Lifecycle Policy 10(b)). On confirmation, set `Status: Confirmed` only if open issues = 0.
 4. Emit `phase-result.yaml`. `invalidates`: list downstream scopes whose consumed meaning changed (architecture notes, BDD tests), known ones only.
 
 ## Anti-patterns to refuse

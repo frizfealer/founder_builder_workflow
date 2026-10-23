@@ -32,6 +32,17 @@ Review status: **open** | **closed** (closed = no open Important)
 - source: "<quote>" (<location>)
 - issue: I-xxx · affected_phase: <P0|P1|P2|P3> · uncertainty: true
 
+## Drafted Issues (for the producing skill to merge into phase-result.yaml)
+
+```yaml
+- id: I-xxx
+  statement: <what appears wrong or unresolved>
+  evidence: <finding id and quoted spans>
+  affected_phase: <P0|P1|P2|P3>
+  uncertainty: true
+  blocks_current_phase: <true|false>
+```
+
 ## Dropped candidates
 
 | id | reason dropped |
