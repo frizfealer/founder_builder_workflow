@@ -4,23 +4,21 @@ Standard for `/verify-artifact` when the artifact is a Product Sense produced by
 
 ## Artifact and sources
 
-- **Artifact:** `product-sense.md`, plus `phase-result.yaml` from the same run.
+- **Artifact:** `product-sense.md`, plus the producing run's reply (its list of reported open truths).
 - **Authoritative sources:** the Product Idea (`product-idea.md`), any business/domain context the invocation or product directory established as authoritative, and the Decision Management record (`decisions.md`) when one exists — an accepted resolution is a source. Nothing else counts — not prior drafts, not the producing conversation, not "common practice".
 - **Required inputs beyond sources:** the confirmed phase objective; the commitments recorded in authoritative artifacts (needed for PS-5/PS-6); the prior `product-sense.md` and declared scope on a scoped update (needed for PS-9).
 - **Statement** (for traceability): every sentence in sections 1–7, except headings and sentences the artifact itself marks as derivation notes ("derived from …"). No keyword filter: a sentence with no modal verb can still assert product truth ("Tables seat four."), and the finder decides nothing — it looks for the span.
 - **Source** (for traceability): a verbatim span from an authoritative input that explicitly states the statement, or a span whose denial the statement would contradict (the admission gate's step 2).
-- **Write scope:** `product-sense.md` and `phase-result.yaml` only. On a scoped update, only the sections the declared changed scope names.
+- **Write scope:** `product-sense.md` only. On a scoped update, only the sections the declared changed scope names.
 
 ## Stage 1 — Mechanical checks (failures are Important; finders do not run until clean)
 
-mechanical: `skills/product-definition/scripts/verify_mechanical.py --artifact product-sense.md [--phase-result …] [--prior … --scope …]`  
-then: `skills/verify-artifact/scripts/verify_generic.py phase-result …` and, on a scoped update, `… write-scope …`.
+mechanical: `skills/product-definition/scripts/verify_mechanical.py --artifact product-sense.md [--prior … --scope …]`  
+then, on a scoped update: `skills/verify-artifact/scripts/verify_generic.py write-scope …`.
 
 - D-1 Eight section headings present, in order: Product Framing, Product Scope, Responsibilities & Authority, Capabilities & Behaviors, Business & Domain Rules, Failure & Recovery, Acceptable Quality, Open Questions.
-- D-2 No Issue ID pattern (`I-\d{3}`) anywhere in `product-sense.md`.
-- D-3 `phase-result.yaml` parses and has `status`, `artifact_changes`, `issues`, `invalidates`; empty collections are `[]`.
-- D-4 `status: blocked` iff some Issue has `blocks_current_phase: true`.
-- D-5 Every Issue has `uncertainty` and `affected_phase` set; `affected_phase` is one of P0 P1 P2 P3 unknown.
+- D-2 Open truths use the artifact's own marker ("No X is established by the authoritative inputs" / "unresolved and deliberately not stated"), never an ID, `TBD`, or `TODO`.
+- D-3 `Status: Draft — N open` equals the number of open markers; `Status: Confirmed` requires zero.
 - D-W On a scoped update, no section outside the declared scope differs from `--prior`.
 
 ## Stage 2 — Finder families
@@ -30,7 +28,7 @@ One fresh-context finder per family; each receives only its family's checks and 
 | Family | Checks | Finder output |
 |---|---|---|
 | Traceability | PS-1, PS-2, PS-3, PS-4, PS-11, PS-12 | one row per statement: `statement \| source span \| none` — every `none` is a candidate; PS-2/PS-3/PS-11/PS-12 are the labels the finder attaches when the nearest span exists but does not support the statement |
-| Gaps & Issues | PS-5, PS-6, PS-8 | one row per committed capability: `capability \| dependent truths \| source or none \| Issue id or none`; plus one row per Issue and per Open Question with its justification |
+| Gaps & open truths | PS-5, PS-6, PS-8 | one row per committed capability: `capability \| dependent truths \| source or none \| open marker or none`; plus one row per reported open truth and per Open Question with its justification |
 | Boundary & scope | PS-7, PS-9, PS-10 | one row per flagged sentence / section / invalidates entry |
 
 Run the Traceability family on a different model family when one is available; it checks for the author model's own habit.
@@ -43,8 +41,8 @@ Each check names the admission-gate rule it enforces. The finder quotes the arti
 - **PS-2 Exclusivity from sufficiency.** A source says the user can reach an outcome one way; the artifact says that is the only way, or forbids other ways. *Evidence:* both spans.
 - **PS-3 Outcome relieved because a person was relieved.** A source says someone need not know or apply a rule; the artifact says the outcome need not satisfy it. *Evidence:* both spans.
 - **PS-4 Guessed value.** A number, threshold, time window, ranking, default, or policy appears where no source establishes one. The correct artifact text is "no X is established by the authoritative inputs". *Evidence:* the value; "no source found".
-- **PS-5 Missing Issue.** A committed capability's correctness, authority, or required behavior depends on a truth the sources do not settle, and `phase-result.yaml` has no Issue for it. *Evidence:* the capability statement; the dependency; absence in `issues`.
-- **PS-6 Spurious Issue.** An Issue was raised for a question no recorded commitment and no confirmed phase objective requires — the OMIT branch written as ISSUE. *Evidence:* the Issue statement; no artifact commitment that needs it.
+- **PS-5 Gap not left open.** A committed capability's correctness, authority, or required behavior depends on a truth the sources do not settle, and the artifact neither marks it open nor does the reply report it. *Evidence:* the capability statement; the dependency; no marker, no report line.
+- **PS-6 Spurious open truth.** A truth is reported open that no recorded commitment and no confirmed phase objective requires — the OMIT branch written as OPEN. *Evidence:* the reported line; no artifact commitment that needs it.
 - **PS-7 Downstream leakage.** A statement about how the product is verified (tests, evaluators, examples, coverage), designed, built, or observed. *Evidence:* the statement. Fix: restate as a product-level truth or delete.
 - **PS-8 Self-classified Open Question.** An entry in Open Questions that is neither an owner-kept-open item nor a Decision Management DEFER. *Evidence:* the entry; no owner or DM record.
 - **PS-9 Scope overreach.** On a scoped update, a section outside the declared scope changed. *Evidence:* diff hunk; declared scope.
@@ -63,12 +61,12 @@ Each check names the admission-gate rule it enforces. The finder quotes the arti
 
 Per `verify-artifact` Stage 5: an Important is **fixed**, **refuted** by a verbatim span the finder missed (script-confirmed), or **owner-resolved** by the founder. The producing skill cannot close a finding by explanation. For PS-1 in particular, "it's obvious" is not a span.
 
-## Pre-existing (not counted against the artifact; drafted as Issues)
+## Pre-existing (not counted against the artifact; reported as open truths for the P0 owner)
 
 - **PS-P1** Two authoritative inputs contradict each other on a product truth.
 - **PS-P2** An authoritative input is ambiguous in a way that admits two incompatible product-level readings, and the artifact picked one.
 
-Routing: `affected_phase: P0`, `uncertainty: true`, `blocks_current_phase` as the reviewer judges from whether the artifact can stand with the truth marked unresolved. The founder, not the artifact author, owns the answer.
+Each is one line in the report's Open truths block, decided by the founder. The artifact author does not resolve them.
 
 ## Skip
 

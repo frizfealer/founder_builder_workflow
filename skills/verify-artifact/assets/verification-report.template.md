@@ -1,7 +1,7 @@
 # Verification report — <artifact path>
 
 Standard: <VERIFY.md path>  
-Inputs: artifact · sources <list> · decisions record <path | none> · phase objective <quoted> · commitments <artifact list> · phase-result <path> · prior <path | n/a> · scope <declared | fresh draft>  
+Inputs: artifact · sources <list> · decisions record <path | none> · phase objective <quoted> · commitments <artifact list> · prior <path | n/a> · scope <declared | fresh draft>  
 Inputs status: **complete** | **incomplete — <what is missing>** (an incomplete run cannot report a pass)
 
 ## Stage 1 — Mechanical
@@ -14,7 +14,7 @@ Finders (one per family): <family: model> · … Candidates: <n> · Verified: <n
 
 ## Summary
 
-Important: <n> open / <n> fixed / <n> refuted / <n> owner-resolved · Nit: <n> · Pre-existing: <n> (drafted as Issues below)
+Important: <n> open / <n> fixed / <n> refuted / <n> owner-resolved · Nit: <n> · Pre-existing: <n> (listed under Open truths below)
 
 Verification status: **open** | **closed** (closed = no open Important and inputs complete)
 
@@ -38,18 +38,13 @@ Verification status: **open** | **closed** (closed = no open Important and input
 #### V-nn — <check ID>: <failure>
 - artifact: "<quote>" (<location>)
 - source: "<quote>" (<location>)
-- drafted issue: I-xxx · affected_phase: <P0|P1|P2|P3>
+- open truth for: <P0|P1|P2 owner>
 
-## Drafted Issues (for the producing skill to merge into phase-result.yaml)
+## Open truths for the owner
 
-```yaml
-- id: I-xxx
-  statement: <what appears wrong or unresolved>
-  evidence: <finding id and quoted spans>
-  affected_phase: <P0|P1|P2|P3>
-  uncertainty: true
-  blocks_current_phase: <true|false>
-```
+One line each; the producing skill repeats these in its reply and confirms each has an open marker in the artifact.
+
+- <unresolved truth> · evidence: "<span>" (<location>) · decides: <P0 owner | P1 owner | …>
 
 ## Dropped candidates
 

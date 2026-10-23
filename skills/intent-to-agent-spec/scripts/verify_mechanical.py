@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Mechanical D-checks for agent_spec.md (Stage 1 of /verify-artifact). Owned by this skill; listed in VERIFY.md.
 
-  verify_mechanical.py --artifact agent_spec.md --sources product-sense.md [decisions.md] --example-map example-map.md [--phase-result ...] [--prior ... --scope ...]
-Generic checks (findings quotes, PhaseResult shape, write scope) come from skills/verify-artifact/scripts/verify_lib.py.
+  verify_mechanical.py --artifact agent_spec.md --sources product-sense.md [decisions.md] --example-map example-map.md [--prior ... --scope ...]
+Generic checks (findings quotes, Status header, write scope) come from skills/verify-artifact/scripts/verify_lib.py.
 Exit 0 = pass, 1 = failures, 2 = usage.
 """
 from __future__ import annotations
@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "verify-artifact" / "scripts"))
-from verify_lib import Report, check_phase_result, check_write_scope, found_in, heading_order, read, sections  # noqa: E402
+from verify_lib import Report, check_status_header, check_write_scope, found_in, heading_order, read, sections  # noqa: E402
 
 
 AS_TOP = ["Agent Requirements", "Global Contract", "Evaluation Policy"]
@@ -111,17 +111,9 @@ def verify_agent_spec(a: argparse.Namespace) -> int:
         line = md[:body_start + m.start()].count("\n") + 1
         r.fail("D-6", f"{a.artifact}:{line}", f"HOW vocabulary `{m.group()}`")
 
-    # D-7 status header vs issues
-    pr = check_phase_result(r, a.phase_result, "D-7") if a.phase_result else None
-    sm = re.search(r"Status:\s*(Draft\s*[—-]\s*(\d+)\s*open issues?|Confirmed)", md)
-    if not sm:
-        r.fail("D-7", a.artifact, "no `Status:` header")
-    elif pr is not None:
-        n_open = len(pr.get("issues") or [])
-        if sm.group(1).startswith("Confirmed") and n_open:
-            r.fail("D-7", a.artifact, f"Status Confirmed but {n_open} open issue(s)")
-        if sm.group(2) and int(sm.group(2)) != n_open:
-            r.fail("D-7", a.artifact, f"Status says {sm.group(2)} open, phase-result has {n_open}")
+    # D-7 Status header vs open markers (rough cards cited, assumed world rows, open-truth phrase)
+    open_markers = [r"\|\s*assumed\s*\|", r"unresolved and deliberately not stated"]
+    check_status_header(r, a.artifact, "D-7", open_markers)
 
     # D-8 statement kinds, comm → rubric
     for blk in scen_blocks:
@@ -159,7 +151,6 @@ def main(argv=None) -> int:
     p.add_argument("--artifact", required=True)
     p.add_argument("--sources", nargs="*", default=[], help="product-sense.md [decisions.md]")
     p.add_argument("--example-map")
-    p.add_argument("--phase-result")
     p.add_argument("--prior")
     p.add_argument("--scope", nargs="*")
     return verify_agent_spec(p.parse_args(argv))

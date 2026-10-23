@@ -1,6 +1,6 @@
 # Exit checklist
 
-Run before `/verify-artifact`. Each item is pass / fail. A failure is fixed in the spec or recorded as an Issue in `phase-result.yaml`; it is never silently accepted.
+Run before `/verify-artifact`. Each item is pass / fail. A failure is fixed in the spec, or the truth is left open and reported; it is never silently accepted.
 
 ## Inputs
 
@@ -47,7 +47,7 @@ Run before `/verify-artifact`. Each item is pass / fail. A failure is fixed in t
 
 ## Coverage
 
-- [ ] Each material field has boundary cards (missing, min, max, past-bound, contradictory) in `example-map.md`, each `confirmed`, `dropped`, or raised as an Issue.
+- [ ] Each material field has boundary cards (missing, min, max, past-bound, contradictory) in `example-map.md`, each `confirmed`, `dropped`, or reported as an open truth.
 
 ## Rubrics
 
@@ -61,8 +61,8 @@ Run before `/verify-artifact`. Each item is pass / fail. A failure is fixed in t
 - [ ] Fixed k stated as a number; pass criterion explicit (all-k or minimum passes); fewer runs declared diagnostic.
 - [ ] Per-scenario exceptions appear only in that scenario.
 
-## PhaseResult
+## Open truths
 
-- [ ] Every red question still open is an Issue with `uncertainty: true` and `affected_phase` P0 (product truth) or P1 (owner decision).
-- [ ] Open-issue count in the spec header equals the number of open Issues.
-- [ ] `invalidates` lists only downstream scopes whose consumed meaning changed.
+- [ ] Every red question still open has an open marker in the spec and one line in the reply (truth · evidence span · P0 or P1 owner).
+- [ ] `Status: Draft — N open` equals the open-marker count; no `TBD`, `TODO`, or ID stands in for a marker.
+- [ ] On an update, the reply names only the downstream scope whose consumed meaning changed.

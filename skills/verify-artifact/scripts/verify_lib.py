@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """verify_lib — helpers shared by every artifact's mechanical checker and by verify-artifact's generic checks.
 
-Generic = true for every phase artifact: verbatim quote lookup, markdown section parsing, PhaseResult shape and
-status/blocks consistency (workflow-contracts.md), write scope against a prior version, the failure Report.
+Generic = true for every phase artifact: verbatim quote lookup, markdown section parsing, open-marker counting and
+Status-header consistency, write scope against a prior version, the failure Report.
 Artifact-specific D-checks live in each producing skill's scripts/verify_mechanical.py and import this module.
 Stdlib only; PyYAML used when present.
 """
@@ -42,7 +42,7 @@ def load_yaml(path: str) -> dict:
 
 
 def _mini_yaml(text: str):
-    """Minimal YAML: nested maps, lists of maps/scalars, scalars. Enough for phase-result.yaml and findings files."""
+    """Minimal YAML: nested maps, lists of maps/scalars, scalars. Enough for findings files."""
     lines = []
     for raw in text.splitlines():
         if not raw.strip() or raw.strip().startswith("#"):
@@ -149,41 +149,31 @@ class Report:
 
 # ---------------------------------------------------------------- shared checks
 
-def check_phase_result(r: Report, path: str | None, dprefix: str):
-    if not path:
-        r.fail(f"{dprefix}", "phase-result.yaml", "not supplied; PhaseResult checks skipped (inputs incomplete)")
+OPEN_MARKERS_DEFAULT = [
+    r"\bNo\b[^.\n]{0,80}\bis established by the authoritative inputs|not established by the authoritative inputs",
+    r"\bunresolved and deliberately not stated\b",
+    r"\bStatus:\s*rough\b",
+    r"\|\s*assumed\s*\|",
+]
+
+
+def count_open(md: str, markers: list[str] | None = None) -> int:
+    """Number of open-truth markers in an artifact. Each VERIFY.md may pass its own marker regexes."""
+    return sum(len(re.findall(m, md, flags=re.I)) for m in (markers or OPEN_MARKERS_DEFAULT))
+
+
+def check_status_header(r: Report, artifact: str, dcode: str, markers: list[str] | None = None):
+    """`Status: Draft — N open` must equal the open-marker count; `Status: Confirmed` requires zero."""
+    md = read(artifact)
+    m = re.search(r"Status:\s*(Draft\s*[—-]\s*(\d+)\s*open|Confirmed)", md)
+    if not m:
+        r.fail(dcode, artifact, "no `Status:` header (Draft — N open | Confirmed)")
         return
-    try:
-        pr = load_yaml(path)
-    except Exception as e:  # noqa: BLE001
-        r.fail(dprefix, path, f"does not parse: {e}")
-        return
-    body = pr.get("phase_result", pr)
-    for f in ("status", "artifact_changes", "issues", "invalidates"):
-        if f not in body:
-            r.fail(dprefix, path, f"missing field `{f}`")
-    issues = body.get("issues") or []
-    if not isinstance(issues, list):
-        r.fail(dprefix, path, "`issues` is not a list")
-        issues = []
-    blocking = False
-    for i, iss in enumerate(issues):
-        if not isinstance(iss, dict):
-            r.fail(dprefix, f"{path} issues[{i}]", "issue is not a map")
-            continue
-        for f in ("id", "statement", "evidence", "affected_phase", "uncertainty", "blocks_current_phase"):
-            if f not in iss:
-                r.fail(dprefix, f"{path} {iss.get('id', f'issues[{i}]')}", f"missing `{f}`")
-        if iss.get("affected_phase") not in ("P0", "P1", "P2", "P3", "unknown"):
-            r.fail(dprefix, f"{path} {iss.get('id')}", f"affected_phase `{iss.get('affected_phase')}` not in P0|P1|P2|P3|unknown")
-        if iss.get("blocks_current_phase") is True:
-            blocking = True
-    status = body.get("status")
-    if status not in ("complete", "blocked"):
-        r.fail(dprefix, path, f"status `{status}` not complete|blocked")
-    elif (status == "blocked") != blocking:
-        r.fail(dprefix, path, "status/blocks_current_phase inconsistent (blocked iff some issue blocks)")
-    return body
+    n = count_open(md, markers)
+    if m.group(1).startswith("Confirmed") and n:
+        r.fail(dcode, artifact, f"Status Confirmed but {n} open marker(s) in artifact")
+    elif m.group(2) is not None and int(m.group(2)) != n:
+        r.fail(dcode, artifact, f"Status says {m.group(2)} open, artifact has {n} open marker(s)")
 
 
 def check_write_scope(r: Report, artifact: str, prior: str | None, scope: list[str], dcode: str):

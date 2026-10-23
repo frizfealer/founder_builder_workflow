@@ -35,7 +35,7 @@ Agent Spec **不規定 HOW**：例如使用哪個 agent framework、怎麼寫 py
 
 Status: <Draft — N open issues | Confirmed>  
 Owner: <name>  
-Source: `product-sense.md` (claims cited as `[PS §n: "…"]`) · owner confirmations in `example-map.md` (cited as `[EM: id]`) · issues in `phase-result.yaml`
+Source: `product-sense.md` (claims cited as `[PS §n: "…"]`) · owner confirmations in `example-map.md` (cited as `[EM: id]`) · open truths marked in place and reported in the producing reply
 
 ## 0. Agent Requirements
 
@@ -65,7 +65,7 @@ Source: `product-sense.md` (claims cited as `[PS §n: "…"]`) · owner confirma
 | <entity> | <fields the agent must resolve> | confirmed | [PS §5: "…"] |
 | <affordance: observe / change / check status of …> | <what it must return> | assumed | needed by <XX-Snn> |
 
-[`assumed` = required of the world, not yet confirmed by Product Sense; architecture must honor or reject via Issue.]
+[`assumed` = required of the world, not yet confirmed by Product Sense; architecture must honor, or reject by reporting an open truth for the P1 owner.]
 
 ## 1. Global Contract
 
