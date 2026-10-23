@@ -1,22 +1,36 @@
-# REVIEW.md — product-sense.md
+# VERIFY.md — product-sense.md
 
-Standard for `/review-artifact` when the artifact is a Product Sense produced by `/product-definition`. The mechanism lives in `skills/review-artifact/SKILL.md`; this file only says what failure looks like here.
+Standard for `/verify-artifact` when the artifact is a Product Sense produced by `/product-definition`. The mechanism lives in `skills/verify-artifact/SKILL.md`; this file only says what failure looks like here.
 
 ## Artifact and sources
 
 - **Artifact:** `product-sense.md`, plus `phase-result.yaml` from the same run.
-- **Authoritative sources:** the Product Idea (`product-idea.md`) and any business/domain context the invocation or product directory established as authoritative. Nothing else counts as a source — not prior drafts, not the producing conversation, not "common practice".
-- **Statement** (for traceability): any sentence in sections 1–7 that says what is or must be true of the product — it uses must / may / never / only / always / requires, names a value, threshold, limit, policy, or authority, or names an actor and what they can do.
+- **Authoritative sources:** the Product Idea (`product-idea.md`), any business/domain context the invocation or product directory established as authoritative, and the Decision Management record (`decisions.md`) when one exists — an accepted resolution is a source. Nothing else counts — not prior drafts, not the producing conversation, not "common practice".
+- **Required inputs beyond sources:** the confirmed phase objective; the commitments recorded in authoritative artifacts (needed for PS-5/PS-6); the prior `product-sense.md` and declared scope on a scoped update (needed for PS-9).
+- **Statement** (for traceability): every sentence in sections 1–7, except headings and sentences the artifact itself marks as derivation notes ("derived from …"). No keyword filter: a sentence with no modal verb can still assert product truth ("Tables seat four."), and the finder decides nothing — it looks for the span.
 - **Source** (for traceability): a verbatim span from an authoritative input that explicitly states the statement, or a span whose denial the statement would contradict (the admission gate's step 2).
 - **Write scope:** `product-sense.md` and `phase-result.yaml` only. On a scoped update, only the sections the declared changed scope names.
 
-## Deterministic pre-checks (run before finders; failures are Important)
+## Stage 1 — Mechanical checks (`verify_mechanical.py --kind product-sense`; failures are Important, finders do not run until clean)
 
 - D-1 Eight section headings present, in order: Product Framing, Product Scope, Responsibilities & Authority, Capabilities & Behaviors, Business & Domain Rules, Failure & Recovery, Acceptable Quality, Open Questions.
 - D-2 No Issue ID pattern (`I-\d{3}`) anywhere in `product-sense.md`.
 - D-3 `phase-result.yaml` parses and has `status`, `artifact_changes`, `issues`, `invalidates`; empty collections are `[]`.
 - D-4 `status: blocked` iff some Issue has `blocks_current_phase: true`.
 - D-5 Every Issue has `uncertainty` and `affected_phase` set; `affected_phase` is one of P0 P1 P2 P3 unknown.
+- D-W On a scoped update, no section outside the declared scope differs from `--prior`.
+
+## Stage 2 — Finder families
+
+One fresh-context finder per family; each receives only its family's checks and returns a table, not prose.
+
+| Family | Checks | Finder output |
+|---|---|---|
+| Traceability | PS-1, PS-2, PS-3, PS-4, PS-11, PS-12 | one row per statement: `statement \| source span \| none` — every `none` is a candidate; PS-2/PS-3/PS-11/PS-12 are the labels the finder attaches when the nearest span exists but does not support the statement |
+| Gaps & Issues | PS-5, PS-6, PS-8 | one row per committed capability: `capability \| dependent truths \| source or none \| Issue id or none`; plus one row per Issue and per Open Question with its justification |
+| Boundary & scope | PS-7, PS-9, PS-10 | one row per flagged sentence / section / invalidates entry |
+
+Run the Traceability family on a different model family when one is available; it checks for the author model's own habit.
 
 ## What failure looks like — Important
 
@@ -35,14 +49,18 @@ Each check names the admission-gate rule it enforces. The finder quotes the arti
 - **PS-11 Silent authority.** Section 3 grants the agent an action without a source stating the grant, or omits a confirmation requirement a source states. Authority is the highest-cost over-admission, so it is listed separately. *Evidence:* both spans.
 - **PS-12 Interaction semantics by accident.** A statement decides persistence across sessions, failure behavior, or which quality concern outranks another, without a source. *Evidence:* the statement; "no source found".
 
-## What failure looks like — Nit (cap: 5 per review)
+## What failure looks like — Nit (cap: 5, applied after merge across finders)
 
 - **PS-N1** A derivation is annotated where a reader could reconstruct it, or missing where they could not.
 - **PS-N2** A statement is phrased as procedure rather than as what should be true.
 - **PS-N3** A committed-future-scope item lives in "in scope now" or vice versa, with the source agreeing on the commitment but not the timing.
 - **PS-N4** `artifact_changes` on a fresh draft has more than one entry, or on a scoped update is more granular than routing needs.
 
-## Pre-existing (not counted against the artifact; routed as Issues)
+## Resolution
+
+Per `verify-artifact` Stage 5: an Important is **fixed**, **refuted** by a verbatim span the finder missed (script-confirmed), or **owner-resolved** by the founder. The producing skill cannot close a finding by explanation. For PS-1 in particular, "it's obvious" is not a span.
+
+## Pre-existing (not counted against the artifact; drafted as Issues)
 
 - **PS-P1** Two authoritative inputs contradict each other on a product truth.
 - **PS-P2** An authoritative input is ambiguous in a way that admits two incompatible product-level readings, and the artifact picked one.
@@ -53,6 +71,6 @@ Routing: `affected_phase: P0`, `uncertainty: true`, `blocks_current_phase` as th
 
 Nothing is skipped. Section 8 is reviewed only under PS-8.
 
-## Relationship to evals
+## Smoke fixtures
 
-`evals/cases.yaml` (when added for this skill) tests whether the *skill* applies the gate on fixtures. This file tests whether a *given artifact* passed the gate. Same must/must-not list, different object under test; keep them in sync.
+`fixtures/planted/` (when added): copies of a known-good Product Sense each with one planted defect, named for the check it must trigger — at minimum `PS-1-over-admission.md`, `PS-4-guessed-value.md`, `PS-5-missing-issue.md`. Run once after editing this file; each named check must fire.

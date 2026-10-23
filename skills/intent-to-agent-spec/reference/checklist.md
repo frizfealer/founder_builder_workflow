@@ -1,6 +1,6 @@
 # Exit checklist
 
-Run before `/review-artifact`. Each item is pass / fail. A failure is fixed in the spec or recorded as an Issue in `phase-result.yaml`; it is never silently accepted.
+Run before `/verify-artifact`. Each item is pass / fail. A failure is fixed in the spec or recorded as an Issue in `phase-result.yaml`; it is never silently accepted.
 
 ## Inputs
 

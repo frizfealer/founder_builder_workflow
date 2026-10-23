@@ -14,7 +14,7 @@ Outputs, all in the product directory:
 - `example-map.md` — rough-example cards, candidate rules, red questions, and the owner's confirmation record per card. The spec cites this file for every owner confirmation.
 - `phase-result.yaml` — in the `workflow-contracts.md` shape. Unresolved truths are Issues here, never decisions in the spec.
 
-Before the owner is asked to confirm the spec, run `/review-artifact agent_spec.md skills/intent-to-agent-spec/REVIEW.md phase-result.yaml` and close every Important.
+Before the owner is asked to confirm the spec, run `/verify-artifact agent_spec.md skills/intent-to-agent-spec/VERIFY.md phase-result.yaml` and close every Important.
 
 ## Hard rules
 
@@ -107,11 +107,11 @@ A judgment statement with no rubric is an Issue, not a scenario.
 
 Write the common policy once (template default: every required Expected holds, every Forbidden absent; `may` not checked; fail / inconclusive / pass; **k = 5** fresh executions, all pass; fewer runs diagnostic). Per-scenario exceptions appear only in that scenario. If the owner wants a different k or a minimum-passes criterion, write the number and the criterion; never "N trials".
 
-### Step 7 — Review, then confirm
+### Step 7 — Verify, then confirm
 
 1. Run `reference/checklist.md`; fix or convert each failure to an Issue.
-2. Run `/review-artifact` with this skill's `REVIEW.md`. Close every Important; merge the report's Drafted Issues into `phase-result.yaml`. This is Lifecycle Policy 10(a).
-3. Present the spec and the closed review report to the owner for confirmation (Lifecycle Policy 10(b)). On confirmation, set `Status: Confirmed` only if open issues = 0.
+2. Run `/verify-artifact` with this skill's `VERIFY.md` (Stage 1 script first, then finders). Close every Important by fix or script-confirmed refutation; merge the report's Drafted Issues into `phase-result.yaml`. This is Lifecycle Policy 10(a).
+3. Present the spec and the closed verification report to the owner for confirmation (Lifecycle Policy 10(b)). On confirmation, set `Status: Confirmed` only if open issues = 0.
 4. Emit `phase-result.yaml`. `invalidates`: list downstream scopes whose consumed meaning changed (architecture notes, BDD tests), known ones only.
 
 ## Anti-patterns to refuse

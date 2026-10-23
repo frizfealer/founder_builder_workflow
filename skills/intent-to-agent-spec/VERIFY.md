@@ -1,16 +1,17 @@
-# REVIEW.md — agent_spec.md
+# VERIFY.md — agent_spec.md
 
-Standard for `/review-artifact` when the artifact is an Agent Spec produced by `/intent-to-agent-spec`. The mechanism lives in `skills/review-artifact/SKILL.md`; this file only says what failure looks like here.
+Standard for `/verify-artifact` when the artifact is an Agent Spec produced by `/intent-to-agent-spec`. The mechanism lives in `skills/verify-artifact/SKILL.md`; this file only says what failure looks like here.
 
 ## Artifact and sources
 
 - **Artifact:** `agent_spec.md`, plus `example-map.md` and `phase-result.yaml` from the same run.
 - **Authoritative sources:** `product-sense.md` (product truth) and the `confirmed` cards in `example-map.md` (owner decisions). The Product Idea is not a source for this artifact; a spec line that can only be traced to the Product Idea is a P0 gap.
-- **Statement** (for traceability): any Agent Requirements line; any Scope & Authority line; any Contract rule; any Expected or Forbidden item; any rubric criterion; any World requirements row.
+- **Required inputs beyond sources:** `decisions.md` when it exists; the confirmed phase objective; the prior `agent_spec.md` and declared scope on a scoped update.
+- **Statement** (for traceability): every line in Agent Requirements, Scope & Authority, Contract, Expected, Forbidden, every rubric criterion, and every World requirements row — no keyword filter.
 - **Source** (for traceability): a `[PS §n: "…"]` citation whose quote exists in `product-sense.md` and supports the statement, or an `[EM: id]` citation whose card is `confirmed` and matches the statement.
 - **Write scope:** `agent_spec.md`, `example-map.md`, `phase-result.yaml`. On a scoped update, only the capabilities and scenarios the declared scope names.
 
-## Deterministic pre-checks (run before finders; failures are Important)
+## Stage 1 — Mechanical checks (`verify_mechanical.py --kind agent-spec`; failures are Important, finders do not run until clean)
 
 - D-1 Sections present in order: Agent Requirements (4 blocks), Global Contract, Evaluation Policy, Capabilities; each capability has Scope & Authority, Contract, Scenarios.
 - D-2 IDs unique and well-formed: `G-\d\d`, `[A-Z]{2}-\d\d`, `[A-Z]{2}-S\d\d`, `EM-[a-z]+-\d\d`.
@@ -21,6 +22,18 @@ Standard for `/review-artifact` when the artifact is an Agent Spec produced by `
 - D-7 Status header count equals open Issues in `phase-result.yaml`; `Confirmed` only if that count is 0.
 - D-8 Every Expected statement is marked `(state)`, `(order)`, or `(comm)`; every `(comm)` has a rubric block beneath it.
 - D-9 Evaluation Policy states k as an integer and the pass criterion.
+- D-W On a scoped update, no capability or scenario outside the declared scope differs from `--prior`.
+
+## Stage 2 — Finder families
+
+| Family | Checks | Finder output |
+|---|---|---|
+| Traceability | AS-1, AS-2, AS-4, AS-5, AS-6, AS-16 | one row per statement: `statement \| citation \| source span \| supports? yes/no/none` |
+| Authority | AS-3, AS-8 | one row per action the spec grants: `action \| may/confirm/must-not \| reversible? \| §3 span or none` |
+| Gaps & Issues | AS-7, AS-14, AS-17, AS-18 | one row per conditional clause, judgment statement, red card, and Issue |
+| Structure & scope | AS-9, AS-10, AS-11, AS-12, AS-13, AS-15 | one row per rule / state line / assumed row / G-rule / duplicate |
+
+Run Traceability and Gaps & Issues on a different model family when one is available.
 
 ## What failure looks like — Important
 
@@ -43,7 +56,7 @@ Standard for `/review-artifact` when the artifact is an Agent Spec produced by `
 - **AS-17 Missing Issue.** A red question in `example-map.md` with no answer and no corresponding Issue in `phase-result.yaml`. *Evidence:* the card; `issues`.
 - **AS-18 Spurious P0 Issue.** An Issue routed `affected_phase: P0` that is an owner decision about agent behavior Product Sense deliberately left to P1 (e.g. wording of a clarification), not missing product truth. *Evidence:* the Issue; the relevant Product Sense section.
 
-## What failure looks like — Nit (cap: 6 per review)
+## What failure looks like — Nit (cap: 6, applied after merge across finders)
 
 - **AS-N1** Calibration set has fewer than 3 entries, or lacks a boundary case.
 - **AS-N2** An ordering constraint is written as an end-state fact or vice versa.
@@ -51,7 +64,11 @@ Standard for `/review-artifact` when the artifact is an Agent Spec produced by `
 - **AS-N4** Scenario or rule titles do not describe the condition they cover.
 - **AS-N5** A citation quote is longer than one line.
 
-## Pre-existing (not counted against the artifact; routed as Issues)
+## Resolution
+
+Per `verify-artifact` Stage 5: **fixed**, **refuted** by a script-confirmed span, or **owner-resolved**. The producing skill cannot close a finding by explanation.
+
+## Pre-existing (not counted against the artifact; drafted as Issues)
 
 - **AS-P1** Product Sense is silent on a committed capability's authority, material fields, or failure behavior, and the spec correctly left it open. `affected_phase: P0`, `uncertainty: true`.
 - **AS-P2** Two Product Sense claims contradict each other where the spec needs one. `affected_phase: P0`, `uncertainty: true`.
@@ -61,6 +78,10 @@ Standard for `/review-artifact` when the artifact is an Agent Spec produced by `
 
 Nothing. The Purpose / Writing Guide header is checked only for being verbatim (D-1).
 
-## Relationship to downstream reviews
+## Smoke fixtures
 
-`agent-spec-to-pytest-bdd/REVIEW.md` and `develop-architecture-notes/REVIEW.md` treat this artifact as their source. A problem they find in the spec itself is Pre-existing for them and comes back here as an Issue with `affected_phase: P1`.
+`fixtures/planted/` (when added): at minimum `AS-5-invented-default.md`, `AS-7-conditional-policy.md`, `AS-16-rough-card-promoted.md`.
+
+## Relationship to downstream verification
+
+`agent-spec-to-pytest-bdd/VERIFY.md` and `develop-architecture-notes/VERIFY.md` treat this artifact as their source. A problem they find in the spec itself is Pre-existing for them and comes back here as an Issue with `affected_phase: P1`.
