@@ -24,11 +24,11 @@ This skill finds and reports. The founder decides.
 
 ## Phase objective
 
-The phase objective is the outcome this phase must produce. It stays the same across runs. Unless the founder has confirmed a different one, it is:
+The phase objective is the outcome this phase must produce. It stays the same across runs. This default counts as confirmed:
 
 > Bring the authoritative Product Sense to the minimum sufficient state required for downstream Verification Design.
 
-Use it by default. Ask the founder to confirm it in exactly two cases: entering this phase with no phase objective confirmed yet, or a request that would change it (for example, treating this round as a throwaway framing exercise not meant to feed Verification Design).
+Ask the founder only when a request would change it (for example, treating this round as a throwaway framing exercise not meant to feed Verification Design). Once the founder confirms a different objective, use that one.
 
 An objective names the target artifact and its scope only. How truth is admitted, omitted, or reported comes from this skill, so a proposed objective leaves those rules out.
 
@@ -55,7 +55,7 @@ Start the file with the status line `Status: Draft — N open`, where N is the n
 5. **Business & Domain Rules**: the rules that make an outcome correct, and the invariants that must never break.
 6. **Failure & Recovery**: what the product does when things go wrong, and what it must never claim.
 7. **Acceptable Quality**: how good is good enough for this product.
-8. **Open Questions**: items the founder has chosen to keep open, each with why. Only two kinds of item belong here, and both enter on the founder's word: an item the founder explicitly keeps open, and an open truth the founder deferred when asked. On a fresh draft this section is normally empty.
+8. **Deferred Questions**: items the founder has chosen to keep open, each with why. Only two kinds of item belong here, and both enter on the founder's word: an item the founder explicitly keeps open, and an open truth the founder deferred when asked. Open truths still awaiting the founder stay as open markers in the sections they affect, so on a fresh draft this section is normally empty.
 
 Run every candidate statement through the admission gate before writing it.
 
@@ -100,7 +100,7 @@ Keep working when you find something unresolved; the founder answers in their ow
 
 - **The inputs or the rest of the artifact already settle it.** This is normal work or a clear defect. Fix it.
 - **It needs a judgment no authoritative input gives.** This is the gate's OPEN branch. Write the open marker, report it, and carry on with the round.
-- **The founder keeps it open on purpose**, and the phase objective does not need it answered this round. Record it in Open Questions. That is product truth ("undecided by design"), not an open truth to report.
+- **The founder keeps it open on purpose**, and the phase objective does not need it answered this round. Record it in Deferred Questions. That is product truth ("undecided by design"), not an open truth to report.
 
 Uncertainty large enough to question the product framing itself is reported as an open truth. Reopening the Product Idea is the founder's call.
 
@@ -109,10 +109,10 @@ Uncertainty large enough to question the product framing itself is reported as a
 The founder settles each open truth in one of three ways:
 
 - **Answer.** Append the founder's words, verbatim and dated, to `## Clarifications` in `product-idea.md`. If they answer in this conversation, transcribe their exact words there. Rerun the affected section: the gate now ADMITs the answer, and the stated value replaces the open marker.
-- **Defer.** Replace the open marker with an Open Questions entry that records the deferral and why the question stays open.
+- **Defer.** Replace the open marker with a Deferred Questions entry that records the deferral and why the question stays open.
 - **Drop.** The founder states that no commitment needs it. Record their words in `## Clarifications`, and replace the open marker with the OMIT statement.
 
-Each settlement is a scoped update and reruns verification on that scope. Confirming the phase objective is a separate act: it sets the objective at phase entry and settles nothing.
+Each settlement is a scoped update and reruns verification on that scope. Confirming a changed phase objective is a separate act and settles nothing.
 
 ## Ownership boundary
 

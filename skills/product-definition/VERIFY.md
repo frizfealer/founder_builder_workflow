@@ -16,7 +16,7 @@ Standard for `/verify-artifact` when the artifact is a Product Sense produced by
 mechanical: `skills/product-definition/scripts/verify_mechanical.py --artifact product-sense.md [--prior … --scope …]`  
 then, on a scoped update: `skills/verify-artifact/scripts/verify_generic.py write-scope …`.
 
-- D-1 Eight section headings present, in order: Product Framing, Product Scope, Responsibilities & Authority, Capabilities & Behaviors, Business & Domain Rules, Failure & Recovery, Acceptable Quality, Open Questions.
+- D-1 Eight section headings present, in order: Product Framing, Product Scope, Responsibilities & Authority, Capabilities & Behaviors, Business & Domain Rules, Failure & Recovery, Acceptable Quality, Deferred Questions.
 - D-2 Open truths use the artifact's own marker, "unresolved and deliberately not stated", never an ID, `TBD`, or `TODO`. "No X is established by the authoritative inputs" is the admission gate's OMIT statement, a complete product-level statement, and is not an open marker.
 - D-3 `Status: Draft — N open` equals the number of open markers; `Status: Confirmed` requires zero.
 - D-W On a scoped update, no section outside the declared scope differs from `--prior`.
@@ -28,7 +28,7 @@ One fresh-context finder per family; each receives only its family's checks and 
 | Family | Checks | Finder output |
 |---|---|---|
 | Traceability | PS-1, PS-2, PS-3, PS-4, PS-11, PS-12 | one row per statement: `statement \| source span \| none` — every `none` is a candidate; PS-2/PS-3/PS-11/PS-12 are the labels the finder attaches when the nearest span exists but does not support the statement |
-| Gaps & open truths | PS-5, PS-6, PS-8 | one row per committed capability: `capability \| dependent truths \| source or none \| open marker or none`; plus one row per reported open truth and per Open Question with its justification |
+| Gaps & open truths | PS-5, PS-6, PS-8 | one row per committed capability: `capability \| dependent truths \| source or none \| open marker or none`; plus one row per reported open truth and per Deferred Questions entry with its justification |
 | Boundary & scope | PS-7, PS-9, PS-10 | one row per flagged sentence / section / invalidates entry |
 
 Run the Traceability family on a different model family when one is available; it checks for the author model's own habit.
@@ -44,7 +44,7 @@ Each check names the admission-gate rule it enforces. The finder quotes the arti
 - **PS-5 Gap not left open.** A committed capability's correctness, authority, or required behavior depends on a truth the sources do not settle, and the artifact neither marks it open nor does the reply report it. *Evidence:* the capability statement; the dependency; no marker, no report line.
 - **PS-6 Spurious open truth.** A truth is reported open that no recorded commitment and no confirmed phase objective requires — the OMIT branch written as OPEN. *Evidence:* the reported line; no artifact commitment that needs it.
 - **PS-7 Downstream leakage.** A statement about how the product is verified (tests, evaluators, examples, coverage), designed, built, or observed. *Evidence:* the statement. Fix: restate as a product-level truth or delete.
-- **PS-8 Self-classified Open Question.** An entry in Open Questions that is neither an owner-kept-open item nor an owner-deferred open truth. *Evidence:* the entry; no owner statement in the sources.
+- **PS-8 Self-classified Deferred Question.** An entry in Deferred Questions that is neither an owner-kept-open item nor an owner-deferred open truth. *Evidence:* the entry; no owner statement in the sources.
 - **PS-9 Scope overreach.** On a scoped update, a section outside the declared scope changed. *Evidence:* diff hunk; declared scope.
 - **PS-10 Speculative invalidation.** `invalidates` lists a downstream scope not consumed by the semantics that actually changed. *Evidence:* the entry; the artifact change.
 - **PS-11 Silent authority.** Section 3 grants the agent an action without a source stating the grant, or omits a confirmation requirement a source states. Authority is the highest-cost over-admission, so it is listed separately. *Evidence:* both spans.

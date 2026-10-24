@@ -18,7 +18,7 @@ from verify_lib import Report, check_status_header, check_write_scope, found_in,
 
 PS_SECTIONS = [
     "Product Framing", "Product Scope", "Responsibilities & Authority", "Capabilities & Behaviors",
-    "Business & Domain Rules", "Failure & Recovery", "Acceptable Quality", "Open Questions",
+    "Business & Domain Rules", "Failure & Recovery", "Acceptable Quality", "Deferred Questions",
 ]
 
 
