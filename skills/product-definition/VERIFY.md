@@ -17,7 +17,7 @@ mechanical: `skills/product-definition/scripts/verify_mechanical.py --artifact p
 then, on a scoped update: `skills/verify-artifact/scripts/verify_generic.py write-scope …`.
 
 - D-1 Eight section headings present, in order: Product Framing, Product Scope, Responsibilities & Authority, Capabilities & Behaviors, Business & Domain Rules, Failure & Recovery, Acceptable Quality, Open Questions.
-- D-2 Open truths use the artifact's own marker ("No X is established by the authoritative inputs" / "unresolved and deliberately not stated"), never an ID, `TBD`, or `TODO`.
+- D-2 Open truths use the artifact's own marker, "unresolved and deliberately not stated", never an ID, `TBD`, or `TODO`. "No X is established by the authoritative inputs" is the admission gate's OMIT statement, a complete product-level statement, and is not an open marker.
 - D-3 `Status: Draft — N open` equals the number of open markers; `Status: Confirmed` requires zero.
 - D-W On a scoped update, no section outside the declared scope differs from `--prior`.
 
@@ -40,7 +40,7 @@ Each check names the admission-gate rule it enforces. The finder quotes the arti
 - **PS-1 Over-admission.** A statement with no explicit source, whose denial would not contradict any source. The author wrote something plausible, conventional, or safe. *Evidence:* the statement; the closest source span, with a one-line argument that denying the statement is consistent with it.
 - **PS-2 Exclusivity from sufficiency.** A source says the user can reach an outcome one way; the artifact says that is the only way, or forbids other ways. *Evidence:* both spans.
 - **PS-3 Outcome relieved because a person was relieved.** A source says someone need not know or apply a rule; the artifact says the outcome need not satisfy it. *Evidence:* both spans.
-- **PS-4 Guessed value.** A number, threshold, time window, ranking, default, or policy appears where no source establishes one. The correct artifact text is "no X is established by the authoritative inputs". *Evidence:* the value; "no source found".
+- **PS-4 Guessed value.** A number, threshold, time window, ranking, default, or policy appears where no source establishes one. The correct artifact text follows the admission gate: "no X is established by the authoritative inputs" when no commitment needs the value (OMIT), or "unresolved and deliberately not stated" when one does (OPEN). *Evidence:* the value; "no source found".
 - **PS-5 Gap not left open.** A committed capability's correctness, authority, or required behavior depends on a truth the sources do not settle, and the artifact neither marks it open nor does the reply report it. *Evidence:* the capability statement; the dependency; no marker, no report line.
 - **PS-6 Spurious open truth.** A truth is reported open that no recorded commitment and no confirmed phase objective requires — the OMIT branch written as OPEN. *Evidence:* the reported line; no artifact commitment that needs it.
 - **PS-7 Downstream leakage.** A statement about how the product is verified (tests, evaluators, examples, coverage), designed, built, or observed. *Evidence:* the statement. Fix: restate as a product-level truth or delete.
@@ -61,10 +61,10 @@ Each check names the admission-gate rule it enforces. The finder quotes the arti
 
 Per `verify-artifact` Stage 5: an Important is **fixed**, **refuted** by a verbatim span the finder missed (script-confirmed), or **owner-resolved** by the founder. The producing skill cannot close a finding by explanation. For PS-1 in particular, "it's obvious" is not a span.
 
-## Pre-existing (not counted against the artifact; reported as open truths for the P0 owner)
+## Pre-existing (not counted against the artifact; reported as open truths for the founder)
 
-- **PS-P1** Two authoritative inputs contradict each other on a product truth.
-- **PS-P2** An authoritative input is ambiguous in a way that admits two incompatible product-level readings, and the artifact picked one.
+- **PS-PRE-1** Two authoritative inputs contradict each other on a product truth.
+- **PS-PRE-2** An authoritative input is ambiguous in a way that admits two incompatible product-level readings, and the artifact picked one.
 
 Each is one line in the report's Open truths block, decided by the founder. The artifact author does not resolve them.
 

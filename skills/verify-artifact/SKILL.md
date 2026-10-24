@@ -1,96 +1,116 @@
 ---
 name: verify-artifact
-description: Shared authoring-time verifier for any phase artifact (product-sense.md, agent_spec.md, architecture-notes.md, BDD test files). Runs mechanical checks first, then narrow fresh-context finders against the artifact's own VERIFY.md, verifies every finding has quoted evidence, assigns Important / Nit / Pre-existing, reports upstream problems as open truths for their owner, and requires every Important to be fixed — the author cannot close a finding by assertion. Use after a phase skill finishes a round and before the owner confirms the artifact. Not a runtime judge of agent behavior.
+description: Verify a phase artifact (product-sense.md, agent_spec.md, architecture-notes.md, BDD test files) against its producing skill's VERIFY.md before the owner confirms it. Use when a phase skill finishes a draft or a scoped update, or after a VERIFY.md changes. Not for judging agent behavior at runtime.
 argument-hint: <artifact path> <VERIFY.md path> [--prior <previous artifact version> --scope <sections>]
 ---
 
-# /verify-artifact — shared verification mechanism
+# /verify-artifact
 
-One mechanism, many standards. This skill owns **how** verification runs and nothing that is specific to one artifact kind. Each producing skill owns **what failure looks like** for its artifact — its `VERIFY.md` (the standard), its `scripts/verify_mechanical.py` (the D-checks), and its `fixtures/planted/` (the smoke test), all beside its `SKILL.md`. Never verify without a `VERIFY.md`; never add a check that is not in it or in the four cross-artifact rules below.
+Verify one artifact against one standard. This skill owns **how** verification runs. The producing skill owns **what failure looks like**: its `VERIFY.md` (the standard), its `scripts/verify_mechanical.py` (the D-checks, built on `scripts/verify_lib.py` here), and its `fixtures/planted/` (smoke fixtures), all beside its `SKILL.md`. Check exactly what `VERIFY.md` and the four cross-artifact rules below list.
 
-What lives here, because it is identical for every artifact: `scripts/verify_lib.py` (quote lookup, section parsing, open-marker counting, write-scope diff, the finding Report) and `scripts/verify_generic.py` (findings quote-existence, status-header count, write-scope as CLI modes). A producing skill's checker imports `verify_lib`; nothing in this folder knows about Product Sense, Agent Spec, or any other kind.
+Verification is the producing agent's **loop**: produce, verify, fix, re-verify. Its signal comes from scripts and spans wherever possible, because the failure it hunts, filling a gap with a plausible default, is a habit the verifying model shares with the author. Three things follow. Scripts run first, and finders start only when the scripts pass. Finders fill tables that ask "where is the span?". The author has no way to close a finding by saying it is fine.
 
-Design goal: give the producing agent a feedback signal it can loop on (produce → verify → fix → re-verify) whose source is, as far as possible, **not the same model's judgment**. Three consequences shape everything below: mechanical checks run first and gate the rest; finders are narrow and adversarial rather than general reviewers; the author has no path to close a finding by asserting it is fine.
+## Terms
+
+- **Span**: a verbatim quote from a file, with its location. Spans are the only evidence. "Verbatim" ignores whitespace and curly versus straight quotes, and nothing else.
+- **Open truth**: a fact the sources do not settle.
+- **Commitment**: a behavior recorded in an authoritative artifact, or the confirmed phase objective. Commitments decide whether a missing fact needs an open marker or an OMIT statement.
+- **Open marker**: the sentence the artifact writes where an open truth's value would go, for example "unresolved and deliberately not stated". Each `VERIFY.md` defines its markers.
+- **OMIT statement**: the sentence an artifact may write for a fact the sources do not settle and no commitment needs, for example "No hold window is established by the authoritative inputs". It is complete as written: it is not an open marker, and nobody answers it. A `VERIFY.md` that defines none allows none.
+- **Status header**: the artifact's `Status:` line. `Status: Draft — N open` means N open markers remain. `Status: Confirmed` requires zero.
 
 ## Inputs
 
-A verifier without its inputs returns silence, and the loop reads silence as pass. All of these are required; a missing one is reported as `inputs: incomplete` and the run does not claim a pass.
+All are required. If one is missing, the report says `Inputs status: incomplete` and the run cannot report a pass. A verifier missing an input returns silence, and the loop reads silence as a pass.
 
-- Artifact under verification (path).
-- `VERIFY.md` for that artifact kind.
-- Authoritative sources, as `VERIFY.md` names them (Product Idea, `product-sense.md`, `agent_spec.md`, `example-map.md`, …).
-- The confirmed **phase objective** and the **commitments** currently recorded in authoritative artifacts — needed to judge whether a gap should be left open or omitted.
-- `--prior`: the previous version of the artifact (or a diff), when this is a scoped update. Without it, write-scope cannot be checked.
-- The declared changed scope, for a scoped update.
+- The artifact.
+- Its `VERIFY.md`.
+- The authoritative sources `VERIFY.md` names.
+- The confirmed phase objective and the commitments recorded in authoritative artifacts. Rule 3 needs them to tell a gap that must stay open from one that can be omitted.
+- On a scoped update, `--prior` (the previous version) and the declared changed scope. Rule 2 needs both.
 
 ## Four cross-artifact rules
 
-Checked in every run in addition to `VERIFY.md`:
+Checked in every run, on top of `VERIFY.md`. A violation is Important unless the rule says otherwise.
 
-1. **Traceability.** Every statement in the artifact points at a source: a rule ID, a quoted span from an authoritative input, or an existing fact in an upstream artifact. `VERIFY.md` says what "statement" and "source" mean for its artifact. No source → **Important**.
-2. **Write scope.** Only files and sections the producing skill declares writable changed; a scoped update touched only the declared scope (checked against `--prior`). Otherwise → **Important**.
-3. **Gaps stay open, not filled.** Where sources are silent, the author must have left the truth open with the artifact's marker — never decided it. Authored decision with no source → **Important**; the fix is to replace the value with an open marker, and the verifier writes the open-truth line the author should have reported. A genuine problem in the *source* (contradiction, ambiguity) → **Pre-existing**, reported as an open truth for the upstream owner, not counted against this artifact.
-4. **Done-when needs evidence.** A claim that a check ran ("tests pass", "validated") must come with the output that shows it. Bare assertion → **Important**.
+1. **Traceability.** Every statement points at a source: a rule ID, a span from an authoritative input, or an existing fact in an upstream artifact. `VERIFY.md` defines "statement" and "source" for its artifact.
+2. **Write scope.** Only the files and sections the producing skill declares writable changed. On a scoped update, only the declared scope differs from `--prior`.
+3. **Gaps stay open.** Where the sources are silent, the artifact carries an open marker or an OMIT statement, never a decision. An authored decision with no source is Important. If a commitment needs the value, the fix replaces it with an open marker, and the verifier writes the open-truth line the author should have reported. If no commitment needs it, the fix replaces it with the OMIT statement `VERIFY.md` defines, and nothing is reported. A problem in the source itself (two sources contradict, or one is ambiguous) is Pre-existing.
+4. **Done-when needs evidence.** A claim that a check ran ("tests pass", "validated") comes with the output that shows it.
+
+## Severity
+
+| Severity | Assigned to | Effect |
+|---|---|---|
+| Important | Any Stage 1 failure, any check `VERIFY.md` marks Important, any violation of the four rules | Blocks gate 1 while open |
+| Nit | Checks `VERIFY.md` marks Nit, and verified problems no check lists. A wording problem counts only when `VERIFY.md` lists it | Never blocks. Capped by `VERIFY.md`'s Nit cap |
+| Pre-existing | A real problem in an upstream source | Not counted against this artifact. Reported as an open truth for the upstream owner |
 
 ## Procedure
 
-### Stage 1 — Mechanical checks (script)
+### Stage 1: scripts
 
-Run the script the artifact's `VERIFY.md` names on its `mechanical:` line (by convention `<producing skill>/scripts/verify_mechanical.py`), then `scripts/verify_generic.py status` (the artifact's `Status: Draft — N open` header equals the count of open markers the `VERIFY.md` defines) and, on a scoped update, `scripts/verify_generic.py write-scope`. The skill-owned script implements that kind's **D-checks** (structure, IDs, citation quotes found verbatim); the generic script covers what every artifact header and every scoped update must satisfy. Any failure is an **Important** finding with exact locations, written to the report before any model runs. The producing skill fixes these and re-runs Stage 1 until clean; Stage 2 does not start on a failing Stage 1. This is the fast, exact signal — spend model effort only on artifacts that already have the right shape.
+Run, in order:
 
-### Stage 2 — Finders (fresh context, one per check family)
+1. The command on the `mechanical:` line of `VERIFY.md`: the producing skill's D-checks (structure, IDs, citation spans).
+2. `scripts/verify_generic.py status`: the status header matches the open-marker count.
+3. On a scoped update, `scripts/verify_generic.py write-scope`: only the declared scope changed.
 
-`VERIFY.md` groups its checks into **families** (for example: traceability, authority, gaps-and-issues, boundary-leakage). One finder per family, run in parallel. Each finder receives only: the artifact, the sources, the inputs above, and *its family's* checks. It does not see the producing conversation, the other families, or the other finders' output.
+`verify_generic.py --help` lists the flags. Each failure is an Important with its exact location, written to the report before any model runs. The producing skill fixes and reruns Stage 1.
 
-Finders are narrow and adversarial. The traceability finder does not "review"; it fills a table — one row per statement, columns `statement | source quote | none` — and every `none` row is a candidate finding. The authority finder lists every action the artifact grants and, for each, the §3 span or `none`. A finder that returns prose instead of its table is re-run. This shape matters because the main failure these checks exist for — filling gaps with plausible defaults — is a habit the finder's model shares with the author; a finder asked "does this look right?" will under-report it, a finder asked "where is the span?" cannot.
+Stage 1 is done when every script exits 0. Only then does Stage 2 start, so model effort goes only to artifacts that already have the right shape.
 
-Where the workflow has a second model family available (the `codex-rescue` route in the pointers pipeline is the existing example), the traceability and gaps families run on it. Same-model finders are acceptable for structural families.
+### Stage 2: finders
 
-### Stage 3 — Verifier (fresh context, 1)
+Run one finder per family `VERIFY.md` defines, in parallel, each in a fresh context (a subagent). A finder receives only the artifact, the sources, the inputs, and its own family's checks. The producing conversation and the other families stay out of its context.
 
-Receives the artifact, sources, and the merged candidate list. For each candidate it runs:
+Each finder fills its family's table from `VERIFY.md`. The traceability finder writes one row per statement, `statement | source span | none`, and every `none` row is a candidate finding. An authority finder lists every action the artifact grants, each with its span or `none`. In a table, a missing span shows as an empty cell. A request to "review" invites the same plausible-default judgment the author made. If a finder returns prose instead of its table, re-run it.
 
-- (a) artifact quote exists verbatim — **scripted**, `verify_generic.py findings`;
-- (b) source quote exists verbatim, or the `none` claim holds after a search of the sources — **scripted** for existence; the model only judges `none` claims that the script could not disprove;
-- (c) the quoted evidence supports the stated failure — model judgment.
+When a second model family is available (the `codex-rescue` subagent), run the traceability and gaps families on it. Structural families may run on the same model as the author.
 
-Any check fails → dropped, with the reason logged. Duplicates across finders merged. Then the **Nit cap** from `VERIFY.md` is applied to the merged, verified list — not per finder — keeping the Nits with the strongest evidence.
+Stage 2 is done when every family has returned its table.
 
-### Stage 4 — Report
+### Stage 3: verifier
 
-Write `verification-report.md` beside the artifact from `assets/verification-report.template.md`. Severity is whatever `VERIFY.md` assigns the check; unlisted but verified problems default to Nit. Pre-existing findings and rule-3 gaps are listed in the report's **Open truths for the owner** block, one line each: unresolved truth · evidence span · who decides. The verifier writes only `verification-report.md`; the producing skill repeats those lines in its reply and makes sure each has an open marker in the artifact.
+One fresh-context verifier receives the artifact, the sources, and the merged candidates. Each candidate passes three checks in order:
 
-### Stage 5 — Resolution (no self-approval)
+- (a) The artifact span exists. Scripted: `verify_generic.py findings`.
+- (b) The source span exists, or the `none` claim holds after searching the sources. Scripted for existence. The model judges only the `none` claims the script cannot disprove.
+- (c) The span supports the stated failure. Model judgment.
 
-For every **Important**, exactly three outcomes exist:
+Drop a candidate at its first failed check and log the reason. Merge duplicates across finders. Then apply the Nit cap once to the merged list, keeping the Nits with the strongest evidence.
 
-1. **Fixed** — the artifact changed; the next verification run confirms the finding no longer reproduces.
-2. **Refuted** — the producing skill supplies a verbatim source span the finder missed, at a stated location. The script confirms the span exists; the verifier confirms it supports the statement. Only then is the finding closed as refuted.
-3. **Owner-resolved** — the accountable human owner closes it with a reason, recorded in the report with their name. This is the owner deciding; it is not available to the producing agent.
+Stage 3 is done when every candidate is either kept with all three checks passed or dropped with a logged reason.
 
-There is no "resolved with a one-line reason" by the author. A finding the author disagrees with and cannot refute with a span stays **open**, and open Importants block confirmation. Nits may be left open.
+Mandatory spans plus scripted span checks are the false-positive control, so one verifier is enough. Add a second only if the owner-overturn rate in reports calls for it.
 
-Verification is closed when no Important is open.
+### Stage 4: report
+
+Write `verification-report.md` beside the artifact from `assets/verification-report.template.md`. It is the only file the verifier writes. Pre-existing findings and rule-3 gaps fixed with an open marker go in the **Open truths for the owner** block, one line each: unresolved truth · evidence span · who decides. The producing skill repeats those lines in its reply and makes sure each has an open marker in the artifact.
+
+Stage 4 is done when every template section is filled, including `Inputs status`.
+
+### Stage 5: resolution
+
+Each Important closes in exactly one of three ways:
+
+1. **Fixed**: the artifact changed, and the next run no longer reproduces the finding.
+2. **Refuted**: the producing skill supplies a source span the finder missed, with its location. The script confirms the span exists, then the verifier confirms it supports the statement.
+3. **Owner-resolved**: the accountable human owner closes it with a reason, recorded in the report with their name. This outcome belongs to the owner alone.
+
+An Important the author disagrees with but cannot refute with a span stays open. Nits may stay open.
+
+Stage 5 is done when no Important is open. That closes gate 1.
 
 ## The two gates
 
-An artifact becomes authoritative for downstream phases only after two gates close, in order:
+An artifact becomes authoritative for downstream phases when two gates close, in order:
 
-1. **Verification closed** — this skill has run against the producing skill's `VERIFY.md`, inputs complete, no Important open.
-2. **Owner confirmation** — the accountable human owner confirms the artifact after seeing the closed verification report. Confirming is acceptance of what the artifact states, including its open truths; it is not an answer to them.
+1. **Verification closed**: this skill ran against the producing skill's `VERIFY.md`, inputs were complete, and no Important is open. This skill's run ends here.
+2. **Owner confirmation**: the owner confirms after seeing the closed report, and only when the artifact has zero open markers. Before confirming, the owner settles every open truth by answering, deferring, or dropping it, as the producing skill defines. An answer goes into the producing skill's sources (for Product Sense, verbatim and dated, in the `## Clarifications` section of `product-idea.md`). The producing skill reruns the affected sections, and verification reruns on that scope. At zero open markers the producing skill sets `Status: Confirmed`, and `verify_generic.py status` rejects `Confirmed` while any marker remains.
 
-Until both close the artifact is a draft: downstream phases may read it to prepare, but any truth they take from it is unconfirmed. A scoped update reopens both gates for the changed scope only. Gate 2 is not part of this skill's run; this skill ends when gate 1 closes.
+Until both gates close, the artifact is a draft. Downstream phases may read it to prepare, but a truth they take from it is unconfirmed. A scoped update reopens both gates for the changed scope only.
 
-## Smoke test after changing a VERIFY.md
+## After changing a VERIFY.md: smoke test
 
-Each `VERIFY.md` folder may hold `fixtures/planted/`: two or three copies of a known-good artifact with one defect planted per copy, each named for the check it should trigger (`PS-1-over-admission.md`). After editing a `VERIFY.md` or this skill, run verification on each fixture once and confirm the named check fires. This is not an eval program; it answers one question — does the signal still detect the thing it was built for — and is run by hand when the standard changes.
-
-## What this skill is not
-
-- Not a runtime judge. It verifies artifacts at authoring time. Runtime judgment of agent responses belongs to the evaluation implementation.
-- Not a style reviewer. Wording is a Nit at most, and only if `VERIFY.md` lists it.
-- Not an escalation path. It reports open truths; whether to answer, defer, or drop them is the owner's call.
-
-## Voting
-
-Not used. Mandatory quoted evidence plus scripted quote-existence is the false-positive control. Add a second verifier only if the owner-overturn rate in verification reports says so.
+`fixtures/planted/` beside a `VERIFY.md` holds two or three copies of a known-good artifact, each with one planted defect and named for the check it should trigger (`PS-1-over-admission.md`). After editing a `VERIFY.md` or this skill, run verification on each fixture once and confirm the named check fires. This answers one question, whether the signal still detects what it was built for, and is run by hand.

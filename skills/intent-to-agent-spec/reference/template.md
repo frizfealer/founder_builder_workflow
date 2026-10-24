@@ -65,7 +65,7 @@ Source: `product-sense.md` (claims cited as `[PS §n: "…"]`) · owner confirma
 | <entity> | <fields the agent must resolve> | confirmed | [PS §5: "…"] |
 | <affordance: observe / change / check status of …> | <what it must return> | assumed | needed by <XX-Snn> |
 
-[`assumed` = required of the world, not yet confirmed by Product Sense; architecture must honor, or reject by reporting an open truth for the P1 owner.]
+[`assumed` = required of the world, not yet confirmed by Product Sense; architecture must honor, or reject by reporting an open truth for the spec owner.]
 
 ## 1. Global Contract
 

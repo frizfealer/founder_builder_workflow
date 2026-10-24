@@ -33,9 +33,9 @@ def verify_product_sense(a: argparse.Namespace) -> int:
         r.fail("D-1", a.artifact, f"section headings missing or out of order: {missing or 'order'}")
     # D-2 open truths are marked with the artifact's own phrase, never with an ID or a value
     for m in re.finditer(r"\bI-\d{3}\b|\bTBD\b|\bTODO\b", md):
-        r.fail("D-2", f"{a.artifact}:{md[:m.start()].count(chr(10))+1}", f"`{m.group()}` is not an open marker; write 'not established by the authoritative inputs'")
+        r.fail("D-2", f"{a.artifact}:{md[:m.start()].count(chr(10))+1}", f"`{m.group()}` is not an open marker; write 'unresolved and deliberately not stated'")
     # D-3 Status header vs open markers
-    check_status_header(r, a.artifact, "D-3", [r"\bNo\b[^.\n]{0,80}\bis established by the authoritative inputs|not established by the authoritative inputs", r"unresolved and deliberately not stated"])
+    check_status_header(r, a.artifact, "D-3", [r"unresolved and deliberately not stated"])
     # write scope (rule 2)
     check_write_scope(r, a.artifact, a.prior, a.scope or [], "D-W")
     return r.dump("product-sense mechanical")

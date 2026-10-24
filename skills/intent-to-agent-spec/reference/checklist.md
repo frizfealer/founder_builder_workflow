@@ -63,6 +63,6 @@ Run before `/verify-artifact`. Each item is pass / fail. A failure is fixed in t
 
 ## Open truths
 
-- [ ] Every red question still open has an open marker in the spec and one line in the reply (truth · evidence span · P0 or P1 owner).
+- [ ] Every red question still open has an open marker in the spec and one line in the reply (truth · evidence span · founder or spec owner).
 - [ ] `Status: Draft — N open` equals the open-marker count; no `TBD`, `TODO`, or ID stands in for a marker.
 - [ ] On an update, the reply names only the downstream scope whose consumed meaning changed.

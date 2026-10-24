@@ -5,7 +5,7 @@ Standard for `/verify-artifact` when the artifact is an Agent Spec produced by `
 ## Artifact and sources
 
 - **Artifact:** `agent_spec.md`, plus `example-map.md` and the producing run's reply (its list of reported open truths).
-- **Authoritative sources:** `product-sense.md` (product truth) and the `confirmed` cards in `example-map.md` (owner decisions). The Product Idea is not a source for this artifact; a spec line that can only be traced to the Product Idea is a P0 gap.
+- **Authoritative sources:** `product-sense.md` (product truth) and the `confirmed` cards in `example-map.md` (owner decisions). The Product Idea is not a source for this artifact; a spec line that can only be traced to the Product Idea is a Product Sense gap.
 - **Required inputs beyond sources:** the confirmed phase objective; the prior `agent_spec.md` and declared scope on a scoped update.
 - **Statement** (for traceability): every line in Agent Requirements, Scope & Authority, Contract, Expected, Forbidden, every rubric criterion, and every World requirements row — no keyword filter.
 - **Source** (for traceability): a `[PS §n: "…"]` citation whose quote exists in `product-sense.md` and supports the statement, or an `[EM: id]` citation whose card is `confirmed` and matches the statement.
@@ -57,7 +57,7 @@ Run Traceability and Gaps & open truths on a different model family when one is 
 - **AS-15 HOW leakage.** Any sentence that tells the implementer how to detect, measure, mock, or judge. *Evidence:* the sentence.
 - **AS-16 Rough card promoted.** A scenario cites an `[EM]` card whose status is `rough` or `dropped`. *Evidence:* the citation; the card.
 - **AS-17 Red card not reported.** A red question in `example-map.md` with no answer, no open marker in the spec, and no line in the reply's open truths. *Evidence:* the card; absence in both.
-- **AS-18 Misrouted open truth.** An open truth reported for the P0 owner that is an agent-behavior decision Product Sense deliberately left to P1 (e.g. wording of a clarification), not missing product truth. *Evidence:* the line; the relevant Product Sense section.
+- **AS-18 Misrouted open truth.** An open truth reported for the founder that is an agent-behavior decision Product Sense deliberately left to the spec owner (e.g. wording of a clarification), not missing product truth. *Evidence:* the line; the relevant Product Sense section.
 
 ## What failure looks like — Nit (cap: 6, applied after merge across finders)
 
@@ -71,11 +71,11 @@ Run Traceability and Gaps & open truths on a different model family when one is 
 
 Per `verify-artifact` Stage 5: **fixed**, **refuted** by a script-confirmed span, or **owner-resolved**. The producing skill cannot close a finding by explanation.
 
-## Pre-existing (not counted against the artifact; reported as open truths for the P0 owner)
+## Pre-existing (not counted against the artifact; reported as open truths for the founder)
 
-- **AS-P1** Product Sense is silent on a committed capability's authority, material fields, or failure behavior, and the spec correctly left it open.
-- **AS-P2** Two Product Sense claims contradict each other where the spec needs one.
-- **AS-P3** A confirmed `example-map.md` card contradicts a Product Sense claim. The owner decided against product truth; report for the P0 owner, who decides which artifact changes.
+- **AS-PRE-1** Product Sense is silent on a committed capability's authority, material fields, or failure behavior, and the spec correctly left it open.
+- **AS-PRE-2** Two Product Sense claims contradict each other where the spec needs one.
+- **AS-PRE-3** A confirmed `example-map.md` card contradicts a Product Sense claim. The owner decided against product truth; report for the founder, who decides which artifact changes.
 
 ## Skip
 
@@ -87,4 +87,4 @@ Nothing. The Purpose / Writing Guide header is checked only for being verbatim (
 
 ## Relationship to downstream verification
 
-`agent-spec-to-pytest-bdd/VERIFY.md` and `develop-architecture-notes/VERIFY.md` treat this artifact as their source. A problem they find in the spec itself is Pre-existing for them and comes back here as an open truth for the P1 owner.
+`agent-spec-to-pytest-bdd/VERIFY.md` and `develop-architecture-notes/VERIFY.md` treat this artifact as their source. A problem they find in the spec itself is Pre-existing for them and comes back here as an open truth for the spec owner.

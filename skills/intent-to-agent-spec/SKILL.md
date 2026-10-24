@@ -1,12 +1,12 @@
 ---
 name: intent-to-agent-spec
-description: P1 skill — turn the authoritative Product Sense (product-sense.md from /product-definition) into an Agent Spec by Specification by Example — Agent Requirements (goal, actors, prioritized capabilities, world requirements), Global Contract, Evaluation Policy, and per-capability Scope & Authority, Contract rules, and Scenarios with Expected / Forbidden and attached rubrics. Every normative line cites a Product Sense claim. Use when asked to "write the agent spec", "define what the agent must do", "spec this agent", "turn product-sense into scenarios", or when agent-spec-to-pytest-bdd or develop-architecture-notes needs an agent_spec.md that does not exist yet. Produces WHAT, never HOW. Leaves unsourced truths open and reports them.
+description: Verification Design skill — turn the authoritative Product Sense (product-sense.md from /product-definition) into an Agent Spec by Specification by Example — Agent Requirements (goal, actors, prioritized capabilities, world requirements), Global Contract, Evaluation Policy, and per-capability Scope & Authority, Contract rules, and Scenarios with Expected / Forbidden and attached rubrics. Every normative line cites a Product Sense claim. Use when asked to "write the agent spec", "define what the agent must do", "spec this agent", "turn product-sense into scenarios", or when agent-spec-to-pytest-bdd or develop-architecture-notes needs an agent_spec.md that does not exist yet. Produces WHAT, never HOW. Leaves unsourced truths open and reports them.
 argument-hint: <product dir containing product-sense.md> [changed scope]
 ---
 
-# /intent-to-agent-spec — P1 Agent Spec
+# /intent-to-agent-spec — Agent Spec
 
-Input is **`product-sense.md`**, the authoritative P0 artifact. Raw product intent (an idea, a PRD, a conversation) does not qualify: if there is no `product-sense.md`, stop and say `/product-definition` has to run first. This skill may not do P0's job without P0's admission gate.
+Input is **`product-sense.md`**, the authoritative Product Definition artifact. Raw product intent (an idea, a PRD, a conversation) does not qualify: if there is no `product-sense.md`, stop and say `/product-definition` has to run first. This skill may not do `/product-definition`'s job without its admission gate.
 
 Outputs, all in the product directory:
 
@@ -18,7 +18,7 @@ Before the owner is asked to confirm the spec, run `/verify-artifact agent_spec.
 ## Hard rules
 
 1. **Examples before rules.** No Contract rule is written until ≥1 concrete example card exists for it. Rules are discovered by walking examples, not abstracted from the idea.
-2. **Every normative line cites a claim.** Format `[PS §n: "short quote"]` pointing at a span in `product-sense.md`, or `[EM: card-id]` pointing at an owner-confirmed card in `example-map.md`. A line with neither is not written; the truth is left open in the spec (an `assumed` row, a `rough` card, or "unresolved and deliberately not stated") and reported in the reply for the P0 owner if product truth is missing, the P1 owner if the spec owner has not decided.
+2. **Every normative line cites a claim.** Format `[PS §n: "short quote"]` pointing at a span in `product-sense.md`, or `[EM: card-id]` pointing at an owner-confirmed card in `example-map.md`. A line with neither is not written; the truth is left open in the spec (an `assumed` row, a `rough` card, or "unresolved and deliberately not stated") and reported in the reply for the founder if product truth is missing, or for the spec owner if they have not decided.
 3. **WHAT only.** No framework, test library, judge model, fixture, mock, log format, or file path. If a sentence tells the implementer how to check, delete it.
 4. **One example, one home.** A confirmed example lives in exactly one scenario. Illustrative conversations inside a rule are labelled "not a separately approved scenario".
 5. **Owner decides pass/fail.** Every Expected, Forbidden, and rubric criterion traces to a claim or a confirmed card. Never add a criterion to make a statement "more testable".
@@ -30,7 +30,7 @@ Before the owner is asked to confirm the spec, run `/verify-artifact agent_spec.
 
 ### Step 0 — Read Product Sense
 
-Read `product-sense.md` end to end. Index every normative statement in sections 1–7 as a claim with its section number and a short quote. Do not read the Product Idea directly; if Product Sense is silent where the spec needs truth, that is an open truth for the P0 owner, not a reason to go around P0.
+Read `product-sense.md` end to end. Index every normative statement in sections 1–7 as a claim with its section number and a short quote. Do not read the Product Idea directly; if Product Sense is silent where the spec needs truth, that is an open truth for the founder, not a reason to go around `/product-definition`.
 
 For a scoped update (existing `agent_spec.md` + changed scope), touch only the capabilities and scenarios the scope affects.
 
@@ -40,8 +40,8 @@ Write the **Agent Requirements** section of the spec. Four blocks, each line cit
 
 - **Goal & outcome** — what the agent does for the user and what business outcome Product Sense says it serves (§1, §7).
 - **Actors & authority** — each actor and the authority relationship: what the agent may do on its own, what requires confirmation from whom, what needs a human (§3). Any action Product Sense calls irreversible, or that creates/cancels/changes external records, is `requires confirmation` unless §3 explicitly says otherwise.
-- **Capabilities, prioritized** — verbs on external state (§4), in the order Product Sense's scope section commits them (§2: in scope now before committed future). A capability with no §2/§4 claim is not listed; it is reported as an open truth for the P0 owner.
-- **World requirements** — entities, their material fields, and the affordances the agent needs (observe X, change Y, check status of Z) drawn from §4–§6. Tag each `confirmed` when Product Sense states it, `assumed` when a scenario needs it and Product Sense is silent. `assumed` lines are requirements on the world that `develop-architecture-notes` must honor, or reject by reporting an open truth for the P1 owner; they are never silently satisfied in the spec. Greenfield products start with everything `assumed`.
+- **Capabilities, prioritized** — verbs on external state (§4), in the order Product Sense's scope section commits them (§2: in scope now before committed future). A capability with no §2/§4 claim is not listed; it is reported as an open truth for the founder.
+- **World requirements** — entities, their material fields, and the affordances the agent needs (observe X, change Y, check status of Z) drawn from §4–§6. Tag each `confirmed` when Product Sense states it, `assumed` when a scenario needs it and Product Sense is silent. `assumed` lines are requirements on the world that `develop-architecture-notes` must honor, or reject by reporting an open truth for the spec owner; they are never silently satisfied in the spec. Greenfield products start with everything `assumed`.
 
 Per capability, also write the **Scope & Authority** block of the template, including:
 
@@ -77,7 +77,7 @@ Stop a capability when every rule has ≥1 example and ≥1 Forbidden counter-ex
 
 Show the owner one capability's cards (examples, candidate rules, red questions). They confirm, edit, or drop each card and answer or defer each question. Record every decision on the card.
 
-**Material-uncertainty gate:** at most two clarification rounds per capability. A question still open afterwards is reported as an open truth (P0 owner if it is product truth, P1 owner otherwise); the dependent card stays `rough` and the dependent scenario is not written.
+**Material-uncertainty gate:** at most two clarification rounds per capability. A question still open afterwards is reported as an open truth (the founder if it is product truth, the spec owner otherwise); the dependent card stays `rough` and the dependent scenario is not written.
 
 ### Step 4 — Write Contract and Scenarios
 

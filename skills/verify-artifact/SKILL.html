@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>verify-artifact, visualized</title>
+<style>
+:root {
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --bg: #fafaf8;
+  --bg-surface: #ffffff;
+  --bg-code: #1e1e2e;
+  --bg-nav: #2c2c3a;
+  --bg-tab: #e8e6e1;
+  --bg-tab-active: #ffffff;
+  --bg-badge-pass: #ddf4dd;
+  --bg-badge-fail: #fdd;
+  --bg-badge-pending: #fff3cd;
+  --bg-copy: #f0eeeb;
+  --bg-highlight: #fff9e6;
+
+  --text: #2c2c2c;
+  --text-muted: #6b6b6b;
+  --text-label: #4a4a4a;
+  --text-nav: #e8e6e1;
+  --text-code: #cdd6f4;
+  --text-badge-pass: #1a7a1a;
+  --text-badge-fail: #a33;
+  --text-badge-pending: #856404;
+
+  --border: #d4d0c8;
+  --border-light: #eae7e0;
+  --accent: #4a6fa5;
+  --accent-hover: #3a5a8a;
+
+  --diagram-source: #0f7a6b;
+  --diagram-transform: #a15c00;
+  --diagram-outcome: #6a4c93;
+
+  --code-comment: #8a8fa3;
+  --code-string: #9ece6a;
+  --code-keyword: #c586c0;
+  --code-literal: #e0af68;
+
+  --radius: 6px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --measure: 68ch;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.65;
+  margin: 0;
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* Reading measure */
+p, li, blockquote, dt, dd, .prose { max-width: var(--measure); }
+td p, td li, th p, .toc li, .toc p, .full-width { max-width: none; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+h1 { font-size: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.5rem; }
+h2 { font-size: 1.5rem; color: var(--accent); }
+h3 { font-size: 1.15rem; }
+h4 { font-size: 1rem; color: var(--text); }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+  background: var(--bg-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+th, td {
+  padding: 0.65rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+}
+th {
+  background: var(--bg-tab);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-label);
+}
+tr:hover td { background: var(--bg-highlight); }
+
+/* Tabs */
+.tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-top: 1.5rem; }
+.tab {
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  background: var(--bg-tab);
+  color: var(--text-label);
+  border-radius: var(--radius) var(--radius) 0 0;
+  transition: background 0.15s, color 0.15s;
+}
+.tab:hover { background: var(--bg-surface); color: var(--text); }
+.tab.active { background: var(--bg-surface); color: var(--accent); border-bottom: 2px solid var(--accent); margin-bottom: -2px; }
+.tab-panel { display: none; padding: 1.5rem 0; }
+.tab-panel.active { display: block; }
+
+/* Collapsible */
+details {
+  margin: 0.75rem 0;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+}
+summary {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+}
+summary:hover { background: var(--bg-highlight); }
+details[open] summary { border-bottom: 1px solid var(--border-light); }
+details > *:not(summary) { padding: 0 1rem; }
+
+/* Code blocks */
+pre {
+  background: var(--bg-code);
+  color: var(--text-code);
+  padding: 1.25rem;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  box-shadow: var(--shadow-md);
+}
+code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--bg-tab);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+
+/* Status badges */
+.badge {
+  display: inline-block;
+  padding: 0.2em 0.7em;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.badge-pass { background: var(--bg-badge-pass); color: var(--text-badge-pass); }
+.badge-fail { background: var(--bg-badge-fail); color: var(--text-badge-fail); }
+.badge-pending { background: var(--bg-badge-pending); color: var(--text-badge-pending); }
+
+.eyebrow { font-family: var(--font-body); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+
+/* Copy button */
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.4em 0.9em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-copy);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.copy-btn:hover { background: var(--bg-surface); border-color: var(--accent); color: var(--accent); }
+.copy-btn.copied { background: var(--bg-badge-pass); color: var(--text-badge-pass); border-color: var(--text-badge-pass); }
+
+/* Sticky TOC */
+.toc {
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  padding: 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.toc ul { list-style: none; padding-left: 1rem; margin: 0.3rem 0; }
+.toc > ul { padding-left: 0; }
+.toc li { margin: 0.25rem 0; }
+.toc a { color: var(--text-muted); font-size: 0.88rem; }
+.toc a:hover { color: var(--accent); }
+
+/* Flow diagrams (SVG containers) */
+.flow-diagram {
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--bg-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+  overflow-x: auto;
+}
+.flow-diagram svg { width: 100%; min-width: 1000px; height: auto; }
+.flow-diagram p { margin-inline: auto; }
+
+/* Coverage matrix highlights */
+.coverage-hit { background: var(--bg-badge-pass); }
+.coverage-miss { background: var(--bg-badge-fail); }
+
+/* Cards / surface blocks */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin: 1rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  body { padding: 1rem; }
+  h1 { font-size: 1.5rem; }
+  .tabs { flex-wrap: wrap; }
+  .tab { font-size: 0.8rem; padding: 0.5rem 0.8rem; }
+  table { font-size: 0.88rem; }
+  th, td { padding: 0.5rem 0.65rem; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+/* Print */
+@media print {
+  body { max-width: none; padding: 0; }
+  .tabs, .tab { display: none; }
+  .tab-panel { display: block !important; }
+  details { border: none; }
+  details[open] summary { border-bottom: none; }
+  .copy-btn { display: none; }
+  .toc { display: none; }
+  pre { box-shadow: none; border: 1px solid var(--border); }
+  .flow-diagram { overflow-x: visible; }
+  .flow-diagram svg { min-width: 0; }
+}
+
+
+/* ---------- supplemental (gaps in report.css) ---------- */
+body { max-width: 1360px; }
+.layout { display: block; }
+@media (min-width: 1400px) {
+  .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 2.5rem; align-items: start; }
+  .toc { margin-top: 2.5rem; }
+}
+@media (max-width: 1399px) {
+  .toc { position: static; max-height: none; margin: 1.5rem 0; }
+}
+main > section:first-child h2 { margin-top: 2.5rem; }
+
+.lede { font-size: 1.1rem; color: var(--text-label); }
+
+.callout {
+  border-left: 4px solid var(--accent);
+  background: var(--bg-surface);
+  padding: 0.9rem 1.1rem;
+  margin: 1.25rem 0;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  box-shadow: var(--shadow-sm);
+  max-width: var(--measure);
+}
+.callout p { margin: 0.35rem 0; }
+.callout-title { font-weight: 700; display: block; margin-bottom: 0.2rem; }
+
+.scroll-x { overflow-x: auto; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; justify-content: center; margin: 0.5rem 0 0; padding: 0; list-style: none; font-size: 0.88rem; color: var(--text-label); }
+.legend li { display: inline-flex; align-items: center; gap: 0.45rem; max-width: none; }
+.swatch { width: 22px; height: 14px; border-radius: 3px; border: 2px solid; display: inline-block; background: var(--bg-surface); }
+.swatch-script { border-color: var(--diagram-source); }
+.swatch-model { border-color: var(--diagram-transform); }
+.swatch-output { border-color: var(--diagram-outcome); }
+.swatch-loop { border: none; height: 0; border-top: 2px dashed var(--text-muted); border-radius: 0; }
+
+.who { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+.who-script { color: var(--diagram-source); }
+.who-model { color: var(--diagram-transform); }
+.who-human { color: var(--diagram-outcome); }
+
+.step-list { counter-reset: step; list-style: none; padding-left: 0; }
+.step-list > li { counter-increment: step; position: relative; padding-left: 2.4rem; margin: 1rem 0; }
+.step-list > li::before {
+  content: counter(step);
+  position: absolute; left: 0; top: 0.05rem;
+  width: 1.7rem; height: 1.7rem; border-radius: 50%;
+  background: var(--bg-tab); color: var(--text-label);
+  font-weight: 700; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.copy-wrap { position: relative; }
+.copy-wrap .copy-btn { position: absolute; top: 0.6rem; right: 0.6rem; }
+.copy-wrap pre { padding-right: 6.5rem; white-space: pre-wrap; word-break: break-word; }
+.copy-btn.manual { background: var(--bg-badge-pending); color: var(--text-badge-pending); border-color: var(--text-badge-pending); }
+
+.quiz summary { font-weight: 600; }
+.quiz .answer { padding-bottom: 0.75rem; }
+
+.mono-path { font-family: var(--font-mono); font-size: 0.85em; }
+main p code, main li code { overflow-wrap: anywhere; }
+td code, th code { white-space: nowrap; }
+</style>
+<noscript><style>.copy-btn { display: none !important; } .copy-wrap pre { padding-right: 1.25rem; }</style></noscript>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">skills/verify-artifact/SKILL.md · learning guide</p>
+  <h1>verify-artifact, visualized</h1>
+  <p class="lede">A shared checker that every phase skill runs on its own output before the owner is asked to confirm it. This page walks through why it is shaped the way it is, then follows one finding from start to finish.</p>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+  <p class="eyebrow">Read in order</p>
+  <ul>
+    <li><a href="#what">1. What it is</a></li>
+    <li><a href="#why">2. The problem it solves</a></li>
+    <li><a href="#pipeline">3. The five stages</a></li>
+    <li><a href="#inputs">4. Inputs it refuses to skip</a></li>
+    <li><a href="#rules">5. Four rules for every artifact</a></li>
+    <li><a href="#stages">6. Each stage, up close</a></li>
+    <li><a href="#severity">7. Severity buckets</a></li>
+    <li><a href="#resolution">8. Closing a finding</a></li>
+    <li><a href="#gates">9. The two gates</a></li>
+    <li><a href="#example">10. One finding, end to end</a></li>
+    <li><a href="#check">11. Check yourself</a></li>
+    <li><a href="#reference">12. Reference</a></li>
+    <li><a href="#notes">Notes on the source</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- 1 -->
+<section id="what">
+  <h2>1. One mechanism here, one standard per artifact elsewhere</h2>
+  <p>The skill splits the work in two. <code>verify-artifact</code> owns <strong>how</strong> verification runs. Each producing skill (for example <code>product-definition</code>, which writes <code>product-sense.md</code>) owns <strong>what failure looks like</strong> for its own artifact.</p>
+  <div class="scroll-x">
+  <table>
+    <thead><tr><th>Lives in <code>skills/verify-artifact/</code></th><th>Lives beside each producing skill's <code>SKILL.md</code></th></tr></thead>
+    <tbody>
+      <tr><td>This procedure: stages 1 to 5, the four cross-artifact rules, resolution rules</td><td><code>VERIFY.md</code>: the standard. Names the sources, the check IDs, their severity, the finder families, the Nit cap</td></tr>
+      <tr><td><code>scripts/verify_lib.py</code>: quote lookup, section parsing, open-marker counting, write-scope diff, the failure <code>Report</code></td><td><code>scripts/verify_mechanical.py</code>: that artifact's D-checks (headings, IDs, markers). Imports <code>verify_lib</code></td></tr>
+      <tr><td><code>scripts/verify_generic.py</code>: three CLI modes every artifact needs (<code>findings</code>, <code>status</code>, <code>write-scope</code>)</td><td><code>fixtures/planted/</code>: known-good copies with one planted defect each, for smoke testing the standard</td></tr>
+      <tr><td><code>assets/verification-report.template.md</code></td><td></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><strong>D-checks</strong> are the mechanical checks a <code>VERIFY.md</code> lists, numbered <code>D-1</code>, <code>D-2</code>, and so on. Nothing in <code>verify-artifact</code> knows about Product Sense, Agent Spec, or any other kind. The skill refuses to run without a <code>VERIFY.md</code>, and it never adds a check that is not in <code>VERIFY.md</code> or in the four shared rules.</p>
+</section>
+
+<!-- 2 -->
+<section id="why">
+  <h2>2. The author's model can't be trusted to judge its own gap-filling</h2>
+  <p>Concrete case: the Product Idea says guests can book a table. The drafting agent writes "a reservation is held for 15 minutes." That number sounds reasonable, so a reviewer built on the same model, asked "does this look right?", will likely nod. Nobody stated it.</p>
+  <p>The general rule follows. The main failure these checks target is <em>filling gaps with plausible defaults</em>, and the reviewing model shares that habit with the author. So the skill's design goal is a feedback signal the author can loop on (produce, verify, fix, re-verify) whose source is, as far as possible, <strong>not the same model's judgment</strong>.</p>
+  <div class="callout">
+    <span class="callout-title">Three design choices follow from that goal</span>
+    <p>1. Mechanical checks run first and gate everything else.</p>
+    <p>2. Finders are narrow and adversarial. They fill a table that asks "where is the span?", not "does this look right?"</p>
+    <p>3. The author has no way to close a finding by saying it is fine.</p>
+  </div>
+  <p>Every later section is one of these three choices worked out in detail.</p>
+</section>
+
+<!-- 3 -->
+<section id="pipeline">
+  <h2>3. Five stages, with two ways back to the author</h2>
+  <p>Read the diagram left to right on the top row, then right to left on the bottom row. Border color tells you who produces the signal at that stage.</p>
+  <figure class="flow-diagram" style="margin-left:0;margin-right:0">
+    <svg viewBox="0 0 1000 420" role="img" aria-labelledby="pipe-title pipe-desc">
+      <title id="pipe-title">verify-artifact pipeline</title>
+      <desc id="pipe-desc">The producing skill drafts an artifact. Stage 1 runs mechanical scripts; any failure sends the artifact back for a fix and Stage 1 re-runs. Stage 2 runs one finder per check family in parallel. Stage 3 verifies each candidate with scripts and a model. Stage 4 writes the report. Stage 5 resolves each Important. If any Important is still open, the author fixes and re-runs from Stage 1. If none is open, verification is closed and the owner confirms, which is outside this skill.</desc>
+      <defs>
+        <marker id="pipe-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--text-muted)"/>
+        </marker>
+      </defs>
+
+      <!-- loop 1: stage 1 fails -->
+      <path d="M355,50 V26 H115 V48" fill="none" stroke="var(--text-muted)" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#pipe-arrow)"/>
+      <text x="235" y="18" text-anchor="middle" font-size="12" fill="var(--text-muted)">any Stage 1 failure: fix, re-run Stage 1 (finders wait)</text>
+
+      <!-- loop 2: important still open -->
+      <path d="M595,350 V385 H12 V100 H28" fill="none" stroke="var(--text-muted)" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#pipe-arrow)"/>
+      <text x="300" y="404" text-anchor="middle" font-size="12" fill="var(--text-muted)">an Important is still open: fix the artifact, re-run from Stage 1</text>
+
+      <!-- row 1 nodes -->
+      <rect x="30" y="50" width="170" height="100" rx="6" fill="var(--bg-surface)" stroke="var(--border)" stroke-width="2"/>
+      <text x="115" y="96" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)">Draft artifact</text>
+      <text x="115" y="118" text-anchor="middle" font-size="12" fill="var(--text-muted)">producing skill</text>
+
+      <rect x="270" y="50" width="170" height="100" rx="6" fill="var(--bg-surface)" stroke="var(--diagram-source)" stroke-width="2"/>
+      <text x="355" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="var(--diagram-source)">STAGE 1 · SCRIPT</text>
+      <text x="355" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)">Mechanical</text>
+      <text x="355" y="118" text-anchor="middle" font-size="12" fill="var(--text-muted)">D-checks, status header,</text>
+      <text x="355" y="134" text-anchor="middle" font-size="12" fill="var(--text-muted)">write scope</text>
+
+      <rect x="510" y="50" width="170" height="100" rx="6" fill="var(--bg-surface)" stroke="var(--diagram-transform)" stroke-width="2"/>
+      <text x="595" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="var(--diagram-transform)">STAGE 2 · MODEL</text>
+      <text x="595" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)">Finders</text>
+      <text x="595" y="118" text-anchor="middle" font-size="12" fill="var(--text-muted)">one per family, parallel,</text>
+      <text x="595" y="134" text-anchor="middle" font-size="12" fill="var(--text-muted)">each fills a table</text>
+
+      <rect x="750" y="50" width="170" height="100" rx="6" fill="var(--bg-surface)" stroke="var(--diagram-transform)" stroke-width="2"/>
+      <text x="835" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="var(--diagram-transform)">STAGE 3 · MIXED</text>
+      <text x="835" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)">Verifier</text>
+      <text x="835" y="118" text-anchor="middle" font-size="12" fill="var(--text-muted)">script: quotes exist</text>
+      <text x="835" y="134" text-anchor="middle" font-size="12" fill="var(--text-muted)">model: evidence fits</text>
+
+      <!-- row 1 edges -->
+      <line x1="200" y1="100" x2="268" y2="100" stroke="var(--text-muted)" stroke-width="1.6" marker-end="url(#pipe-arrow)"/>
+      <line x1="440" y1="100" x2="508" y2="100" stroke="var(--text-muted)" stroke-width="1.6" marker-end="url(#pipe-arrow)"/>
+      <text x="475" y="92" text-anchor="middle" font-size="12" fill="var(--text-muted)">clean</text>
+      <line x1="680" y1="100" x2="748" y2="100" stroke="var(--text-muted)" stroke-width="1.6" marker-end="url(#pipe-arrow)"/>
+      <line x1="835" y1="150" x2="835" y2="248" stroke="var(--text-muted)" stroke-width="1.6" marker-end="url(#pipe-arrow)"/>
+
+      <!-- row 2 nodes -->
+      <rect x="750" y="250" width="170" height="100" rx="6" fill="var(--bg-surface)" stroke="var(--diagram-outcome)" stroke-width="2"/>
+      <text x="835" y="274" text-anchor="middle" font-size="12" font-weight="700" fill="var(--diagram-outcome)">STAGE 4 · OUTPUT</text>
+      <text x="835" y="298" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)">Report</text>
+      <text x="835" y="318" text-anchor="middle" font-size="12" fill="var(--text-muted)">findings by severity,</text>
+      <text x="835" y="334" text-anchor="middle" font-size="12" fill="var(--text-muted)">open truths for owner</text>
+
+      <rect x="510" y="250" width="170" height="100" rx="6" fill="var(--bg-surface)" stroke="var(--diagram-outcome)" stroke-width="2"/>
+      <text x="595" y="274" text-anchor="middle" font-size="12" font-weight="700" fill="var(--diagram-outcome)">STAGE 5 · OUTPUT</text>
+      <text x="595" y="298" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)">Resolution</text>
+      <text x="595" y="318" text-anchor="middle" font-size="12" fill="var(--text-muted)">fixed, refuted,</text>
+      <text x="595" y="334" text-anchor="middle" font-size="12" fill="var(--text-muted)">or owner-resolved</text>
+
+      <rect x="270" y="250" width="170" height="100" rx="6" fill="var(--bg-surface)" stroke="var(--text)" stroke-width="2"/>
+      <text x="355" y="292" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)">Verification closed</text>
+      <text x="355" y="314" text-anchor="middle" font-size="12" fill="var(--text-muted)">gate 1</text>
+
+      <rect x="30" y="250" width="170" height="100" rx="6" fill="var(--bg-surface)" stroke="var(--border)" stroke-width="2" stroke-dasharray="5 4"/>
+      <text x="115" y="292" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)">Owner confirms</text>
+      <text x="115" y="314" text-anchor="middle" font-size="12" fill="var(--text-muted)">gate 2, not this skill</text>
+
+      <!-- row 2 edges -->
+      <line x1="750" y1="300" x2="682" y2="300" stroke="var(--text-muted)" stroke-width="1.6" marker-end="url(#pipe-arrow)"/>
+      <line x1="510" y1="300" x2="442" y2="300" stroke="var(--text-muted)" stroke-width="1.6" marker-end="url(#pipe-arrow)"/>
+      <text x="475" y="292" text-anchor="middle" font-size="12" fill="var(--text-muted)">none open</text>
+      <line x1="270" y1="300" x2="202" y2="300" stroke="var(--text-muted)" stroke-width="1.6" marker-end="url(#pipe-arrow)"/>
+    </svg>
+    <ul class="legend">
+      <li><span class="swatch swatch-script"></span>script: exact, no model judgment</li>
+      <li><span class="swatch swatch-model"></span>model judgment, in fresh context</li>
+      <li><span class="swatch swatch-output"></span>written output and its rules</li>
+      <li><span class="swatch swatch-loop"></span>return path to the author</li>
+    </ul>
+  </figure>
+  <p>The two dashed lines are the point of the skill. The author keeps looping until the cheap exact signal is clean, then until no Important is open. Owner confirmation comes after, and this skill does not perform it.</p>
+</section>
+
+<!-- 4 -->
+<section id="inputs">
+  <h2>4. A missing input must fail loudly, because silence reads as a pass</h2>
+  <p>If the gaps finder never sees the recorded commitments, it cannot tell which capabilities are committed, so it cannot flag a committed capability whose gap was left unmarked (PS-5 for <code>product-sense.md</code>). It returns nothing, and the loop reads nothing as "pass." So every input below is required. If one is missing, the report says <code>inputs: incomplete</code> and the run cannot claim a pass.</p>
+  <div class="scroll-x">
+  <table>
+    <thead><tr><th>Input</th><th>What breaks without it</th></tr></thead>
+    <tbody>
+      <tr><td>The artifact (path)</td><td>Nothing to verify</td></tr>
+      <tr><td>Its <code>VERIFY.md</code></td><td>No standard; the skill never verifies without one</td></tr>
+      <tr><td>Authoritative sources named in <code>VERIFY.md</code> (Product Idea, <code>product-sense.md</code>, <code>agent_spec.md</code>, <code>example-map.md</code>, …)</td><td>Traceability cannot be checked</td></tr>
+      <tr><td>Confirmed phase objective and recorded commitments</td><td>Cannot judge whether a gap should be left open or simply omitted</td></tr>
+      <tr><td><code>--prior</code> version, on a scoped update</td><td>Write scope cannot be checked</td></tr>
+      <tr><td>Declared changed scope, on a scoped update</td><td>Same</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="rules">
+  <h2>5. Four rules apply to every artifact on top of its own <code>VERIFY.md</code></h2>
+  <p>Two terms first. An <strong>open truth</strong> is a fact the sources do not settle. An <strong>open marker</strong> is the sentence the artifact writes where that fact's value would go, such as "The hold window is unresolved and deliberately not stated." Each <code>VERIFY.md</code> defines its markers. An <strong>OMIT statement</strong> is the sentence for a fact the sources do not settle and no commitment needs, such as "No hold window is established by the authoritative inputs." It is complete as written: it is not an open marker, and nobody answers it.</p>
+  <div class="scroll-x">
+  <table>
+    <thead><tr><th>Rule</th><th>Passes when</th><th>If violated</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1. Traceability</strong></td><td>Every statement points at a source: a rule ID, a quoted span from an authoritative input, or a fact in an upstream artifact. <code>VERIFY.md</code> defines "statement" and "source" for its kind</td><td><span class="badge badge-fail">Important</span></td></tr>
+      <tr><td><strong>2. Write scope</strong></td><td>Only declared files and sections changed. On a scoped update, only the declared scope differs from <code>--prior</code></td><td><span class="badge badge-fail">Important</span></td></tr>
+      <tr><td><strong>3. Gaps stay open</strong></td><td>Where sources are silent, the artifact uses an open marker or an OMIT statement instead of deciding</td><td>Authored decision with no source: <span class="badge badge-fail">Important</span>. If a commitment needs the value, the fix replaces it with an open marker, and the verifier writes the open-truth line. If no commitment needs it, the fix replaces it with the OMIT statement <code>VERIFY.md</code> defines, and nothing is reported.<br>Problem in the source itself (contradiction, ambiguity): <span class="badge badge-pending">Pre-existing</span>, reported to the upstream owner</td></tr>
+      <tr><td><strong>4. Done-when needs evidence</strong></td><td>Any "tests pass" or "validated" claim comes with the output that shows it</td><td><span class="badge badge-fail">Important</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="stages">
+  <h2>6. Each stage spends model effort only where scripts can't decide</h2>
+
+  <h3 id="stage1">Stage 1: mechanical checks gate everything</h3>
+  <p class="who who-script">script</p>
+  <p>Three scripts run in this order:</p>
+  <ol class="step-list">
+    <li>The script on the <code>mechanical:</code> line of the artifact's <code>VERIFY.md</code>, by convention <code>&lt;producing skill&gt;/scripts/verify_mechanical.py</code>. It runs that kind's D-checks: structure, IDs, citation quotes found verbatim.</li>
+    <li><code>verify_generic.py status</code>. The header <code>Status: Draft — N open</code> must equal the number of open markers, as the artifact's <code>VERIFY.md</code> defines them. <code>Status: Confirmed</code> requires zero.</li>
+    <li><code>verify_generic.py write-scope</code>, only on a scoped update. Any section outside the declared scope that differs from <code>--prior</code> fails.</li>
+  </ol>
+  <p>Every failure is an Important with exact locations, written to the report before any model runs. The author fixes and re-runs Stage 1 until it is clean. Stage 2 does not start on a failing Stage 1.</p>
+  <p>Example of the status check. Both sentences below are open markers in <code>product-sense.md</code>'s <code>VERIFY.md</code> (D-2):</p>
+<pre><code><span style="color:var(--code-comment)"># product-sense.md, top of file</span>
+Status: Draft — 1 open
+
+<span style="color:var(--code-comment)"># elsewhere in the artifact: two open markers</span>
+The hold window is unresolved and deliberately not stated.
+Cancellation fees are unresolved and deliberately not stated.
+
+<span style="color:var(--code-comment)"># output</span>
+ST     product-sense.md                         Status says 1 open, artifact has 2 open marker(s)
+status: 1 failure(s)</code></pre>
+
+  <h3 id="stage2">Stage 2: finders fill tables, they don't review</h3>
+  <p class="who who-model">model, fresh context, one per family, in parallel</p>
+  <p><code>VERIFY.md</code> groups its checks into <strong>families</strong>. For <code>product-sense.md</code> they are Traceability, Gaps &amp; open truths, and Boundary &amp; scope. Each finder sees only the artifact, the sources, the inputs, and its own family's checks. It does not see the producing conversation, the other families, or the other finders.</p>
+  <p>The traceability finder's whole job is this table. Every <code>none</code> row becomes a candidate finding.</p>
+  <div class="scroll-x">
+  <table>
+    <thead><tr><th>statement</th><th>source quote</th><th>none</th></tr></thead>
+    <tbody>
+      <tr><td>Guests can book a table through the chat assistant.</td><td>"guests book a table by chatting with the assistant" (product-idea.md)</td><td></td></tr>
+      <tr><td>A reservation is held for 15 minutes past the booking time.</td><td></td><td><strong>none</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="prose" style="color:var(--text-muted);font-size:0.9rem">Rows are illustrative, for a made-up restaurant booking product.</p>
+  <p>Other families get the same treatment. <code>SKILL.md</code>'s example is an authority finder that lists every action the artifact grants, each with its span or <code>none</code>. In <code>product-sense.md</code>'s <code>VERIFY.md</code> that check (PS-11, silent authority) sits inside the Traceability family instead of its own.</p>
+  <p>A finder that returns prose instead of its table is re-run. If a second model family is available (the <code>codex-rescue</code> route is the existing example), the traceability and gaps families run on it. Same-model finders are acceptable for structural families.</p>
+
+  <h3 id="stage3">Stage 3: the verifier drops anything without quoted evidence</h3>
+  <p class="who who-model">mixed, fresh context, one verifier</p>
+  <p>The verifier receives the artifact, the sources, and the merged candidate list. Each candidate passes three gates in order, and failing any gate drops it with a logged reason.</p>
+  <div class="scroll-x">
+  <table>
+    <thead><tr><th>Gate</th><th>Question</th><th>Who decides</th><th>Code in <code>verify_generic.py findings</code></th></tr></thead>
+    <tbody>
+      <tr><td>(a)</td><td>Does the quoted artifact text exist verbatim?</td><td><span class="who who-script">script</span></td><td><code>Fa</code></td></tr>
+      <tr><td>(b)</td><td>Does the quoted source text exist verbatim? If the finder claimed <code>none</code>, does that hold after searching the sources?</td><td><span class="who who-script">script</span> for existence. <span class="who who-model">model</span> only for <code>none</code> claims the script couldn't disprove</td><td><code>Fb</code></td></tr>
+      <tr><td>(c)</td><td>Does the quoted evidence actually support the stated failure?</td><td><span class="who who-model">model</span></td><td>none</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>"Verbatim" is lenient about whitespace and curly versus straight quotes (<code>verify_lib.normalize</code>), and strict about everything else. After the gates, duplicates across finders are merged. Then the <strong>Nit cap</strong> from <code>VERIFY.md</code> is applied once to the merged list, not per finder, keeping the Nits with the strongest evidence. For <code>product-sense.md</code> the cap is 5.</p>
+
+  <h3 id="stage4">Stage 4: one report file, written beside the artifact</h3>
+  <p class="who who-human">output</p>
+  <p>The verifier writes <code>verification-report.md</code> from the template, and writes nothing else. Severity is whatever <code>VERIFY.md</code> assigns the check. A verified problem that no check lists defaults to Nit.</p>
+  <p>Pre-existing findings and rule-3 gaps fixed with an open marker go into the <strong>Open truths for the owner</strong> block, one line each, in this shape:</p>
+<pre><code>- &lt;unresolved truth&gt; · evidence: "&lt;span&gt;" (&lt;location&gt;) · decides: &lt;founder | spec owner | …&gt;</code></pre>
+  <p>The producing skill then repeats those lines in its reply and makes sure each one has an open marker in the artifact.</p>
+</section>
+
+<!-- 7 -->
+<section id="severity">
+  <h2>7. Only Importants block; Pre-existing problems belong to someone else</h2>
+  <div class="scroll-x">
+  <table>
+    <thead><tr><th>Severity</th><th>Comes from</th><th>Blocks confirmation?</th><th>Who acts</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-fail">Important</span></td><td>Any Stage 1 failure, any check <code>VERIFY.md</code> marks Important, any violation of the four rules</td><td>Yes, while open</td><td>Producing skill must fix, refute, or get owner resolution</td></tr>
+      <tr><td><span class="badge badge-pending">Nit</span></td><td>Checks <code>VERIFY.md</code> marks Nit, plus verified problems no check lists. Capped after merge</td><td>No; may stay open</td><td>Producing skill, optionally</td></tr>
+      <tr><td><span class="badge badge-pass">Pre-existing</span></td><td>A real problem in an upstream source: two sources contradict, or one is ambiguous</td><td>Not counted against this artifact</td><td>The upstream owner, via an open-truth line</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Wording problems are a Nit at most, and only if <code>VERIFY.md</code> lists them. This is not a style reviewer.</p>
+</section>
+
+<!-- 8 -->
+<section id="resolution">
+  <h2>8. An Important closes in exactly three ways, and none of them is the author's say-so</h2>
+  <div class="scroll-x">
+  <table>
+    <thead><tr><th>Outcome</th><th>What has to happen</th><th>Confirmed by</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Fixed</strong></td><td>The artifact changed</td><td>The next verification run no longer reproduces the finding</td></tr>
+      <tr><td><strong>Refuted</strong></td><td>The producing skill supplies a verbatim source span the finder missed, at a stated location</td><td><span class="who who-script">script</span> confirms the span exists, then the <span class="who who-model">verifier</span> confirms it supports the statement</td></tr>
+      <tr><td><strong>Owner-resolved</strong></td><td>The accountable human owner closes it with a reason</td><td>Recorded in the report with the owner's name. Not available to the producing agent</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout">
+    <span class="callout-title">What is ruled out</span>
+    <p>"Resolved: this is standard practice" is not an outcome. A finding the author disagrees with and cannot refute with a span stays open, and open Importants block confirmation.</p>
+  </div>
+  <p>Verification is closed when no Important is open. That closes gate 1 of the two gates in the next section.</p>
+</section>
+
+<!-- 9 -->
+<section id="gates">
+  <h2>9. An artifact stays a draft until two gates close, in order</h2>
+  <div class="scroll-x">
+  <table>
+    <thead><tr><th>Gate</th><th>Closes when</th><th>Who closes it</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1. Verification closed</strong></td><td>This skill ran against the producing skill's <code>VERIFY.md</code>, inputs were complete, and no Important is open</td><td>This skill. Its run ends here</td></tr>
+      <tr><td><strong>2. Owner confirmation</strong></td><td>The accountable human owner confirms the artifact after seeing the closed verification report, and only when the artifact has zero open markers</td><td>The owner, outside this skill</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Gate 2 needs every open truth settled first. Concrete case: <code>product-sense.md</code> still says "The hold window is unresolved and deliberately not stated," so the founder cannot confirm it yet. The founder settles it in one of three ways the producing skill defines: answer it, defer it, or drop it.</p>
+  <ol class="step-list">
+    <li>The founder answers: "Hold the table 10 minutes, then release it."</li>
+    <li>The answer is appended verbatim and dated to the <code>## Clarifications</code> section of <code>product-idea.md</code>. That section is an authoritative source.</li>
+    <li><code>/product-definition</code> reruns the affected section. The open marker becomes "A table is held for 10 minutes past the booking time," and the header count drops by one.</li>
+    <li>Verification reruns on that scope, and the new statement traces to the founder's dated line.</li>
+    <li>At zero open markers, the producing skill sets <code>Status: Confirmed</code>. <code>verify_generic.py status</code> rejects <code>Confirmed</code> while any marker remains.</li>
+  </ol>
+  <p>Until both gates close, the artifact is a draft. Downstream phases may read it to prepare, but any truth they take from it is unconfirmed. A scoped update reopens both gates, for the changed scope only.</p>
+</section>
+
+<!-- 10 -->
+<section id="example">
+  <h2>10. One finding, end to end</h2>
+  <p class="prose" style="color:var(--text-muted);font-size:0.9rem">Illustrative walkthrough. The product and the sentences are made up. The check IDs, scripts, and rules are the real ones from <code>skills/product-definition/VERIFY.md</code> and this skill.</p>
+  <p>Setup: <code>product-idea.md</code> says guests book a table by chatting with the assistant, and says nothing about how long a table is held. Booking is a committed capability, and it cannot be stated correctly without the hold window, so this gap must stay open rather than be omitted. The drafted <code>product-sense.md</code> contains "A reservation is held for 15 minutes past the booking time."</p>
+  <ol class="step-list">
+    <li><strong>Stage 1 passes.</strong> All eight headings are present and in order (D-1). No <code>TBD</code> or <code>TODO</code> (D-2). The header says <code>Draft — 2 open</code> and there are two open markers (D-3). The scripts cannot see a guessed number, so this stage has nothing to say about it.</li>
+    <li><strong>Stage 2 flags it.</strong> The traceability finder writes the statement with <code>none</code> in the source column and labels it PS-4, guessed value. Separately, it also claims <code>none</code> for "Guests can book a table through the chat assistant." That second claim is wrong.</li>
+    <li><strong>Stage 3 keeps one, drops one.</strong> For the 15-minute candidate: (a) the script finds the artifact quote verbatim; (b) the source is a <code>none</code> claim, so the model searches <code>product-idea.md</code> and finds no hold window; (c) the evidence fits PS-4. It becomes <code>V-01</code>, Important. The booking candidate is dropped at (b): <em><code>none</code> claim disproved, span found in product-idea.md</em>.</li>
+    <li><strong>Stage 4 reports it.</strong> <code>V-01 — PS-4: guessed value</code>, with <code>source: none — searched product-idea.md</code>. Because this is an authored decision with no source (rule 3) and booking needs the value, the verifier also writes an open-truth line: <em>How long a reservation is held past booking time · evidence: none in product-idea.md · decides: founder</em>.</li>
+    <li><strong>Stage 5 refuses a shortcut.</strong> The author replies "15 minutes is the industry norm." That is not a span, so V-01 stays open and blocks confirmation.</li>
+    <li><strong>The author fixes it.</strong> The sentence becomes "The hold window is unresolved and deliberately not stated." The header must now read <code>Draft — 3 open</code>. If the author forgets to update it, Stage 1's status check fails on the next run. That is the loop catching the fix's own side effect.</li>
+    <li><strong>Re-verification closes it.</strong> The next run no longer reproduces V-01, so it is marked fixed. With no Important open, verification is closed (gate 1). The artifact still has three open markers, so the founder settles each one, as section 9 shows, before confirming (gate 2).</li>
+  </ol>
+</section>
+
+<!-- 11 -->
+<section id="check">
+  <h2>11. Check yourself</h2>
+  <p>Answer each question before opening it.</p>
+  <details class="quiz">
+    <summary>Stage 1 reports only a status-header mismatch. Do the finders run while the author fixes it?</summary>
+    <div class="answer prose"><p>No. Stage 2 does not start on a failing Stage 1. Model effort is spent only on artifacts that already have the right shape.</p></div>
+  </details>
+  <details class="quiz">
+    <summary>Why is the traceability finder told to fill a table instead of reviewing the artifact?</summary>
+    <div class="answer prose"><p>The failure it hunts, filling gaps with plausible defaults, is a habit the finder's model shares with the author. Asked "does this look right?", it under-reports. Asked "where is the span?", a missing span is visible as an empty cell.</p></div>
+  </details>
+  <details class="quiz">
+    <summary>The Product Idea says cancellations are free in one place and charged in another, and the artifact picked "free." Is that an Important against the artifact?</summary>
+    <div class="answer prose"><p>The contradiction itself is Pre-existing: a problem in the source, reported as an open truth for the upstream owner and not counted against this artifact. For <code>product-sense.md</code> this is PS-PRE-1 or PS-PRE-2. The author should not have resolved it either way.</p></div>
+  </details>
+  <details class="quiz">
+    <summary>A finder reports 4 Nits and another reports 4 Nits. The Nit cap is 5. How many Nits reach the report?</summary>
+    <div class="answer prose"><p>At most 5. The cap applies once, after merging and verifying across all finders, keeping the Nits with the strongest evidence. It is not 5 per finder.</p></div>
+  </details>
+  <details class="quiz">
+    <summary>The finders never received the recorded commitments, and they found nothing. Can the report say verification passed?</summary>
+    <div class="answer prose"><p>No. The run is <code>inputs: incomplete</code>, and an incomplete run cannot report a pass.</p></div>
+  </details>
+  <details class="quiz">
+    <summary>Verification is closed, but the artifact still has two open markers. Can the owner confirm it?</summary>
+    <div class="answer prose"><p>No. Gate 2 requires zero open markers. The owner first answers, defers, or drops each open truth. An answer goes into the sources, the producing skill reruns, and verification reruns on that scope. <code>verify_generic.py status</code> rejects <code>Status: Confirmed</code> while any marker remains.</p></div>
+  </details>
+</section>
+
+<!-- 12 -->
+<section id="reference">
+  <h2>12. Reference</h2>
+
+  <h3>Script commands</h3>
+  <p>Exit codes for both scripts: <code>0</code> pass, <code>1</code> failures, <code>2</code> usage error.</p>
+  <div class="copy-wrap">
+    <button class="copy-btn" type="button" data-copy="cmd-findings">Copy</button>
+<pre id="cmd-findings"><code>uv run python skills/verify-artifact/scripts/verify_generic.py findings --findings candidates.yaml --artifact product-sense.md --sources product-idea.md</code></pre>
+  </div>
+  <div class="copy-wrap">
+    <button class="copy-btn" type="button" data-copy="cmd-status">Copy</button>
+<pre id="cmd-status"><code>uv run python skills/verify-artifact/scripts/verify_generic.py status --artifact product-sense.md</code></pre>
+  </div>
+  <div class="copy-wrap">
+    <button class="copy-btn" type="button" data-copy="cmd-scope">Copy</button>
+<pre id="cmd-scope"><code>uv run python skills/verify-artifact/scripts/verify_generic.py write-scope --artifact product-sense.md --prior old/product-sense.md --scope "Product Scope"</code></pre>
+  </div>
+  <p>The <code>findings</code> file is YAML: a list, or <code>{findings: [...]}</code>. Each item has <code>id</code>, <code>artifact</code> (quote), and <code>source</code> (quote, <code>none</code>, or text starting "no source found"). Failure codes: <code>Fa</code> artifact quote, <code>Fb</code> source quote, <code>ST</code> status header, <code>WS</code> write scope.</p>
+
+  <h3>Smoke test after editing a <code>VERIFY.md</code></h3>
+  <p><code>fixtures/planted/</code> holds two or three known-good artifacts with one defect planted per copy, each named for the check it should trigger, for example <code>PS-1-over-admission.md</code>. After editing a <code>VERIFY.md</code> or this skill, run verification on each fixture once and confirm the named check fires. It answers one question: does the signal still detect what it was built for. It is run by hand and is not an eval program.</p>
+
+  <h3>What this skill is not</h3>
+  <ul>
+    <li><strong>Not a runtime judge.</strong> It checks artifacts at authoring time. Judging agent responses at runtime belongs to the evaluation implementation.</li>
+    <li><strong>Not a style reviewer.</strong> Wording is a Nit at most, and only if <code>VERIFY.md</code> lists it.</li>
+    <li><strong>Not an escalation path.</strong> It reports open truths. Whether to answer, defer, or drop them is the owner's call.</li>
+    <li><strong>No voting.</strong> Mandatory quoted evidence plus scripted quote-existence controls false positives. A second verifier is added only if the owner-overturn rate in reports calls for it.</li>
+  </ul>
+
+  <h3>Prompts to paste into Claude Code</h3>
+  <div class="copy-wrap">
+    <button class="copy-btn" type="button" data-copy="prompt-run">Copy</button>
+<pre id="prompt-run"><code>/verify-artifact product-sense.md skills/product-definition/VERIFY.md</code></pre>
+  </div>
+  <div class="copy-wrap">
+    <button class="copy-btn" type="button" data-copy="prompt-quiz">Copy</button>
+<pre id="prompt-quiz"><code>Quiz me on skills/verify-artifact/SKILL.md. Ask one question at a time about the five stages, the four cross-artifact rules, severity, and the three ways an Important can close. Wait for my answer, then tell me what I got right or wrong, quoting the skill.</code></pre>
+  </div>
+  <div class="copy-wrap">
+    <button class="copy-btn" type="button" data-copy="prompt-smoke">Copy</button>
+<pre id="prompt-smoke"><code>Help me build fixtures/planted/ for skills/product-definition/VERIFY.md: start from a known-good product-sense.md and make three copies, each with one planted defect, named PS-1-over-admission.md, PS-4-guessed-value.md, and PS-5-missing-issue.md. Then run /verify-artifact on each and tell me whether the named check fired.</code></pre>
+  </div>
+</section>
+
+<section id="notes">
+  <h2>Notes on the source</h2>
+  <p>One small inconsistency turned up while building this page. It is reported here rather than smoothed over.</p>
+  <ul>
+    <li>Stage 1 says to run <code>verify_generic.py status</code> and <code>write-scope</code> after the skill-owned script. The product-definition script already runs both (as D-3 and D-W), so those checks run twice and report under two codes. The generic <code>status</code> run also counts <code>verify_lib.OPEN_MARKERS_DEFAULT</code> unless <code>--markers</code> is passed. That list has two markers D-3 does not count (<code>Status: rough</code> and <code>| assumed |</code>), so the two runs can disagree.</li>
+  </ul>
+</section>
+
+</main>
+</div>
+
+<script>
+(function () {
+  function manualFallback(btn, pre) {
+    var range = document.createRange();
+    range.selectNodeContents(pre);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    btn.textContent = 'Selected: press Ctrl/⌘+C';
+    btn.classList.add('manual');
+    setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('manual'); }, 3000);
+  }
+  document.querySelectorAll('.copy-btn[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var pre = document.getElementById(btn.getAttribute('data-copy'));
+      var text = pre.innerText.trim();
+      if (!navigator.clipboard || !navigator.clipboard.writeText) { manualFallback(btn, pre); return; }
+      navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1600);
+      }, function () { manualFallback(btn, pre); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

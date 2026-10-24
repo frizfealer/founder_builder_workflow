@@ -6,7 +6,7 @@ Inputs status: **complete** | **incomplete — <what is missing>** (an incomplet
 
 ## Stage 1 — Mechanical
 
-`verify_mechanical.py --kind <kind> …` → <n> failure(s). <Paste the script output verbatim; a clean run pastes the summary line.>
+`<command from the VERIFY.md mechanical: line>`, `verify_generic.py status`, and on a scoped update `verify_generic.py write-scope` → <n> failure(s). <Paste the script output verbatim; a clean run pastes the summary line.>
 
 ## Stage 2–3 — Finders and verifier
 
@@ -38,13 +38,13 @@ Verification status: **open** | **closed** (closed = no open Important and input
 #### V-nn — <check ID>: <failure>
 - artifact: "<quote>" (<location>)
 - source: "<quote>" (<location>)
-- open truth for: <P0|P1|P2 owner>
+- open truth for: <founder | spec owner | …>
 
 ## Open truths for the owner
 
 One line each; the producing skill repeats these in its reply and confirms each has an open marker in the artifact.
 
-- <unresolved truth> · evidence: "<span>" (<location>) · decides: <P0 owner | P1 owner | …>
+- <unresolved truth> · evidence: "<span>" (<location>) · decides: <founder | spec owner | …>
 
 ## Dropped candidates
 

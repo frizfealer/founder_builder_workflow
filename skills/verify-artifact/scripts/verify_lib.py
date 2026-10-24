@@ -150,7 +150,6 @@ class Report:
 # ---------------------------------------------------------------- shared checks
 
 OPEN_MARKERS_DEFAULT = [
-    r"\bNo\b[^.\n]{0,80}\bis established by the authoritative inputs|not established by the authoritative inputs",
     r"\bunresolved and deliberately not stated\b",
     r"\bStatus:\s*rough\b",
     r"\|\s*assumed\s*\|",
