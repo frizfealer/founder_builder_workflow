@@ -1,10 +1,10 @@
 ---
-name: intent-to-agent-spec
+name: product-sense-to-agent-spec
 description: Verification Design skill — turn the authoritative Product Sense (product-sense.md from /product-definition) into an Agent Spec by Specification by Example — Agent Requirements (goal, actors, prioritized capabilities, world requirements), Global Contract, Evaluation Policy, and per-capability Scope & Authority, Contract rules, and Scenarios with Expected / Forbidden and attached rubrics. Every normative line cites a Product Sense claim. Use when asked to "write the agent spec", "define what the agent must do", "spec this agent", "turn product-sense into scenarios", or when agent-spec-to-pytest-bdd or develop-architecture-notes needs an agent_spec.md that does not exist yet. Produces WHAT, never HOW. Leaves unsourced truths open and reports them.
 argument-hint: <product dir containing product-sense.md> [changed scope]
 ---
 
-# /intent-to-agent-spec — Agent Spec
+# /product-sense-to-agent-spec — Agent Spec
 
 Input is **`product-sense.md`**, the authoritative Product Definition artifact. Raw product intent (an idea, a PRD, a conversation) does not qualify: if there is no `product-sense.md`, stop and say `/product-definition` has to run first. This skill may not do `/product-definition`'s job without its admission gate.
 
@@ -13,7 +13,7 @@ Outputs, all in the product directory:
 - `agent_spec.md` — structure in `reference/template.md`.
 - `example-map.md` — rough-example cards, candidate rules, red questions, and the owner's confirmation record per card. The spec cites this file for every owner confirmation.
 
-Before the owner is asked to confirm the spec, run `/verify-artifact agent_spec.md skills/intent-to-agent-spec/VERIFY.md` and close every Important.
+Before the owner is asked to confirm the spec, run `/verify-artifact agent_spec.md skills/product-sense-to-agent-spec/VERIFY.md` and close every Important.
 
 ## Hard rules
 

@@ -1,6 +1,6 @@
 # VERIFY.md — agent_spec.md
 
-Standard for `/verify-artifact` when the artifact is an Agent Spec produced by `/intent-to-agent-spec`. The mechanism lives in `skills/verify-artifact/SKILL.md`; this file only says what failure looks like here.
+Standard for `/verify-artifact` when the artifact is an Agent Spec produced by `/product-sense-to-agent-spec`. The mechanism lives in `skills/verify-artifact/SKILL.md`; this file only says what failure looks like here.
 
 ## Artifact and sources
 
@@ -13,7 +13,7 @@ Standard for `/verify-artifact` when the artifact is an Agent Spec produced by `
 
 ## Stage 1 — Mechanical checks (failures are Important; finders do not run until clean)
 
-mechanical: `skills/intent-to-agent-spec/scripts/verify_mechanical.py --artifact agent_spec.md --sources product-sense.md --example-map example-map.md [--prior … --scope …]`  
+mechanical: `skills/product-sense-to-agent-spec/scripts/verify_mechanical.py --artifact agent_spec.md --sources product-sense.md --example-map example-map.md [--prior … --scope …]`  
 then, on a scoped update: `skills/verify-artifact/scripts/verify_generic.py write-scope …`.
 
 - D-1 Sections present in order: Agent Requirements (4 blocks), Global Contract, Evaluation Policy, Capabilities; each capability has Scope & Authority, Contract, Scenarios.

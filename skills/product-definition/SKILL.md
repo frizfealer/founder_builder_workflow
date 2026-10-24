@@ -118,6 +118,6 @@ Each settlement is a scoped update and reruns verification on that scope. Confir
 
 This skill owns product truth and nothing downstream of it. Expectations about testing, architecture, or implementation will surface while drafting. Capture each at the product level (what must be true) and leave the rest to the phase that owns it:
 
-- how it is verified (tests, evaluators, examples, coverage) → Verification Design (`/intent-to-agent-spec`)
+- how it is verified (tests, evaluators, examples, coverage) → Verification Design (`/product-sense-to-agent-spec`)
 - how it is designed and built → `/develop-architecture-notes`
 - what running it actually showed → running the product (no skill yet)
