@@ -19,7 +19,6 @@ A verifier without its inputs returns silence, and the loop reads silence as pas
 - Artifact under verification (path).
 - `VERIFY.md` for that artifact kind.
 - Authoritative sources, as `VERIFY.md` names them (Product Idea, `product-sense.md`, `agent_spec.md`, `example-map.md`, …).
-- `decisions.md` or equivalent Decision Management record, if the workflow has one — resolutions are sources; a claim citing one is admitted.
 - The confirmed **phase objective** and the **commitments** currently recorded in authoritative artifacts — needed to judge whether a gap should be left open or omitted.
 - `--prior`: the previous version of the artifact (or a diff), when this is a scoped update. Without it, write-scope cannot be checked.
 - The declared changed scope, for a scoped update.
@@ -71,7 +70,16 @@ For every **Important**, exactly three outcomes exist:
 
 There is no "resolved with a one-line reason" by the author. A finding the author disagrees with and cannot refute with a span stays **open**, and open Importants block confirmation. Nits may be left open.
 
-Verification is closed when no Important is open. This is Lifecycle Policy 7(a); owner confirmation (7(b)) follows and is not part of this skill.
+Verification is closed when no Important is open.
+
+## The two gates
+
+An artifact becomes authoritative for downstream phases only after two gates close, in order:
+
+1. **Verification closed** — this skill has run against the producing skill's `VERIFY.md`, inputs complete, no Important open.
+2. **Owner confirmation** — the accountable human owner confirms the artifact after seeing the closed verification report. Confirming is acceptance of what the artifact states, including its open truths; it is not an answer to them.
+
+Until both close the artifact is a draft: downstream phases may read it to prepare, but any truth they take from it is unconfirmed. A scoped update reopens both gates for the changed scope only. Gate 2 is not part of this skill's run; this skill ends when gate 1 closes.
 
 ## Smoke test after changing a VERIFY.md
 
@@ -81,7 +89,7 @@ Each `VERIFY.md` folder may hold `fixtures/planted/`: two or three copies of a k
 
 - Not a runtime judge. It verifies artifacts at authoring time. Runtime judgment of agent responses belongs to the evaluation implementation.
 - Not a style reviewer. Wording is a Nit at most, and only if `VERIFY.md` lists it.
-- Not an escalation path. It reports open truths; classification (DROP / DEFER / RESOLVE NOW) stays with Decision Management.
+- Not an escalation path. It reports open truths; whether to answer, defer, or drop them is the owner's call.
 
 ## Voting
 

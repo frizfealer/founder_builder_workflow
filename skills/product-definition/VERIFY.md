@@ -5,7 +5,7 @@ Standard for `/verify-artifact` when the artifact is a Product Sense produced by
 ## Artifact and sources
 
 - **Artifact:** `product-sense.md`, plus the producing run's reply (its list of reported open truths).
-- **Authoritative sources:** the Product Idea (`product-idea.md`), any business/domain context the invocation or product directory established as authoritative, and the Decision Management record (`decisions.md`) when one exists — an accepted resolution is a source. Nothing else counts — not prior drafts, not the producing conversation, not "common practice".
+- **Authoritative sources:** the Product Idea (`product-idea.md`), any business/domain context the invocation or product directory established as authoritative, including the `## Clarifications` section of `product-idea.md` where the founder's dated answers to earlier open truths live. Nothing else counts — not prior drafts, not the producing conversation, not "common practice".
 - **Required inputs beyond sources:** the confirmed phase objective; the commitments recorded in authoritative artifacts (needed for PS-5/PS-6); the prior `product-sense.md` and declared scope on a scoped update (needed for PS-9).
 - **Statement** (for traceability): every sentence in sections 1–7, except headings and sentences the artifact itself marks as derivation notes ("derived from …"). No keyword filter: a sentence with no modal verb can still assert product truth ("Tables seat four."), and the finder decides nothing — it looks for the span.
 - **Source** (for traceability): a verbatim span from an authoritative input that explicitly states the statement, or a span whose denial the statement would contradict (the admission gate's step 2).
@@ -44,7 +44,7 @@ Each check names the admission-gate rule it enforces. The finder quotes the arti
 - **PS-5 Gap not left open.** A committed capability's correctness, authority, or required behavior depends on a truth the sources do not settle, and the artifact neither marks it open nor does the reply report it. *Evidence:* the capability statement; the dependency; no marker, no report line.
 - **PS-6 Spurious open truth.** A truth is reported open that no recorded commitment and no confirmed phase objective requires — the OMIT branch written as OPEN. *Evidence:* the reported line; no artifact commitment that needs it.
 - **PS-7 Downstream leakage.** A statement about how the product is verified (tests, evaluators, examples, coverage), designed, built, or observed. *Evidence:* the statement. Fix: restate as a product-level truth or delete.
-- **PS-8 Self-classified Open Question.** An entry in Open Questions that is neither an owner-kept-open item nor a Decision Management DEFER. *Evidence:* the entry; no owner or DM record.
+- **PS-8 Self-classified Open Question.** An entry in Open Questions that is neither an owner-kept-open item nor an owner-deferred open truth. *Evidence:* the entry; no owner statement in the sources.
 - **PS-9 Scope overreach.** On a scoped update, a section outside the declared scope changed. *Evidence:* diff hunk; declared scope.
 - **PS-10 Speculative invalidation.** `invalidates` lists a downstream scope not consumed by the semantics that actually changed. *Evidence:* the entry; the artifact change.
 - **PS-11 Silent authority.** Section 3 grants the agent an action without a source stating the grant, or omits a confirmation requirement a source states. Authority is the highest-cost over-admission, so it is listed separately. *Evidence:* both spans.

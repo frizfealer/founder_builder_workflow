@@ -1,7 +1,7 @@
 # Verification report — <artifact path>
 
 Standard: <VERIFY.md path>  
-Inputs: artifact · sources <list> · decisions record <path | none> · phase objective <quoted> · commitments <artifact list> · prior <path | n/a> · scope <declared | fresh draft>  
+Inputs: artifact · sources <list> · phase objective <quoted> · commitments <artifact list> · prior <path | n/a> · scope <declared | fresh draft>  
 Inputs status: **complete** | **incomplete — <what is missing>** (an incomplete run cannot report a pass)
 
 ## Stage 1 — Mechanical

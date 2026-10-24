@@ -109,8 +109,8 @@ Write the common policy once (template default: every required Expected holds, e
 ### Step 7 — Verify, then confirm
 
 1. Run `reference/checklist.md`; fix each failure or leave the truth open and report it.
-2. Run `/verify-artifact` with this skill's `VERIFY.md` (Stage 1 script first, then finders). Close every Important by fix or script-confirmed refutation; repeat the report's open truths in the reply. This is Lifecycle Policy 7(a).
-3. Present the spec and the closed verification report to the owner for confirmation (Lifecycle Policy 7(b)). On confirmation, set `Status: Confirmed` only if the open-marker count is 0.
+2. Run `/verify-artifact` with this skill's `VERIFY.md` (Stage 1 script first, then finders). Close every Important by fix or script-confirmed refutation; repeat the report's open truths in the reply.
+3. Present the spec and the closed verification report to the owner for confirmation (the second gate in `skills/verify-artifact/SKILL.md`). On confirmation, set `Status: Confirmed` only if the open-marker count is 0.
 4. End the reply with: section-level summary of changes; **Open truths**, one line each (truth · evidence span · who decides); and, on an update, the downstream scope whose consumed meaning changed (architecture notes, BDD tests) — known scope only.
 
 ## Anti-patterns to refuse

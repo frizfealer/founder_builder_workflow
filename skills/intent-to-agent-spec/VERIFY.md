@@ -6,14 +6,14 @@ Standard for `/verify-artifact` when the artifact is an Agent Spec produced by `
 
 - **Artifact:** `agent_spec.md`, plus `example-map.md` and the producing run's reply (its list of reported open truths).
 - **Authoritative sources:** `product-sense.md` (product truth) and the `confirmed` cards in `example-map.md` (owner decisions). The Product Idea is not a source for this artifact; a spec line that can only be traced to the Product Idea is a P0 gap.
-- **Required inputs beyond sources:** `decisions.md` when it exists; the confirmed phase objective; the prior `agent_spec.md` and declared scope on a scoped update.
+- **Required inputs beyond sources:** the confirmed phase objective; the prior `agent_spec.md` and declared scope on a scoped update.
 - **Statement** (for traceability): every line in Agent Requirements, Scope & Authority, Contract, Expected, Forbidden, every rubric criterion, and every World requirements row — no keyword filter.
 - **Source** (for traceability): a `[PS §n: "…"]` citation whose quote exists in `product-sense.md` and supports the statement, or an `[EM: id]` citation whose card is `confirmed` and matches the statement.
 - **Write scope:** `agent_spec.md`, `example-map.md`. On a scoped update, only the capabilities and scenarios the declared scope names.
 
 ## Stage 1 — Mechanical checks (failures are Important; finders do not run until clean)
 
-mechanical: `skills/intent-to-agent-spec/scripts/verify_mechanical.py --artifact agent_spec.md --sources product-sense.md [decisions.md] --example-map example-map.md [--prior … --scope …]`  
+mechanical: `skills/intent-to-agent-spec/scripts/verify_mechanical.py --artifact agent_spec.md --sources product-sense.md --example-map example-map.md [--prior … --scope …]`  
 then, on a scoped update: `skills/verify-artifact/scripts/verify_generic.py write-scope …`.
 
 - D-1 Sections present in order: Agent Requirements (4 blocks), Global Contract, Evaluation Policy, Capabilities; each capability has Scope & Authority, Contract, Scenarios.
@@ -75,7 +75,7 @@ Per `verify-artifact` Stage 5: **fixed**, **refuted** by a script-confirmed span
 
 - **AS-P1** Product Sense is silent on a committed capability's authority, material fields, or failure behavior, and the spec correctly left it open.
 - **AS-P2** Two Product Sense claims contradict each other where the spec needs one.
-- **AS-P3** A confirmed `example-map.md` card contradicts a Product Sense claim. The owner decided against product truth; report for the P0 owner so Decision Management decides which artifact changes.
+- **AS-P3** A confirmed `example-map.md` card contradicts a Product Sense claim. The owner decided against product truth; report for the P0 owner, who decides which artifact changes.
 
 ## Skip
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Mechanical D-checks for agent_spec.md (Stage 1 of /verify-artifact). Owned by this skill; listed in VERIFY.md.
 
-  verify_mechanical.py --artifact agent_spec.md --sources product-sense.md [decisions.md] --example-map example-map.md [--prior ... --scope ...]
+  verify_mechanical.py --artifact agent_spec.md --sources product-sense.md --example-map example-map.md [--prior ... --scope ...]
 Generic checks (findings quotes, Status header, write scope) come from skills/verify-artifact/scripts/verify_lib.py.
 Exit 0 = pass, 1 = failures, 2 = usage.
 """
@@ -149,7 +149,7 @@ def verify_agent_spec(a: argparse.Namespace) -> int:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--artifact", required=True)
-    p.add_argument("--sources", nargs="*", default=[], help="product-sense.md [decisions.md]")
+    p.add_argument("--sources", nargs="*", default=[], help="product-sense.md")
     p.add_argument("--example-map")
     p.add_argument("--prior")
     p.add_argument("--scope", nargs="*")
