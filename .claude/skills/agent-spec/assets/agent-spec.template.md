@@ -27,7 +27,9 @@ Rules that apply to every state-changing capability.
 #### Scope & Authority
 
 The agent may:
-- <action>
+- <XX>-A1 <action> [state-changing]
+- <XX>-A2 <action> [state-changing, transient]
+- <XX>-A3 <action> [read-only]
 
 The agent must not:
 - <action>
@@ -50,21 +52,22 @@ Trigger:
 
 ##### Failure handling
 
-| Tool call | Failure | Required behavior | Rule |
+| Action | Outcome | Required behavior | Rule |
 |---|---|---|---|
-| <tool> | timeout | <behavior> | <XX-nn or G-nn> |
-| <tool> | unknown result | <behavior> | <id> |
-| <tool> | partial success | <behavior> | <id> |
-| <tool> | stale data | <behavior> | <id> |
-| <tool> | ambiguous match | <behavior> | <id> |
-| <tool> | <tool-specific failure from the tool list> | <behavior> | <id> |
+| <XX>-An | <supporting actor> does not answer | <behavior> | <XX-nn or G-nn> |
+| <XX>-An | <supporting actor>'s answer is unknown | <behavior> | <id> |
+| <XX>-An | <supporting actor> reports partial success | <behavior> | <id> |
+| <XX>-An | <supporting actor> reports stale data | <behavior> | <id> |
+| <XX>-An | <supporting actor> reports an ambiguous match | <behavior> | <id> |
+| <XX>-An | <outcome as the supporting actor reports it> | <behavior> | <id> |
+| any | <user-caused event> | <behavior> | <id> |
 
 #### Scenarios
 
 ##### XX-S01 — <title>
 
 - **Interaction type:** <none | clarify | infeasible | confirm | a combination>
-- **Category tags:** <single-tool | multi-tool, multi-turn, state-dependency, canonicalization, insufficient-information>
+- **Category tags:** <single-action | multi-action, multi-turn, state-dependency, canonicalization, insufficient-information>
 - **Suite:** <capability | regression>
 
 **Initial state**
@@ -74,19 +77,22 @@ Trigger:
 - Turn 1: "<the user's request>"
 
 **User knows**
-- Q: <question the agent must ask> A: <exact answer>
+- Q: <confirmation question> A: <exact answer> (confirmation)
+- Q: <question the agent may ask> A: <exact answer> (optional)
+- <The pair tagged (confirmation) is the confirmation question Turn anchors refers to. The tag is required when the scenario has more than one pair.>
 
 **Expected**
 
 Required events:
-- `<tool>(<arg>=<value>, …)` called exactly once<, after <authorizing user turn>>
+- <XX>-An occurs exactly once, for <values>, <before | after> <Turn n | the user's confirmation turn | the <XX>-Am for …>.
 
 Final state assertions:
 - <what exists, with field values>
 - <what is unchanged>
 
 **Forbidden**
-- <event that must not occur>
+- <XX>-An for any proposal other than the confirmed one.
+- A second <XX>-An.
 
 **Data variants**
 
@@ -98,10 +104,10 @@ Final state assertions:
 
 **Reference trajectory**
 1. User: "<turn>"
-2. Agent → `<tool>(…)` → `<result>`
+2. Agent → <XX>-An (<values>) → <outcome>.
 3. Agent asks <what>.
 4. User: "<answer>"
-5. Agent → `<tool>(…)` → `<result>`
+5. Agent → <XX>-An (<values>) → <outcome>.
 
 **Illustrates** <XX-nn, G-nn>
 
@@ -140,3 +146,27 @@ Final state assertions:
 | <name> | <what a Pass means> | <scenario ids> |
 
 **pytest-bdd mapping.** Given = Initial state + User knows. When = User. Then = Required events + Final state assertions. Each Forbidden line becomes a negative assertion over the action log. Data variants are the Examples table of a Scenario Outline. The action log is derived from the tool log through Appendix A; that derivation lives in the step definitions, never in the scenarios.
+
+## Appendix A. Interface binding (provisional)
+
+Owned by architecture. Proposed in round 1; architecture notes may rewrite it, and update mode rebinds the scenarios.
+
+<Binding-specific reading rules: **Value comparison** (how each value compares, such as case or date format) and how an id an action carries resolves to the values its lines name.>
+
+| Action | Mark | Commit call | Information items and where each is carried | Outcomes, as tool results | Effect on <state> |
+|---|---|---|---|---|---|
+| <XX>-An <action> | <mark> | `<tool>(<params>)` → `<result>` | <item>: <argument, or through which id> | <outcome>: <result or exception>; … | <when it opens or ends the state, by result> |
+
+Unmapped read-only calls: <`<tool>(<params>)` → `<result>`, or none>.
+
+**Binding contract.**
+- Every state-changing tool call is the commit call of at least one action. Only read-only calls may be unmapped.
+- One call may commit several actions. One action never has two commit calls.
+
+## Appendix B. Supporting-actor guarantees
+
+Promises the agent relies on but cannot act on, because no agent turn exists when they apply. They are stated here so the builder sees them; no scenario grades them.
+
+| Id | Guarantee | Covers |
+|---|---|---|
+| SG-01 | <what the supporting actor does on its own> | <the failure rows or situations it covers> |
