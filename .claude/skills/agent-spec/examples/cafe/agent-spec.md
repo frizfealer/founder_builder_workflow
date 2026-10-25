@@ -263,13 +263,19 @@ Final state assertions:
 
 ## 5. Evaluation
 
-**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question.
+### 5.1 How lines are read
 
 **Turn anchors.** "Turn n" is the nth scripted User turn of the scenario. "The user's confirmation turn" is the user turn in which the simulated user gives the User-knows answer to the confirmation question. If a trial has more than one confirmation turn, "the user's confirmation turn" is the first. The harness labels both turn kinds on the user events it records, so no grader infers them from text.
 
 **Confirmed proposal.** "The confirmed proposal" is the proposal stated in the scenario's User-knows confirmation question.
 
-**Value comparison.** Café and name compare case-insensitively and ignoring accents; dates compare as YYYY-MM-DD, times as HH:MM, party sizes as integers.
+**When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence.
+
+**Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions and in Forbidden lines phrased as state.
+
+### 5.2 Metrics and graders
+
+**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question.
 
 **Trials and metrics.** Each data variant of each scenario runs 5 trials. Forbidden lines report pass^k (every trial passes). Required events and Final state assertions report pass@1 and pass^k.
 
@@ -287,15 +293,15 @@ Final state assertions:
 |---|---|---|
 | Confirmation id reported | The agent's final message states the confirmation id that CR-A1 returned. | CR-S01 |
 
-**pytest-bdd mapping.** Given = Initial state + User knows. When = User. Then = Required events + Final state assertions. Each Forbidden line becomes a negative assertion over the action log. Data variants are the Examples table of a Scenario Outline. The action log is derived from the tool log through Appendix A; that derivation lives in the step definitions, never in the scenarios. Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions and in Forbidden lines phrased as state.
+**pytest-bdd mapping.** Given = Initial state + User knows. When = User. Then = Required events + Final state assertions. Each Forbidden line becomes a negative assertion over the action log. Data variants are the Examples table of a Scenario Outline. The action log is derived from the tool log through Appendix A; that derivation lives in the step definitions, never in the scenarios.
 
 ## Appendix A. Interface binding (provisional)
 
 Owned by architecture. Proposed in round 1; architecture notes may rewrite it, and update mode rebinds the scenarios.
 
-**When an action occurs.** An action occurs when the agent issues that action's commit call, whatever the result. A rejected or timed-out commit call still counts as one occurrence.
+**Value comparison.** Café and name compare case-insensitively and ignoring accents; dates compare as YYYY-MM-DD, times as HH:MM, party sizes as integers.
 
-**Which slot an action is for.** CR-A3 is for the slot in its arguments. CR-A1 and CR-A4 are for the slot of the hold their `hold_id` names, as given in the CR-A3 call that returned that `hold_id`. A "for <values>" condition is evaluated against that resolved slot. A `hold_id` that no CR-A3 returned has no slot, so the action fails every positive condition ("for X") and satisfies every negative one ("for any proposal other than X"). A released `hold_id` still resolves through the CR-A3 that returned it.
+**Which slot an action is for.** CR-A3 is for the slot in its arguments. CR-A1 and CR-A4 are for the slot of the hold their `hold_id` names, as given in the CR-A3 call that returned that `hold_id`. A "for <values>" condition is evaluated against that resolved slot and, for CR-A1, the `name` in its call. "The hold the first CR-A3 placed" is the `hold_id` returned by the first CR-A3 call that returned one; a CR-A3 that returned no `hold_id` placed no hold. A `hold_id` that no CR-A3 returned has no slot, so the action fails every positive condition ("for X") and satisfies every negative one ("for any proposal other than X"). A released `hold_id` still resolves through the CR-A3 that returned it.
 
 | Action | Mark | Commit call | Information items and where each is carried | Outcomes, as tool results | Effect on holds |
 |---|---|---|---|---|---|
