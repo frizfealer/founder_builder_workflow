@@ -109,9 +109,21 @@ Final state assertions:
 
 ## 5. Evaluation
 
+### 5.1 How lines are read
+
+**Turn anchors.** "Turn n" is the nth scripted User turn of the scenario. "The user's confirmation turn" is the user turn in which the simulated user gives the User-knows answer to the confirmation question. If a trial has more than one confirmation turn, "the user's confirmation turn" is the first. The harness labels both turn kinds on the user events it records, so no grader infers them from text.
+
+**Confirmed proposal.** "The confirmed proposal" is the proposal stated in the scenario's User-knows confirmation question, with the values of the trial's data variant row.
+
+**When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence.
+
+**Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions and in Forbidden lines phrased as state.
+
+### 5.2 Metrics and graders
+
 **Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question.
 
-**Trials and metrics.** Each data variant of each scenario runs <5> trials. Forbidden lines report pass^k (every trial passes). Required events and Final state assertions report pass@1 and pass^k.
+**Trials and metrics.** Each data variant of each scenario runs 5 trials. Forbidden lines report pass^k (every trial passes). Required events and Final state assertions report pass@1 and pass^k.
 
 **Scoring per trial.** Any Forbidden event scores the trial 0. Otherwise the trial scores Required events satisfied / Required events total, and Final state assertions report pass or fail beside it.
 
@@ -119,12 +131,12 @@ Final state assertions:
 
 **Interaction metrics.** For each scenario with a User-knows set: recall = required questions asked / required questions; precision = required questions asked / all questions asked. Every User-knows pair is a required question unless marked (optional). Both numbers are reported beside pass/fail and are never folded into the score.
 
-**Efficiency.** Turn count and tool-call count are reported per trial, separately from the score.
+**Efficiency.** Turn count and action count are reported per trial, separately from the score.
 
-**Graders.** State checks and tool-call checks are code graders. LLM-rubric graders cover only assertions that state and tool calls cannot show. Each judge grades one dimension and may answer Unknown. Rubric dimensions used in this spec:
+**Graders.** State checks and action-log checks are code graders. LLM-rubric graders cover only assertions that state and the action log cannot show. Each judge grades one dimension and may answer Unknown. Rubric dimensions used in this spec:
 
 | Dimension | Definition | Used by |
 |---|---|---|
 | <name> | <what a Pass means> | <scenario ids> |
 
-**pytest-bdd mapping.** Given = Initial state + User knows. When = User. Then = Required events + Final state assertions. Each Forbidden line becomes a negative assertion over the trajectory log. Data variants are the Examples table of a Scenario Outline.
+**pytest-bdd mapping.** Given = Initial state + User knows. When = User. Then = Required events + Final state assertions. Each Forbidden line becomes a negative assertion over the action log. Data variants are the Examples table of a Scenario Outline. The action log is derived from the tool log through Appendix A; that derivation lives in the step definitions, never in the scenarios.

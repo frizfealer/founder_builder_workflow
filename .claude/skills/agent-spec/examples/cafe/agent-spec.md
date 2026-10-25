@@ -1,4 +1,4 @@
-<!-- Worked example, excerpt, ACTION FORM DRAFT: one capability with three scenarios, to test whether intent-level action lines stay unambiguous and convert to pytest-bdd steps without rewording. Tool names appear only in Appendix A. The rule and failure row for an unknown confirm result are omitted here, as in the original example. -->
+<!-- Worked example, excerpt: one capability with three scenarios. Tool names appear only in Appendix A. -->
 
 # Sunrise Café Reservation Agent — Agent Spec
 
@@ -267,7 +267,7 @@ Final state assertions:
 
 **Turn anchors.** "Turn n" is the nth scripted User turn of the scenario. "The user's confirmation turn" is the user turn in which the simulated user gives the User-knows answer to the confirmation question. If a trial has more than one confirmation turn, "the user's confirmation turn" is the first. The harness labels both turn kinds on the user events it records, so no grader infers them from text.
 
-**Confirmed proposal.** "The confirmed proposal" is the proposal stated in the scenario's User-knows confirmation question.
+**Confirmed proposal.** "The confirmed proposal" is the proposal stated in the scenario's User-knows confirmation question, with the values of the trial's data variant row.
 
 **When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence.
 
