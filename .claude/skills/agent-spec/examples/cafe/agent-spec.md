@@ -303,7 +303,7 @@ Owned by architecture. Proposed in round 1; architecture notes may rewrite it, a
 
 **Which slot an action is for.** CR-A3 is for the slot in its arguments. CR-A1 and CR-A4 are for the slot of the hold their `hold_id` names, as given in the CR-A3 call that returned that `hold_id`. A "for <values>" condition is evaluated against that resolved slot and, for CR-A1, the `name` in its call. "The hold the first CR-A3 placed" is the `hold_id` returned by the first CR-A3 call that returned one; a CR-A3 that returned no `hold_id` placed no hold. A `hold_id` that no CR-A3 returned has no slot, so the action fails every positive condition ("for X") and satisfies every negative one ("for any proposal other than X"). A released `hold_id` still resolves through the CR-A3 that returned it.
 
-| Action | Mark | Commit call | Information items and where each is carried | Outcomes, as tool results | Effect on holds |
+| Action | Mark | Commit call | Information items and where each is carried | Outcomes, as tool results | Effect on state |
 |---|---|---|---|---|---|
 | CR-A3 hold a slot | state-changing, transient | `hold_slot(cafe, date, time, party_size)` → `{hold_id, expires_at}` | all four as arguments | held: returns `hold_id`; slot taken: `SlotUnavailable`; party too large: `PartySizeTooLarge`; no answer: timeout | Opens a hold only when it returns `hold_id`. |
 | CR-A1 create the reservation | state-changing | `confirm_hold(hold_id, name)` → `{confirmation_id, status}` | name as argument; cafe, date, time and party size through the hold | created: returns `confirmation_id`; hold expired or unknown: `HoldExpired` or `HoldNotFound`; no answer: timeout | Ends the hold when it returns `confirmation_id`, `HoldExpired` or `HoldNotFound`. A timeout ends nothing. |

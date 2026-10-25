@@ -54,8 +54,7 @@ Trigger:
 
 | Action | Outcome | Required behavior | Rule |
 |---|---|---|---|
-| <XX>-An | <supporting actor> does not answer | <behavior> | <XX-nn or G-nn> |
-| <XX>-An | <supporting actor>'s answer is unknown | <behavior> | <id> |
+| <XX>-An | <supporting actor> does not answer (result unknown) | <behavior> | <XX-nn or G-nn> |
 | <XX>-An | <supporting actor> reports partial success | <behavior> | <id> |
 | <XX>-An | <supporting actor> reports stale data | <behavior> | <id> |
 | <XX>-An | <supporting actor> reports an ambiguous match | <behavior> | <id> |
@@ -153,7 +152,7 @@ Owned by architecture. Proposed in round 1; architecture notes may rewrite it, a
 
 <Binding-specific reading rules: **Value comparison** (how each value compares, such as case or date format) and how an id an action carries resolves to the values its lines name.>
 
-| Action | Mark | Commit call | Information items and where each is carried | Outcomes, as tool results | Effect on <state> |
+| Action | Mark | Commit call | Information items and where each is carried | Outcomes, as tool results | Effect on state |
 |---|---|---|---|---|---|
 | <XX>-An <action> | <mark> | `<tool>(<params>)` → `<result>` | <item>: <argument, or through which id> | <outcome>: <result or exception>; … | <when it opens or ends the state, by result> |
 
