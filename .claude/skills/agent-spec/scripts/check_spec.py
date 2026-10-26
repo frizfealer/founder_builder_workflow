@@ -247,7 +247,8 @@ def check(text):
             errors.append(f"{action_id}: more than one commit call in Appendix A ({', '.join(calls)}); one action never has two commit calls")
 
     # Tool names belong to Appendix A, so a rebinding never touches the rest of the spec.
-    # Each error names the heading or rule the line falls under.
+    # Each error names the heading or rule the line falls under. Only `tool` or tool( counts, so a tool
+    # named after a plain word (release, search) does not flag prose that uses the word.
     binding_start = next((i for i, line in enumerate(lines) if line.startswith("## Appendix A")), len(lines))
     where = ""
     for line in lines[:binding_start]:
@@ -256,7 +257,7 @@ def check(text):
         elif m := RULE_RE.match(line):
             where = m.group(1)
         for tool in sorted(tools):
-            if re.search(rf"\b{re.escape(tool)}\b", line):
+            if re.search(rf"`{re.escape(tool)}`|\b{re.escape(tool)}\(", line):
                 errors.append(f"{where}: tool name outside Appendix A: {tool}")
 
     # Scenarios.

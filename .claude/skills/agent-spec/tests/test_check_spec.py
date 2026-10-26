@@ -39,6 +39,13 @@ def test_check_spec_cafe_fixture(tmp_path):
     assert "| CR-04 | CR-S02 |" in out
 
 
+def test_check_spec_plain_word_tool_name(tmp_path):
+    """Should not report prose that uses a tool's name as a plain word outside backticks."""
+    text = mutate("`release_hold(hold_id)`", "`release(hold_id)`")
+    code, out = run(text, tmp_path)
+    assert code == 0, out
+
+
 RULE_VIOLATIONS = {
     "required-event-read-only-action": (
         [
