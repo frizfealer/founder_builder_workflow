@@ -24,7 +24,7 @@ Read every document and code path the user passed before asking anything. Then f
 | 5 | Domain rules | no | | |
 | 6 | Known failure cases or transcripts | no | | |
 
-For input 2, also note which tools only read and which change state; step 4 needs the read-only list.
+For input 2, also note which tools only read and which change state; Appendix A needs the read-only list.
 
 *Found* means the input is complete enough to write from. *Partial* means it exists but a named piece is missing (a tool with no failure modes, an entity with no fields). *Missing* means nothing was supplied. Code counts as a source: a tool's signature and its raised exceptions are input 2, a schema or model class is input 3.
 
@@ -122,10 +122,10 @@ You are the worst reviewer of this spec, because the assumptions that shaped a r
 
 ### 4.1 Run the mechanical check
 
-Run the checker with the read-only tools from input 2:
+Run the checker:
 
 ```bash
-uv run python .claude/skills/agent-spec/scripts/check_spec.py <path>/agent-spec.md --read-only <tool,tool>
+uv run python .claude/skills/agent-spec/scripts/check_spec.py <path>/agent-spec.md
 ```
 
 Fix every error it prints and rerun it. Keep the final output, including its coverage table of rules against scenarios, because the report quotes it.

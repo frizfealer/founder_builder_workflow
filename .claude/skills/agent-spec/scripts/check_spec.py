@@ -1,13 +1,15 @@
 """Mechanical checks for an Agent Spec written by the agent-spec skill.
 
 Checks only what can be decided without judgment: section and block order,
-rule tags, id references, coverage of rules by scenarios, data-variant row
-counts, read-only tools in Required events, and rubric dimensions. Judgment
+rule tags, action marks, id references, coverage of rules by scenarios,
+data-variant row counts, read-only actions in Required events, the Appendix A
+binding of actions to tools, tool names outside Appendix A, the User-knows
+confirmation tag, and rubric dimensions. Judgment
 (faithfulness to inputs, unambiguous verdicts, semantic gaps) is left to the
 reviewers in the skill's verification step.
 
 Usage:
-    uv run python check_spec.py <agent-spec.md> --read-only tool_a,tool_b
+    uv run python check_spec.py <agent-spec.md>
 
 Exit code 0 when no errors are found, 1 otherwise. The first output line
 starts with the error count.
@@ -18,7 +20,10 @@ import re
 import sys
 from dataclasses import dataclass, field
 
-SECTIONS = ["Purpose", "Stakeholders & Interests", "Global Contract", "Capabilities", "Evaluation"]
+SECTIONS = [
+    "Purpose", "Stakeholders & Interests", "Global Contract", "Capabilities", "Evaluation",
+    "Appendix A", "Appendix B",
+]
 CAPABILITY_SUBSECTIONS = [
     "#### Scope & Authority",
     "#### Preconditions and Trigger",
@@ -44,14 +49,20 @@ SCENARIO_BLOCKS = [
 ]
 INTERACTION_TYPES = {"none", "clarify", "infeasible", "confirm"}
 CATEGORY_TAGS = {
-    "single-tool", "multi-tool", "multi-turn",
+    "single-action", "multi-action", "multi-turn",
     "state-dependency", "canonicalization", "insufficient-information",
 }
 SUITES = {"capability", "regression"}
 TAGS = {"minimal guarantee", "success guarantee"}
+ACTION_MARKS = {"state-changing", "state-changing, transient", "read-only"}
+
+# A numbered section is keyed by its name, an appendix by its label ("Appendix A").
+SECTION_RE = re.compile(r"^## (?:\d+\. (.+?)|(Appendix [A-Z])\. .+?)\s*$")
 
 RULE_RE = re.compile(r"^\*\*([A-Z]{1,3}-\d{2}) — [^*]+\*\*\s*(.*)$")
 RULE_ID_RE = re.compile(r"\b([A-Z]{1,3}-\d{2})\b")
+ACTION_ID_RE = re.compile(r"\b([A-Z]{1,3}-A\d+)\b")
+ACTION_RE = re.compile(r"^- ([A-Z]{1,3}-A\d+) .*?(?:\[([^\]]+)\])?\s*$")
 CAPABILITY_RE = re.compile(r"^### 4\.\d+ (.+) \((state-changing|read-only)\) — prefix ([A-Z]{1,3})\s*$")
 SCENARIO_RE = re.compile(r"^##### ([A-Z]{1,3})-S(\d{2}) — .+$")
 CALL_RE = re.compile(r"`([A-Za-z_][\w.]*)\(")
@@ -99,23 +110,24 @@ def table_rows(lines):
     return rows[2:]  # drop header and separator
 
 
-def check(text, read_only_tools):
+def check(text):
     errors = []
     lines = text.splitlines()
 
     # Sections, in order.
-    found = [m.group(1) for line in lines if (m := re.match(r"^## \d+\. (.+?)\s*$", line))]
+    found = [m.group(1) or m.group(2) for line in lines if (m := SECTION_RE.match(line))]
     if found != SECTIONS:
         errors.append(f"sections are {found}; expected {SECTIONS} in that order")
 
     def section(name):
-        for m, body in split_by(lines, re.compile(r"^## \d+\. (.+?)\s*$")):
-            if m.group(1) == name:
+        for m, body in split_by(lines, SECTION_RE):
+            if (m.group(1) or m.group(2)) == name:
                 return body
         return []
 
-    # Rules: global and per capability.
+    # Rules: global and per capability. Actions: from each Scope & Authority, id to mark.
     rules = {}
+    actions = {}
 
     def collect_rules(body, where):
         ids = []
@@ -156,6 +168,18 @@ def check(text, read_only_tools):
         if present != sorted(present):
             errors.append(f"{cap.name}: subsections out of order; expected {[s.lstrip('# ') for s in CAPABILITY_SUBSECTIONS]}")
 
+        if positions[0] is not None:
+            scope_end = next((p for p in positions[1:] if p is not None), len(cap.lines))
+            for line in cap.lines[positions[0]:scope_end]:
+                if not (m := ACTION_RE.match(line)):
+                    continue
+                action_id, mark = m.group(1), m.group(2)
+                if mark is None:
+                    errors.append(f"{action_id}: missing mark; expected one of {sorted(ACTION_MARKS)}")
+                elif mark not in ACTION_MARKS:
+                    errors.append(f"{action_id}: unknown mark [{mark}]; expected one of {sorted(ACTION_MARKS)}")
+                actions[action_id] = mark
+
         scope = "\n".join(cap.lines)
         for phrase in ("The agent may:", "The agent must not:"):
             if phrase not in scope:
@@ -182,15 +206,40 @@ def check(text, read_only_tools):
         if not cap.scenarios:
             errors.append(f"{cap.name}: no scenarios")
 
-    # Failure rows cite known rules (checked after every capability's rules are collected).
+    # Failure rows cite known actions and rules (checked after every capability's are collected).
     for cap in capabilities:
         for row in cap.failure_rows:
+            for action_id in ACTION_ID_RE.findall(row[0]):
+                if action_id not in actions:
+                    errors.append(f"{cap.name}: failure row '{row[0]} / {row[1]}' cites unknown action {action_id}")
             cited = RULE_ID_RE.findall(row[-1])
             if not cited:
                 errors.append(f"{cap.name}: failure row '{row[0]} / {row[1]}' names no rule")
             for rule_id in cited:
                 if rule_id not in rules:
                     errors.append(f"{cap.name}: failure row '{row[0]} / {row[1]}' cites unknown rule {rule_id}")
+
+    # Appendix A: every action has exactly one commit call; every state-changing call commits an action.
+    binding = section("Appendix A")
+    tools = set(CALL_RE.findall("\n".join(binding)))
+    header = next((i for i, line in enumerate(binding) if line.startswith("| Action")), None)
+    commit_calls = {}
+    if header is not None:
+        for row in table_rows(binding[header:]):
+            tool = next(iter(CALL_RE.findall(row[2])), row[2])
+            bound = ACTION_ID_RE.findall(row[0])
+            if not bound and "state-changing" in row[1]:
+                errors.append(f"{tool}: state-changing tool with no action in Appendix A")
+            for action_id in bound:
+                if action_id not in actions:
+                    errors.append(f"Appendix A row for {tool} cites unknown action {action_id}")
+                commit_calls.setdefault(action_id, []).append(tool)
+    for action_id in actions:
+        calls = commit_calls.get(action_id, [])
+        if not calls:
+            errors.append(f"{action_id}: no Appendix A row")
+        elif len(calls) > 1:
+            errors.append(f"{action_id}: more than one commit call in Appendix A ({', '.join(calls)}); one action never has two commit calls")
 
     # Scenarios.
     seen_ids = set()
@@ -200,6 +249,14 @@ def check(text, read_only_tools):
         seen_ids.add(s.id)
         if s.prefix != cap.prefix:
             errors.append(f"{s.id}: scenarios in {cap.name} use the prefix {cap.prefix}")
+
+        # Scenarios name actions by id; tool names belong to Appendix A, so a rebinding never touches scenarios.
+        body = "\n".join(s.lines)
+        for action_id in sorted(set(ACTION_ID_RE.findall(body)) - actions.keys()):
+            errors.append(f"{s.id}: cites unknown action {action_id}")
+        for tool in sorted(tools):
+            if re.search(rf"\b{re.escape(tool)}\b", body):
+                errors.append(f"{s.id}: tool name outside Appendix A: {tool}")
 
         found_at = {}
         for name, pattern in SCENARIO_BLOCKS:
@@ -236,19 +293,24 @@ def check(text, read_only_tools):
         if bad:
             errors.append(f"{s.id}: unknown category tag {bad}; allowed {sorted(CATEGORY_TAGS)}")
 
+        pairs = [line for line in block("User knows") if line.startswith("- Q:")]
+        tagged = [line for line in pairs if "(confirmation)" in line]
+        if len(pairs) > 1 and len(tagged) != 1:
+            errors.append(f"{s.id}: User knows has {len(pairs)} pairs and {len(tagged)} carry the confirmation tag; mark exactly one (confirmation)")
+
         suite = value("Suite")
         if suite not in SUITES:
             errors.append(f"{s.id}: suite '{suite}' must be one of {sorted(SUITES)}")
 
         required = [line for line in block("Required events")[1:] if line.strip().startswith("-")]
-        calls = [c for line in required for c in CALL_RE.findall(line)]
+        cited = [a for line in required for a in ACTION_ID_RE.findall(line)]
         if not required:
             errors.append(f"{s.id}: Required events is empty; write '- none' when no write is required")
-        for tool in calls:
-            if tool in read_only_tools:
-                errors.append(f"{s.id}: Required events lists read-only tool {tool}")
-        if cap.kind == "read-only" and calls:
-            errors.append(f"{s.id}: read-only capability {cap.name} has Required events {calls}")
+        for action_id in cited:
+            if actions.get(action_id) == "read-only":
+                errors.append(f"{s.id}: Required events cites read-only action {action_id}")
+        if cap.kind == "read-only" and cited:
+            errors.append(f"{s.id}: read-only capability {cap.name} has Required events {cited}")
 
         rows = table_rows(block("Data variants"))
         if not 2 <= len(rows) <= 3:
@@ -299,13 +361,11 @@ def check(text, read_only_tools):
 def main():
     parser = argparse.ArgumentParser(description="Mechanical checks for an Agent Spec.")
     parser.add_argument("spec", help="path to agent-spec.md")
-    parser.add_argument("--read-only", default="", help="comma-separated names of tools that do not change state")
     args = parser.parse_args()
 
     with open(args.spec, encoding="utf-8") as f:
         text = f.read()
-    read_only = {t.strip() for t in args.read_only.split(",") if t.strip()}
-    errors, coverage = check(text, read_only)
+    errors, coverage = check(text)
 
     print(f"{len(errors)} errors")
     for e in errors:
