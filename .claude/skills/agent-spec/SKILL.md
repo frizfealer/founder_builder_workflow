@@ -88,7 +88,7 @@ Coverage, before writing any scenario:
 - Every rule in the capability and every global rule it touches has at least one scenario that illustrates it.
 - Every rule of the form "act only when" has one scenario where the agent acts and one where it holds back.
 - Every failure row that changes the outcome has a scenario whose Initial state causes that failure.
-- Write the plain single-tool, single-turn scenario first, then derive the harder ones from it: a missing detail (clarify), an unavailable request (infeasible), a write that needs approval (confirm), a tool that depends on state, a request in a surface form that needs canonicalizing, a request nothing can satisfy.
+- Write the plain single-action, single-turn scenario first, then derive the harder ones from it: a missing detail (clarify), an unavailable request (infeasible), a write that needs approval (confirm), a tool that depends on state, a request in a surface form that needs canonicalizing, a request nothing can satisfy.
 
 Each scenario carries the blocks in the template's order. The rules for filling them:
 

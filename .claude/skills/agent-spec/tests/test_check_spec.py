@@ -9,6 +9,7 @@ SCRIPT = SKILL / "scripts" / "check_spec.py"
 EXAMPLE = (SKILL / "examples" / "cafe" / "agent-spec.md").read_text(encoding="utf-8")
 
 CR_A4_BINDING_ROW = "| CR-A4 release a hold | state-changing | `release_hold(hold_id)` → `{released}` | the hold through `hold_id` | released: `released: true`; hold already gone: `HoldNotFound`; no answer: timeout | Ends the hold when it returns `released: true` or `HoldNotFound`. A timeout ends nothing. |\n"
+CR_A4_FAILURE_ROW = "| CR-A4 | booking system does not answer | Treat the hold as possibly still open: tell the user, propose nothing new until it lapses under SG-01. | CR-06 |\n"
 S01_HOLD_EVENT = "- CR-A3 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 2, before the user's confirmation turn."
 S01_CREATE_EVENT = "- CR-A1 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 2, name Alex, after the user's confirmation turn."
 
@@ -91,6 +92,15 @@ RULE_VIOLATIONS = {
     "missing-appendix-a": (
         [("## Appendix A. Interface binding (provisional)\n", "")],
         ["sections", "Appendix A"],
+    ),
+    "state-changing-action-without-failure-row": (
+        [(CR_A4_FAILURE_ROW, "")],
+        ["CR-A4", "no failure row"],
+    ),
+    "rule-text-tool-name": (
+        [("CR-A4 releases the old hold before CR-A3 places the new one.",
+          "CR-A4 releases the old hold before `hold_slot` places the new one.")],
+        ["CR-06", "hold_slot", "tool name outside Appendix A"],
     ),
     "user-knows-without-confirmation-tag": (
         [("- Q: Shall I book Sunrise Café on 2026-10-30 at 19:00 for 4 under Alex? A: Yes.",

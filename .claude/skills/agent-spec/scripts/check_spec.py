@@ -1,10 +1,11 @@
 """Mechanical checks for an Agent Spec written by the agent-spec skill.
 
 Checks only what can be decided without judgment: section and block order,
-rule tags, action marks, id references, coverage of rules by scenarios,
-data-variant row counts, read-only actions in Required events, the Appendix A
-binding of actions to tools, tool names outside Appendix A, the User-knows
-confirmation tag, and rubric dimensions. Judgment
+rule tags, action marks, id references, coverage of rules by scenarios, a
+failure row for every state-changing action, data-variant row counts,
+read-only actions in Required events, the Appendix A binding of actions to
+tools, tool names outside Appendix A, the User-knows confirmation tag, and
+rubric dimensions. Judgment
 (faithfulness to inputs, unambiguous verdicts, semantic gaps) is left to the
 reviewers in the skill's verification step.
 
@@ -218,6 +219,10 @@ def check(text):
             for rule_id in cited:
                 if rule_id not in rules:
                     errors.append(f"{cap.name}: failure row '{row[0]} / {row[1]}' cites unknown rule {rule_id}")
+    with_failure_row = {a for cap in capabilities for row in cap.failure_rows for a in ACTION_ID_RE.findall(row[0])}
+    for action_id, mark in actions.items():
+        if mark is not None and mark.startswith("state-changing") and action_id not in with_failure_row:
+            errors.append(f"{action_id}: state-changing action has no failure row")
 
     # Appendix A: every action has exactly one commit call; every state-changing call commits an action.
     binding = section("Appendix A")
@@ -241,6 +246,19 @@ def check(text):
         elif len(calls) > 1:
             errors.append(f"{action_id}: more than one commit call in Appendix A ({', '.join(calls)}); one action never has two commit calls")
 
+    # Tool names belong to Appendix A, so a rebinding never touches the rest of the spec.
+    # Each error names the heading or rule the line falls under.
+    binding_start = next((i for i, line in enumerate(lines) if line.startswith("## Appendix A")), len(lines))
+    where = ""
+    for line in lines[:binding_start]:
+        if line.startswith("#"):
+            where = line.lstrip("# ")
+        elif m := RULE_RE.match(line):
+            where = m.group(1)
+        for tool in sorted(tools):
+            if re.search(rf"\b{re.escape(tool)}\b", line):
+                errors.append(f"{where}: tool name outside Appendix A: {tool}")
+
     # Scenarios.
     seen_ids = set()
     for cap, s in all_scenarios:
@@ -250,13 +268,9 @@ def check(text):
         if s.prefix != cap.prefix:
             errors.append(f"{s.id}: scenarios in {cap.name} use the prefix {cap.prefix}")
 
-        # Scenarios name actions by id; tool names belong to Appendix A, so a rebinding never touches scenarios.
         body = "\n".join(s.lines)
         for action_id in sorted(set(ACTION_ID_RE.findall(body)) - actions.keys()):
             errors.append(f"{s.id}: cites unknown action {action_id}")
-        for tool in sorted(tools):
-            if re.search(rf"\b{re.escape(tool)}\b", body):
-                errors.append(f"{s.id}: tool name outside Appendix A: {tool}")
 
         found_at = {}
         for name, pattern in SCENARIO_BLOCKS:

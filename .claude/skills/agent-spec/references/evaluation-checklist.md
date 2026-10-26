@@ -24,9 +24,9 @@ Distilled from ToolSandbox (Lu et al., arXiv 2408.04682), AppWorld-UL (Chen, Tri
   - *confirm*: one path exists but a condition (cost, irreversibility, policy) requires approval before the write. User knows holds the approval and any condition on it.
   - *none*: the instruction and state fully determine the outcome and no user turn is needed after the first.
   Build a combined type only from non-conflicting gaps (an infeasible gap that removes the item cannot combine with a clarify gap about which item).
-- [ ] **Derive hard scenarios from a seed.** Write the plain single-tool, single-turn scenario first. Then branch: add a second tool, remove a slot so the user must be asked, make a tool depend on state another tool changes, remove the tool or fact the task needs, phrase the request in a surface form that needs canonicalizing. Paraphrased requests reuse the seed's Expected block.
+- [ ] **Derive hard scenarios from a seed.** Write the plain single-action, single-turn scenario first. Then branch: add a second action, remove a slot so the user must be asked, make a tool depend on state another tool changes, remove the tool or fact the task needs, phrase the request in a surface form that needs canonicalizing. Paraphrased requests reuse the seed's Expected block.
 - [ ] **Category tags are literal.**
-  - *single-tool* / *multi-tool*: how many distinct tool calls the outcome needs.
+  - *single-action* / *multi-action*: how many distinct actions the outcome needs.
   - *multi-turn*: the user must speak more than once.
   - *state-dependency*: a call's success or correctness depends on world state that another call reveals or changes. Nested dependencies are the hard case.
   - *canonicalization*: the user's surface form ("this Friday", "1B", a landmark name) must become the tool's argument form, with or without a helper tool.

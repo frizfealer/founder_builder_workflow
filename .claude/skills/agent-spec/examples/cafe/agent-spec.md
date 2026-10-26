@@ -78,6 +78,7 @@ When the user withdraws before CR-A1, the agent releases its hold with CR-A4 and
 | any | the user asks for a party larger than 8 | Tell the user the maximum is 8; ask for a new party size; hold and propose nothing until it is 8 or fewer. | CR-02 |
 | CR-A3 | booking system reports the party too large | Tell the user the maximum is 8; ask for a new party size. | CR-02 |
 | CR-A1 | booking system reports the hold expired, or unknown | Tell the user the hold lapsed; hold again and ask for confirmation again. | CR-04, CR-06 |
+| CR-A4 | booking system does not answer | Treat the hold as possibly still open: tell the user, propose nothing new until it lapses under SG-01. | CR-06 |
 | any | the user changes a proposal term after confirming, before CR-A1 | Treat the earlier confirmation as void; release the old hold; hold for the changed proposal; ask for confirmation. | CR-04, CR-06 |
 | any | the user withdraws before CR-A1 | Release the hold; create nothing. | CR-07 |
 | any | the user stops answering before confirming | Create nothing. The hold lapses under SG-01; no agent action is possible. | CR-03 |
@@ -321,4 +322,4 @@ Promises the agent relies on but cannot act on, because no agent turn exists whe
 
 | Id | Guarantee | Covers |
 |---|---|---|
-| SG-01 | The booking system expires an unconfirmed hold 10 minutes after it was placed. | The user stops answering before confirming, and a hold call that timed out. |
+| SG-01 | The booking system expires an unconfirmed hold 10 minutes after it was placed. | The user stops answering before confirming, a hold call that timed out, and a release that timed out. |

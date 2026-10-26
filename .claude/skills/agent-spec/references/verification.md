@@ -32,7 +32,7 @@ The report starts with a count line, such as "3 findings: 2 Important, 1 Nit." o
 >
 > Read, in this order: the review packet at [packet path], which lists the inputs the spec was written from; every source file the packet lists; the spec at [spec path]; the checklists in [skill dir]/references/.
 >
-> A script has already verified section and block order, rule tags, action marks, id references, rule-to-scenario coverage counts, data-variant row counts, read-only actions in Required events, the Appendix A binding of actions to tools, tool names outside Appendix A, the User-knows confirmation tag and rubric-dimension bookkeeping. Skip those.
+> A script has already verified section and block order, rule tags, action marks, id references, rule-to-scenario coverage counts, a failure row for every state-changing action, data-variant row counts, read-only actions in Required events, the Appendix A binding of actions to tools, tool names outside Appendix A, the User-knows confirmation tag and rubric-dimension bookkeeping. Skip those.
 >
 > Scope: [the whole spec | only these sections: …]. Already answered, do not report again: [list of finding summaries, or "none"].
 >
