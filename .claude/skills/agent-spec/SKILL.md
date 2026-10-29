@@ -26,19 +26,19 @@ Read every document and code path the user passed before asking anything. Then f
 
 For input 2, also note which tools only read and which change state; Appendix A needs the read-only list.
 
-*Found* means the input is complete enough to write from. *Partial* means it exists but a named piece is missing (a tool with no failure modes, an entity with no fields). *Missing* means nothing was supplied. Code counts as a source: a tool's signature and its raised exceptions are input 2, a schema or model class is input 3.
+*Found* means the input is complete enough to write from. *Partial* means it exists but a named piece is missing (a tool with no failure modes, an entity with no fields). *Missing* means nothing was supplied. *Proposed* applies to row 2 only: if the inputs define no tools at all, mark row 2 proposed instead of missing, and step 3.8 proposes the tool set. Code counts as a source: a tool's signature and its raised exceptions are input 2, a schema or model class is input 3.
 
 Done when every row has a status and either a source or a one-line description of the gap.
 
 ## 2. Interview for the gaps
 
-Interview only for rows marked partial or missing. Ask at most 4 questions per turn, the most blocking first, each with your recommended answer so that "yes" accepts it.
+Interview only for the product inputs, rows 1 and 3 to 6, that are marked partial or missing. Row 2 waits for step 3.8, because the tools follow from actions that step 3 writes. Ask at most 4 questions per turn, the most blocking first, each with your recommended answer so that "yes" accepts it.
 
-If the available skills include `grilling` or `grill-with-docs` (under any plugin prefix), invoke `grilling` with the ledger's partial and missing rows as the agenda; use `grill-with-docs` only when `grilling` is absent. The 4-questions-per-turn cap still applies. Otherwise interview directly in the same format.
+If the available skills include `grilling` or `grill-with-docs` (under any plugin prefix), invoke `grilling` with those partial and missing rows as the agenda; use `grill-with-docs` only when `grilling` is absent. The 4-questions-per-turn cap still applies. Otherwise interview directly in the same format.
 
 For the optional inputs, ask once. If the user has nothing, record *none* and proceed. For input 4 when it is none, propose this default and ask the user to confirm it in the same turn: a state-changing call is authorized only by the user's explicit confirmation of the full proposal that call executes, and any change to the proposal voids the confirmation.
 
-Done when every required row is found and every optional row is found or recorded as none, with any default the user accepted written into the ledger.
+Done when rows 1 and 3 are found and every optional row is found or recorded as none, with any default the user accepted written into the ledger.
 
 ## 3. Write the spec
 
@@ -56,7 +56,7 @@ Done when every party has at least one stated interest and every interest names 
 
 ### 3.3 Capability list
 
-List the capabilities from input 1 and test each against the user-goal tests in the use-case checklist: it passes the go-home-happy test (when it is done, the user can stop and be satisfied), and it fits one conversation. Raise a capability that is really a step by asking why the user wants it; split one that is really two goals. Give each a two-letter prefix and keep its state-changing or read-only mark.
+List the capabilities from input 1 and test each against the user-goal tests in the use-case checklist: it passes the go-home-happy test (when it is done, the user can stop and be satisfied), and it fits one conversation. Raise a capability that is really a step by asking why the user wants it; split one that is really two goals. Give each a two-letter prefix and keep its state-changing or read-only mark. A capability is state-changing when any of its actions is, and read-only otherwise.
 
 Done when every capability passes the user-goal tests and has a unique prefix.
 
@@ -73,11 +73,11 @@ For each capability, in this order:
 - **Scope & Authority.** "The agent may" lists the actions inside the goal, at the level of intent. "The agent must not" lists the adjacent writes and inferences the capability does not authorize.
 - **Preconditions and Trigger.** A precondition is guaranteed before the capability starts and never re-checked inside it. The trigger is an event the agent can perceive.
 - **Contract.** Rules numbered `<PREFIX>-01` onward, each tagged [minimal guarantee] (holds on every exit, including abandonment) or [success guarantee] (holds on success). Write the guarantees by asking what would make each stakeholder unhappy on failure and on success, then writing the negation. Rules name intent, never tool mechanics or wording.
-- **Failure handling.** Brainstorm before writing: walk every tool call the capability makes and list each failure in the checklist (timeout, unknown result, partial success, stale data, ambiguous match, and the rest), plus every failure mode input 2 declares for that tool. Then prune to failures the agent can detect and must handle, merge those with the same handling, and write one table row each with the rule it serves. A failure no existing rule covers gets a new rule.
+- **Failure handling.** Brainstorm before writing: walk every state-changing action the capability takes and list each failure in the checklist (timeout, unknown result, partial success, stale data, ambiguous match, and the rest), plus, when row 2 was found or partial, every failure mode input 2 declares for the tool that will commit that action. Name each outcome as the supporting actor reports it. Then prune to failures the agent can detect and must handle, merge those with the same handling, and write one table row each with the rule it serves. A failure no existing rule covers gets a new rule. A failure the agent cannot act on, because no agent turn exists when it applies, becomes an SG row in Appendix B, and the failure row cites it.
 
 The Contract and Failure sections of the use-case checklist carry the tests for each part.
 
-Done when every state-changing tool call the capability makes has at least one failure row, and every row names a rule.
+Done when every state-changing action has at least one failure row, and every row names a rule.
 
 ### 3.6 Scenarios
 
@@ -88,21 +88,21 @@ Coverage, before writing any scenario:
 - Every rule in the capability and every global rule it touches has at least one scenario that illustrates it.
 - Every rule of the form "act only when" has one scenario where the agent acts and one where it holds back.
 - Every failure row that changes the outcome has a scenario whose Initial state causes that failure.
-- Write the plain single-action, single-turn scenario first, then derive the harder ones from it: a missing detail (clarify), an unavailable request (infeasible), a write that needs approval (confirm), a tool that depends on state, a request in a surface form that needs canonicalizing, a request nothing can satisfy.
+- Write the plain single-action, single-turn scenario first, then derive the harder ones from it: a missing detail (clarify), an unavailable request (infeasible), a write that needs approval (confirm), an action that depends on state, a request in a surface form that needs canonicalizing, a request nothing can satisfy.
 
 Each scenario carries the blocks in the template's order. The rules for filling them:
 
 - **Interaction type** is chosen by what the agent lacks: a choice (clarify), a feasible path (infeasible), an approval (confirm), or nothing (none). Combine only non-conflicting gaps.
 - **Category tags** are literal counts and conditions, defined in the evaluation checklist.
 - **Suite** is regression for behavior that must already hold and never break, capability for behavior being built or a hard interaction case. Scenarios from known failure cases (input 6) start in capability.
-- **Initial state** holds one concrete fact per line: today's date whenever any phrase is relative to it, every existing record with the fields the rule depends on, availability, and any tool outage the scenario injects.
+- **Initial state** holds one concrete fact per line: today's date whenever any phrase is relative to it, every existing record with the fields the rule depends on, availability, and any failure the scenario injects. Write an injected failure as an outcome ("the 19:00 slot is taken"), never as a tool result or exception.
 - **User** holds the turns the user initiates on their own: the request and any unprompted change of mind. A later turn states the point at which it arrives, relative to the agent's actions (for example, "in reply to the agent's proposal, in place of a confirmation"), so the simulator delivers it at one defined point. Dialogue appears only here and in Initial state.
 - **User knows** holds question-answer pairs the simulated user can answer but has not volunteered. Answers to the agent's questions live here, never in User. Every pair is a required question unless marked (optional). When a scenario has more than one pair, mark the one that answers the confirmation question (confirmation).
-- **Expected: Required events** lists only the state-changing tool calls that constitute the outcome, with their arguments. Read-only calls are never Required. Add an ordering constraint only where an authorizing user turn must precede a write. A read-only capability has Required events: none.
+- **Expected: Required events** lists only the state-changing actions that constitute the outcome, each with its values and timing. Read-only actions are never Required. Add an ordering constraint only where an authorizing user turn must precede a write. A read-only capability has Required events: none.
 - **Expected: Final state assertions** state what exists, with field values, and what is unchanged. Use full-set forms ("exactly one", "no other record changed").
-- **Forbidden** lists events that must not occur: a call pattern, a call before its authorizing turn, a call count.
+- **Forbidden** lists events that must not occur: an action for any proposal other than the confirmed one, an action before its authorizing turn, an action count, or a state that must never hold.
 - **Data variants** is a table of 2 to 3 rows that vary values only. Every value that differs between rows gets a column, including the user's wording of it and any injected failure, so each row fills a pytest-bdd Scenario Outline without guessing. An Initial state fact that depends on a varying value, such as availability for the party size, must hold for every row: state it for every row's value, or give it a column. The scenario body uses row 1.
-- **Reference trajectory** is the shortest passing sequence of user turns, tool calls and tool results. Agent turns are described, not quoted. It must use every required User-knows pair.
+- **Reference trajectory** is the shortest passing sequence of user turns, actions with their values, and outcomes as the supporting actor reports them. Agent turns are described, not quoted. It must use every required User-knows pair.
 - **Illustrates** names the rule ids the scenario exists for.
 - **Unambiguity note** is one line on why two domain experts reach the same verdict.
 
@@ -115,6 +115,16 @@ Done when the coverage conditions above hold for every capability and every scen
 ### 3.7 Evaluation
 
 The template carries the Evaluation section. Fill its slots: the trials per scenario (default 5) and the rubric dimension table, one row per dimension with its definition and the scenarios that use it. Change the fixed text only when the user asked for a different metric.
+
+### 3.8 Interface binding
+
+Write Appendix A from the actions in every Scope & Authority, the "act only when" rules and the failure rows.
+
+If row 2 was found, bind the supplied tools and ask nothing. Give each state-changing action its commit call, and list the remaining read-only calls on the "Unmapped read-only calls" line.
+
+If row 2 is proposed or partial, derive the smallest tool set in which every state-changing action has one commit call and every fact the agent must know before it can act or decide has a read. The facts are the conditions of the "act only when" rules and the Initial state facts the scenarios set, such as existing records and availability. One tool may commit several actions and one read may return several facts, so the smallest set is the fewest tools that still cover every action and every fact. Each commit call's outcomes are the failure-row outcomes of the actions it commits. For a partial row 2, keep the supplied tools and propose only the missing pieces. Write the tools into Appendix A, with the reads on the "Unmapped read-only calls" line with their parameters and return values. Then show the appendix to the user and ask them to confirm it in one turn. Record the confirmed tool set in row 2 of the ledger, marked proposed or supplied per tool.
+
+Done when Appendix A meets its binding contract and, if any tool was proposed, the user has confirmed the appendix.
 
 ## 4. Verify
 
@@ -134,7 +144,7 @@ Done when the script prints "0 errors".
 
 ### 4.2 Write the review packet
 
-Reviewers get the inputs, never your conclusions. Write a temporary file outside the product directory that holds the final input ledger, every interview answer verbatim, any default the user accepted, and the path of every source document and code file you read. Leave out your reasoning about why the rules are right.
+Reviewers get the inputs, never your conclusions. Write a temporary file outside the product directory that holds the final input ledger, every interview answer verbatim, any default the user accepted, the tool set as confirmed, marked proposed or supplied per tool, and the path of every source document and code file you read. Leave out your reasoning about why the rules are right.
 
 Done when a reviewer could reconstruct every input from the packet and the files it lists.
 
@@ -166,6 +176,7 @@ Reply with evidence, so the user can judge the spec without rereading it:
 
 - the file written, and each capability with its scenario count;
 - the input ledger's final state, naming any default the user accepted;
+- the proposed tools, which are provisional, and that Appendix A is the part of the spec that architecture notes may change;
 - the checker's count line and coverage table;
 - the findings, opening with a count line by severity, each marked fixed, answered with its reason, open, or Pre-existing, and the number of rounds run;
 - which reviewers ran as subagents and which ran through Codex;
