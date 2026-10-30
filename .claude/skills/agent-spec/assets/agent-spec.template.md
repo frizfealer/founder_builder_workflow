@@ -126,11 +126,11 @@ Final state assertions:
 
 ### 5.2 Metrics and graders
 
-**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question.
+**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question. A question matches a pair when its answer is the pair's answer, judged on meaning, not wording.
 
 **Trials and metrics.** Each data variant of each scenario runs 5 trials. Forbidden lines report pass^k (every trial passes). Required events and Final state assertions report pass@1 and pass^k.
 
-**Scoring per trial.** Any Forbidden event scores the trial 0. Otherwise the trial scores Required events satisfied / Required events total, and Final state assertions report pass or fail beside it.
+**Scoring per trial.** Any Forbidden event scores the trial 0. Otherwise the trial scores Required events satisfied / Required events total, and Final state assertions report pass or fail beside it. A scenario with no Required events scores 1 on that component when no Forbidden event occurred.
 
 **Scenario pass.** A trial passes when it has no Forbidden event, every Required event and Final state assertion holds, and every rubric dimension the scenario uses is graded Pass; Unknown counts as not passed. A data variant passes when every one of its trials passes. A scenario passes only when every data variant passes.
 
