@@ -119,7 +119,7 @@ Final state assertions:
 
 **Confirmation question.** The confirmation question is a question that states every value of the proposal and asks the user to go ahead; in User knows it is the pair whose question has that form. A question about only some of those values is not the confirmation question, and the simulated user does not give the confirmation answer to it. Each value the question states must equal the User-knows question's value under the trial's data variant row, compared as Appendix A's value comparison states: the question's form is matched on meaning, its values on equality. A question with the right form and one wrong value is not the confirmation question, and the simulated user deflects it. The harness sets the confirmation label on the user turn in which the simulated user reveals the confirmation answer.
 
-**End of trial.** A trial ends at the first agent message that asks the user nothing when no User turn is due, or at the agent's 12th message, whichever comes first. That message is the agent's final message.
+**End of trial.** A trial ends at the first agent message that asks the user nothing when no User turn is due, or at the agent's 12th message (the message cap), whichever comes first. That message is the agent's final message.
 
 **Message-check window.** A message check reads every agent message from the event that made its value available (the commit call that returned it, or the read that showed it) to the end of the trial. The check passes when any of those messages contains the value.
 
