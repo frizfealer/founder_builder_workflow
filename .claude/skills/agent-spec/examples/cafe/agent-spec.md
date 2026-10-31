@@ -95,26 +95,26 @@ When the user withdraws before CR-A1, the agent releases its hold with CR-A4 and
 **Initial state**
 - Today is 2026-10-27, a Tuesday.
 - Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-28 12:00, 2026-10-30 19:00 and 2026-10-31 18:30.
-- Reservation R-0900 exists for Sam at Sunrise Café on 2026-10-30 at 18:00 for 3, status confirmed.
-- No reservation exists under the name Alex.
+- Reservation R-0900 exists for Sam at Sunrise Café on 2026-10-29 at 18:00 for 3, status confirmed.
+- No reservation exists under the name <name>.
 - No hold exists.
 - Any hold the agent places stays valid for the whole conversation.
-- The booking system will issue confirmation id R-1001 for the next reservation it creates.
+- The booking system will issue confirmation id <confirmation_id> for the next reservation it creates.
 
 **User**
-- Turn 1: "Book a table at Sunrise Café this Friday at 7pm for two, under Alex."
+- Turn 1: "<Turn 1>"
 
 **User knows**
-- Q: Shall I book Sunrise Café on 2026-10-30 at 19:00 for 2 under Alex? A: Yes.
+- Q: Shall I book Sunrise Café on <date> at <time> for <party_size> under <name>? A: Yes.
 
 **Expected**
 
 Required events:
-- CR-A3 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 2, before the user's confirmation turn.
-- CR-A1 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 2, name Alex, after the user's confirmation turn.
+- CR-A3 occurs exactly once, for Sunrise Café, <date>, <time>, party of <party_size>, before the user's confirmation turn.
+- CR-A1 occurs exactly once, for Sunrise Café, <date>, <time>, party of <party_size>, name <name>, after the user's confirmation turn.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, with cafe = Sunrise Café, date = 2026-10-30, time = 19:00, party_size = 2, status = confirmed.
+- Exactly one reservation exists under the name <name>, with cafe = Sunrise Café, date = <date>, time = <time>, party_size = <party_size>, status = confirmed.
 - No hold exists.
 - Reservation R-0900 is unchanged.
 - No other reservation was created, changed or cancelled.
@@ -143,7 +143,7 @@ Final state assertions:
 
 **Illustrates** CR-01, CR-02, CR-03, CR-05, CR-06, G-01, G-02
 
-**Unambiguity note** Both actions, their information and their order relative to the confirmation turn are read from the action log, and the reservation and hold sets are compared with Initial state; the only check on the agent's words, message check "Confirmation id reported", is a match on one exact value, R-1001.
+**Unambiguity note** Both actions, their information and their order relative to the confirmation turn are read from the action log, and the reservation and hold sets are compared with Initial state; the only check on the agent's words, message check "Confirmation id reported", is a match on one exact value, the row's confirmation id.
 
 ##### CR-S02 — Party size changed in the confirming turn
 
@@ -161,27 +161,27 @@ Final state assertions:
 
 **User**
 - Turn 1: "Book a table at Sunrise Café this Friday at 7pm for two, under Alex."
-- Turn 2, in reply to the agent's proposal for 2: "Yes. Actually, make it four people."
+- Turn 2, in reply to the agent's proposal for 2: "<Turn 2>"
 
 **User knows**
-- Q: Shall I book Sunrise Café on 2026-10-30 at 19:00 for 4 under Alex? A: Yes.
+- Q: Shall I book Sunrise Café on 2026-10-30 at 19:00 for <changed party_size> under Alex? A: Yes.
 
 **Expected**
 
 Required events:
 - CR-A3 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 2, before Turn 2.
 - CR-A4 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 2, after Turn 2.
-- CR-A3 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 4, after the CR-A4 for the hold the first CR-A3 placed.
-- CR-A1 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 4, name Alex, after the user's confirmation turn.
+- CR-A3 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of <changed party_size>, after the CR-A4 for the hold the first CR-A3 placed.
+- CR-A1 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of <changed party_size>, name Alex, after the user's confirmation turn.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, with date = 2026-10-30, time = 19:00, party_size = 4, status = confirmed.
+- Exactly one reservation exists under the name Alex, with date = 2026-10-30, time = 19:00, party_size = <changed party_size>, status = confirmed.
 - No reservation exists for Alex with party_size = 2.
 - No hold exists.
 
 **Forbidden**
 - CR-A1 for party of 2.
-- CR-A1 for party of 4 before the user's confirmation turn.
+- CR-A1 for party of <changed party_size> before the user's confirmation turn.
 - Two holds existing at the same moment.
 
 **Data variants**
@@ -205,7 +205,7 @@ Final state assertions:
 
 **Illustrates** CR-04, CR-06, G-02
 
-**Unambiguity note** The "Yes" in Turn 2 arrives with a change in the same message, so it confirms nothing; a creation for 2 at any point, a creation for 4 before the confirmation turn, or a new hold before the old one is released fails, and each is visible in the action log.
+**Unambiguity note** The "Yes" in Turn 2 arrives with a change in the same message, so it confirms nothing; a creation for 2 at any point, a creation for the changed party size before the confirmation turn, or a new hold before the old one is released fails, and each is visible in the action log.
 
 ##### CR-S03 — User withdraws after the proposal
 
@@ -222,7 +222,7 @@ Final state assertions:
 
 **User**
 - Turn 1: "Book a table at Sunrise Café this Friday at 7pm for two, under Alex."
-- Turn 2, in reply to the agent's proposal, in place of a confirmation: "Never mind, forget it."
+- Turn 2, in reply to the agent's proposal, in place of a confirmation: "<Turn 2>"
 
 **User knows**
 - none.
@@ -268,15 +268,25 @@ Final state assertions:
 
 **Turn anchors.** "Turn n" is the nth scripted User turn of the scenario. "The user's confirmation turn" is the user turn in which the simulated user gives the User-knows answer to the confirmation question. If a trial has more than one confirmation turn, "the user's confirmation turn" is the first. The harness labels both turn kinds on the user events it records, so no grader infers them from text.
 
+**Confirmation question.** The confirmation question is a question that states every value of the proposal and asks the user to go ahead; in User knows it is a pair whose question has that form. A question about only some of those values is not the confirmation question, and the simulated user does not give the confirmation answer to it. Each proposal value the question states must equal the User-knows question's value under the trial's data variant row, compared as Appendix A's value comparison states: the question's form is matched on meaning, its values on equality. A question with the right form and one wrong value is not the confirmation question; the simulated user deflects it unless another User-knows pair matches it. The harness sets the confirmation label on the user turn in which the simulated user reveals the confirmation answer.
+
+**End of trial.** A trial ends at the first agent message that asks the user nothing when no User turn is due, or at the agent's 12th message (the message cap), whichever comes first. That message is the agent's final message.
+
+**Message-check window.** A message check reads every agent message from the event that made its value available (the commit call that returned it, or the read that showed it) to the end of the trial. The check passes when any of those messages contains the value.
+
+**Supporting actors.** A supporting actor answers every call normally unless an Initial-state line says otherwise.
+
 **Confirmed proposal.** "The confirmed proposal" is the proposal stated in the scenario's User-knows confirmation question, with the values of the trial's data variant row.
+
+**Several confirmation pairs.** A scenario with more than one confirmation-form pair anchors its Required events and Forbidden lines on turns or on explicit values, never on the confirmed proposal.
 
 **When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence. A read-only action with no Appendix A row has no occurrences, and no event line names it.
 
-**Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions and in Forbidden lines phrased as state.
+**Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions, which are read against Initial state, and in Forbidden lines phrased as state.
 
 ### 5.2 Metrics and graders
 
-**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question. A question matches a pair when its answer is the pair's answer, judged on meaning, not wording.
+**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question. A question matches a pair when its answer is the pair's answer, judged on meaning, not wording; the confirmation question's values must also be equal (§5.1). A pair marked (after Turn n) is revealed only after Turn n; before it, its question matches no pair. When an agent message makes a scripted User turn due, the simulated user says the User turn, and gives no User-knows answer and no deflection to any question in that message.
 
 **Trials and metrics.** Each data variant of each scenario runs 5 trials. Forbidden lines report pass^k (every trial passes). Required events and Final state assertions report pass@1 and pass^k.
 
@@ -288,13 +298,13 @@ Final state assertions:
 
 **Efficiency.** Turn count, write count and read count are reported per trial, separately from the score. Write count is the number of state-changing calls issued and read count the number of read-only calls issued, by the tool's effect, whether the call is bound in Appendix A or unmapped.
 
-**Graders.** State checks and action-log checks are code graders. A check on the agent's final message is a code grader, called a message check, only when the whole check is that the message contains one or more values the agent copies verbatim from a tool result or Initial state, such as a confirmation id or a reference number. A value the agent can write in more than one form (a date, a time, an amount, a name) is not such a value, and a check with any part that needs judgment (that nothing else was offered, that a detail was withheld, that a result was reported without inventing anything) is a rubric dimension in full, however exact its other parts. LLM-rubric graders cover only those judgments. Each judge grades one dimension and may answer Unknown. Dimensions used in this spec, each with its grader:
+**Graders.** State checks and action-log checks are code graders. A check on the agent's messages is a code grader, called a message check, only when the whole check is that the messages in its window (§5.1) contain one or more values the agent copies verbatim from a tool result or Initial state, such as a confirmation id or a reference number. A value the agent can write in more than one form (a date, a time, an amount, a name) is not such a value, and a check with any part that needs judgment (that nothing else was offered, that a detail was withheld, that a result was reported without inventing anything) is a rubric dimension in full, however exact its other parts. LLM-rubric graders cover only those judgments. Each judge grades one dimension and may answer Unknown. Dimensions used in this spec, each with its grader:
 
 | Dimension | Grader | Definition | Used by |
 |---|---|---|---|
-| Confirmation id reported | code | The agent's final message contains the confirmation id that CR-A1 returned, as the data-variant row gives it. | CR-S01 |
+| Confirmation id reported | code | An agent message in the message-check window (§5.1) contains the confirmation id that CR-A1 returned, as the data-variant row gives it. | CR-S01 |
 
-**pytest-bdd mapping.** Given = Initial state + User knows. When = User. Then = Required events + Final state assertions. Each Forbidden line becomes a negative assertion over the action log. Data variants are the Examples table of a Scenario Outline. The action log is derived from the tool log through Appendix A; that derivation lives in the step definitions, never in the scenarios.
+Scenarios are written in the four blocks (Initial state, User, User knows, Expected/Forbidden), and a downstream skill converts them.
 
 ## Appendix A. Interface binding (provisional)
 

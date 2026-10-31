@@ -11,8 +11,8 @@ EXAMPLE = (SKILL / "examples" / "cafe" / "agent-spec.md").read_text(encoding="ut
 
 CR_A4_BINDING_ROW = "| CR-A4 release a hold | state-changing | `release_hold(hold_id)` → `{released}` | the hold through `hold_id` | released: `released: true`; hold already gone: `HoldNotFound`; no answer: timeout | Ends the hold when it returns `released: true` or `HoldNotFound`. A timeout ends nothing. |\n"
 CR_A4_FAILURE_ROW = "| CR-A4 | booking system does not answer | Treat the hold as possibly still open: tell the user, propose nothing new until it lapses under SG-01. | CR-06 |\n"
-S01_HOLD_EVENT = "- CR-A3 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 2, before the user's confirmation turn."
-S01_CREATE_EVENT = "- CR-A1 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 2, name Alex, after the user's confirmation turn."
+S01_HOLD_EVENT = "- CR-A3 occurs exactly once, for Sunrise Café, <date>, <time>, party of <party_size>, before the user's confirmation turn."
+S01_CREATE_EVENT = "- CR-A1 occurs exactly once, for Sunrise Café, <date>, <time>, party of <party_size>, name <name>, after the user's confirmation turn."
 
 
 def run(text, tmp_path):
@@ -31,35 +31,8 @@ def errors_without_lines(out):
     return sorted(re.sub(r"agent-spec\.md:\d+: ", "", line) for line in out.splitlines() if line.startswith("ERROR"))
 
 
-# What the round-3 rules find in the pre-round-3 café spec. The regenerated spec should bring this to [].
-EXPECTED_VIOLATIONS = [
-    (98, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
-    (99, "CR-S01: holds 'Alex' from data-variant column 'name'; write <name>"),
-    (102, "CR-S01: holds 'R-1001' from data-variant column 'confirmation_id'; write <confirmation_id>"),
-    (105, "CR-S01: holds 'Book a table at Sunrise Café this Friday at 7pm for two, under Alex.' from data-variant column 'Turn 1'; write <Turn 1>"),
-    (108, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
-    (108, "CR-S01: holds '19:00' from data-variant column 'time'; write <time>"),
-    (108, "CR-S01: holds '2' from data-variant column 'party_size'; write <party_size>"),
-    (108, "CR-S01: holds 'Alex' from data-variant column 'name'; write <name>"),
-    (113, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
-    (113, "CR-S01: holds '19:00' from data-variant column 'time'; write <time>"),
-    (113, "CR-S01: holds '2' from data-variant column 'party_size'; write <party_size>"),
-    (114, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
-    (114, "CR-S01: holds '19:00' from data-variant column 'time'; write <time>"),
-    (114, "CR-S01: holds '2' from data-variant column 'party_size'; write <party_size>"),
-    (114, "CR-S01: holds 'Alex' from data-variant column 'name'; write <name>"),
-    (117, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
-    (117, "CR-S01: holds '19:00' from data-variant column 'time'; write <time>"),
-    (117, "CR-S01: holds '2' from data-variant column 'party_size'; write <party_size>"),
-    (117, "CR-S01: holds 'Alex' from data-variant column 'name'; write <name>"),
-    (164, "CR-S02: holds 'Yes. Actually, make it four people.' from data-variant column 'Turn 2'; write <Turn 2>"),
-    (167, "CR-S02: holds '4' from data-variant column 'changed party_size'; write <changed party_size>"),
-    (174, "CR-S02: holds '4' from data-variant column 'changed party_size'; write <changed party_size>"),
-    (175, "CR-S02: holds '4' from data-variant column 'changed party_size'; write <changed party_size>"),
-    (178, "CR-S02: holds '4' from data-variant column 'changed party_size'; write <changed party_size>"),
-    (184, "CR-S02: holds '4' from data-variant column 'changed party_size'; write <changed party_size>"),
-    (225, "CR-S03: holds 'Never mind, forget it.' from data-variant column 'Turn 2'; write <Turn 2>"),
-]
+# The café example is clean under every rule; a mutation adds only the errors it causes.
+EXPECTED_VIOLATIONS = []
 BASELINE = sorted(f"ERROR {message}" for _, message in EXPECTED_VIOLATIONS)
 
 
@@ -69,7 +42,7 @@ def mutate(old, new, count=1):
 
 
 def test_check_spec_cafe_fixture(tmp_path):
-    """Should report exactly the pinned round-3 violations and print the coverage table for the café example."""
+    """Should report zero errors and print the coverage table for the café example."""
     code, out = run(EXAMPLE, tmp_path)
     errors = [line for line in out.splitlines() if line.startswith("ERROR")]
     assert errors == [f"ERROR agent-spec.md:{n}: {message}" for n, message in EXPECTED_VIOLATIONS], out
@@ -257,7 +230,7 @@ def test_check_spec_rule_without_tag(tmp_path):
     assert "CR-05: needs exactly one tag" in out
 
 
-DIMENSION_ROW = "| Confirmation id reported | code | The agent's final message contains the confirmation id that CR-A1 returned, as the data-variant row gives it. | CR-S01 |"
+DIMENSION_ROW = "| Confirmation id reported | code | An agent message in the message-check window (§5.1) contains the confirmation id that CR-A1 returned, as the data-variant row gives it. | CR-S01 |"
 DIMENSION_HEADER = "| Dimension | Grader | Definition | Used by |\n|---|---|---|---|\n"
 
 
