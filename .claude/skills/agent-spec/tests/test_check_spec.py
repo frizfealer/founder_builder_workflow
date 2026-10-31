@@ -529,3 +529,35 @@ def test_check_spec_variant_value_outside_longer_value(tmp_path):
     code, out = run(text, tmp_path)
     hits = [line for line in out.splitlines() if "data-variant column" in line]
     assert len(hits) == 2 and "column 'Turn 1'" in hits[0] and "column 'time'" in hits[1], out
+
+
+TINY_PAIR = "- Q: Shall I book <time> under <name>? A: Yes."
+TINY_FORBIDDEN = "- A second TB-A1."
+
+
+def multi_confirmation(forbidden):
+    """Tiny spec with a second confirmation-form pair, scoped after Turn 1, and the given Forbidden line added."""
+    text = tiny().replace(TINY_PAIR, TINY_PAIR + "\n- Q: Shall I book 20:30 under <name>? A: Yes. (optional) (after Turn 1)")
+    return text.replace(TINY_FORBIDDEN, TINY_FORBIDDEN + "\n" + forbidden)
+
+
+def test_check_spec_multi_confirmation_on_confirmed_proposal(tmp_path):
+    """Should report an event line that relies on the confirmed proposal when a scenario has two confirmation-form pairs."""
+    text = multi_confirmation("- TB-A1 for any proposal other than the confirmed one.")
+    line = text.splitlines().index("- TB-A1 for any proposal other than the confirmed one.") + 1
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert f"ERROR agent-spec.md:{line}: TB-S01: has 2 confirmation-form User-knows pairs; anchor this line on turns or explicit values, not on the confirmed proposal" in out
+
+
+def test_check_spec_multi_confirmation_on_turns_and_values(tmp_path):
+    """Should accept event lines anchored on turns and explicit values when a scenario has two confirmation-form pairs."""
+    code, out = run(multi_confirmation("- TB-A1 for <time> before Turn 1."), tmp_path)
+    assert code == 0, out
+
+
+def test_check_spec_single_confirmation_on_confirmed_proposal(tmp_path):
+    """Should accept the confirmed proposal in an event line when a scenario has one confirmation-form pair."""
+    text = tiny().replace(TINY_FORBIDDEN, TINY_FORBIDDEN + "\n- TB-A1 for any proposal other than the confirmed one.")
+    code, out = run(text, tmp_path)
+    assert code == 0, out

@@ -8,7 +8,8 @@ tools (every state-changing action has one commit call; a read-only action
 has a row when a Forbidden line or failure row names it), tool names outside
 Appendix A, data-variant values written as <column> in the converted blocks,
 Initial-state lines about a supporting actor's response that name no action,
-and dimensions (message checks graded by code, rubric dimensions graded by a
+event lines that rely on the confirmed proposal in a scenario with more than one
+confirmation-form User-knows pair, and dimensions (message checks graded by code, rubric dimensions graded by a
 judge) against the Evaluation table. Judgment
 (faithfulness to inputs, unambiguous verdicts, semantic gaps) is left to the
 reviewers in the skill's verification step.
@@ -80,6 +81,10 @@ TURN_ANCHOR_RE = re.compile(r"\bTurn \d+\b")
 SUPPORTING_RE = re.compile(r"^- \*\*Supporting actors:\*\*\s*(.+)$")
 # How a supporting actor responds to an agent action.
 RESPONSE_RE = re.compile(r"\b(answers?|rejects?|reports?|returns?|times? out|fails?)\b", re.IGNORECASE)
+# A User-knows question, and the parts that differ between confirmation-form pairs: <column> and literal values.
+QUESTION_RE = re.compile(r"^- Q: (.+?) A: ")
+QUESTION_VALUE_RE = re.compile(r"<[^>]+>|\d[\d:\-]*")
+CONFIRMED_PROPOSAL_RE = re.compile(r"\bconfirmed (proposal|one)\b", re.IGNORECASE)
 
 
 @dataclass
@@ -415,6 +420,19 @@ def check(text, path):
             if (any(actor in low for actor in actors) and RESPONSE_RE.search(line)
                     and not ACTION_ID_RE.search(line) and not any(name in low for name in action_names)):
                 errors.append(f"{path}:{n}: {s.id}: Initial-state line states how a supporting actor responds to an agent action; name the action id or the action's name from its Appendix A row")
+
+        # Pairs whose questions differ only in values are confirmation-form pairs. With more than one,
+        # "the confirmed proposal" names no single proposal, so event lines anchor on turns or values.
+        forms = {}
+        for line in block("User knows")[1:]:
+            if m := QUESTION_RE.match(line):
+                form = QUESTION_VALUE_RE.sub("<value>", m.group(1)).lower()
+                forms[form] = forms.get(form, 0) + 1
+        confirmation_pairs = max(forms.values(), default=0)
+        if confirmation_pairs > 1:
+            for n, line in numbered("Required events") + numbered("Forbidden"):
+                if CONFIRMED_PROPOSAL_RE.search(line):
+                    errors.append(f"{path}:{n}: {s.id}: has {confirmation_pairs} confirmation-form User-knows pairs; anchor this line on turns or explicit values, not on the confirmed proposal")
 
         s.illustrates = set(RULE_ID_RE.findall(" ".join(block("Illustrates"))))
         if not s.illustrates:
