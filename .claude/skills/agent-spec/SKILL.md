@@ -42,7 +42,7 @@ Done when rows 1 and 3 are found and every optional row is found or recorded as 
 
 ## 3. Write the spec
 
-Fill [the template](assets/agent-spec.template.md) in its section order with its headings. [The café example](examples/cafe/agent-spec.md) shows one capability with two scenarios; match the shape and detail of each block. Its scenario count is a sample, not a target. Write the sections in the order below, because each depends on the one before.
+Fill [the template](assets/agent-spec.template.md) in its section order with its headings. [The café example](examples/cafe/agent-spec.md) shows one capability with its scenarios; match the shape and detail of each block. Its scenario count is a sample, not a target. Write the sections in the order below, because each depends on the one before.
 
 ### 3.1 Purpose
 
