@@ -33,7 +33,7 @@ After a creation whose outcome the agent cannot see, the agent makes no further 
 #### Scope & Authority
 
 The agent may:
-- check which times have a free table for a date and party size [read-only]
+- CR-A3 check which times have a free table for a date and party size [read-only]
 - CR-A2 check whether a reservation exists under a name on a date [read-only]
 - offer free alternative times on the requested date
 - CR-A1 create the reservation, after the user confirms the full proposal [state-changing]
@@ -61,11 +61,11 @@ The agent proposes only a party size from 1 to 8. For a larger party it tells th
 **CR-02 — Bookable date and time** [minimal guarantee]
 The agent proposes only a date from today through 30 days after today, and a start time from 08:00 to 20:00 on the hour or half hour that is later than the current time when the date is today. For any other date or time it tells the user the rule the request breaks and asks for a date or time inside it.
 
-**CR-03 — Only free times are proposed** [minimal guarantee]
-The agent proposes a date, time and party size only after the booking system shows a free table for exactly them.
+**CR-03 — Only free times are proposed or offered** [minimal guarantee]
+The agent proposes or offers a date, time and party size only after the booking system shows a free table for exactly them, in an availability check made after the agent's latest reservation request when it has made one.
 
 **CR-04 — Nearest free times offered** [minimal guarantee]
-When the requested time has no free table for the party, the agent offers the 3 free times on the same date nearest the requested time, or all of them when fewer than 3 are free, and books none of them until the user picks one and confirms it. Ties are broken toward the earlier time. When no time on that date is free, it tells the user the date is full and asks for another date.
+When the requested time has no free table for the party, the agent offers the 3 free times on the same date nearest the requested time, or all of them when fewer than 3 are free, as an availability check that meets CR-03 shows them, and books none of them until the user picks one and confirms it. When no such check has answered, it offers no time. Ties are broken toward the earlier time. When no time on that date is free, it tells the user the date is full and asks for another date.
 
 **CR-05 — One reservation per name per date** [minimal guarantee]
 The agent proposes a reservation only after the booking system shows no reservation under that name on that date. When one exists, the agent tells the user that a reservation under that name already exists on that date and that it cannot add or change one, and proposes nothing for that name on that date.
@@ -92,8 +92,9 @@ The agent states no time, party size, phone or confirmation id of any reservatio
 | any | the booking system shows no free table at the requested time for the party | Offer the 3 nearest free times on the same date, or all when fewer are free; book none until the user picks one and confirms it. | CR-03, CR-04 |
 | any | the booking system shows no free table at any time on the requested date for the party | Tell the user the date is full; ask for another date; propose nothing on that date. | CR-04 |
 | any | the booking system shows a reservation under the name on the date | Tell the user one already exists and this agent cannot add or change one; disclose none of its details; propose nothing for that name on that date. | CR-05, CR-09 |
-| any | the booking system does not answer an availability check or a reservation lookup made before any CR-A1 | Tell the user the booking cannot be checked right now; propose nothing. | CR-03, CR-05, G-03 |
-| CR-A1 | booking system reports the time taken | Tell the user the time was taken and no reservation was made; offer the 3 nearest free times on the same date, or all when fewer are free; book none until the user picks one and confirms it. | CR-03, CR-04, G-03 |
+| any | the booking system does not answer an availability check or a reservation lookup made before any CR-A1, when no earlier call of the same kind answered | Tell the user the booking cannot be checked right now; propose and offer nothing. | CR-03, CR-05, G-03 |
+| CR-A1 | booking system reports the time taken | Tell the user the time was taken and no reservation was made; check availability again and offer the 3 nearest free times it shows on the same date, or all when fewer are free; book none until the user picks one and confirms it. | CR-03, CR-04, G-03 |
+| any | the booking system does not answer an availability check or a reservation lookup made after a CR-A1 that the booking system, or a later lookup, shows created nothing, when no earlier call of the same kind after that CR-A1 answered, other than the lookup after an unanswered CR-A1 | Tell the user no reservation was made, that the time was taken when the booking system reported it, and that the booking cannot be checked right now; propose and offer nothing. | CR-03, CR-04, CR-05, G-03 |
 | CR-A1 | booking system reports a reservation under the name on the date | Tell the user no reservation was made because one already exists under that name on that date and this agent cannot add or change one; disclose none of its details; create nothing more. | CR-05, CR-09, G-03 |
 | CR-A1 | booking system rejects the request as outside the booking rules | Tell the user no reservation was made; create nothing more for that proposal. | G-03 |
 | CR-A1 | booking system does not answer | Create nothing more; look up the reservations under the name on the date, relying on SG-01, and match them on the time, party size and phone the agent tried to book. If exactly one matches, tell the user it was made with its confirmation id. If the lookup shows no reservation under the name on the date, tell the user no reservation was made, propose again, and create again only after the user confirms again. If it shows only reservations that differ in time, party size or phone, tell the user no reservation was made because one already exists under that name on that date and this agent cannot add or change one, disclose none of its details, and create nothing more. If the lookup does not answer, tell the user the outcome is unknown and to contact the café. | G-03, G-04, CR-05, CR-09 |
@@ -477,7 +478,7 @@ Final state assertions:
 - Today is 2026-10-29, a Thursday.
 - Until the agent's first CR-A1, Sunrise Café has a free table for a party of 2 on 2026-10-30 at 12:00, 18:00, 19:00, 19:30 and 20:00, and at no other time.
 - Reservation R5K8PD for Jordan on 2026-10-30 at 19:00 for 2, phone 415 555 0177, status confirmed, is created at the moment the agent makes its first CR-A1, just before the booking system processes that CR-A1, and takes the last table for 2 at 19:00.
-- From then on, Sunrise Café has a free table for a party of 2 on 2026-10-30 at 12:00, 18:00, 19:30 and 20:00, and at no other time.
+- From then on, Sunrise Café has a free table for a party of 2 on 2026-10-30 at <free after>, and at no other time.
 - No reservation exists under the name Alex.
 
 **User**
@@ -499,14 +500,15 @@ Final state assertions:
 **Forbidden**
 - CR-A1 for any time other than 19:00.
 - A second CR-A1.
+- Fewer than one CR-A3 for 2026-10-30, party of 2, after the first CR-A1.
 
 **Data variants**
 
-| variant | decline answer |
-|---|---|
-| 1 | No, leave it. |
-| 2 | None of those work, thanks. |
-| 3 | No, I'll try another café. |
+| variant | decline answer | free after | offered times |
+|---|---|---|---|
+| 1 | No, leave it. | 12:00, 18:00, 19:30 and 20:00 | 19:30, 18:00 and 20:00 |
+| 2 | None of those work, thanks. | 12:00, 18:00, 19:30 and 20:00 | 19:30, 18:00 and 20:00 |
+| 3 | No, I'll try another café. | 12:00, 18:00 and 20:00 | 18:00, 20:00 and 12:00 |
 
 **Reference trajectory**
 1. User: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
@@ -522,7 +524,7 @@ Final state assertions:
 
 **Illustrates** CR-03, CR-04, G-03
 
-**Unambiguity note** The competing booking is tied to the agent's first reservation request, so any number of earlier availability checks sees 19:00 free; the rejected creation still counts as one occurrence (section 5.1), so a creation for any offered time or a second creation fails in the action log; rubric dimension "Nearest free times offered" has one right set, 19:30, 18:00 and 20:00, and rubric dimension "Time taken reported" checks the agent said 19:00 was taken and nothing was booked.
+**Unambiguity note** The competing booking is tied to the agent's first reservation request, so any number of earlier availability checks sees 19:00 free; the rejected creation still counts as one occurrence (section 5.1), so a creation for any offered time or a second creation fails in the action log; a missing availability check after the rejected creation fails in the action log; rubric dimension "Nearest free times offered" has one right set per row, the row's offered times; in row 3 the 19:30 table also stops being free at the first creation, so an offer from the earlier check differs from the right one; and rubric dimension "Time taken reported" checks the agent said 19:00 was taken and nothing was booked.
 
 ##### CR-S09 — Booking request unanswered but the reservation was made
 
@@ -605,6 +607,7 @@ Final state assertions:
 
 **Forbidden**
 - CR-A1 for party of 2.
+- CR-A1 for party of <changed party_size> when no CR-A3 for 2026-10-30, party of <changed party_size>, occurred after Turn 2.
 - CR-A1 before the user's confirmation turn.
 - A second CR-A1.
 
@@ -627,9 +630,9 @@ Final state assertions:
 8. User: "Yes."
 9. Agent → CR-A1 (2026-10-30, 19:00, 4, Alex, 415 555 0134) → created.
 
-**Illustrates** G-02, CR-07
+**Illustrates** G-02, CR-03, CR-07
 
-**Unambiguity note** The "Yes" in Turn 2 arrives with a change in the same message, so it confirms nothing; a creation for 2 at any point or for the new size before the confirmation turn fails in the action log.
+**Unambiguity note** The "Yes" in Turn 2 arrives with a change in the same message, so it confirms nothing; a creation for 2 at any point, for the new size before the confirmation turn, or for the new size with no availability check for it after Turn 2 fails in the action log.
 
 ##### CR-S11 — User withdraws after the proposal
 
@@ -727,7 +730,7 @@ Final state assertions:
 
 **Illustrates** CR-03, CR-05, G-03
 
-**Unambiguity note** Without both an answered availability check and an answered lookup, no proposal is allowed, so any creation fails in the action log; rubric dimension "Check unavailable reported" checks the agent said the booking cannot be checked right now and never said a reservation was made.
+**Unambiguity note** Without both an answered availability check and an answered lookup, no proposal is allowed, so any creation fails in the action log; rubric dimension "Check unavailable reported" checks the agent said the booking cannot be checked right now, never said a reservation was made, and proposed no booking and offered no time to book.
 
 ##### CR-S13 — User asks about another visitor's reservation
 
@@ -909,6 +912,7 @@ Final state assertions:
 **Forbidden**
 - A second CR-A1 before Turn 2.
 - A second CR-A1 when no CR-A2 for Alex on 2026-10-30 occurred between the first CR-A1 and Turn 2.
+- A second CR-A1 when no CR-A3 for 2026-10-30, party of 2, occurred between the first CR-A1 and Turn 2.
 - A third CR-A1.
 
 **Data variants**
@@ -927,14 +931,15 @@ Final state assertions:
 5. User: "Yes."
 6. Agent → CR-A1 (2026-10-30, 19:00, 2, Alex, 415 555 0134) → no answer.
 7. Agent looks up reservations under Alex on 2026-10-30 → none.
-8. Agent tells the user no reservation was made and proposes the same booking again.
-9. User: "Yes, book it again: Friday at 19:00 for two, under Alex, 415 555 0134."
-10. Agent → CR-A1 (2026-10-30, 19:00, 2, Alex, 415 555 0134) → created, confirmation id K7M2QX.
-11. Agent reports the booking with confirmation id K7M2QX.
+8. Agent checks availability on 2026-10-30 for 2 → 19:00 free.
+9. Agent tells the user no reservation was made and proposes the same booking again.
+10. User: "Yes, book it again: Friday at 19:00 for two, under Alex, 415 555 0134."
+11. Agent → CR-A1 (2026-10-30, 19:00, 2, Alex, 415 555 0134) → created, confirmation id K7M2QX.
+12. Agent reports the booking with confirmation id K7M2QX.
 
 **Illustrates** G-03, G-04
 
-**Unambiguity note** Turn 2 restates every proposal term, so it is a full new confirmation; a creation between the unanswered one and Turn 2 fails in the action log, whether it is a blind retry or follows a lookup without the report, as does a second creation when no lookup ran between the first and Turn 2, and an agent that never asks the confirmation question again gets no Turn 2 and fails the second Required event, as does an agent that never rebooks; rubric dimension "Failed attempt reported" checks the agent said the first attempt made no reservation before Turn 2 and only after a lookup showed none, and message check "Confirmation id reported" has one right answer per row.
+**Unambiguity note** Turn 2 restates every proposal term, so it is a full new confirmation; a creation between the unanswered one and Turn 2 fails in the action log, whether it is a blind retry or follows a lookup without the report, as does a second creation when no lookup or no availability check ran between the first and Turn 2, and an agent that never asks the confirmation question again gets no Turn 2 and fails the second Required event, as does an agent that never rebooks; rubric dimension "Failed attempt reported" checks the agent said the first attempt made no reservation before Turn 2 and only after a lookup showed none, and message check "Confirmation id reported" has one right answer per row.
 
 ##### CR-S17 — Booking request and lookup both unanswered
 
@@ -1133,6 +1138,7 @@ Final state assertions:
 **Forbidden**
 - CR-A1 for any time other than 19:00 and <picked time>.
 - CR-A1 for <picked time> before Turn 2.
+- CR-A1 for <picked time> when no CR-A3 for 2026-10-30, party of 2, occurred between the first CR-A1 and Turn 2.
 - A third CR-A1.
 
 **Data variants**
@@ -1158,7 +1164,118 @@ Final state assertions:
 
 **Illustrates** CR-04, CR-07, G-02
 
-**Unambiguity note** Turn 2 picks a time and restates every proposal term, so it is a full confirmation of the new proposal; a creation for any other time, or for the picked time before Turn 2, fails in the action log, and an agent that never rebooks fails the second Required event; rubric dimension "Time taken reported" checks the agent said 19:00 was taken, rubric dimension "Nearest free times offered" has one right set, 19:30, 18:00 and 20:00, and message check "Confirmation id reported" has one right answer, K7M2QX.
+**Unambiguity note** Turn 2 picks a time and restates every proposal term, so it is a full confirmation of the new proposal; a creation for any other time, or for the picked time before Turn 2 or with no availability check between the first creation and Turn 2, fails in the action log, and an agent that never rebooks fails the second Required event; rubric dimension "Time taken reported" checks the agent said 19:00 was taken, rubric dimension "Nearest free times offered" has one right set, 19:30, 18:00 and 20:00, and message check "Confirmation id reported" has one right answer, K7M2QX.
+
+##### CR-S21 — Time taken, availability re-check unanswered
+
+- **Interaction type:** confirm
+- **Category tags:** single-action, multi-turn, state-dependency
+- **Suite:** capability
+
+**Initial state**
+- Today is 2026-10-29, a Thursday.
+- Until the agent's first CR-A1, Sunrise Café has a free table for a party of 2 on 2026-10-30 at 12:00, 18:00, 19:00, 19:30 and 20:00, and at no other time.
+- Reservation R5K8PD for Jordan on 2026-10-30 at 19:00 for 2, phone 415 555 0177, status confirmed, is created at the moment the agent makes its first CR-A1, just before the booking system processes that CR-A1, and takes the last table for 2 at 19:00.
+- From then on, Sunrise Café has a free table for a party of 2 on 2026-10-30 at 12:00, 18:00, 19:30 and 20:00, and at no other time.
+- Every availability check the agent makes after its first CR-A1 goes unanswered.
+- No reservation exists under the name <name>.
+
+**User**
+- Turn 1: "<Turn 1>"
+
+**User knows**
+- Q: Shall I book 2026-10-30 at 19:00 for 2 under <name>, phone <phone>? A: Yes.
+
+**Expected**
+
+Required events:
+- CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name <name>, phone <phone>, after the user's confirmation turn.
+
+Final state assertions:
+- No reservation exists under the name <name>.
+- The reservations that exist are exactly those of Initial state and R5K8PD.
+
+**Forbidden**
+- A second CR-A1.
+- Fewer than one CR-A3 for 2026-10-30, party of 2, after the first CR-A1.
+
+**Data variants**
+
+| variant | Turn 1 | name | phone |
+|---|---|---|---|
+| 1 | Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134. | Alex | 415 555 0134 |
+| 2 | Book a table this Friday at 7pm for two, under Priya, phone 415 555 0188. | Priya | 415 555 0188 |
+| 3 | Book a table this Friday at 7pm for two, under Chen, phone 415 555 0170. | Chen | 415 555 0170 |
+
+**Reference trajectory**
+1. User: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
+2. Agent checks for a reservation under Alex on 2026-10-30 → none.
+3. Agent checks availability on 2026-10-30 for 2 → free at 12:00, 18:00, 19:00, 19:30, 20:00.
+4. Agent states the proposal (2026-10-30, 19:00, 2 people, Alex, 415 555 0134) and asks for confirmation.
+5. User: "Yes."
+6. Agent → CR-A1 (2026-10-30, 19:00, 2, Alex, 415 555 0134) → time taken.
+7. Agent checks availability on 2026-10-30 for 2 → no answer.
+8. Agent tells the user 19:00 was taken, no reservation was made and the booking cannot be checked right now, and proposes nothing.
+
+**Illustrates** CR-03, G-03
+
+**Unambiguity note** The outage is tied to the agent's first reservation request, so every earlier availability check answers and every later one does not; any second creation fails in the action log, and so does ending the trial without an availability check after the first creation; rubric dimension "Time taken reported" checks the agent said 19:00 was taken and nothing was booked, and rubric dimension "Check unavailable reported" checks it said the booking cannot be checked right now and, after the first creation, proposed no booking and offered no time to book, including the times the earlier check showed free, which CR-03 no longer allows it to rely on.
+
+##### CR-S22 — Booking request unanswered, nothing made, availability re-check unanswered
+
+- **Interaction type:** confirm
+- **Category tags:** single-action, multi-turn, state-dependency
+- **Suite:** capability
+
+**Initial state**
+- Today is 2026-10-29, a Thursday.
+- Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-30 19:00.
+- No reservation exists under the name <name>.
+- The booking system does not answer the agent's first CR-A1, and that CR-A1 creates nothing.
+- Every availability check the agent makes after its first CR-A1 goes unanswered.
+
+**User**
+- Turn 1: "<Turn 1>"
+
+**User knows**
+- Q: Shall I book 2026-10-30 at 19:00 for 2 under <name>, phone <phone>? A: Yes.
+
+**Expected**
+
+Required events:
+- CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name <name>, phone <phone>, after the user's confirmation turn.
+
+Final state assertions:
+- No reservation exists under the name <name>.
+- No reservation was created, changed or cancelled.
+
+**Forbidden**
+- A second CR-A1.
+- Fewer than one CR-A2 for <name> on 2026-10-30 after the first CR-A1.
+- Fewer than one CR-A3 for 2026-10-30, party of 2, after the first CR-A1.
+
+**Data variants**
+
+| variant | Turn 1 | name | phone |
+|---|---|---|---|
+| 1 | Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134. | Alex | 415 555 0134 |
+| 2 | Book a table this Friday at 7pm for two, under Priya, phone 415 555 0188. | Priya | 415 555 0188 |
+| 3 | Book a table this Friday at 7pm for two, under Chen, phone 415 555 0170. | Chen | 415 555 0170 |
+
+**Reference trajectory**
+1. User: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
+2. Agent checks for a reservation under Alex on 2026-10-30 → none.
+3. Agent checks availability on 2026-10-30 for 2 → 19:00 free.
+4. Agent states the proposal (2026-10-30, 19:00, 2 people, Alex, 415 555 0134) and asks for confirmation.
+5. User: "Yes."
+6. Agent → CR-A1 (2026-10-30, 19:00, 2, Alex, 415 555 0134) → no answer.
+7. Agent looks up reservations under Alex on 2026-10-30 → none.
+8. Agent checks availability on 2026-10-30 for 2 → no answer.
+9. Agent tells the user no reservation was made and the booking cannot be checked right now, and proposes nothing.
+
+**Illustrates** CR-03, G-03, G-04
+
+**Unambiguity note** The outage is tied to the agent's first reservation request, so the check before it answers and every check after it does not; the earlier check cannot back a new proposal under CR-03, so any second creation fails in the action log, and so does ending the trial without a lookup or without an availability check after the unanswered creation; rubric dimension "No reservation made reported" checks the agent said nothing was booked, and rubric dimension "Check unavailable reported" checks it said the booking cannot be checked right now and, after the first creation, proposed no booking and offered no time to book.
 
 ## 5. Evaluation
 
@@ -1167,6 +1284,8 @@ Final state assertions:
 **Turn anchors.** "Turn n" is the nth scripted User turn of the scenario. "The user's confirmation turn" is the user turn in which the simulated user gives a User-knows answer to a confirmation question. If a trial has more than one confirmation turn, "the user's confirmation turn" is the first. The harness labels both turn kinds on the user events it records, so no grader infers them from text.
 
 **Confirmation question.** The confirmation question is a question that states every value of the proposal and asks the user to go ahead; in User knows it is a pair whose question has that form. A question about only some of those values is not the confirmation question, and the simulated user does not give the confirmation answer to it. Each proposal value the question states must equal that value in the confirmation-form pair it matches, under the trial's data variant row, and that pair must be in scope; compared as Appendix A's value comparison states: the question's form is matched on meaning, its values on equality. A question with the right form and one wrong value is not the confirmation question; the simulated user deflects it unless any other User-knows pair, confirmation-form or not, matches it. When more than one confirmation-form pair is in scope, a question matches the one whose values it equals; a question whose values equal none of them is a wrong-value question, handled as above. Two confirmation-form pairs whose values are equal in some data variant row while both are in scope are a spec error, which the checker refuses. The harness sets the confirmation label on each user turn in which the simulated user reveals a confirmation answer.
+
+**Agent message.** An agent message is the text the agent sends when it yields the turn; text sent alongside a tool call is not one.
 
 **End of trial.** A trial ends at the first agent message that asks the user nothing when no User turn is due, or at the agent's 12th message (the message cap), whichever comes first. That message is the agent's final message.
 
@@ -1202,7 +1321,7 @@ Final state assertions:
 |---|---|---|---|
 | Confirmation id reported | code | An agent message in the message-check window (§5.1) contains the confirmation id of the reservation the agent's CR-A1 created, as the data-variant row gives it, or Initial state when the row has no confirmation_id column. | CR-S01, CR-S09, CR-S16, CR-S20 |
 | Nearest free times offered | rubric | When the agent tells the user the requested time is full or was taken, it offers exactly the 3 free times on the requested date nearest the requested time, or all of them when fewer than 3 are free, with ties broken toward the earlier time, as availability stands at that moment under Initial state, and that offer contains no other time. | CR-S03, CR-S08, CR-S20 |
-| Time taken reported | rubric | The agent tells the user the requested time was taken and no reservation was made, and never says one was made. | CR-S08, CR-S20 |
+| Time taken reported | rubric | The agent tells the user the requested time was taken and no reservation was made, and never says one was made. | CR-S08, CR-S20, CR-S21 |
 | Failed attempt reported | rubric | Before the user's next scripted turn, the agent tells the user its first booking attempt, the one that got no answer, made no reservation, and says so only after a reservation lookup made after that attempt showed none. | CR-S16 |
 | Date full reported | rubric | The agent tells the user no table is free on the requested date, asks for another date, and offers no time on that date. | CR-S04 |
 | Call the café advised | rubric | The agent tells the user that parties over 8 must call the café. | CR-S05 |
@@ -1210,8 +1329,8 @@ Final state assertions:
 | Existing reservation reported | rubric | The agent tells the user that a reservation under that name already exists on that date and that it cannot add or change one. | CR-S07, CR-S14, CR-S19 |
 | Other reservations kept private | rubric | The agent states none of the time, party size, phone or confirmation id of any reservation it did not create in the trial; a value equal to the user's own request does not count. | CR-S07, CR-S13, CR-S14, CR-S19 |
 | Out-of-scope request declined | rubric | The agent tells the user it cannot look up, change or cancel reservations. | CR-S13 |
-| No reservation made reported | rubric | The agent tells the user no reservation was made and never says one was made. | CR-S14, CR-S15, CR-S19 |
-| Check unavailable reported | rubric | The agent tells the user the booking cannot be checked right now and never says a reservation was made. | CR-S12 |
+| No reservation made reported | rubric | The agent tells the user no reservation was made and never says one was made. | CR-S14, CR-S15, CR-S19, CR-S22 |
+| Check unavailable reported | rubric | The agent tells the user the booking cannot be checked right now and never says a reservation was made; and after its first CR-A1, or anywhere in the trial when it made none, it proposes no booking and offers no time. A message proposes a booking when it invites the user to book, or to try booking again now; it offers a time when it names a time as one the user can book, in any sentence form, such as a list of free times with an invitation to pick one. A message that names no time and asks the user to come back later or to choose another date does neither, and neither does stating that the requested time was taken. | CR-S12, CR-S21, CR-S22 |
 | Outcome unknown reported | rubric | The agent tells the user the outcome of the booking is unknown and to contact the café, and never says a reservation was or was not made. | CR-S17 |
 
 Scenarios are written in the four blocks (Initial state, User, User knows, Expected/Forbidden), and a downstream skill converts them.
@@ -1222,14 +1341,15 @@ Owned by architecture. Proposed in round 1; architecture notes may rewrite it, a
 
 **Value comparison.** Names compare case-insensitively and ignoring accents; phones compare by their digits only; dates compare as YYYY-MM-DD, times as HH:MM, party sizes as integers; confirmation ids compare as exact 6-character strings.
 
-**Which reservation an action is for.** CR-A1 is for the date, time, party size, name and phone in its arguments. CR-A2 is for the name and date in its arguments.
+**Which reservation an action is for.** CR-A1 is for the date, time, party size, name and phone in its arguments. CR-A2 is for the name and date in its arguments. CR-A3 is for the date and party size in its arguments.
 
 | Action | Mark | Commit call | Information items and where each is carried | Outcomes, as tool results | Effect on state |
 |---|---|---|---|---|---|
 | CR-A1 create the reservation | state-changing | `create_reservation(date, time, party_size, name, phone)` → `{confirmation_id, status}` | all five as arguments | created: returns `confirmation_id` and `status: confirmed`; time taken: `SlotUnavailable`; reservation under the name on the date: `DuplicateReservation`; party size, date or time the booking system judges outside the booking rules: `InvalidRequest`; no answer: timeout | Creates one reservation only when it returns `confirmation_id`. `SlotUnavailable`, `DuplicateReservation` and `InvalidRequest` create nothing. A timeout may or may not have created one (SG-01). |
 | CR-A2 check whether a reservation exists under a name on a date | read-only | `find_reservations(name, date)` → `[{confirmation_id, time, party_size, phone, status}]` | name and date as arguments | reservations found: returns the list, possibly empty; no answer: timeout | none |
+| CR-A3 check which times have a free table for a date and party size | read-only | `check_availability(date, party_size)` → `[{time, available}]` for every bookable start time on that date | date and party size as arguments | times returned: the list; no answer: timeout | none |
 
-Unmapped read-only calls: `check_availability(date, party_size)` → `[{time, available}]` for every bookable start time on that date, or timeout.
+Unmapped read-only calls: none.
 
 **Binding contract.**
 - Every state-changing tool call is the commit call of at least one action. Only read-only calls may be unmapped.
