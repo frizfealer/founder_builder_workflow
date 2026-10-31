@@ -117,9 +117,11 @@ Final state assertions:
 
 **Turn anchors.** "Turn n" is the nth scripted User turn of the scenario. "The user's confirmation turn" is the user turn in which the simulated user gives the User-knows answer to the confirmation question. If a trial has more than one confirmation turn, "the user's confirmation turn" is the first. The harness labels both turn kinds on the user events it records, so no grader infers them from text.
 
-**Confirmation question.** The confirmation question is a question that states every value of the proposal and asks the user to go ahead; in User knows it is the pair whose question has that form. A question about only some of those values is not the confirmation question, and the simulated user does not give the confirmation answer to it. The harness sets the confirmation label on the user turn in which the simulated user reveals the confirmation answer.
+**Confirmation question.** The confirmation question is a question that states every value of the proposal and asks the user to go ahead; in User knows it is the pair whose question has that form. A question about only some of those values is not the confirmation question, and the simulated user does not give the confirmation answer to it. Each value the question states must equal the User-knows question's value under the trial's data variant row, compared as Appendix A's value comparison states: the question's form is matched on meaning, its values on equality. A question with the right form and one wrong value is not the confirmation question, and the simulated user deflects it. The harness sets the confirmation label on the user turn in which the simulated user reveals the confirmation answer.
 
 **End of trial.** A trial ends at the first agent message that asks the user nothing when no User turn is due, or at the agent's 12th message, whichever comes first. That message is the agent's final message.
+
+**Message-check window.** A message check reads every agent message from the event that made its value available (the commit call that returned it, or the read that showed it) to the end of the trial. The check passes when any of those messages contains the value.
 
 **Supporting actors.** A supporting actor answers every call normally unless an Initial-state line says otherwise.
 
@@ -131,7 +133,7 @@ Final state assertions:
 
 ### 5.2 Metrics and graders
 
-**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question. A question matches a pair when its answer is the pair's answer, judged on meaning, not wording.
+**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question. A question matches a pair when its answer is the pair's answer, judged on meaning, not wording; the confirmation question's values must also be equal (§5.1). When one agent message both makes a scripted User turn due and asks a User-knows question, the simulated user says the User turn and gives no User-knows answer.
 
 **Trials and metrics.** Each data variant of each scenario runs 5 trials. Forbidden lines report pass^k (every trial passes). Required events and Final state assertions report pass@1 and pass^k.
 
@@ -143,11 +145,11 @@ Final state assertions:
 
 **Efficiency.** Turn count, write count and read count are reported per trial, separately from the score. Write count is the number of state-changing calls issued and read count the number of read-only calls issued, by the tool's effect, whether the call is bound in Appendix A or unmapped.
 
-**Graders.** State checks and action-log checks are code graders. A check on the agent's final message is a code grader, called a message check, only when the whole check is that the message contains one or more values the agent copies verbatim from a tool result or Initial state, such as a confirmation id or a reference number. A value the agent can write in more than one form (a date, a time, an amount, a name) is not such a value, and a check with any part that needs judgment (that nothing else was offered, that a detail was withheld, that a result was reported without inventing anything) is a rubric dimension in full, however exact its other parts. LLM-rubric graders cover only those judgments. Each judge grades one dimension and may answer Unknown. Dimensions used in this spec, each with its grader:
+**Graders.** State checks and action-log checks are code graders. A check on the agent's messages is a code grader, called a message check, only when the whole check is that the messages in its window (§5.1) contain one or more values the agent copies verbatim from a tool result or Initial state, such as a confirmation id or a reference number. A value the agent can write in more than one form (a date, a time, an amount, a name) is not such a value, and a check with any part that needs judgment (that nothing else was offered, that a detail was withheld, that a result was reported without inventing anything) is a rubric dimension in full, however exact its other parts. LLM-rubric graders cover only those judgments. Each judge grades one dimension and may answer Unknown. Dimensions used in this spec, each with its grader:
 
 | Dimension | Grader | Definition | Used by |
 |---|---|---|---|
-| <name> | <code or rubric> | <what a Pass means; for code, the verbatim value the final message must contain> | <scenario ids> |
+| <name> | <code or rubric> | <what a Pass means; for code, the verbatim value the agent's messages must contain> | <scenario ids> |
 
 Scenarios are written in the four blocks (Initial state, User, User knows, Expected/Forbidden), and a downstream skill converts them.
 

@@ -13,6 +13,12 @@ Write one file, `agent-spec.md`, in the product directory the user named, or bes
 
 When an `agent-spec.md` already exists and the user passed a findings file, update from the findings. The file may be free-form; each finding names the scenario id and quotes the spec line it is about. Apply a finding only when its fix is to the spec. Report every other finding back unapplied with its reason: it names no scenario id, it quotes no spec line, or its fix belongs elsewhere, such as in the test code or the agent under test. Touch only the lines the applied findings quote and the lines that repeat their pattern, keep every rule and scenario id stable, and apply the coverage conditions of step 3.6 to anything a fix adds.
 
+In every update run, before verifying, re-sync the spec's §5.1 and §5.2 fixed text from [the template](assets/agent-spec.template.md). The re-sync replaces that text and keeps these values from the spec:
+- the dimension table;
+- the trial count;
+- the message cap;
+- any metric the user asked for.
+
 ## 1. Collect the inputs
 
 Read every document and code path the user passed before asking anything. Then fill the input ledger and show it to the user:
@@ -108,7 +114,7 @@ Each scenario carries the blocks in the template's order. The rules for filling 
 - **Illustrates** names the rule ids the scenario exists for.
 - **Unambiguity note** is one line on why two domain experts reach the same verdict.
 
-Expected and Forbidden assert on world state and on what the agent did or did not do, never on the agent's wording. When a rule can only be checked by reading the agent's words, name the check in the Unambiguity note and register it in the Evaluation table under the same name, with its grader. It is a `message check "<name>"`, graded by code, only when the whole check is that the final message contains values the agent copies verbatim from a tool result or Initial state, such as a confirmation id. A date, a time, an amount or a name is not such a value, because the agent can write it in more than one form and nothing defines how message text is compared. It is a `rubric dimension "<name>"`, graded by an LLM judge, when any part of the check needs judgment: uncertainty was communicated, alternatives were presented and nothing else was, a detail was withheld, a not-found result was reported without inventing anything. A check is one or the other in full; an exact part does not split a rubric check into two. Code before judge where code decides the whole check.
+Expected and Forbidden assert on world state and on what the agent did or did not do, never on the agent's wording. When a rule can only be checked by reading the agent's words, name the check in the Unambiguity note and register it in the Evaluation table under the same name, with its grader. It is a `message check "<name>"`, graded by code, only when the whole check is that the agent's messages, from the event that made the value available to the end of the trial, contain values the agent copies verbatim from a tool result or Initial state, such as a confirmation id. A date, a time, an amount or a name is not such a value, because the agent can write it in more than one form and nothing defines how message text is compared. It is a `rubric dimension "<name>"`, graded by an LLM judge, when any part of the check needs judgment: uncertainty was communicated, alternatives were presented and nothing else was, a detail was withheld, a not-found result was reported without inventing anything. A check is one or the other in full; an exact part does not split a rubric check into two. Code before judge where code decides the whole check.
 
 Write every line as one proposition, because each line is converted on its own, as one line.
 
