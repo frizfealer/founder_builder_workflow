@@ -13,6 +13,8 @@ Write one file, `agent-spec.md`, in the product directory the user named, or bes
 
 When an `agent-spec.md` already exists and the user passed a findings file, update from the findings. The file may be free-form; each finding names the scenario id and quotes the spec line it is about. Apply a finding only when its fix is to the spec. Report every other finding back unapplied with its reason: it names no scenario id, it quotes no spec line, or its fix belongs elsewhere, such as in the test code or the agent under test. Touch only the lines the applied findings quote and the lines that repeat their pattern, keep every rule and scenario id stable, and apply the coverage conditions of step 3.6 to anything a fix adds.
 
+In every update run, including the fixes of step 4.5, a fix that changes a rule's text stops at that rule. Show the user the rule before and after the proposed change, apply only the other lines the fix quotes, and report the rule change as a proposed finding for the user to decide.
+
 In every update run, before verifying, re-sync the spec's §5.1 and §5.2 fixed text from [the template](assets/agent-spec.template.md). The re-sync replaces that text and keeps these values from the spec:
 - the dimension table;
 - the trial count;
