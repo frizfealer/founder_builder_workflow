@@ -381,15 +381,33 @@ def check(text, path):
             errors.append(f"{s.id}: Data variants has {len(rows)} rows; expected 2 or 3")
 
         # A value from a data-variant column is written as <column> in the converted blocks.
+        # Longest values match first and their spans are removed, so a value inside a longer one
+        # ("19:30" inside "19:30.") is not reported twice. A line that holds the column's value for
+        # every row states the fact for every row, which is allowed.
         variant_header = next((line for line in block("Data variants") if line.startswith("|")), None)
         if variant_header and rows:
             columns = [c.strip() for c in variant_header.strip().strip("|").split("|")]
+            cells = {c: [row[c] if c < len(row) else "" for row in rows] for c in range(1, len(columns))}
+            by_length = sorted(cells, key=lambda c: -len(cells[c][0]))
+
+            def value_re(val):
+                return re.compile(rf"(?<![\w-]){re.escape(val)}(?![\w-])")
+
             for name in CONVERTED_BLOCKS:
                 for n, line in numbered(name):
                     text_only = TURN_ANCHOR_RE.sub("", line)
-                    for column, val in zip(columns[1:], rows[0][1:]):
-                        if val and re.search(rf"(?<![\w-]){re.escape(val)}(?![\w-])", text_only):
-                            errors.append(f"{path}:{n}: {s.id}: holds '{val}' from data-variant column '{column}'; write <{column}>")
+                    hits = []
+                    for c in by_length:
+                        values = cells[c]
+                        if not values[0] or not value_re(values[0]).search(text_only):
+                            continue
+                        every_row = all(v and value_re(v).search(text_only) for v in values)
+                        for v in sorted(set(values) if every_row else {values[0]}, key=len, reverse=True):
+                            text_only = value_re(v).sub("\0", text_only)
+                        if not every_row:
+                            hits.append(c)
+                    for c in sorted(hits):
+                        errors.append(f"{path}:{n}: {s.id}: holds '{rows[0][c]}' from data-variant column '{columns[c]}'; write <{columns[c]}>")
 
         # An Initial-state line about how a supporting actor responds names the action.
         for n, line in numbered("Initial state"):

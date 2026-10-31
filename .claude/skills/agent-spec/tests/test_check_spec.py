@@ -33,13 +33,10 @@ def errors_without_lines(out):
 
 # What the round-3 rules find in the pre-round-3 café spec. The regenerated spec should bring this to [].
 EXPECTED_VIOLATIONS = [
-    (97, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
-    (97, "CR-S01: holds '19:00' from data-variant column 'time'; write <time>"),
     (98, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
     (99, "CR-S01: holds 'Alex' from data-variant column 'name'; write <name>"),
     (102, "CR-S01: holds 'R-1001' from data-variant column 'confirmation_id'; write <confirmation_id>"),
     (105, "CR-S01: holds 'Book a table at Sunrise Café this Friday at 7pm for two, under Alex.' from data-variant column 'Turn 1'; write <Turn 1>"),
-    (105, "CR-S01: holds 'Alex' from data-variant column 'name'; write <name>"),
     (108, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
     (108, "CR-S01: holds '19:00' from data-variant column 'time'; write <time>"),
     (108, "CR-S01: holds '2' from data-variant column 'party_size'; write <party_size>"),
@@ -501,3 +498,34 @@ def test_check_spec_supporting_actor_response_names_tool_call(tmp_path):
     code, out = run(text, tmp_path)
     assert code == 1
     assert "tool name outside Appendix A: create_reservation" in out
+
+
+def test_check_spec_variant_value_for_every_row(tmp_path):
+    """Should accept a line that holds the column's value for every data-variant row."""
+    code, out = run(tiny("- No reservation exists under the name <name>.\n- A table is free at 19:00 and at 12:00."), tmp_path)
+    assert code == 0, out
+
+
+def test_check_spec_variant_value_for_some_rows(tmp_path):
+    """Should report a line that holds the column's value for row 1 but not for every row."""
+    text = tiny("- No reservation exists under the name <name>.\n- A table is free at 19:00.")
+    line = text.splitlines().index("- A table is free at 19:00.") + 1
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert f"ERROR agent-spec.md:{line}: TB-S01: holds '19:00' from data-variant column 'time'; write <time>" in out
+
+
+def test_check_spec_variant_value_inside_longer_value(tmp_path):
+    """Should report one hit for the longest value and none for shorter values inside its span."""
+    text = tiny('- No reservation exists under the name <name>.\n- The note reads "Book 19:00 for Alex."')
+    code, out = run(text, tmp_path)
+    hits = [line for line in out.splitlines() if "data-variant column" in line]
+    assert len(hits) == 1 and "column 'Turn 1'" in hits[0], out
+
+
+def test_check_spec_variant_value_outside_longer_value(tmp_path):
+    """Should report a shorter value that also appears outside the longer value's span."""
+    text = tiny('- No reservation exists under the name <name>.\n- The note reads "Book 19:00 for Alex." and the table at 19:00 is free.')
+    code, out = run(text, tmp_path)
+    hits = [line for line in out.splitlines() if "data-variant column" in line]
+    assert len(hits) == 2 and "column 'Turn 1'" in hits[0] and "column 'time'" in hits[1], out
