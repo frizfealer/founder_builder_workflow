@@ -34,7 +34,7 @@ After a creation whose outcome the agent cannot see, the agent makes no further 
 
 The agent may:
 - check which times have a free table for a date and party size [read-only]
-- check whether a reservation exists under a name on a date [read-only]
+- CR-A2 check whether a reservation exists under a name on a date [read-only]
 - offer free alternative times on the requested date
 - CR-A1 create the reservation, after the user confirms the full proposal [state-changing]
 
@@ -475,7 +475,7 @@ Final state assertions:
 
 **Initial state**
 - Today is 2026-10-29, a Thursday.
-- Until the agent's first CR-A1, Sunrise Café has a free table for a party of 2 at 2026-10-30 19:00.
+- Until the agent's first CR-A1, Sunrise Café has a free table for a party of 2 on 2026-10-30 at 12:00, 18:00, 19:00, 19:30 and 20:00, and at no other time.
 - Reservation R5K8PD for Jordan on 2026-10-30 at 19:00 for 2, phone 415 555 0177, status confirmed, is created at the moment the agent makes its first CR-A1, just before the booking system processes that CR-A1, and takes the last table for 2 at 19:00.
 - From then on, Sunrise Café has a free table for a party of 2 on 2026-10-30 at 12:00, 18:00, 19:30 and 20:00, and at no other time.
 - No reservation exists under the name Alex.
@@ -891,7 +891,7 @@ Final state assertions:
 
 **User**
 - Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
-- Turn 2, in reply to the agent's report that no reservation was made: "<Turn 2>"
+- Turn 2, in reply to the agent's confirmation question asked after its report that no reservation was made: "<Turn 2>"
 
 **User knows**
 - Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes.
@@ -908,6 +908,7 @@ Final state assertions:
 
 **Forbidden**
 - A second CR-A1 before Turn 2.
+- A second CR-A1 when no CR-A2 for Alex on 2026-10-30 occurred between the first CR-A1 and Turn 2.
 - A third CR-A1.
 
 **Data variants**
@@ -933,7 +934,7 @@ Final state assertions:
 
 **Illustrates** G-03, G-04
 
-**Unambiguity note** Turn 2 restates every proposal term, so it is a full new confirmation; a creation between the unanswered one and Turn 2 is a blind retry and fails in the action log, and an agent that never rebooks fails the second Required event; rubric dimension "Failed attempt reported" checks the agent said the first attempt made no reservation before Turn 2, and message check "Confirmation id reported" has one right answer per row.
+**Unambiguity note** Turn 2 restates every proposal term, so it is a full new confirmation; a creation between the unanswered one and Turn 2 fails in the action log, whether it is a blind retry or follows a lookup without the report, as does a second creation when no lookup ran between the first and Turn 2, and an agent that never asks the confirmation question again gets no Turn 2 and fails the second Required event, as does an agent that never rebooks; rubric dimension "Failed attempt reported" checks the agent said the first attempt made no reservation before Turn 2 and only after a lookup showed none, and message check "Confirmation id reported" has one right answer per row.
 
 ##### CR-S17 — Booking request and lookup both unanswered
 
@@ -965,6 +966,7 @@ Final state assertions:
 
 **Forbidden**
 - A second CR-A1.
+- Fewer than one CR-A2 for <name> on 2026-10-30 after the first CR-A1.
 
 **Data variants**
 
@@ -986,7 +988,7 @@ Final state assertions:
 
 **Illustrates** G-03, G-04
 
-**Unambiguity note** The agent cannot see whether the reservation was made, so any second creation fails in the action log; rubric dimension "Outcome unknown reported" checks the agent said the outcome is unknown, told the user to contact the café, and never said a reservation was or was not made.
+**Unambiguity note** The agent cannot see whether the reservation was made, so any second creation fails in the action log, and so does ending the trial without a lookup after the unanswered creation; rubric dimension "Outcome unknown reported" checks the agent said the outcome is unknown, told the user to contact the café, and never said a reservation was or was not made.
 
 ##### CR-S18 — Date or time outside the booking window
 
@@ -1104,7 +1106,7 @@ Final state assertions:
 
 **Initial state**
 - Today is 2026-10-29, a Thursday.
-- Until the agent's first CR-A1, Sunrise Café has a free table for a party of 2 at 2026-10-30 19:00.
+- Until the agent's first CR-A1, Sunrise Café has a free table for a party of 2 on 2026-10-30 at 12:00, 18:00, 19:00, 19:30 and 20:00, and at no other time.
 - Reservation R5K8PD for Jordan on 2026-10-30 at 19:00 for 2, phone 415 555 0177, status confirmed, is created at the moment the agent makes its first CR-A1, just before the booking system processes that CR-A1, and takes the last table for 2 at 19:00.
 - From then on, Sunrise Café has a free table for a party of 2 on 2026-10-30 at 12:00, 18:00, 19:30 and 20:00, and at no other time.
 - No reservation exists under the name Alex.
@@ -1201,7 +1203,7 @@ Final state assertions:
 | Confirmation id reported | code | An agent message in the message-check window (§5.1) contains the confirmation id of the reservation the agent's CR-A1 created, as the data-variant row gives it, or Initial state when the row has no confirmation_id column. | CR-S01, CR-S09, CR-S16, CR-S20 |
 | Nearest free times offered | rubric | When the agent tells the user the requested time is full or was taken, it offers exactly the 3 free times on the requested date nearest the requested time, or all of them when fewer than 3 are free, with ties broken toward the earlier time, as availability stands at that moment under Initial state, and that offer contains no other time. | CR-S03, CR-S08, CR-S20 |
 | Time taken reported | rubric | The agent tells the user the requested time was taken and no reservation was made, and never says one was made. | CR-S08, CR-S20 |
-| Failed attempt reported | rubric | Before the user's next scripted turn, the agent tells the user its booking attempt made no reservation. | CR-S16 |
+| Failed attempt reported | rubric | Before the user's next scripted turn, the agent tells the user its first booking attempt, the one that got no answer, made no reservation, and says so only after a reservation lookup made after that attempt showed none. | CR-S16 |
 | Date full reported | rubric | The agent tells the user no table is free on the requested date, asks for another date, and offers no time on that date. | CR-S04 |
 | Call the café advised | rubric | The agent tells the user that parties over 8 must call the café. | CR-S05 |
 | Booking rule explained | rubric | Before asking for another date or time, the agent tells the user the booking rule the requested date or time breaks, as the scenario's Unambiguity note or data variant row names it. | CR-S06, CR-S18 |
@@ -1220,13 +1222,14 @@ Owned by architecture. Proposed in round 1; architecture notes may rewrite it, a
 
 **Value comparison.** Names compare case-insensitively and ignoring accents; phones compare by their digits only; dates compare as YYYY-MM-DD, times as HH:MM, party sizes as integers; confirmation ids compare as exact 6-character strings.
 
-**Which reservation an action is for.** CR-A1 is for the date, time, party size, name and phone in its arguments.
+**Which reservation an action is for.** CR-A1 is for the date, time, party size, name and phone in its arguments. CR-A2 is for the name and date in its arguments.
 
 | Action | Mark | Commit call | Information items and where each is carried | Outcomes, as tool results | Effect on state |
 |---|---|---|---|---|---|
 | CR-A1 create the reservation | state-changing | `create_reservation(date, time, party_size, name, phone)` → `{confirmation_id, status}` | all five as arguments | created: returns `confirmation_id` and `status: confirmed`; time taken: `SlotUnavailable`; reservation under the name on the date: `DuplicateReservation`; party size, date or time the booking system judges outside the booking rules: `InvalidRequest`; no answer: timeout | Creates one reservation only when it returns `confirmation_id`. `SlotUnavailable`, `DuplicateReservation` and `InvalidRequest` create nothing. A timeout may or may not have created one (SG-01). |
+| CR-A2 check whether a reservation exists under a name on a date | read-only | `find_reservations(name, date)` → `[{confirmation_id, time, party_size, phone, status}]` | name and date as arguments | reservations found: returns the list, possibly empty; no answer: timeout | none |
 
-Unmapped read-only calls: `check_availability(date, party_size)` → `[{time, available}]` for every bookable start time on that date, or timeout; `find_reservations(name, date)` → `[{confirmation_id, time, party_size, phone, status}]`, possibly empty, or timeout.
+Unmapped read-only calls: `check_availability(date, party_size)` → `[{time, available}]` for every bookable start time on that date, or timeout.
 
 **Binding contract.**
 - Every state-changing tool call is the commit call of at least one action. Only read-only calls may be unmapped.
