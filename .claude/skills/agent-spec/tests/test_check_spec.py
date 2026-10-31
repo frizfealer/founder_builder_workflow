@@ -130,6 +130,55 @@ def test_check_spec_rule_violation(tmp_path, replacements, expected):
     assert any(all(s in line for s in expected) for line in errors), out
 
 
+READ_ONLY_ACTION = "- CR-A4 release a hold it placed [state-changing]\n- CR-A2 look up open slots [read-only]\n"
+UNMAPPED_LINE = "Unmapped read-only calls: `search_availability(cafe, date, time, party_size)` → `[{time, available}]`. The agent may call it; no scenario line refers to it."
+READ_ONLY_BINDING_ROW = "| CR-A2 look up open slots | read-only | `search_availability(cafe, date, time, party_size)` → `[{time, available}]` | all four as arguments | answered: returns the list; no answer: timeout | none |\n"
+
+
+def test_check_spec_unbound_read_only_action_not_named(tmp_path):
+    """Should accept a read-only action with no Appendix A row when no Forbidden line or failure row names it."""
+    text = mutate("- CR-A4 release a hold it placed [state-changing]\n", READ_ONLY_ACTION)
+    code, out = run(text, tmp_path)
+    assert code == 0, out
+
+
+def test_check_spec_unbound_read_only_action_named_in_forbidden(tmp_path):
+    """Should report a read-only action named in a Forbidden line when it has no Appendix A row."""
+    text = mutate("- CR-A4 release a hold it placed [state-changing]\n", READ_ONLY_ACTION)
+    text = text.replace("- A second CR-A3.\n", "- A second CR-A3.\n- CR-A2 for any other café.\n", 1)
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert "CR-A2: read-only action named in ['CR-S01 Forbidden'] has no Appendix A row" in out
+
+
+def test_check_spec_unbound_read_only_action_named_in_failure_row(tmp_path):
+    """Should report a read-only action named in a failure row when it has no Appendix A row."""
+    text = mutate("- CR-A4 release a hold it placed [state-changing]\n", READ_ONLY_ACTION)
+    text = text.replace(CR_A4_FAILURE_ROW, CR_A4_FAILURE_ROW + "| CR-A2 | booking system does not answer | Tell the user availability cannot be checked; propose nothing. | CR-01 |\n", 1)
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert "CR-A2: read-only action named in ['Create Reservation failure row'] has no Appendix A row" in out
+
+
+def test_check_spec_bound_read_only_action_named_in_forbidden(tmp_path):
+    """Should accept a read-only action named in a Forbidden line once Appendix A gives it a row."""
+    text = mutate("- CR-A4 release a hold it placed [state-changing]\n", READ_ONLY_ACTION)
+    text = text.replace("- A second CR-A3.\n", "- A second CR-A3.\n- CR-A2 for any other café.\n", 1)
+    text = text.replace(CR_A4_BINDING_ROW, CR_A4_BINDING_ROW + READ_ONLY_BINDING_ROW, 1)
+    text = text.replace(UNMAPPED_LINE, "Unmapped read-only calls: none.", 1)
+    code, out = run(text, tmp_path)
+    assert code == 0, out
+
+
+def test_check_spec_call_both_bound_and_unmapped(tmp_path):
+    """Should report a call that has an Appendix A row and is also listed on the Unmapped read-only calls line."""
+    text = mutate("- CR-A4 release a hold it placed [state-changing]\n", READ_ONLY_ACTION)
+    text = text.replace(CR_A4_BINDING_ROW, CR_A4_BINDING_ROW + READ_ONLY_BINDING_ROW, 1)
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert "search_availability: bound in an Appendix A row and listed on the Unmapped read-only calls line" in out
+
+
 def test_check_spec_unillustrated_rule(tmp_path):
     """Should report a rule that no scenario illustrates."""
     text = mutate("**Illustrates** CR-07, G-02", "**Illustrates** G-02")

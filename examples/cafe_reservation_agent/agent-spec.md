@@ -1170,7 +1170,7 @@ Final state assertions:
 
 **Confirmed proposal.** "The confirmed proposal" is the proposal stated in the scenario's User-knows confirmation question, with the values of the trial's data variant row.
 
-**When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence.
+**When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence. A read-only action with no Appendix A row has no occurrences, and no event line names it.
 
 **Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions and in Forbidden lines phrased as state.
 
@@ -1186,7 +1186,7 @@ Final state assertions:
 
 **Interaction metrics.** For each scenario with a User-knows set: recall = required questions asked / required questions; precision = required questions asked / all questions asked. Every User-knows pair is a required question unless marked (optional). Both numbers are reported beside pass/fail and are never folded into the score.
 
-**Efficiency.** Turn count and action count are reported per trial, separately from the score.
+**Efficiency.** Turn count, write count and read count are reported per trial, separately from the score. Write count is the number of state-changing calls issued and read count the number of read-only calls issued, by the tool's effect, whether the call is bound in Appendix A or unmapped.
 
 **Graders.** State checks and action-log checks are code graders. LLM-rubric graders cover only assertions that state and the action log cannot show. Each judge grades one dimension and may answer Unknown. Rubric dimensions used in this spec:
 
@@ -1225,6 +1225,7 @@ Unmapped read-only calls: `check_availability(date, party_size)` → `[{time, av
 **Binding contract.**
 - Every state-changing tool call is the commit call of at least one action. Only read-only calls may be unmapped.
 - One call may commit several actions. One action never has two commit calls.
+- A read-only action has a row only when a Forbidden line or a failure row names it; its call is then its read. Every other read stays unmapped.
 
 ## Appendix B. Supporting-actor guarantees
 

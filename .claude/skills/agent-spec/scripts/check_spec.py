@@ -4,8 +4,9 @@ Checks only what can be decided without judgment: section and block order,
 rule tags, action marks, id references, coverage of rules by scenarios, a
 failure row for every state-changing action, data-variant row counts,
 read-only actions in Required events, the Appendix A binding of actions to
-tools, tool names outside Appendix A, the User-knows confirmation tag, and
-rubric dimensions. Judgment
+tools (every state-changing action has one commit call; a read-only action
+has a row when a Forbidden line or failure row names it), tool names outside
+Appendix A, the User-knows confirmation tag, and rubric dimensions. Judgment
 (faithfulness to inputs, unambiguous verdicts, semantic gaps) is left to the
 reviewers in the skill's verification step.
 
@@ -239,12 +240,24 @@ def check(text):
                 if action_id not in actions:
                     errors.append(f"Appendix A row for {tool} cites unknown action {action_id}")
                 commit_calls.setdefault(action_id, []).append(tool)
-    for action_id in actions:
-        calls = commit_calls.get(action_id, [])
-        if not calls:
-            errors.append(f"{action_id}: no Appendix A row")
-        elif len(calls) > 1:
-            errors.append(f"{action_id}: more than one commit call in Appendix A ({', '.join(calls)}); one action never has two commit calls")
+    # A call is bound in a row or listed as unmapped, never both.
+    unmapped_line = next((line for line in binding if line.startswith("Unmapped read-only calls:")), "")
+    bound_tools = {t for calls in commit_calls.values() for t in calls}
+    for tool in sorted(bound_tools & set(CALL_RE.findall(unmapped_line))):
+        errors.append(f"{tool}: bound in an Appendix A row and listed on the Unmapped read-only calls line; a call is one or the other")
+    # A read-only action needs a row only when a Forbidden line or a failure row names it;
+    # Forbidden lines are collected per scenario below, so this check runs after the scenarios.
+    def check_binding(named_in_events):
+        for action_id, mark in actions.items():
+            calls = commit_calls.get(action_id, [])
+            if len(calls) > 1:
+                errors.append(f"{action_id}: more than one commit call in Appendix A ({', '.join(calls)}); one action never has two commit calls")
+            elif calls:
+                continue
+            elif mark != "read-only":
+                errors.append(f"{action_id}: no Appendix A row")
+            elif action_id in named_in_events:
+                errors.append(f"{action_id}: read-only action named in {sorted(named_in_events[action_id])} has no Appendix A row; a read-only action without a row has no occurrences")
 
     # Tool names belong to Appendix A, so a rebinding never touches the rest of the spec.
     # Each error names the heading or rule the line falls under. Only `tool` or tool( counts, so a tool
@@ -261,6 +274,12 @@ def check(text):
                 errors.append(f"{where}: tool name outside Appendix A: {tool}")
 
     # Scenarios.
+    named_in_events = {}  # read-only action id -> where a Forbidden line or failure row names it
+    for cap in capabilities:
+        for row in cap.failure_rows:
+            for action_id in ACTION_ID_RE.findall(row[0]):
+                if actions.get(action_id) == "read-only":
+                    named_in_events.setdefault(action_id, set()).add(f"{cap.name} failure row")
     seen_ids = set()
     for cap, s in all_scenarios:
         if s.id in seen_ids:
@@ -327,6 +346,11 @@ def check(text):
         if cap.kind == "read-only" and cited:
             errors.append(f"{s.id}: read-only capability {cap.name} has Required events {cited}")
 
+        for line in block("Forbidden")[1:]:
+            for action_id in ACTION_ID_RE.findall(line):
+                if actions.get(action_id) == "read-only":
+                    named_in_events.setdefault(action_id, set()).add(f"{s.id} Forbidden")
+
         rows = table_rows(block("Data variants"))
         if not 2 <= len(rows) <= 3:
             errors.append(f"{s.id}: Data variants has {len(rows)} rows; expected 2 or 3")
@@ -338,6 +362,8 @@ def check(text):
             errors.append(f"{s.id}: Illustrates unknown rule {rule_id}")
 
         s.dimensions = {d.lower() for d in DIMENSION_REF_RE.findall(" ".join(block("Unambiguity note")))}
+
+    check_binding(named_in_events)
 
     # Every rule illustrated.
     illustrated = {}

@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 An Agent Spec is a behavior contract for an LLM agent. It states what the agent may do, what it must not do, when it is authorized to act, what counts as success or violation, and which invariants hold across world states. Every rule is illustrated by at least one key example, and every key example is written so that it converts into a pytest-bdd test without rewording.
 
-Write one file, `agent-spec.md`, in the product directory the user named, or beside the inputs when no directory was named. Nothing else changes: product code, tests, architecture notes and tickets are other skills' work. When an `agent-spec.md` already exists and the user named a capability to add or change, touch only that capability's section and the Evaluation table rows it affects, and keep every existing rule and scenario id stable.
+Write one file, `agent-spec.md`, in the product directory the user named, or beside the inputs when no directory was named. Nothing else changes: product code, tests, architecture notes and tickets are other skills' work. When an `agent-spec.md` already exists and the user named a capability to add or change, touch only that capability's section and the Evaluation table rows it affects, keep every existing rule and scenario id stable, and apply the coverage conditions of step 3.6 to every rule, rule clause and failure row the change adds before verifying.
 
 ## 1. Collect the inputs
 
@@ -122,7 +122,9 @@ Write Appendix A from the actions in every Scope & Authority, the "act only when
 
 If row 2 was found, bind the supplied tools and ask nothing. Give each state-changing action its commit call, and list the remaining read-only calls on the "Unmapped read-only calls" line.
 
-If row 2 is proposed or partial, derive the smallest tool set in which every state-changing action has one commit call and every fact the agent must know before it can act or decide has a read. The facts are the conditions of the "act only when" rules and the Initial state facts the scenarios set, such as existing records and availability. One tool may commit several actions and one read may return several facts, so the smallest set is the fewest tools that still cover every action and every fact. Each commit call's outcomes are the failure-row outcomes of the actions it commits. For a partial row 2, keep the supplied tools and propose only the missing pieces. Write the tools into Appendix A, with the reads on the "Unmapped read-only calls" line with their parameters and return values. Then show the appendix to the user and ask them to confirm it in one turn. Record the confirmed tool set in row 2 of the ledger, marked proposed or supplied per tool.
+If row 2 is proposed or partial, derive the smallest tool set in which every state-changing action has one commit call and every fact the agent must know before it can act or decide has a read. The facts are the conditions of the "act only when" rules and the Initial state facts the scenarios set, such as existing records and availability. One tool may commit several actions and one read may return several facts, so the smallest set is the fewest tools that still cover every action and every fact. Each commit call's outcomes are the failure-row outcomes of the actions it commits. For a partial row 2, keep the supplied tools and propose only the missing pieces. Write the tools into Appendix A, with the reads on the "Unmapped read-only calls" line with their parameters and return values. Then run the checker (step 4.1), so the appendix the user confirms has already passed it, show the appendix to the user, and ask them to confirm it in one turn. Record the confirmed tool set in row 2 of the ledger, marked proposed or supplied per tool.
+
+In either case, a read-only action gets a table row only when a Forbidden line or a failure row names it; the row's call is then its read, and its Effect on state is none. Every other read stays on the "Unmapped read-only calls" line. A read-only action without a row has no occurrences, so no event line may name it.
 
 Done when Appendix A meets its binding contract and, if any tool was proposed, the user has confirmed the appendix.
 
@@ -166,7 +168,9 @@ Done when every finding has three verdicts and is kept or dropped.
 
 Fix each kept finding, or record why it stands: an input supports the line, or only the user can decide it. A finding only the user can decide becomes an open question in the report. Fix the pattern, not the line: search the spec for every instance of the finding's pattern and fix them all. Pre-existing findings are reported and left untouched.
 
-Then rerun 4.1. If this round changed the spec, start the next round at 4.3, scoped to the sections this round changed, and pass every answered finding to the finders as already answered. Stop after round 3, even with findings left: three rounds without converging means the inputs or the approach need the user, so the remaining findings go into the report as open.
+When a fix adds a rule, a rule clause or a failure row, apply the coverage conditions of step 3.6 to it before rerunning the checker: the new clause needs a scenario, or a data-variant row, whose Initial state exercises it. The checker counts scenario references per rule and cannot see that a new clause has none.
+
+Then rerun 4.1. If this round changed the spec, save a copy of the spec as it stands at the end of the round in a scratch directory outside the product directory, beside the review packet, so the next round's findings can be told apart by whether they quote a line this round changed; then start the next round at 4.3, scoped to the sections this round changed, and pass every answered finding to the finders as already answered. Stop after round 3, even with findings left: three rounds without converging means the inputs or the approach need the user, so the remaining findings go into the report as open.
 
 Done when a round changes nothing and the script prints "0 errors", or round 3 has ended.
 
@@ -178,7 +182,7 @@ Reply with evidence, so the user can judge the spec without rereading it:
 - the input ledger's final state, naming any default the user accepted;
 - the proposed tools, which are provisional, and that Appendix A is the part of the spec that architecture notes may change;
 - the checker's count line and coverage table;
-- the findings, opening with a count line by severity, each marked fixed, answered with its reason, open, or Pre-existing, and the number of rounds run;
+- the findings, opening with a count line by severity, each marked fixed, answered with its reason, open, or Pre-existing, and the number of rounds run; for every round after the first, how many kept findings quote a line the previous round changed (a fix that introduced a defect) and how many quote a line it did not (a defect earlier finders missed), because the two call for different remedies;
 - which reviewers ran as subagents and which ran through Codex;
 - the open questions, each as a "what if" the inputs could not answer;
 - what verification cannot catch: whether the rules are the business's real rules and whether the stakeholder list is complete, which only the user can confirm;

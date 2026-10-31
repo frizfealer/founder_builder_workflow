@@ -70,6 +70,7 @@ Do not handle failures as you name them; people who do run out of energy after t
   Add every failure mode the tool list (input 2) declares.
 - [ ] **Keep a failure only if the agent can detect it and must do something about it.** Convert the undetectable into the detectable ("the user forgot" becomes "no answer within the turn limit"); drop what has no detectable form.
 - [ ] **Merge failures with the same handling.** Three causes with one response are one row with a compound condition.
+- [ ] **A failure row that branches on a lookup covers every result of the lookup**: nothing found, a record that matches, a record that does not match, and no answer. A missing branch is the else-branch a coder will invent.
 - [ ] **Write the condition as what the agent observes**, in the past tense: "create_reservation timed out", not "the network was slow".
 - [ ] **Each row ends in one of four ways**: the step is repaired and the capability continues; the user gets another chance at the same step; the capability stops with the minimal guarantee intact; a different route to success. Say which.
 - [ ] **A failure that cannot be handled by the agent needs a new rule or a new stakeholder.** Finding this now is cheaper than a coder inventing the else-branch.
