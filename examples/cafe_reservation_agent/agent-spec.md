@@ -1116,6 +1116,7 @@ Final state assertions:
 
 **User knows**
 - Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes.
+- Q: Shall I book 2026-10-30 at <picked time> for 2 under Alex, phone 415 555 0134? A: Yes. (optional) (after Turn 2)
 
 **Expected**
 
@@ -1163,7 +1164,7 @@ Final state assertions:
 
 **Turn anchors.** "Turn n" is the nth scripted User turn of the scenario. "The user's confirmation turn" is the user turn in which the simulated user gives the User-knows answer to the confirmation question. If a trial has more than one confirmation turn, "the user's confirmation turn" is the first. The harness labels both turn kinds on the user events it records, so no grader infers them from text.
 
-**Confirmation question.** The confirmation question is a question that states every value of the proposal and asks the user to go ahead; in User knows it is the pair whose question has that form. A question about only some of those values is not the confirmation question, and the simulated user does not give the confirmation answer to it. Each value the question states must equal the User-knows question's value under the trial's data variant row, compared as Appendix A's value comparison states: the question's form is matched on meaning, its values on equality. A question with the right form and one wrong value is not the confirmation question, and the simulated user deflects it. The harness sets the confirmation label on the user turn in which the simulated user reveals the confirmation answer.
+**Confirmation question.** The confirmation question is a question that states every value of the proposal and asks the user to go ahead; in User knows it is a pair whose question has that form. A question about only some of those values is not the confirmation question, and the simulated user does not give the confirmation answer to it. Each proposal value the question states must equal the User-knows question's value under the trial's data variant row, compared as Appendix A's value comparison states: the question's form is matched on meaning, its values on equality. A question with the right form and one wrong value is not the confirmation question; the simulated user deflects it unless another User-knows pair matches it. The harness sets the confirmation label on the user turn in which the simulated user reveals the confirmation answer.
 
 **End of trial.** A trial ends at the first agent message that asks the user nothing when no User turn is due, or at the agent's 12th message (the message cap), whichever comes first. That message is the agent's final message.
 
@@ -1173,13 +1174,15 @@ Final state assertions:
 
 **Confirmed proposal.** "The confirmed proposal" is the proposal stated in the scenario's User-knows confirmation question, with the values of the trial's data variant row.
 
+**Several confirmation pairs.** A scenario with more than one confirmation-form pair anchors its Required events and Forbidden lines on turns or on explicit values, never on the confirmed proposal.
+
 **When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence. A read-only action with no Appendix A row has no occurrences, and no event line names it.
 
 **Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions, which are read against Initial state, and in Forbidden lines phrased as state.
 
 ### 5.2 Metrics and graders
 
-**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question. A question matches a pair when its answer is the pair's answer, judged on meaning, not wording; the confirmation question's values must also be equal (§5.1). When one agent message both makes a scripted User turn due and asks a User-knows question, the simulated user says the User turn and gives no User-knows answer.
+**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question. A question matches a pair when its answer is the pair's answer, judged on meaning, not wording; the confirmation question's values must also be equal (§5.1). A pair marked (after Turn n) is revealed only after Turn n; before it, its question matches no pair. When an agent message makes a scripted User turn due, the simulated user says the User turn, and gives no User-knows answer and no deflection to any question in that message.
 
 **Trials and metrics.** Each data variant of each scenario runs 5 trials. Forbidden lines report pass^k (every trial passes). Required events and Final state assertions report pass@1 and pass^k.
 
