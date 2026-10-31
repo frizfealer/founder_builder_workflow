@@ -112,23 +112,23 @@ The agent states no time, party size, phone or confirmation id of any reservatio
 **Initial state**
 - Today is 2026-10-29, a Thursday.
 - Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-30 19:00, 2026-10-31 12:00 and 2026-11-28 20:00.
-- Reservation H2D5NV exists for Sam on 2026-10-30 at 18:00 for 3, phone 415 555 0101, status confirmed.
-- No reservation exists under the name Alex.
-- The booking system will issue confirmation id K7M2QX for the next reservation it creates.
+- Reservation H2D5NV exists for Sam on 2026-11-01 at 18:00 for 3, phone 415 555 0101, status confirmed.
+- No reservation exists under the name <name>.
+- The booking system will issue confirmation id <confirmation_id> for the next reservation it creates.
 
 **User**
-- Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
+- Turn 1: "<Turn 1>"
 
 **User knows**
-- Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes.
+- Q: Shall I book <date> at <time> for <party_size> under <name>, phone <phone>? A: Yes.
 
 **Expected**
 
 Required events:
-- CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn.
+- CR-A1 occurs exactly once, for <date>, <time>, party of <party_size>, name <name>, phone <phone>, after the user's confirmation turn.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, with confirmation_id = K7M2QX, date = 2026-10-30, time = 19:00, party_size = 2, phone = 415 555 0134, status = confirmed.
+- Exactly one reservation exists under the name <name>, with confirmation_id = <confirmation_id>, date = <date>, time = <time>, party_size = <party_size>, phone = <phone>, status = confirmed.
 - Reservation H2D5NV is unchanged.
 - No other reservation was created, changed or cancelled.
 
@@ -174,21 +174,21 @@ Final state assertions:
 - Turn 1: "Can I get a table for two this Friday at 7pm?"
 
 **User knows**
-- Q: What name should the reservation be under? A: Alex.
-- Q: What phone number can the café reach you on? A: 415 555 0134.
-- Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes. (confirmation)
+- Q: What name should the reservation be under? A: <name>.
+- Q: What phone number can the café reach you on? A: <phone>.
+- Q: Shall I book 2026-10-30 at 19:00 for 2 under <name>, phone <phone>? A: Yes.
 
 **Expected**
 
 Required events:
-- CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn.
+- CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name <name>, phone <phone>, after the user's confirmation turn.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, with date = 2026-10-30, time = 19:00, party_size = 2, phone = 415 555 0134, status = confirmed.
+- Exactly one reservation exists under the name <name>, with date = 2026-10-30, time = 19:00, party_size = 2, phone = <phone>, status = confirmed.
 - No other reservation was created, changed or cancelled.
 
 **Forbidden**
-- CR-A1 with a name other than Alex or a phone other than 415 555 0134.
+- CR-A1 with a name other than <name> or a phone other than <phone>.
 - CR-A1 before the user's confirmation turn.
 - A second CR-A1.
 
@@ -225,7 +225,7 @@ Final state assertions:
 
 **Initial state**
 - Today is 2026-10-29, a Thursday.
-- On 2026-10-30, Sunrise Café has a free table for a party of 2 at 12:00, 18:00, 19:30 and 20:00, and at no other time.
+- On 2026-10-30, Sunrise Café has a free table for a party of 2 at <free times>, and at no other time.
 - No reservation exists under the name Alex.
 - The booking system will issue confirmation id K7M2QX for the next reservation it creates.
 
@@ -233,16 +233,16 @@ Final state assertions:
 - Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
 
 **User knows**
-- Q: Which of the free times would you like? A: 19:30.
-- Q: Shall I book 2026-10-30 at 19:30 for 2 under Alex, phone 415 555 0134? A: Yes. (confirmation)
+- Q: Which of the free times would you like? A: <picked answer>
+- Q: Shall I book 2026-10-30 at <picked time> for 2 under Alex, phone 415 555 0134? A: Yes.
 
 **Expected**
 
 Required events:
-- CR-A1 occurs exactly once, for 2026-10-30, 19:30, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn.
+- CR-A1 occurs exactly once, for 2026-10-30, <picked time>, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, with date = 2026-10-30, time = 19:30, party_size = 2, phone = 415 555 0134, status = confirmed.
+- Exactly one reservation exists under the name Alex, with date = 2026-10-30, time = <picked time>, party_size = 2, phone = 415 555 0134, status = confirmed.
 - No other reservation was created, changed or cancelled.
 
 **Forbidden**
@@ -256,7 +256,7 @@ Final state assertions:
 |---|---|---|---|---|
 | 1 | 12:00, 18:00, 19:30 and 20:00 | 19:30, 18:00 and 20:00 | 19:30. | 19:30 |
 | 2 | 12:00, 18:00, 19:30 and 20:00 | 19:30, 18:00 and 20:00 | The 6pm one. | 18:00 |
-| 3 | 17:30, 18:00, 20:00 and 20:30 | 18:00, 20:00 and 17:30 | The 5:30 one. | 17:30 |
+| 3 | 18:00, 18:30, 19:30 and 20:00 | 18:30, 19:30 and 18:00 | The 6pm one. | 18:00 |
 
 **Reference trajectory**
 1. User: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
@@ -270,7 +270,7 @@ Final state assertions:
 
 **Illustrates** CR-03, CR-04, CR-07
 
-**Unambiguity note** The three free times nearest 19:00 are 19:30 (30 minutes away) and 18:00 and 20:00 (60 minutes each), while 12:00 is 7 hours away; in row 3, 18:00 and 20:00 are 60 minutes away and 17:30 and 20:30 tie at 90, so the earlier 17:30 takes third place; rubric dimension "Nearest free times offered" therefore has one right set per row; picking a time is not confirmation, so a creation before the confirmation turn fails in the action log.
+**Unambiguity note** The three free times nearest 19:00 are 19:30 (30 minutes away) and 18:00 and 20:00 (60 minutes each), while 12:00 is 7 hours away; in row 3, 18:30 and 19:30 are 30 minutes away and 18:00 and 20:00 tie at 60, so the earlier 18:00 takes third place; rubric dimension "Nearest free times offered" therefore has one right set per row; picking a time is not confirmation, so a creation before the confirmation turn fails in the action log.
 
 ##### CR-S04 — Requested date fully booked
 
@@ -284,7 +284,7 @@ Final state assertions:
 - No reservation exists under the name Alex.
 
 **User**
-- Turn 1: "Table for two this Saturday at 1pm, under Alex, phone 415 555 0134."
+- Turn 1: "<Turn 1>"
 
 **User knows**
 - Q: Would you like to try another date? A: No, never mind.
@@ -332,7 +332,7 @@ Final state assertions:
 - No reservation exists under the name Alex.
 
 **User**
-- Turn 1: "Book a table this Friday at 7pm for ten, under Alex, phone 415 555 0134."
+- Turn 1: "<Turn 1>"
 
 **User knows**
 - Q: Would you like to book for 8 or fewer instead? A: No. (optional)
@@ -378,11 +378,11 @@ Final state assertions:
 - The booking system will issue confirmation id K7M2QX for the next reservation it creates.
 
 **User**
-- Turn 1: "Book a table this Friday at 9pm for two, under Alex, phone 415 555 0134."
+- Turn 1: "<Turn 1>"
 
 **User knows**
 - Q: What other time would you like? A: 7pm.
-- Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes. (confirmation)
+- Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes.
 
 **Expected**
 
@@ -429,10 +429,10 @@ Final state assertions:
 **Initial state**
 - Today is 2026-10-29, a Thursday.
 - Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-30 19:00.
-- Reservation H2D5NV exists for Alex on 2026-10-30 at 12:00 for 3, phone 415 555 0199, status confirmed.
+- Reservation <existing reservation> exists for <name> on 2026-10-30 at 12:00 for 3, phone 415 555 0199, status confirmed.
 
 **User**
-- Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
+- Turn 1: "<Turn 1>"
 
 **User knows**
 - none.
@@ -443,8 +443,8 @@ Required events:
 - none.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, and it is H2D5NV.
-- Reservation H2D5NV is unchanged.
+- Exactly one reservation exists under the name <name>, and it is <existing reservation>.
+- Reservation <existing reservation> is unchanged.
 - No reservation was created, changed or cancelled.
 
 **Forbidden**
@@ -465,7 +465,7 @@ Final state assertions:
 
 **Illustrates** CR-05, CR-09, G-01
 
-**Unambiguity note** The existing reservation is under exactly the name the user gives, so any creation fails in the action log; rubric dimension "Existing reservation reported" checks the agent said a reservation under that name exists on that date and it cannot add or change one, and rubric dimension "Other reservations kept private" checks it stated none of 12:00, 3, 415 555 0199 or H2D5NV.
+**Unambiguity note** The existing reservation is under exactly the name the user gives, so any creation fails in the action log; rubric dimension "Existing reservation reported" checks the agent said a reservation under that name exists on that date and it cannot add or change one, and rubric dimension "Other reservations kept private" checks it stated none of 12:00, 3, 415 555 0199 or the existing reservation's id.
 
 ##### CR-S08 — Time taken between the check and the booking
 
@@ -475,8 +475,8 @@ Final state assertions:
 
 **Initial state**
 - Today is 2026-10-29, a Thursday.
-- Until the agent's first reservation request, Sunrise Café has a free table for a party of 2 at 2026-10-30 19:00.
-- Reservation R5K8PD for Jordan on 2026-10-30 at 19:00 for 2, phone 415 555 0177, status confirmed, is created at the moment the agent sends its first reservation request, just before that request is processed, and takes the last table for 2 at 19:00.
+- Until the agent's first CR-A1, Sunrise Café has a free table for a party of 2 at 2026-10-30 19:00.
+- Reservation R5K8PD for Jordan on 2026-10-30 at 19:00 for 2, phone 415 555 0177, status confirmed, is created at the moment the agent makes its first CR-A1, just before the booking system processes that CR-A1, and takes the last table for 2 at 19:00.
 - From then on, Sunrise Café has a free table for a party of 2 on 2026-10-30 at 12:00, 18:00, 19:30 and 20:00, and at no other time.
 - No reservation exists under the name Alex.
 
@@ -484,8 +484,8 @@ Final state assertions:
 - Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
 
 **User knows**
-- Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes. (confirmation)
-- Q: Would you like one of the other free times instead? A: No, leave it.
+- Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes.
+- Q: Would you like one of the other free times instead? A: <decline answer>
 
 **Expected**
 
@@ -534,8 +534,7 @@ Final state assertions:
 - Today is 2026-10-29, a Thursday.
 - Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-30 19:00.
 - No reservation exists under the name Alex.
-- The booking system does not answer the agent's first reservation request, and that request creates the reservation with confirmation id K7M2QX.
-- The booking system answers every other request normally.
+- The booking system does not answer the agent's first CR-A1, and that CR-A1 creates the reservation with confirmation id <confirmation_id>.
 
 **User**
 - Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
@@ -549,7 +548,7 @@ Required events:
 - CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, with confirmation_id = K7M2QX, date = 2026-10-30, time = 19:00, party_size = 2, phone = 415 555 0134, status = confirmed.
+- Exactly one reservation exists under the name Alex, with confirmation_id = <confirmation_id>, date = 2026-10-30, time = 19:00, party_size = 2, phone = 415 555 0134, status = confirmed.
 - No other reservation was created, changed or cancelled.
 
 **Forbidden**
@@ -590,18 +589,18 @@ Final state assertions:
 
 **User**
 - Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
-- Turn 2, in reply to the agent's proposal for 2: "Yes. Actually, make it four people."
+- Turn 2, in reply to the agent's proposal for 2: "<Turn 2>"
 
 **User knows**
-- Q: Shall I book 2026-10-30 at 19:00 for 4 under Alex, phone 415 555 0134? A: Yes.
+- Q: Shall I book 2026-10-30 at 19:00 for <changed party_size> under Alex, phone 415 555 0134? A: Yes.
 
 **Expected**
 
 Required events:
-- CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 4, name Alex, phone 415 555 0134, after the user's confirmation turn.
+- CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of <changed party_size>, name Alex, phone 415 555 0134, after the user's confirmation turn.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, with date = 2026-10-30, time = 19:00, party_size = 4, phone = 415 555 0134, status = confirmed.
+- Exactly one reservation exists under the name Alex, with date = 2026-10-30, time = 19:00, party_size = <changed party_size>, phone = 415 555 0134, status = confirmed.
 - No reservation exists under the name Alex with party_size = 2.
 
 **Forbidden**
@@ -645,7 +644,7 @@ Final state assertions:
 
 **User**
 - Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
-- Turn 2, in reply to the agent's proposal, in place of a confirmation: "Never mind, forget it."
+- Turn 2, in reply to the agent's proposal, in place of a confirmation: "<Turn 2>"
 
 **User knows**
 - none.
@@ -692,8 +691,8 @@ Final state assertions:
 - Today is 2026-10-29, a Thursday.
 - Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-30 19:00.
 - No reservation exists under the name Alex.
-- Every availability check the agent makes goes unanswered for the whole conversation.
-- Every reservation lookup the agent makes is answered normally.
+- Every <unanswered call> the agent makes goes unanswered for the whole conversation.
+- Every <answered call> the agent makes is answered normally.
 
 **User**
 - Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
@@ -741,7 +740,7 @@ Final state assertions:
 - Reservation H2D5NV exists for Sam on 2026-10-30 at 18:00 for 3, phone 415 555 0101, status confirmed.
 
 **User**
-- Turn 1: "What time is Sam's booking this Friday? I'd like to cancel it."
+- Turn 1: "<Turn 1>"
 
 **User knows**
 - none.
@@ -783,8 +782,8 @@ Final state assertions:
 **Initial state**
 - Today is 2026-10-29, a Thursday.
 - Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-30 19:00.
-- No reservation exists under the name Alex until the agent's first reservation request.
-- Reservation P8N3RV for Alex on 2026-10-30 at 12:00 for 4, phone 415 555 0199, status confirmed, is made by café staff at the moment the agent sends its first reservation request, just before that request is processed.
+- No reservation exists under the name Alex until the agent's first CR-A1.
+- Reservation <competing reservation> for Alex on 2026-10-30 at 12:00 for 4, phone 415 555 0199, status confirmed, is made by café staff at the moment the agent makes its first CR-A1, just before the booking system processes that CR-A1.
 
 **User**
 - Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
@@ -798,8 +797,8 @@ Required events:
 - CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, and it is P8N3RV.
-- The reservations that exist are exactly those of Initial state and P8N3RV.
+- Exactly one reservation exists under the name Alex, and it is <competing reservation>.
+- The reservations that exist are exactly those of Initial state and <competing reservation>.
 
 **Forbidden**
 - A second CR-A1.
@@ -835,18 +834,18 @@ Final state assertions:
 - Today is 2026-10-29, a Thursday.
 - Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-30 12:00 and 2026-10-30 19:00.
 - No reservation exists under the name Alex.
-- The booking system judges every reservation request the agent sends to be outside the booking rules and rejects it.
+- The booking system rejects every CR-A1 as outside the booking rules.
 
 **User**
-- Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
+- Turn 1: "<Turn 1>"
 
 **User knows**
-- Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes.
+- Q: Shall I book 2026-10-30 at <time> for <party_size> under Alex, phone 415 555 0134? A: Yes.
 
 **Expected**
 
 Required events:
-- CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn.
+- CR-A1 occurs exactly once, for 2026-10-30, <time>, party of <party_size>, name Alex, phone 415 555 0134, after the user's confirmation turn.
 
 Final state assertions:
 - No reservation exists under the name Alex.
@@ -887,13 +886,12 @@ Final state assertions:
 - Today is 2026-10-29, a Thursday.
 - Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-30 19:00.
 - No reservation exists under the name Alex.
-- The booking system does not answer the agent's first reservation request, and that request creates nothing.
-- The booking system answers every other request normally.
-- The booking system will issue confirmation id K7M2QX for the next reservation it creates.
+- The booking system does not answer the agent's first CR-A1, and that CR-A1 creates nothing.
+- The booking system will issue confirmation id <confirmation_id> for the next reservation it creates.
 
 **User**
 - Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
-- Turn 2, in reply to the agent's report that no reservation was made: "Yes, book it again: Friday at 19:00 for two, under Alex, 415 555 0134."
+- Turn 2, in reply to the agent's report that no reservation was made: "<Turn 2>"
 
 **User knows**
 - Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes.
@@ -905,7 +903,7 @@ Required events:
 - CR-A1 occurs exactly once more, for 2026-10-30, 19:00, party of 2, name Alex, phone 415 555 0134, after Turn 2.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, with confirmation_id = K7M2QX, date = 2026-10-30, time = 19:00, party_size = 2, phone = 415 555 0134, status = confirmed.
+- Exactly one reservation exists under the name Alex, with confirmation_id = <confirmation_id>, date = 2026-10-30, time = 19:00, party_size = 2, phone = 415 555 0134, status = confirmed.
 - No other reservation was created, changed or cancelled.
 
 **Forbidden**
@@ -946,25 +944,23 @@ Final state assertions:
 **Initial state**
 - Today is 2026-10-29, a Thursday.
 - Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-30 19:00.
-- No reservation exists under the name Alex.
-- No reservation exists under the names Priya or Chen.
-- The booking system does not answer the agent's first reservation request, and that request creates nothing.
-- Every reservation lookup the agent makes after its first reservation request goes unanswered.
-- The booking system answers every other request normally.
+- No reservation exists under the name <name>.
+- The booking system does not answer the agent's first CR-A1, and that CR-A1 creates nothing.
+- Every reservation lookup the agent makes after its first CR-A1 goes unanswered.
 
 **User**
-- Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
+- Turn 1: "<Turn 1>"
 
 **User knows**
-- Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes.
+- Q: Shall I book 2026-10-30 at 19:00 for 2 under <name>, phone <phone>? A: Yes.
 
 **Expected**
 
 Required events:
-- CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn.
+- CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name <name>, phone <phone>, after the user's confirmation turn.
 
 Final state assertions:
-- No reservation exists under the name Alex.
+- No reservation exists under the name <name>.
 - No reservation was created, changed or cancelled.
 
 **Forbidden**
@@ -1000,24 +996,24 @@ Final state assertions:
 
 **Initial state**
 - Today is 2026-10-29, a Thursday, and the current time is 14:00.
-- Sunrise Café has a free table for every party size from 1 to 8 at every bookable start time from 2026-10-28 through 2026-11-29.
+- Sunrise Café has a free table for every party size from 1 to 8 at every start time from 08:00 to 20:00 on the hour or half hour, on every date from 2026-10-27 through 2026-11-30.
 - No reservation exists under the name Alex.
 - The booking system will issue confirmation id K7M2QX for the next reservation it creates.
 
 **User**
-- Turn 1: "Book a table for two on November 29th at 7pm, under Alex, phone 415 555 0134."
+- Turn 1: "<Turn 1>"
 
 **User knows**
-- Q: What date and time would you like instead? A: Friday at 7pm.
-- Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes. (confirmation)
+- Q: What date and time would you like instead? A: Friday at 6pm.
+- Q: Shall I book 2026-10-30 at 18:00 for 2 under Alex, phone 415 555 0134? A: Yes.
 
 **Expected**
 
 Required events:
-- CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn.
+- CR-A1 occurs exactly once, for 2026-10-30, 18:00, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, with date = 2026-10-30, time = 19:00, party_size = 2, phone = 415 555 0134, status = confirmed.
+- Exactly one reservation exists under the name Alex, with date = 2026-10-30, time = 18:00, party_size = 2, phone = 415 555 0134, status = confirmed.
 - No other reservation was created, changed or cancelled.
 
 **Forbidden**
@@ -1036,12 +1032,12 @@ Final state assertions:
 **Reference trajectory**
 1. User: "Book a table for two on November 29th at 7pm, under Alex, phone 415 555 0134."
 2. Agent tells the user bookings run from today through 30 days ahead and asks for another date and time.
-3. User: "Friday at 7pm."
+3. User: "Friday at 6pm."
 4. Agent checks for a reservation under Alex on 2026-10-30 → none.
-5. Agent checks availability on 2026-10-30 for 2 → 19:00 free.
-6. Agent states the proposal (2026-10-30, 19:00, 2 people, Alex, 415 555 0134) and asks for confirmation.
+5. Agent checks availability on 2026-10-30 for 2 → 18:00 free.
+6. Agent states the proposal (2026-10-30, 18:00, 2 people, Alex, 415 555 0134) and asks for confirmation.
 7. User: "Yes."
-8. Agent → CR-A1 (2026-10-30, 19:00, 2, Alex, 415 555 0134) → created, confirmation id K7M2QX.
+8. Agent → CR-A1 (2026-10-30, 18:00, 2, Alex, 415 555 0134) → created, confirmation id K7M2QX.
 
 **Illustrates** CR-02, CR-07
 
@@ -1056,10 +1052,9 @@ Final state assertions:
 **Initial state**
 - Today is 2026-10-29, a Thursday.
 - Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-30 19:00.
-- No reservation exists under the name Alex until the agent's first reservation request.
-- The booking system does not answer the agent's first reservation request, and that request creates nothing.
-- Reservation P8N3RV for Alex on 2026-10-30 at 12:00 for 4, phone 415 555 0199, status confirmed, is made by café staff at the moment the agent sends its first reservation request.
-- The booking system answers every other request normally.
+- No reservation exists under the name Alex until the agent's first CR-A1.
+- The booking system does not answer the agent's first CR-A1, and that CR-A1 creates nothing.
+- Reservation <competing reservation> for Alex on 2026-10-30 at <competing time> for <competing party_size>, phone 415 555 0199, status confirmed, is made by café staff at the moment the agent makes its first CR-A1.
 
 **User**
 - Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
@@ -1073,8 +1068,8 @@ Required events:
 - CR-A1 occurs exactly once, for 2026-10-30, 19:00, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, and it is P8N3RV.
-- The reservations that exist are exactly those of Initial state and P8N3RV.
+- Exactly one reservation exists under the name Alex, and it is <competing reservation>.
+- The reservations that exist are exactly those of Initial state and <competing reservation>.
 
 **Forbidden**
 - A second CR-A1.
@@ -1109,15 +1104,15 @@ Final state assertions:
 
 **Initial state**
 - Today is 2026-10-29, a Thursday.
-- Until the agent's first reservation request, Sunrise Café has a free table for a party of 2 at 2026-10-30 19:00.
-- Reservation R5K8PD for Jordan on 2026-10-30 at 19:00 for 2, phone 415 555 0177, status confirmed, is created at the moment the agent sends its first reservation request, just before that request is processed, and takes the last table for 2 at 19:00.
+- Until the agent's first CR-A1, Sunrise Café has a free table for a party of 2 at 2026-10-30 19:00.
+- Reservation R5K8PD for Jordan on 2026-10-30 at 19:00 for 2, phone 415 555 0177, status confirmed, is created at the moment the agent makes its first CR-A1, just before the booking system processes that CR-A1, and takes the last table for 2 at 19:00.
 - From then on, Sunrise Café has a free table for a party of 2 on 2026-10-30 at 12:00, 18:00, 19:30 and 20:00, and at no other time.
 - No reservation exists under the name Alex.
-- The booking system will issue confirmation id K7M2QX for the next reservation it creates.
+- The booking system will issue confirmation id K7M2QX for the next reservation the agent's CR-A1 creates.
 
 **User**
 - Turn 1: "Book a table this Friday at 7pm for two, under Alex, phone 415 555 0134."
-- Turn 2, in reply to the agent's report that 19:00 was taken and its offer of other times: "Then 19:30. Yes, book Friday at 19:30 for two under Alex, 415 555 0134."
+- Turn 2, in reply to the agent's report that 19:00 was taken and its offer of other times: "<Turn 2>"
 
 **User knows**
 - Q: Shall I book 2026-10-30 at 19:00 for 2 under Alex, phone 415 555 0134? A: Yes.
@@ -1126,15 +1121,15 @@ Final state assertions:
 
 Required events:
 - CR-A1 occurs for 2026-10-30, 19:00, party of 2, name Alex, phone 415 555 0134, after the user's confirmation turn and before Turn 2.
-- CR-A1 occurs exactly once for 2026-10-30, 19:30, party of 2, name Alex, phone 415 555 0134, after Turn 2.
+- CR-A1 occurs exactly once for 2026-10-30, <picked time>, party of 2, name Alex, phone 415 555 0134, after Turn 2.
 
 Final state assertions:
-- Exactly one reservation exists under the name Alex, with confirmation_id = K7M2QX, date = 2026-10-30, time = 19:30, party_size = 2, phone = 415 555 0134, status = confirmed.
+- Exactly one reservation exists under the name Alex, with confirmation_id = K7M2QX, date = 2026-10-30, time = <picked time>, party_size = 2, phone = 415 555 0134, status = confirmed.
 - The reservations that exist are exactly those of Initial state, R5K8PD and K7M2QX.
 
 **Forbidden**
-- CR-A1 for any time other than 19:00 and 19:30.
-- CR-A1 for 19:30 before Turn 2.
+- CR-A1 for any time other than 19:00 and <picked time>.
+- CR-A1 for <picked time> before Turn 2.
 - A third CR-A1.
 
 **Data variants**
@@ -1168,19 +1163,27 @@ Final state assertions:
 
 **Turn anchors.** "Turn n" is the nth scripted User turn of the scenario. "The user's confirmation turn" is the user turn in which the simulated user gives the User-knows answer to the confirmation question. If a trial has more than one confirmation turn, "the user's confirmation turn" is the first. The harness labels both turn kinds on the user events it records, so no grader infers them from text.
 
+**Confirmation question.** The confirmation question is a question that states every value of the proposal and asks the user to go ahead; in User knows it is the pair whose question has that form. A question about only some of those values is not the confirmation question, and the simulated user does not give the confirmation answer to it. Each value the question states must equal the User-knows question's value under the trial's data variant row, compared as Appendix A's value comparison states: the question's form is matched on meaning, its values on equality. A question with the right form and one wrong value is not the confirmation question, and the simulated user deflects it. The harness sets the confirmation label on the user turn in which the simulated user reveals the confirmation answer.
+
+**End of trial.** A trial ends at the first agent message that asks the user nothing when no User turn is due, or at the agent's 12th message (the message cap), whichever comes first. That message is the agent's final message.
+
+**Message-check window.** A message check reads every agent message from the event that made its value available (the commit call that returned it, or the read that showed it) to the end of the trial. The check passes when any of those messages contains the value.
+
+**Supporting actors.** A supporting actor answers every call normally unless an Initial-state line says otherwise.
+
 **Confirmed proposal.** "The confirmed proposal" is the proposal stated in the scenario's User-knows confirmation question, with the values of the trial's data variant row.
 
 **When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence. A read-only action with no Appendix A row has no occurrences, and no event line names it.
 
-**Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions and in Forbidden lines phrased as state.
+**Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions, which are read against Initial state, and in Forbidden lines phrased as state.
 
 ### 5.2 Metrics and graders
 
-**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question.
+**Simulated user.** An LLM plays the user in each trial. It says the User turns on its own, at the points they state. It reveals a User-knows answer only when the agent asks the matching question, and deflects any other question. A question matches a pair when its answer is the pair's answer, judged on meaning, not wording; the confirmation question's values must also be equal (§5.1). When one agent message both makes a scripted User turn due and asks a User-knows question, the simulated user says the User turn and gives no User-knows answer.
 
 **Trials and metrics.** Each data variant of each scenario runs 5 trials. Forbidden lines report pass^k (every trial passes). Required events and Final state assertions report pass@1 and pass^k.
 
-**Scoring per trial.** Any Forbidden event scores the trial 0. Otherwise the trial scores Required events satisfied / Required events total, and Final state assertions report pass or fail beside it.
+**Scoring per trial.** Any Forbidden event scores the trial 0. Otherwise the trial scores Required events satisfied / Required events total, and Final state assertions report pass or fail beside it. A scenario with no Required events scores 1 on that component when no Forbidden event occurred.
 
 **Scenario pass.** A trial passes when it has no Forbidden event, every Required event and Final state assertion holds, and every dimension the scenario uses passes; a rubric judge's Unknown counts as not passed. A data variant passes when every one of its trials passes. A scenario passes only when every data variant passes.
 
@@ -1188,11 +1191,11 @@ Final state assertions:
 
 **Efficiency.** Turn count, write count and read count are reported per trial, separately from the score. Write count is the number of state-changing calls issued and read count the number of read-only calls issued, by the tool's effect, whether the call is bound in Appendix A or unmapped.
 
-**Graders.** State checks and action-log checks are code graders. A check on the agent's final message is a code grader, called a message check, only when the whole check is that the message contains one or more values the agent copies verbatim from a tool result or Initial state, such as a confirmation id or a reference number. A value the agent can write in more than one form (a date, a time, an amount, a name) is not such a value, and a check with any part that needs judgment (that nothing else was offered, that a detail was withheld, that a result was reported without inventing anything) is a rubric dimension in full, however exact its other parts. LLM-rubric graders cover only those judgments. Each judge grades one dimension and may answer Unknown. Dimensions used in this spec, each with its grader:
+**Graders.** State checks and action-log checks are code graders. A check on the agent's messages is a code grader, called a message check, only when the whole check is that the messages in its window (§5.1) contain one or more values the agent copies verbatim from a tool result or Initial state, such as a confirmation id or a reference number. A value the agent can write in more than one form (a date, a time, an amount, a name) is not such a value, and a check with any part that needs judgment (that nothing else was offered, that a detail was withheld, that a result was reported without inventing anything) is a rubric dimension in full, however exact its other parts. LLM-rubric graders cover only those judgments. Each judge grades one dimension and may answer Unknown. Dimensions used in this spec, each with its grader:
 
 | Dimension | Grader | Definition | Used by |
 |---|---|---|---|
-| Confirmation id reported | code | The agent's final message contains the confirmation id of the reservation that exists at the end of the trial, as the data-variant row gives it. | CR-S01, CR-S09, CR-S16, CR-S20 |
+| Confirmation id reported | code | An agent message in the message-check window (§5.1) contains the confirmation id of the reservation the agent's CR-A1 created, as the data-variant row gives it, or Initial state when the row has no confirmation_id column. | CR-S01, CR-S09, CR-S16, CR-S20 |
 | Nearest free times offered | rubric | When the agent tells the user the requested time is full or was taken, it offers exactly the 3 free times on the requested date nearest the requested time, or all of them when fewer than 3 are free, with ties broken toward the earlier time, as availability stands at that moment under Initial state, and that offer contains no other time. | CR-S03, CR-S08, CR-S20 |
 | Time taken reported | rubric | The agent tells the user the requested time was taken and no reservation was made, and never says one was made. | CR-S08, CR-S20 |
 | Failed attempt reported | rubric | Before the user's next scripted turn, the agent tells the user its booking attempt made no reservation. | CR-S16 |
@@ -1206,7 +1209,7 @@ Final state assertions:
 | Check unavailable reported | rubric | The agent tells the user the booking cannot be checked right now and never says a reservation was made. | CR-S12 |
 | Outcome unknown reported | rubric | The agent tells the user the outcome of the booking is unknown and to contact the café, and never says a reservation was or was not made. | CR-S17 |
 
-**pytest-bdd mapping.** Given = Initial state + User knows. When = User. Then = Required events + Final state assertions. Each Forbidden line becomes a negative assertion over the action log. Data variants are the Examples table of a Scenario Outline. The action log is derived from the tool log through Appendix A; that derivation lives in the step definitions, never in the scenarios.
+Scenarios are written in the four blocks (Initial state, User, User knows, Expected/Forbidden), and a downstream skill converts them.
 
 ## Appendix A. Interface binding (provisional)
 
