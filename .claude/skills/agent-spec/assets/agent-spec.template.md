@@ -76,9 +76,8 @@ Trigger:
 - Turn 1: "<the user's request>"
 
 **User knows**
-- Q: <confirmation question> A: <exact answer> (confirmation)
+- Q: <confirmation question> A: <exact answer>
 - Q: <question the agent may ask> A: <exact answer> (optional)
-- <The pair tagged (confirmation) is the confirmation question Turn anchors refers to. The tag is required when the scenario has more than one pair.>
 
 **Expected**
 
@@ -97,7 +96,7 @@ Final state assertions:
 
 | variant | <column per value that varies> |
 |---|---|
-| 1 | <values used in the scenario body> |
+| 1 | <values the Reference trajectory uses> |
 | 2 | <values> |
 | 3 | <values> |
 
@@ -118,11 +117,15 @@ Final state assertions:
 
 **Turn anchors.** "Turn n" is the nth scripted User turn of the scenario. "The user's confirmation turn" is the user turn in which the simulated user gives the User-knows answer to the confirmation question. If a trial has more than one confirmation turn, "the user's confirmation turn" is the first. The harness labels both turn kinds on the user events it records, so no grader infers them from text.
 
+**Confirmation question.** The confirmation question is a question that states every value of the proposal and asks the user to go ahead; in User knows it is the pair whose question has that form. A question about only some of those values is not the confirmation question, and the simulated user does not give the confirmation answer to it. The harness sets the confirmation label on the user turn in which the simulated user reveals the confirmation answer.
+
+**End of trial.** A trial ends at the first agent message that asks the user nothing when no User turn is due, or at the agent's 12th message, whichever comes first. That message is the agent's final message.
+
 **Confirmed proposal.** "The confirmed proposal" is the proposal stated in the scenario's User-knows confirmation question, with the values of the trial's data variant row.
 
 **When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence. A read-only action with no Appendix A row has no occurrences, and no event line names it.
 
-**Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions and in Forbidden lines phrased as state.
+**Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions, which are read against Initial state, and in Forbidden lines phrased as state.
 
 ### 5.2 Metrics and graders
 
@@ -144,7 +147,7 @@ Final state assertions:
 |---|---|---|---|
 | <name> | <code or rubric> | <what a Pass means; for code, the verbatim value the final message must contain> | <scenario ids> |
 
-**pytest-bdd mapping.** Given = Initial state + User knows. When = User. Then = Required events + Final state assertions. Each Forbidden line becomes a negative assertion over the action log. Data variants are the Examples table of a Scenario Outline. The action log is derived from the tool log through Appendix A; that derivation lives in the step definitions, never in the scenarios.
+Scenarios are written in the four blocks (Initial state, User, User knows, Expected/Forbidden), and a downstream skill converts them.
 
 ## Appendix A. Interface binding (provisional)
 

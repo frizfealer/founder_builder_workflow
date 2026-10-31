@@ -6,9 +6,10 @@ failure row for every state-changing action, data-variant row counts,
 read-only actions in Required events, the Appendix A binding of actions to
 tools (every state-changing action has one commit call; a read-only action
 has a row when a Forbidden line or failure row names it), tool names outside
-Appendix A, the User-knows confirmation tag, and dimensions (message checks
-graded by code, rubric dimensions graded by a judge) against the Evaluation
-table. Judgment
+Appendix A, data-variant values written as <column> in the converted blocks,
+Initial-state lines about a supporting actor's response that name no action,
+and dimensions (message checks graded by code, rubric dimensions graded by a
+judge) against the Evaluation table. Judgment
 (faithfulness to inputs, unambiguous verdicts, semantic gaps) is left to the
 reviewers in the skill's verification step.
 
@@ -73,6 +74,12 @@ CALL_RE = re.compile(r"`([A-Za-z_][\w.]*)\(")
 DIMENSION_REF_RE = re.compile(r'(rubric dimension|message check) "([^"]+)"', re.IGNORECASE)
 GRADER_FOR_REF = {"rubric dimension": "rubric", "message check": "code"}
 GRADERS = {"code", "rubric"}
+# Blocks a downstream skill converts; a data-variant value in them is written as <column>.
+CONVERTED_BLOCKS = ["Initial state", "User", "User knows", "Required events", "Final state assertions", "Forbidden"]
+TURN_ANCHOR_RE = re.compile(r"\bTurn \d+\b")
+SUPPORTING_RE = re.compile(r"^- \*\*Supporting actors:\*\*\s*(.+)$")
+# How a supporting actor responds to an agent action.
+RESPONSE_RE = re.compile(r"\b(answers?|rejects?|reports?|returns?|times? out|fails?)\b", re.IGNORECASE)
 
 
 @dataclass
@@ -80,6 +87,7 @@ class Scenario:
     id: str
     prefix: str
     lines: list[str]
+    start: int  # index in the file of the scenario heading
     illustrates: set[str] = field(default_factory=set)
     dimensions: dict[str, str] = field(default_factory=dict)  # dimension name -> grader the reference implies
 
@@ -116,7 +124,7 @@ def table_rows(lines):
     return rows[2:]  # drop header and separator
 
 
-def check(text):
+def check(text, path):
     errors = []
     lines = text.splitlines()
 
@@ -154,6 +162,16 @@ def check(text):
     for rule_id in collect_rules(section("Global Contract"), "Global Contract"):
         if not rule_id.startswith("G-"):
             errors.append(f"{rule_id}: Global Contract rules use the prefix G")
+
+    # Supporting actors, by name: "the booking system, which ..." gives "booking system".
+    actors = []
+    for line in section("Stakeholders & Interests"):
+        if m := SUPPORTING_RE.match(line):
+            for part in m.group(1).split(";"):
+                name = re.split(r",| \(| who\b| which\b| that\b", part.strip(), maxsplit=1)[0]
+                name = re.sub(r"^(the|a|an)\s+", "", name.strip(), flags=re.IGNORECASE).lower()
+                if name:
+                    actors.append(name)
 
     capabilities = []
     for m, body in split_by(section("Capabilities"), CAPABILITY_RE):
@@ -206,7 +224,7 @@ def check(text):
                 errors.append(f"{cap.name}: Failure handling table has no rows")
 
         for sm, sbody in split_by(cap.lines, SCENARIO_RE):
-            scenario = Scenario(id=f"{sm.group(1)}-S{sm.group(2)}", prefix=sm.group(1), lines=sbody)
+            scenario = Scenario(id=f"{sm.group(1)}-S{sm.group(2)}", prefix=sm.group(1), lines=sbody, start=lines.index(sm.group(0)))
             cap.scenarios.append(scenario)
             all_scenarios.append((cap, scenario))
         if not cap.scenarios:
@@ -234,10 +252,13 @@ def check(text):
     tools = set(CALL_RE.findall("\n".join(binding)))
     header = next((i for i, line in enumerate(binding) if line.startswith("| Action")), None)
     commit_calls = {}
+    action_names = []  # each action's name as its Appendix A row writes it, lowercased
     if header is not None:
         for row in table_rows(binding[header:]):
             tool = next(iter(CALL_RE.findall(row[2])), row[2])
             bound = ACTION_ID_RE.findall(row[0])
+            if name := ACTION_ID_RE.sub("", row[0]).strip().lower():
+                action_names.append(name)
             if not bound and "state-changing" in row[1]:
                 errors.append(f"{tool}: state-changing tool with no action in Appendix A")
             for action_id in bound:
@@ -331,11 +352,6 @@ def check(text):
         if bad:
             errors.append(f"{s.id}: unknown category tag {bad}; allowed {sorted(CATEGORY_TAGS)}")
 
-        pairs = [line for line in block("User knows") if line.startswith("- Q:")]
-        tagged = [line for line in pairs if "(confirmation)" in line]
-        if len(pairs) > 1 and len(tagged) != 1:
-            errors.append(f"{s.id}: User knows has {len(pairs)} pairs and {len(tagged)} carry the confirmation tag; mark exactly one (confirmation)")
-
         suite = value("Suite")
         if suite not in SUITES:
             errors.append(f"{s.id}: suite '{suite}' must be one of {sorted(SUITES)}")
@@ -355,9 +371,32 @@ def check(text):
                 if actions.get(action_id) == "read-only":
                     named_in_events.setdefault(action_id, set()).add(f"{s.id} Forbidden")
 
+        def numbered(name):
+            """(1-based file line number, line) for each line of a block after its heading."""
+            first = s.start + 1 + found_at[name] + 1
+            return [(first + i + 1, line) for i, line in enumerate(block(name)[1:])]
+
         rows = table_rows(block("Data variants"))
         if not 2 <= len(rows) <= 3:
             errors.append(f"{s.id}: Data variants has {len(rows)} rows; expected 2 or 3")
+
+        # A value from a data-variant column is written as <column> in the converted blocks.
+        variant_header = next((line for line in block("Data variants") if line.startswith("|")), None)
+        if variant_header and rows:
+            columns = [c.strip() for c in variant_header.strip().strip("|").split("|")]
+            for name in CONVERTED_BLOCKS:
+                for n, line in numbered(name):
+                    text_only = TURN_ANCHOR_RE.sub("", line)
+                    for column, val in zip(columns[1:], rows[0][1:]):
+                        if val and re.search(rf"(?<![\w-]){re.escape(val)}(?![\w-])", text_only):
+                            errors.append(f"{path}:{n}: {s.id}: holds '{val}' from data-variant column '{column}'; write <{column}>")
+
+        # An Initial-state line about how a supporting actor responds names the action.
+        for n, line in numbered("Initial state"):
+            low = line.lower()
+            if (any(actor in low for actor in actors) and RESPONSE_RE.search(line)
+                    and not ACTION_ID_RE.search(line) and not any(name in low for name in action_names)):
+                errors.append(f"{path}:{n}: {s.id}: Initial-state line states how a supporting actor responds to an agent action; name the action id or the action's name from its Appendix A row")
 
         s.illustrates = set(RULE_ID_RE.findall(" ".join(block("Illustrates"))))
         if not s.illustrates:
@@ -430,7 +469,7 @@ def main():
 
     with open(args.spec, encoding="utf-8") as f:
         text = f.read()
-    errors, coverage = check(text)
+    errors, coverage = check(text, args.spec)
 
     print(f"{len(errors)} errors")
     for e in errors:

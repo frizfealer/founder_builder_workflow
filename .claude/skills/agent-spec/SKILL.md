@@ -1,7 +1,7 @@
 ---
 name: agent-spec
 description: Write an Agent Spec, the behavior contract for an LLM agent, with numbered rules, key-example scenarios that convert to pytest-bdd tests without rewording, and an evaluation plan.
-argument-hint: <product dir, documents or code paths> [capability to add or change]
+argument-hint: <product dir, documents or code paths> [capability to add or change | findings file]
 disable-model-invocation: true
 ---
 
@@ -10,6 +10,8 @@ disable-model-invocation: true
 An Agent Spec is a behavior contract for an LLM agent. It states what the agent may do, what it must not do, when it is authorized to act, what counts as success or violation, and which invariants hold across world states. Every rule is illustrated by at least one key example, and every key example is written so that it converts into a pytest-bdd test without rewording.
 
 Write one file, `agent-spec.md`, in the product directory the user named, or beside the inputs when no directory was named. Nothing else changes: product code, tests, architecture notes and tickets are other skills' work. When an `agent-spec.md` already exists and the user named a capability to add or change, touch only that capability's section and the Evaluation table rows it affects, keep every existing rule and scenario id stable, and apply the coverage conditions of step 3.6 to every rule, rule clause and failure row the change adds before verifying.
+
+When an `agent-spec.md` already exists and the user passed a findings file, update from the findings. The file may be free-form; each finding names the scenario id and quotes the spec line it is about. Apply a finding only when its fix is to the spec. Report every other finding back unapplied with its reason: it names no scenario id, it quotes no spec line, or its fix belongs elsewhere, such as in the test code or the agent under test. Touch only the lines the applied findings quote and the lines that repeat their pattern, keep every rule and scenario id stable, and apply the coverage conditions of step 3.6 to anything a fix adds.
 
 ## 1. Collect the inputs
 
@@ -97,11 +99,11 @@ Each scenario carries the blocks in the template's order. The rules for filling 
 - **Suite** is regression for behavior that must already hold and never break, capability for behavior being built or a hard interaction case. Scenarios from known failure cases (input 6) start in capability.
 - **Initial state** holds one concrete fact per line: today's date whenever any phrase is relative to it, every existing record with the fields the rule depends on, availability, and any failure the scenario injects. Write an injected failure as an outcome ("the 19:00 slot is taken"), never as a tool result or exception.
 - **User** holds the turns the user initiates on their own: the request and any unprompted change of mind. A later turn states the point at which it arrives, relative to the agent's actions (for example, "in reply to the agent's proposal, in place of a confirmation"), so the simulator delivers it at one defined point. Dialogue appears only here and in Initial state.
-- **User knows** holds question-answer pairs the simulated user can answer but has not volunteered. Answers to the agent's questions live here, never in User. Every pair is a required question unless marked (optional). When a scenario has more than one pair, mark the one that answers the confirmation question (confirmation).
+- **User knows** holds question-answer pairs the simulated user can answer but has not volunteered. Answers to the agent's questions live here, never in User. Every pair is a required question unless marked (optional).
 - **Expected: Required events** lists only the state-changing actions that constitute the outcome, each with its values and timing. Read-only actions are never Required. Add an ordering constraint only where an authorizing user turn must precede a write. A read-only capability has Required events: none.
 - **Expected: Final state assertions** state what exists, with field values, and what is unchanged. Use full-set forms ("exactly one", "no other record changed").
 - **Forbidden** lists events that must not occur: an action for any proposal other than the confirmed one, an action before its authorizing turn, an action count, or a state that must never hold.
-- **Data variants** is a table of 2 to 3 rows that vary values only. Every value that differs between rows gets a column, including the user's wording of it and any injected failure, so each row fills a pytest-bdd Scenario Outline without guessing. An Initial state fact that depends on a varying value, such as availability for the party size, must hold for every row: state it for every row's value, or give it a column. The scenario body uses row 1.
+- **Data variants** is a table of 2 to 3 rows that vary values only. Every value that differs between rows gets a column, including the user's wording of it and any injected failure, so each row fills a pytest-bdd Scenario Outline without guessing. An Initial state fact that depends on a varying value, such as availability for the party size, must hold for every row: state it for every row's value, or give it a column. In Initial state, User, User knows, Expected and Forbidden, a value that has a column is written as <column>; the Reference trajectory uses row 1.
 - **Reference trajectory** is the shortest passing sequence of user turns, actions with their values, and outcomes as the supporting actor reports them. Agent turns are described, not quoted. It must use every required User-knows pair.
 - **Illustrates** names the rule ids the scenario exists for.
 - **Unambiguity note** is one line on why two domain experts reach the same verdict.

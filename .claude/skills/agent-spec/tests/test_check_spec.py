@@ -1,3 +1,4 @@
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -15,13 +16,54 @@ S01_CREATE_EVENT = "- CR-A1 occurs exactly once, for Sunrise Café, 2026-10-30, 
 
 
 def run(text, tmp_path):
+    """Run the checker on text; the spec path in the output reads as 'agent-spec.md'."""
     spec = tmp_path / "agent-spec.md"
     spec.write_text(text, encoding="utf-8")
     result = subprocess.run(
         [sys.executable, str(SCRIPT), str(spec)],
         capture_output=True, text=True,
     )
-    return result.returncode, result.stdout
+    return result.returncode, result.stdout.replace(str(spec), "agent-spec.md")
+
+
+def errors_without_lines(out):
+    """Error lines with the 'agent-spec.md:<n>: ' location removed, so inserted lines do not shift them."""
+    return sorted(re.sub(r"agent-spec\.md:\d+: ", "", line) for line in out.splitlines() if line.startswith("ERROR"))
+
+
+# What the round-3 rules find in the pre-round-3 café spec. The regenerated spec should bring this to [].
+EXPECTED_VIOLATIONS = [
+    (97, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
+    (97, "CR-S01: holds '19:00' from data-variant column 'time'; write <time>"),
+    (98, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
+    (99, "CR-S01: holds 'Alex' from data-variant column 'name'; write <name>"),
+    (102, "CR-S01: holds 'R-1001' from data-variant column 'confirmation_id'; write <confirmation_id>"),
+    (105, "CR-S01: holds 'Book a table at Sunrise Café this Friday at 7pm for two, under Alex.' from data-variant column 'Turn 1'; write <Turn 1>"),
+    (105, "CR-S01: holds 'Alex' from data-variant column 'name'; write <name>"),
+    (108, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
+    (108, "CR-S01: holds '19:00' from data-variant column 'time'; write <time>"),
+    (108, "CR-S01: holds '2' from data-variant column 'party_size'; write <party_size>"),
+    (108, "CR-S01: holds 'Alex' from data-variant column 'name'; write <name>"),
+    (113, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
+    (113, "CR-S01: holds '19:00' from data-variant column 'time'; write <time>"),
+    (113, "CR-S01: holds '2' from data-variant column 'party_size'; write <party_size>"),
+    (114, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
+    (114, "CR-S01: holds '19:00' from data-variant column 'time'; write <time>"),
+    (114, "CR-S01: holds '2' from data-variant column 'party_size'; write <party_size>"),
+    (114, "CR-S01: holds 'Alex' from data-variant column 'name'; write <name>"),
+    (117, "CR-S01: holds '2026-10-30' from data-variant column 'date'; write <date>"),
+    (117, "CR-S01: holds '19:00' from data-variant column 'time'; write <time>"),
+    (117, "CR-S01: holds '2' from data-variant column 'party_size'; write <party_size>"),
+    (117, "CR-S01: holds 'Alex' from data-variant column 'name'; write <name>"),
+    (164, "CR-S02: holds 'Yes. Actually, make it four people.' from data-variant column 'Turn 2'; write <Turn 2>"),
+    (167, "CR-S02: holds '4' from data-variant column 'changed party_size'; write <changed party_size>"),
+    (174, "CR-S02: holds '4' from data-variant column 'changed party_size'; write <changed party_size>"),
+    (175, "CR-S02: holds '4' from data-variant column 'changed party_size'; write <changed party_size>"),
+    (178, "CR-S02: holds '4' from data-variant column 'changed party_size'; write <changed party_size>"),
+    (184, "CR-S02: holds '4' from data-variant column 'changed party_size'; write <changed party_size>"),
+    (225, "CR-S03: holds 'Never mind, forget it.' from data-variant column 'Turn 2'; write <Turn 2>"),
+]
+BASELINE = sorted(f"ERROR {message}" for _, message in EXPECTED_VIOLATIONS)
 
 
 def mutate(old, new, count=1):
@@ -30,11 +72,13 @@ def mutate(old, new, count=1):
 
 
 def test_check_spec_cafe_fixture(tmp_path):
-    """Should report zero errors and print the coverage table for the café example."""
+    """Should report exactly the pinned round-3 violations and print the coverage table for the café example."""
     code, out = run(EXAMPLE, tmp_path)
-    assert code == 0, out
-    assert out.startswith("0 errors")
-    rule_ids = [line.split("|")[1].strip() for line in out.splitlines()[4:] if line.startswith("|")]
+    errors = [line for line in out.splitlines() if line.startswith("ERROR")]
+    assert errors == [f"ERROR agent-spec.md:{n}: {message}" for n, message in EXPECTED_VIOLATIONS], out
+    assert out.startswith(f"{len(EXPECTED_VIOLATIONS)} errors")
+    table = out.split("| Rule | Scenarios |\n|---|---|\n", 1)[1]
+    rule_ids = [line.split("|")[1].strip() for line in table.splitlines() if line.startswith("|")]
     assert rule_ids == ["G-01", "G-02", "CR-01", "CR-02", "CR-03", "CR-04", "CR-05", "CR-06", "CR-07"]
     assert "| CR-04 | CR-S02 |" in out
 
@@ -43,7 +87,7 @@ def test_check_spec_plain_word_tool_name(tmp_path):
     """Should not report prose that uses a tool's name as a plain word outside backticks."""
     text = mutate("`release_hold(hold_id)`", "`release(hold_id)`")
     code, out = run(text, tmp_path)
-    assert code == 0, out
+    assert errors_without_lines(out) == BASELINE, out
 
 
 RULE_VIOLATIONS = {
@@ -109,11 +153,6 @@ RULE_VIOLATIONS = {
           "CR-A4 releases the old hold before `hold_slot` places the new one.")],
         ["CR-06", "hold_slot", "tool name outside Appendix A"],
     ),
-    "user-knows-without-confirmation-tag": (
-        [("- Q: Shall I book Sunrise Café on 2026-10-30 at 19:00 for 4 under Alex? A: Yes.",
-          "- Q: Shall I book Sunrise Café on 2026-10-30 at 19:00 for 4 under Alex? A: Yes.\n- Q: Do you want a window table? A: No preference. (optional)")],
-        ["CR-S02", "confirmation tag"],
-    ),
 }
 
 
@@ -139,7 +178,7 @@ def test_check_spec_unbound_read_only_action_not_named(tmp_path):
     """Should accept a read-only action with no Appendix A row when no Forbidden line or failure row names it."""
     text = mutate("- CR-A4 release a hold it placed [state-changing]\n", READ_ONLY_ACTION)
     code, out = run(text, tmp_path)
-    assert code == 0, out
+    assert errors_without_lines(out) == BASELINE, out
 
 
 def test_check_spec_unbound_read_only_action_named_in_forbidden(tmp_path):
@@ -167,7 +206,7 @@ def test_check_spec_bound_read_only_action_named_in_forbidden(tmp_path):
     text = text.replace(CR_A4_BINDING_ROW, CR_A4_BINDING_ROW + READ_ONLY_BINDING_ROW, 1)
     text = text.replace(UNMAPPED_LINE, "Unmapped read-only calls: none.", 1)
     code, out = run(text, tmp_path)
-    assert code == 0, out
+    assert errors_without_lines(out) == BASELINE, out
 
 
 def test_check_spec_call_both_bound_and_unmapped(tmp_path):
@@ -283,3 +322,182 @@ def test_check_spec_missing_section(tmp_path):
     code, out = run(text, tmp_path)
     assert code == 1
     assert "sections are" in out
+
+
+# A one-scenario spec, so each round-3 rule is tested on its own and not only through the café file.
+TINY = """# Tiny — Agent Spec
+
+## 1. Purpose
+
+Books a table.
+
+## 2. Stakeholders & Interests
+
+- **Primary actor:** the visitor, who wants a table.
+- **Supporting actors:** the booking system, which may not answer.
+- **Offstage stakeholders:** the owner, who wants no unwanted bookings.
+
+## 3. Global Contract
+
+**G-01 — Confirm first** [minimal guarantee]
+Book only after confirmation.
+
+## 4. Capabilities
+
+### 4.1 Book (state-changing) — prefix TB
+
+#### Scope & Authority
+
+The agent may:
+- TB-A1 create the reservation [state-changing]
+
+The agent must not:
+- change other reservations
+
+#### Preconditions and Trigger
+
+Preconditions:
+- none
+
+Trigger:
+- the user asks for a table
+
+#### Contract
+
+**TB-01 — Booked** [success guarantee]
+The reservation exists.
+
+##### Failure handling
+
+| Action | Outcome | Required behavior | Rule |
+|---|---|---|---|
+| TB-A1 | booking system does not answer | Tell the user. | TB-01 |
+
+#### Scenarios
+
+##### TB-S01 — Book
+
+- **Interaction type:** confirm
+- **Category tags:** single-action
+- **Suite:** regression
+
+**Initial state**
+{initial}
+
+**User**
+- Turn 1: "<Turn 1>"
+
+**User knows**
+- Q: Shall I book <time> under <name>? A: Yes.
+
+**Expected**
+
+Required events:
+- TB-A1 occurs exactly once, for <time>, name <name>, after the user's confirmation turn.
+
+Final state assertions:
+- Exactly one reservation exists under the name <name>.
+
+**Forbidden**
+- A second TB-A1.
+
+**Data variants**
+
+| variant | Turn 1 | time | name |
+|---|---|---|---|
+| 1 | Book 19:00 for Alex. | 19:00 | Alex |
+| 2 | Book 12:00 for Priya. | 12:00 | Priya |
+
+**Reference trajectory**
+1. User: "Book 19:00 for Alex."
+2. Agent asks for confirmation of 19:00 under Alex.
+3. User: "Yes."
+4. Agent → TB-A1 (19:00, Alex) → created.
+
+**Illustrates** TB-01, G-01
+
+**Unambiguity note** Read from the action log.
+
+## 5. Evaluation
+
+| Dimension | Grader | Definition | Used by |
+|---|---|---|---|
+| none | | | |
+
+## Appendix A. Interface binding (provisional)
+
+| Action | Mark | Commit call | Information items and where each is carried | Outcomes, as tool results | Effect on state |
+|---|---|---|---|---|---|
+| TB-A1 create the reservation | state-changing | `create_reservation(time, name)` → `{id}` | both as arguments | created: returns `id`; no answer: timeout | Creates the reservation. |
+
+Unmapped read-only calls: none.
+
+## Appendix B. Supporting-actor guarantees
+
+| Id | Guarantee | Covers |
+|---|---|---|
+| SG-01 | none | none |
+"""
+
+
+def tiny(initial="- No reservation exists under the name <name>."):
+    return TINY.replace("{initial}", initial)
+
+
+def test_check_spec_tiny_fixture_clean(tmp_path):
+    """Should report zero errors for the tiny spec, which writes every variant value as <column>."""
+    code, out = run(tiny(), tmp_path)
+    assert code == 0, out
+
+
+def test_check_spec_variant_value_hard_coded(tmp_path):
+    """Should report file and line of a converted line that holds a row-1 value instead of <column>."""
+    text = tiny("- No reservation exists under the name Alex.")
+    line = text.splitlines().index("- No reservation exists under the name Alex.") + 1
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert f"ERROR agent-spec.md:{line}: TB-S01: holds 'Alex' from data-variant column 'name'; write <name>" in out
+
+
+def test_check_spec_variant_value_in_reference_trajectory(tmp_path):
+    """Should accept row-1 values in the Reference trajectory, which is not a converted block."""
+    code, out = run(tiny(), tmp_path)
+    assert "data-variant column" not in out, out
+
+
+def test_check_spec_supporting_actor_response_names_action_id(tmp_path):
+    """Should accept an Initial-state line about the booking system's response that names TB-A1's id."""
+    text = tiny("- No reservation exists under the name <name>.\n- The booking system does not answer the agent's first TB-A1.")
+    code, out = run(text, tmp_path)
+    assert code == 0, out
+
+
+def test_check_spec_supporting_actor_response_names_action_name(tmp_path):
+    """Should accept an Initial-state response line that uses the action's name from its Appendix A row."""
+    text = tiny("- No reservation exists under the name <name>.\n- The booking system does not answer the agent's first create the reservation.")
+    code, out = run(text, tmp_path)
+    assert code == 0, out
+
+
+def test_check_spec_supporting_actor_response_names_no_action(tmp_path):
+    """Should report file and line of an Initial-state response line that names no action."""
+    text = tiny("- No reservation exists under the name <name>.\n- The booking system does not answer the agent's first reservation request.")
+    line = text.splitlines().index("- The booking system does not answer the agent's first reservation request.") + 1
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert f"ERROR agent-spec.md:{line}: TB-S01: Initial-state line states how a supporting actor responds" in out
+
+
+def test_check_spec_supporting_actor_state_line(tmp_path):
+    """Should accept an Initial-state line about what the supporting actor will issue, which is not a response."""
+    text = tiny("- No reservation exists under the name <name>.\n- The booking system will issue id R-1 for the next reservation it creates.")
+    code, out = run(text, tmp_path)
+    assert code == 0, out
+
+
+def test_check_spec_supporting_actor_response_names_tool_call(tmp_path):
+    """Should report a response line that names the tool call, under the existing tool-name rule."""
+    text = tiny("- No reservation exists under the name <name>.\n- The booking system does not answer the agent's first `create_reservation(` call.")
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert "tool name outside Appendix A: create_reservation" in out
