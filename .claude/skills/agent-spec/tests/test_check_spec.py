@@ -534,3 +534,31 @@ def test_check_spec_single_confirmation_on_confirmed_proposal(tmp_path):
     text = tiny().replace(TINY_FORBIDDEN, TINY_FORBIDDEN + "\n- TB-A1 for any proposal other than the confirmed one.")
     code, out = run(text, tmp_path)
     assert code == 0, out
+
+
+def with_second_pair(pair):
+    """Tiny spec with a second User-knows pair after the confirmation pair."""
+    return tiny().replace(TINY_PAIR, TINY_PAIR + "\n" + pair)
+
+
+def test_check_spec_identical_confirmation_pairs(tmp_path):
+    """Should report two confirmation-form pairs with equal values that are in scope at the same time."""
+    text = with_second_pair("- Q: Shall I book <time> under <name>? A: Yes. (optional)")
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert "TB-S01: confirmation-form User-knows pairs 1 and 2 have equal values in data-variant row 1 while both are in scope" in out
+
+
+def test_check_spec_confirmation_pairs_equal_in_one_row(tmp_path):
+    """Should report confirmation-form pairs whose values become equal in a later data-variant row."""
+    text = with_second_pair("- Q: Shall I book 12:00 under <name>? A: Yes. (optional)")
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert "TB-S01: confirmation-form User-knows pairs 1 and 2 have equal values in data-variant row 2 while both are in scope" in out
+
+
+def test_check_spec_equal_confirmation_pairs_disjoint_scopes(tmp_path):
+    """Should accept equal confirmation-form pairs whose turn scopes never overlap."""
+    text = tiny().replace(TINY_PAIR, TINY_PAIR + " (before Turn 1)\n- Q: Shall I book <time> under <name>? A: Yes. (optional) (after Turn 1)")
+    code, out = run(text, tmp_path)
+    assert code == 0, out

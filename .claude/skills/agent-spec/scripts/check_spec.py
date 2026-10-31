@@ -9,7 +9,8 @@ has a row when a Forbidden line or failure row names it), tool names outside
 Appendix A, data-variant values written as <column> in the converted blocks,
 Initial-state lines about a supporting actor's response that name no action,
 event lines that rely on the confirmed proposal in a scenario with more than one
-confirmation-form User-knows pair, and dimensions (message checks graded by code, rubric dimensions graded by a
+confirmation-form User-knows pair, confirmation-form pairs with equal values in
+scope at once, and dimensions (message checks graded by code, rubric dimensions graded by a
 judge) against the Evaluation table. Judgment
 (faithfulness to inputs, unambiguous verdicts, semantic gaps) is left to the
 reviewers in the skill's verification step.
@@ -85,6 +86,7 @@ RESPONSE_RE = re.compile(r"\b(answers?|rejects?|reports?|returns?|times? out|fai
 QUESTION_RE = re.compile(r"^- Q: (.+?) A: ")
 QUESTION_VALUE_RE = re.compile(r"<[^>]+>|\d[\d:\-]*")
 CONFIRMED_PROPOSAL_RE = re.compile(r"\bconfirmed (proposal|one)\b", re.IGNORECASE)
+SCOPE_RE = re.compile(r"\((before|after) Turn (\d+)\)")
 
 
 @dataclass
@@ -423,12 +425,30 @@ def check(text, path):
 
         # Pairs whose questions differ only in values are confirmation-form pairs. With more than one,
         # "the confirmed proposal" names no single proposal, so event lines anchor on turns or values.
-        forms = {}
-        for line in block("User knows")[1:]:
-            if m := QUESTION_RE.match(line):
-                form = QUESTION_VALUE_RE.sub("<value>", m.group(1)).lower()
-                forms[form] = forms.get(form, 0) + 1
-        confirmation_pairs = max(forms.values(), default=0)
+        forms = {}  # question form -> [(pair number, question, (first turn, last turn) in scope)]
+        pairs = [line for line in block("User knows")[1:] if QUESTION_RE.match(line)]
+        for number, line in enumerate(pairs, 1):
+            question = QUESTION_RE.match(line).group(1)
+            scope = dict((kind, int(n)) for kind, n in SCOPE_RE.findall(line))
+            span = (scope.get("after", float("-inf")), scope.get("before", float("inf")))
+            forms.setdefault(QUESTION_VALUE_RE.sub("<value>", question).lower(), []).append((number, question, span))
+        confirmation_pairs = max((len(v) for v in forms.values()), default=0)
+        # Two confirmation-form pairs in scope at once must differ in some value in every row,
+        # or a question equal to both matches two pairs.
+        variant_cols = [c.strip() for c in (variant_header or "|").strip().strip("|").split("|")]
+        for group in forms.values():
+            for i, (n1, q1, (lo1, hi1)) in enumerate(group):
+                for n2, q2, (lo2, hi2) in group[i + 1:]:
+                    if max(lo1, lo2) >= min(hi1, hi2):
+                        continue
+                    for r, row in enumerate(rows, 1):
+                        def fill(q):
+                            for c, col in enumerate(variant_cols[1:], 1):
+                                q = q.replace(f"<{col}>", row[c] if c < len(row) else "")
+                            return " ".join(q.lower().split())
+                        if fill(q1) == fill(q2):
+                            errors.append(f"{s.id}: confirmation-form User-knows pairs {n1} and {n2} have equal values in data-variant row {r} while both are in scope; a question equal to both matches two pairs")
+                            break
         if confirmation_pairs > 1:
             for n, line in numbered("Required events") + numbered("Forbidden"):
                 if CONFIRMED_PROPOSAL_RE.search(line):
