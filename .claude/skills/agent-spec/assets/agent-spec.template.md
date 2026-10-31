@@ -121,6 +121,8 @@ Final state assertions:
 
 **End of trial.** A trial ends at the first agent message that asks the user nothing when no User turn is due, or at the agent's 12th message, whichever comes first. That message is the agent's final message.
 
+**Supporting actors.** A supporting actor answers every call normally unless an Initial-state line says otherwise.
+
 **Confirmed proposal.** "The confirmed proposal" is the proposal stated in the scenario's User-knows confirmation question, with the values of the trial's data variant row.
 
 **When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence. A read-only action with no Appendix A row has no occurrences, and no event line names it.

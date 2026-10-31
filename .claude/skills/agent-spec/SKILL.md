@@ -1,13 +1,13 @@
 ---
 name: agent-spec
-description: Write an Agent Spec, the behavior contract for an LLM agent, with numbered rules, key-example scenarios that convert to pytest-bdd tests without rewording, and an evaluation plan.
+description: Write an Agent Spec, the behavior contract for an LLM agent, with numbered rules, key-example scenarios that a downstream skill converts to executable tests line by line, without rewording, and an evaluation plan.
 argument-hint: <product dir, documents or code paths> [capability to add or change | findings file]
 disable-model-invocation: true
 ---
 
 # Agent Spec
 
-An Agent Spec is a behavior contract for an LLM agent. It states what the agent may do, what it must not do, when it is authorized to act, what counts as success or violation, and which invariants hold across world states. Every rule is illustrated by at least one key example, and every key example is written so that it converts into a pytest-bdd test without rewording.
+An Agent Spec is a behavior contract for an LLM agent. It states what the agent may do, what it must not do, when it is authorized to act, what counts as success or violation, and which invariants hold across world states. Every rule is illustrated by at least one key example, and every key example is written so that a downstream skill converts it into an executable test without rewording.
 
 Write one file, `agent-spec.md`, in the product directory the user named, or beside the inputs when no directory was named. Nothing else changes: product code, tests, architecture notes and tickets are other skills' work. When an `agent-spec.md` already exists and the user named a capability to add or change, touch only that capability's section and the Evaluation table rows it affects, keep every existing rule and scenario id stable, and apply the coverage conditions of step 3.6 to every rule, rule clause and failure row the change adds before verifying.
 
@@ -103,14 +103,14 @@ Each scenario carries the blocks in the template's order. The rules for filling 
 - **Expected: Required events** lists only the state-changing actions that constitute the outcome, each with its values and timing. Read-only actions are never Required. Add an ordering constraint only where an authorizing user turn must precede a write. A read-only capability has Required events: none.
 - **Expected: Final state assertions** state what exists, with field values, and what is unchanged. Use full-set forms ("exactly one", "no other record changed").
 - **Forbidden** lists events that must not occur: an action for any proposal other than the confirmed one, an action before its authorizing turn, an action count, or a state that must never hold.
-- **Data variants** is a table of 2 to 3 rows that vary values only. Every value that differs between rows gets a column, including the user's wording of it and any injected failure, so each row fills a pytest-bdd Scenario Outline without guessing. An Initial state fact that depends on a varying value, such as availability for the party size, must hold for every row: state it for every row's value, or give it a column. In Initial state, User, User knows, Expected and Forbidden, a value that has a column is written as <column>; the Reference trajectory uses row 1.
+- **Data variants** is a table of 2 to 3 rows that vary values only. Every value that differs between rows gets a column, including the user's wording of it and any injected failure, so each row fills the scenario's <column> placeholders without guessing. An Initial state fact that depends on a varying value, such as availability for the party size, must hold for every row: state it for every row's value, or give it a column. In Initial state, User, User knows, Expected and Forbidden, a value that has a column is written as <column>; the Reference trajectory uses row 1.
 - **Reference trajectory** is the shortest passing sequence of user turns, actions with their values, and outcomes as the supporting actor reports them. Agent turns are described, not quoted. It must use every required User-knows pair.
 - **Illustrates** names the rule ids the scenario exists for.
 - **Unambiguity note** is one line on why two domain experts reach the same verdict.
 
 Expected and Forbidden assert on world state and on what the agent did or did not do, never on the agent's wording. When a rule can only be checked by reading the agent's words, name the check in the Unambiguity note and register it in the Evaluation table under the same name, with its grader. It is a `message check "<name>"`, graded by code, only when the whole check is that the final message contains values the agent copies verbatim from a tool result or Initial state, such as a confirmation id. A date, a time, an amount or a name is not such a value, because the agent can write it in more than one form and nothing defines how message text is compared. It is a `rubric dimension "<name>"`, graded by an LLM judge, when any part of the check needs judgment: uncertainty was communicated, alternatives were presented and nothing else was, a detail was withheld, a not-found result was reported without inventing anything. A check is one or the other in full; an exact part does not split a rubric check into two. Code before judge where code decides the whole check.
 
-Write every line as one proposition, because each line becomes one pytest-bdd step.
+Write every line as one proposition, because each line is converted on its own, as one line.
 
 Done when the coverage conditions above hold for every capability and every scenario has every block filled.
 

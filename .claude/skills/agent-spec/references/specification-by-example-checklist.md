@@ -51,4 +51,4 @@ A key example is a concrete case, with real-looking values, that shows what one 
 
 - [ ] **Searchable title.** The scenario title is what someone would search for to find this case.
 - [ ] **The Unambiguity note is the "show and keep quiet" test.** Hand the scenario to a colleague with no commentary; whatever you would have to add aloud belongs in the scenario.
-- [ ] **Consistent phrasing across scenarios.** Reuse the same sentence shapes for the same kinds of assertion so the pytest-bdd step definitions are shared, not one-off.
+- [ ] **Consistent phrasing across scenarios.** Reuse the same sentence shapes for the same kinds of assertion so the step definitions are shared, not one-off.

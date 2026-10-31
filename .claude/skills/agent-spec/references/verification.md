@@ -8,7 +8,7 @@ Every finding belongs to exactly one of four classes.
 
 - **Lies.** The spec states something the inputs contradict or do not support. A rule invents a domain fact; a tool is called with a parameter it does not take; a reference trajectory's tool results would not produce the scenario's Final state; the Reference trajectory disagrees with its Data variants row 1.
 - **Ambiguous.** Two domain experts could reach different verdicts on the same trajectory. Initial state leaves open a fact the verdict depends on; an Expected line needs judgment; a Forbidden line depends on the agent's wording; a rule uses a term it never defines ("material change").
-- **Untestable.** A line cannot become one pytest-bdd step without rewording, or the check it implies cannot be computed from world state and the tool log. A rubric dimension is used where a state check, a tool-call check or a verbatim-value message check would do, or a message check is used for a value the agent can rephrase or for a check with a part that needs judgment.
+- **Untestable.** A line cannot become one step without rewording, or the check it implies cannot be computed from world state and the tool log. A rubric dimension is used where a state check, a tool-call check or a verbatim-value message check would do, or a message check is used for a value the agent can rephrase or for a check with a part that needs judgment.
 - **Gap.** Something the contract needs is missing. A stakeholder interest no rule protects; a tool failure mode from the inputs with no failure row; an "act only when" rule without both an acting and a holding-back scenario; a failure row that changes the outcome with no scenario; a required User-knows pair the reference trajectory never uses; a rule that requires the agent to tell the user something, with no scenario asserting it.
 
 Wording, style, formatting, heading choice and preferences ("I would phrase this rule differently", "one more scenario would be nice") are not findings.
@@ -28,7 +28,7 @@ The report starts with a count line, such as "3 findings: 2 Important, 1 Nit." o
 
 ## Shared header (every finder)
 
-> You are reviewing an Agent Spec, a behavior contract for an LLM agent whose scenarios will become pytest-bdd tests. You did not write it. Find defects; do not edit any file.
+> You are reviewing an Agent Spec, a behavior contract for an LLM agent whose scenarios will become executable tests. You did not write it. Find defects; do not edit any file.
 >
 > Read, in this order: the review packet at [packet path], which lists the inputs the spec was written from; every source file the packet lists; the spec at [spec path]; the checklists in [skill dir]/references/.
 >
