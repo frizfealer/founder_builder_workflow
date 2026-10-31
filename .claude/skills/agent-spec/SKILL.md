@@ -106,7 +106,7 @@ Each scenario carries the blocks in the template's order. The rules for filling 
 - **Illustrates** names the rule ids the scenario exists for.
 - **Unambiguity note** is one line on why two domain experts reach the same verdict.
 
-Expected and Forbidden assert on world state and on what the agent did or did not do, never on the agent's wording. When a rule can only be checked by reading the agent's words (uncertainty was communicated, alternatives were presented before the choice), name the dimension in the Unambiguity note as `rubric dimension "<name>"` and register it in the Evaluation table under the same name.
+Expected and Forbidden assert on world state and on what the agent did or did not do, never on the agent's wording. When a rule can only be checked by reading the agent's words, name the check in the Unambiguity note and register it in the Evaluation table under the same name, with its grader. It is a `message check "<name>"`, graded by code, only when the whole check is that the final message contains values the agent copies verbatim from a tool result or Initial state, such as a confirmation id. A date, a time, an amount or a name is not such a value, because the agent can write it in more than one form and nothing defines how message text is compared. It is a `rubric dimension "<name>"`, graded by an LLM judge, when any part of the check needs judgment: uncertainty was communicated, alternatives were presented and nothing else was, a detail was withheld, a not-found result was reported without inventing anything. A check is one or the other in full; an exact part does not split a rubric check into two. Code before judge where code decides the whole check.
 
 Write every line as one proposition, because each line becomes one pytest-bdd step.
 
@@ -114,7 +114,7 @@ Done when the coverage conditions above hold for every capability and every scen
 
 ### 3.7 Evaluation
 
-The template carries the Evaluation section. Fill its slots: the trials per scenario (default 5) and the rubric dimension table, one row per dimension with its definition and the scenarios that use it. Change the fixed text only when the user asked for a different metric.
+The template carries the Evaluation section. Fill its slots: the trials per scenario (default 5) and the dimension table, one row per dimension with its grader (code for a message check, rubric for a judgment), its definition and the scenarios that use it. Change the fixed text only when the user asked for a different metric.
 
 ### 3.8 Interface binding
 

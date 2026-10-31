@@ -6,7 +6,9 @@ failure row for every state-changing action, data-variant row counts,
 read-only actions in Required events, the Appendix A binding of actions to
 tools (every state-changing action has one commit call; a read-only action
 has a row when a Forbidden line or failure row names it), tool names outside
-Appendix A, the User-knows confirmation tag, and rubric dimensions. Judgment
+Appendix A, the User-knows confirmation tag, and dimensions (message checks
+graded by code, rubric dimensions graded by a judge) against the Evaluation
+table. Judgment
 (faithfulness to inputs, unambiguous verdicts, semantic gaps) is left to the
 reviewers in the skill's verification step.
 
@@ -68,7 +70,9 @@ ACTION_RE = re.compile(r"^- ([A-Z]{1,3}-A\d+) .*?(?:\[([^\]]+)\])?\s*$")
 CAPABILITY_RE = re.compile(r"^### 4\.\d+ (.+) \((state-changing|read-only)\) — prefix ([A-Z]{1,3})\s*$")
 SCENARIO_RE = re.compile(r"^##### ([A-Z]{1,3})-S(\d{2}) — .+$")
 CALL_RE = re.compile(r"`([A-Za-z_][\w.]*)\(")
-DIMENSION_REF_RE = re.compile(r'rubric dimension "([^"]+)"', re.IGNORECASE)
+DIMENSION_REF_RE = re.compile(r'(rubric dimension|message check) "([^"]+)"', re.IGNORECASE)
+GRADER_FOR_REF = {"rubric dimension": "rubric", "message check": "code"}
+GRADERS = {"code", "rubric"}
 
 
 @dataclass
@@ -77,7 +81,7 @@ class Scenario:
     prefix: str
     lines: list[str]
     illustrates: set[str] = field(default_factory=set)
-    dimensions: set[str] = field(default_factory=set)
+    dimensions: dict[str, str] = field(default_factory=dict)  # dimension name -> grader the reference implies
 
 
 @dataclass
@@ -361,7 +365,11 @@ def check(text):
         for rule_id in sorted(s.illustrates - rules.keys()):
             errors.append(f"{s.id}: Illustrates unknown rule {rule_id}")
 
-        s.dimensions = {d.lower() for d in DIMENSION_REF_RE.findall(" ".join(block("Unambiguity note")))}
+        for kind, name in DIMENSION_REF_RE.findall(" ".join(block("Unambiguity note"))):
+            grader = GRADER_FOR_REF[kind.lower()]
+            if s.dimensions.get(name.lower(), grader) != grader:
+                errors.append(f"{s.id}: \"{name}\" is named both as a message check and as a rubric dimension; pick one")
+            s.dimensions[name.lower()] = grader
 
     check_binding(named_in_events)
 
@@ -374,26 +382,42 @@ def check(text):
         if rule_id not in illustrated:
             errors.append(f"{rule_id}: no scenario illustrates this rule")
 
-    # Rubric dimensions: table and scenario references agree.
+    # Dimensions: the Evaluation table and the scenario references agree on names, scenarios and grader.
     evaluation = section("Evaluation")
     header = next((i for i, line in enumerate(evaluation) if line.startswith("| Dimension")), None)
-    table = {}
+    table, graders = {}, {}
     if header is not None:
+        columns = [c.strip().lower() for c in evaluation[header].strip().strip("|").split("|")]
+        if "grader" not in columns:
+            errors.append("Evaluation dimension table has no Grader column; expected | Dimension | Grader | Definition | Used by |")
         for row in table_rows(evaluation[header:]):
-            name = row[0].lower()
-            if name and name != "none":
-                table[name] = set(re.findall(r"\b[A-Z]{1,3}-S\d{2}\b", row[-1]))
-    used = {}
+            cells = dict(zip(columns, row))
+            name = cells.get("dimension", "").lower()
+            if not name or name == "none":
+                continue
+            table[name] = set(re.findall(r"\b[A-Z]{1,3}-S\d{2}\b", cells.get("used by", row[-1])))
+            grader = cells.get("grader", "").lower()
+            if "grader" in columns and grader not in GRADERS:
+                errors.append(f"dimension \"{name}\": grader '{grader}' must be code or rubric")
+            graders[name] = grader
+    used, implied = {}, {}
     for _, s in all_scenarios:
-        for d in s.dimensions:
+        for d, grader in s.dimensions.items():
             used.setdefault(d, set()).add(s.id)
+            implied.setdefault(d, set()).add(grader)
     for d, ids in sorted(used.items()):
         if d not in table:
-            errors.append(f"rubric dimension \"{d}\" is named in {sorted(ids)} but missing from the Evaluation table")
-        elif table[d] != ids:
-            errors.append(f"rubric dimension \"{d}\": Used by lists {sorted(table[d])}; scenarios naming it are {sorted(ids)}")
+            errors.append(f"dimension \"{d}\" is named in {sorted(ids)} but missing from the Evaluation table")
+            continue
+        if table[d] != ids:
+            errors.append(f"dimension \"{d}\": Used by lists {sorted(table[d])}; scenarios naming it are {sorted(ids)}")
+        if len(implied[d]) > 1:
+            errors.append(f"dimension \"{d}\" is a message check in some scenarios and a rubric dimension in others; one dimension has one grader")
+        elif graders.get(d) in GRADERS and graders[d] not in implied[d]:
+            ref = "message check" if "code" in implied[d] else "rubric dimension"
+            errors.append(f"dimension \"{d}\": table grader is {graders[d]} but scenarios name it as a {ref}")
     for d in sorted(table.keys() - used.keys()):
-        errors.append(f"rubric dimension \"{d}\" is in the Evaluation table but no scenario names it")
+        errors.append(f"dimension \"{d}\" is in the Evaluation table but no scenario names it")
 
     coverage = [(rule_id, sorted(illustrated.get(rule_id, []))) for rule_id in rules]
     return errors, coverage

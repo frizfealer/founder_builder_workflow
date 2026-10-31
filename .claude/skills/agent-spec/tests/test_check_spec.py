@@ -221,13 +221,52 @@ def test_check_spec_rule_without_tag(tmp_path):
     assert "CR-05: needs exactly one tag" in out
 
 
-def test_check_spec_rubric_dimension_missing_from_table(tmp_path):
-    """Should report a rubric dimension named in a scenario but absent from the Evaluation table."""
-    text = mutate('rubric dimension "Confirmation id reported"', 'rubric dimension "tone"')
+DIMENSION_ROW = "| Confirmation id reported | code | The agent's final message contains the confirmation id that CR-A1 returned, as the data-variant row gives it. | CR-S01 |"
+DIMENSION_HEADER = "| Dimension | Grader | Definition | Used by |\n|---|---|---|---|\n"
+
+
+def test_check_spec_dimension_missing_from_table(tmp_path):
+    """Should report a dimension named in a scenario but absent from the Evaluation table, and the reverse."""
+    text = mutate('message check "Confirmation id reported"', 'rubric dimension "tone"')
     code, out = run(text, tmp_path)
     assert code == 1
-    assert 'rubric dimension "tone" is named in' in out
-    assert 'rubric dimension "confirmation id reported" is in the Evaluation table but no scenario names it' in out
+    assert 'dimension "tone" is named in' in out
+    assert 'dimension "confirmation id reported" is in the Evaluation table but no scenario names it' in out
+
+
+def test_check_spec_dimension_table_without_grader_column(tmp_path):
+    """Should report an Evaluation table that lacks the Grader column."""
+    text = mutate(DIMENSION_HEADER, "| Dimension | Definition | Used by |\n|---|---|---|\n")
+    text = text.replace(DIMENSION_ROW, DIMENSION_ROW.replace("| code ", "", 1), 1)
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert "Evaluation dimension table has no Grader column" in out
+
+
+def test_check_spec_dimension_unknown_grader(tmp_path):
+    """Should report a grader value other than code or rubric."""
+    text = mutate(DIMENSION_ROW, DIMENSION_ROW.replace("| code |", "| llm |"))
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert "dimension \"confirmation id reported\": grader 'llm' must be code or rubric" in out
+
+
+def test_check_spec_dimension_grader_disagrees_with_scenario(tmp_path):
+    """Should report a table grader that disagrees with how the scenario names the dimension."""
+    text = mutate(DIMENSION_ROW, DIMENSION_ROW.replace("| code |", "| rubric |"))
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert 'dimension "confirmation id reported": table grader is rubric but scenarios name it as a message check' in out
+
+
+def test_check_spec_dimension_named_both_ways(tmp_path):
+    """Should report one dimension named as a message check in one scenario and a rubric dimension in another."""
+    text = mutate('**Unambiguity note** The "Yes" in Turn 2',
+                  '**Unambiguity note** Rubric dimension "Confirmation id reported" is also judged here; the "Yes" in Turn 2')
+    text = text.replace(DIMENSION_ROW, DIMENSION_ROW.replace("| CR-S01 |", "| CR-S01, CR-S02 |"), 1)
+    code, out = run(text, tmp_path)
+    assert code == 1
+    assert 'dimension "confirmation id reported" is a message check in some scenarios and a rubric dimension in others' in out
 
 
 def test_check_spec_failure_row_unknown_rule(tmp_path):

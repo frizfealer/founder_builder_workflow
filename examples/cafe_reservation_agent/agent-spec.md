@@ -156,7 +156,7 @@ Final state assertions:
 
 **Illustrates** CR-03, CR-05, CR-07, CR-08, G-01, G-02, G-03
 
-**Unambiguity note** The creation, its values and its order after the confirmation turn are read from the action log, and the reservation set is compared with Initial state; row 3 sits on the last bookable day, the last start time and the largest party, so a correct agent books it; the only judged item, rubric dimension "Confirmation id reported", has one right answer per row.
+**Unambiguity note** The creation, its values and its order after the confirmation turn are read from the action log, and the reservation set is compared with Initial state; row 3 sits on the last bookable day, the last start time and the largest party, so a correct agent books it; the only check on the agent's words, message check "Confirmation id reported", is a match on the row's confirmation id.
 
 ##### CR-S02 — Name and phone missing
 
@@ -575,7 +575,7 @@ Final state assertions:
 
 **Illustrates** G-03, G-04
 
-**Unambiguity note** A second creation is a blind retry and fails in the action log whatever it returns; rubric dimension "Confirmation id reported" has one right answer, the row's confirmation id, which the agent can learn only from the lookup.
+**Unambiguity note** A second creation is a blind retry and fails in the action log whatever it returns; message check "Confirmation id reported" has one right answer, the row's confirmation id, which the agent can learn only from the lookup.
 
 ##### CR-S10 — Party size changed in the confirming turn
 
@@ -935,7 +935,7 @@ Final state assertions:
 
 **Illustrates** G-03, G-04
 
-**Unambiguity note** Turn 2 restates every proposal term, so it is a full new confirmation; a creation between the unanswered one and Turn 2 is a blind retry and fails in the action log, and an agent that never rebooks fails the second Required event; rubric dimension "Failed attempt reported" checks the agent said the first attempt made no reservation before Turn 2, and rubric dimension "Confirmation id reported" has one right answer per row.
+**Unambiguity note** Turn 2 restates every proposal term, so it is a full new confirmation; a creation between the unanswered one and Turn 2 is a blind retry and fails in the action log, and an agent that never rebooks fails the second Required event; rubric dimension "Failed attempt reported" checks the agent said the first attempt made no reservation before Turn 2, and message check "Confirmation id reported" has one right answer per row.
 
 ##### CR-S17 — Booking request and lookup both unanswered
 
@@ -1160,7 +1160,7 @@ Final state assertions:
 
 **Illustrates** CR-04, CR-07, G-02
 
-**Unambiguity note** Turn 2 picks a time and restates every proposal term, so it is a full confirmation of the new proposal; a creation for any other time, or for the picked time before Turn 2, fails in the action log, and an agent that never rebooks fails the second Required event; rubric dimension "Time taken reported" checks the agent said 19:00 was taken, rubric dimension "Nearest free times offered" has one right set, 19:30, 18:00 and 20:00, and rubric dimension "Confirmation id reported" has one right answer, K7M2QX.
+**Unambiguity note** Turn 2 picks a time and restates every proposal term, so it is a full confirmation of the new proposal; a creation for any other time, or for the picked time before Turn 2, fails in the action log, and an agent that never rebooks fails the second Required event; rubric dimension "Time taken reported" checks the agent said 19:00 was taken, rubric dimension "Nearest free times offered" has one right set, 19:30, 18:00 and 20:00, and message check "Confirmation id reported" has one right answer, K7M2QX.
 
 ## 5. Evaluation
 
@@ -1182,29 +1182,29 @@ Final state assertions:
 
 **Scoring per trial.** Any Forbidden event scores the trial 0. Otherwise the trial scores Required events satisfied / Required events total, and Final state assertions report pass or fail beside it.
 
-**Scenario pass.** A trial passes when it has no Forbidden event, every Required event and Final state assertion holds, and every rubric dimension the scenario uses is graded Pass; Unknown counts as not passed. A data variant passes when every one of its trials passes. A scenario passes only when every data variant passes.
+**Scenario pass.** A trial passes when it has no Forbidden event, every Required event and Final state assertion holds, and every dimension the scenario uses passes; a rubric judge's Unknown counts as not passed. A data variant passes when every one of its trials passes. A scenario passes only when every data variant passes.
 
 **Interaction metrics.** For each scenario with a User-knows set: recall = required questions asked / required questions; precision = required questions asked / all questions asked. Every User-knows pair is a required question unless marked (optional). Both numbers are reported beside pass/fail and are never folded into the score.
 
 **Efficiency.** Turn count, write count and read count are reported per trial, separately from the score. Write count is the number of state-changing calls issued and read count the number of read-only calls issued, by the tool's effect, whether the call is bound in Appendix A or unmapped.
 
-**Graders.** State checks and action-log checks are code graders. LLM-rubric graders cover only assertions that state and the action log cannot show. Each judge grades one dimension and may answer Unknown. Rubric dimensions used in this spec:
+**Graders.** State checks and action-log checks are code graders. A check on the agent's final message is a code grader, called a message check, only when the whole check is that the message contains one or more values the agent copies verbatim from a tool result or Initial state, such as a confirmation id or a reference number. A value the agent can write in more than one form (a date, a time, an amount, a name) is not such a value, and a check with any part that needs judgment (that nothing else was offered, that a detail was withheld, that a result was reported without inventing anything) is a rubric dimension in full, however exact its other parts. LLM-rubric graders cover only those judgments. Each judge grades one dimension and may answer Unknown. Dimensions used in this spec, each with its grader:
 
-| Dimension | Definition | Used by |
-|---|---|---|
-| Confirmation id reported | The agent's final message states the confirmation id of the reservation that exists at the end of the trial. | CR-S01, CR-S09, CR-S16, CR-S20 |
-| Nearest free times offered | When the agent tells the user the requested time is full or was taken, it offers exactly the 3 free times on the requested date nearest the requested time, or all of them when fewer than 3 are free, with ties broken toward the earlier time, as availability stands at that moment under Initial state, and that offer contains no other time. | CR-S03, CR-S08, CR-S20 |
-| Time taken reported | The agent tells the user the requested time was taken and no reservation was made, and never says one was made. | CR-S08, CR-S20 |
-| Failed attempt reported | Before the user's next scripted turn, the agent tells the user its booking attempt made no reservation. | CR-S16 |
-| Date full reported | The agent tells the user no table is free on the requested date, asks for another date, and offers no time on that date. | CR-S04 |
-| Call the café advised | The agent tells the user that parties over 8 must call the café. | CR-S05 |
-| Booking rule explained | Before asking for another date or time, the agent tells the user the booking rule the requested date or time breaks, as the scenario's Unambiguity note or data variant row names it. | CR-S06, CR-S18 |
-| Existing reservation reported | The agent tells the user that a reservation under that name already exists on that date and that it cannot add or change one. | CR-S07, CR-S14, CR-S19 |
-| Other reservations kept private | The agent states none of the time, party size, phone or confirmation id of any reservation it did not create in the trial; a value equal to the user's own request does not count. | CR-S07, CR-S13, CR-S14, CR-S19 |
-| Out-of-scope request declined | The agent tells the user it cannot look up, change or cancel reservations. | CR-S13 |
-| No reservation made reported | The agent tells the user no reservation was made and never says one was made. | CR-S14, CR-S15, CR-S19 |
-| Check unavailable reported | The agent tells the user the booking cannot be checked right now and never says a reservation was made. | CR-S12 |
-| Outcome unknown reported | The agent tells the user the outcome of the booking is unknown and to contact the café, and never says a reservation was or was not made. | CR-S17 |
+| Dimension | Grader | Definition | Used by |
+|---|---|---|---|
+| Confirmation id reported | code | The agent's final message contains the confirmation id of the reservation that exists at the end of the trial, as the data-variant row gives it. | CR-S01, CR-S09, CR-S16, CR-S20 |
+| Nearest free times offered | rubric | When the agent tells the user the requested time is full or was taken, it offers exactly the 3 free times on the requested date nearest the requested time, or all of them when fewer than 3 are free, with ties broken toward the earlier time, as availability stands at that moment under Initial state, and that offer contains no other time. | CR-S03, CR-S08, CR-S20 |
+| Time taken reported | rubric | The agent tells the user the requested time was taken and no reservation was made, and never says one was made. | CR-S08, CR-S20 |
+| Failed attempt reported | rubric | Before the user's next scripted turn, the agent tells the user its booking attempt made no reservation. | CR-S16 |
+| Date full reported | rubric | The agent tells the user no table is free on the requested date, asks for another date, and offers no time on that date. | CR-S04 |
+| Call the café advised | rubric | The agent tells the user that parties over 8 must call the café. | CR-S05 |
+| Booking rule explained | rubric | Before asking for another date or time, the agent tells the user the booking rule the requested date or time breaks, as the scenario's Unambiguity note or data variant row names it. | CR-S06, CR-S18 |
+| Existing reservation reported | rubric | The agent tells the user that a reservation under that name already exists on that date and that it cannot add or change one. | CR-S07, CR-S14, CR-S19 |
+| Other reservations kept private | rubric | The agent states none of the time, party size, phone or confirmation id of any reservation it did not create in the trial; a value equal to the user's own request does not count. | CR-S07, CR-S13, CR-S14, CR-S19 |
+| Out-of-scope request declined | rubric | The agent tells the user it cannot look up, change or cancel reservations. | CR-S13 |
+| No reservation made reported | rubric | The agent tells the user no reservation was made and never says one was made. | CR-S14, CR-S15, CR-S19 |
+| Check unavailable reported | rubric | The agent tells the user the booking cannot be checked right now and never says a reservation was made. | CR-S12 |
+| Outcome unknown reported | rubric | The agent tells the user the outcome of the booking is unknown and to contact the café, and never says a reservation was or was not made. | CR-S17 |
 
 **pytest-bdd mapping.** Given = Initial state + User knows. When = User. Then = Required events + Final state assertions. Each Forbidden line becomes a negative assertion over the action log. Data variants are the Examples table of a Scenario Outline. The action log is derived from the tool log through Appendix A; that derivation lives in the step definitions, never in the scenarios.
 

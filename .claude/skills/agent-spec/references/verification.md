@@ -8,7 +8,7 @@ Every finding belongs to exactly one of four classes.
 
 - **Lies.** The spec states something the inputs contradict or do not support. A rule invents a domain fact; a tool is called with a parameter it does not take; a reference trajectory's tool results would not produce the scenario's Final state; the scenario body disagrees with its Data variants row 1.
 - **Ambiguous.** Two domain experts could reach different verdicts on the same trajectory. Initial state leaves open a fact the verdict depends on; an Expected line needs judgment; a Forbidden line depends on the agent's wording; a rule uses a term it never defines ("material change").
-- **Untestable.** A line cannot become one pytest-bdd step without rewording, or the check it implies cannot be computed from world state and the tool log. A rubric dimension is used where a state or tool-call check would do.
+- **Untestable.** A line cannot become one pytest-bdd step without rewording, or the check it implies cannot be computed from world state and the tool log. A rubric dimension is used where a state check, a tool-call check or a verbatim-value message check would do, or a message check is used for a value the agent can rephrase or for a check with a part that needs judgment.
 - **Gap.** Something the contract needs is missing. A stakeholder interest no rule protects; a tool failure mode from the inputs with no failure row; an "act only when" rule without both an acting and a holding-back scenario; a failure row that changes the outcome with no scenario; a required User-knows pair the reference trajectory never uses; a rule that requires the agent to tell the user something, with no scenario asserting it.
 
 Wording, style, formatting, heading choice and preferences ("I would phrase this rule differently", "one more scenario would be nice") are not findings.
@@ -32,7 +32,7 @@ The report starts with a count line, such as "3 findings: 2 Important, 1 Nit." o
 >
 > Read, in this order: the review packet at [packet path], which lists the inputs the spec was written from; every source file the packet lists; the spec at [spec path]; the checklists in [skill dir]/references/.
 >
-> A script has already verified section and block order, rule tags, action marks, id references, rule-to-scenario coverage counts, a failure row for every state-changing action, data-variant row counts, read-only actions in Required events, the Appendix A binding of actions to tools, tool names outside Appendix A, the User-knows confirmation tag and rubric-dimension bookkeeping. Skip those.
+> A script has already verified section and block order, rule tags, action marks, id references, rule-to-scenario coverage counts, a failure row for every state-changing action, data-variant row counts, read-only actions in Required events, the Appendix A binding of actions to tools, tool names outside Appendix A, the User-knows confirmation tag and dimension bookkeeping (message checks and rubric dimensions). Skip those.
 >
 > Scope: [the whole spec | only these sections: …]. Already answered, do not report again: [list of finding summaries, or "none"].
 >
@@ -52,7 +52,7 @@ Hunt for **Ambiguous** and **Untestable**. For each scenario, write down three t
 2. a valid variation the scenario does not mention: different read-only lookups, different phrasing, one extra reasonable question;
 3. a plausible wrong run: a write before the authorizing turn, a guessed value, a retry after an unknown result.
 
-The scenario must pass the first two and fail the third, and every line must decide its part without judgment. Then turn each Initial state, Required event, Final state and Forbidden line into a Given or Then step; a line that needs rewording or splitting is a finding. Check that each rubric dimension measures something state and tool calls cannot show.
+The scenario must pass the first two and fail the third, and every line must decide its part without judgment. Then turn each Initial state, Required event, Final state and Forbidden line into a Given or Then step; a line that needs rewording or splitting is a finding. Check that each rubric dimension measures something state, tool calls and the message's literal content cannot show, and that each message check is, in full, a match on values the agent copies verbatim, with no part that needs judgment and no date, time, amount or name.
 
 ## Finder: coverage
 

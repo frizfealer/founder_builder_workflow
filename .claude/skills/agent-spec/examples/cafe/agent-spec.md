@@ -143,7 +143,7 @@ Final state assertions:
 
 **Illustrates** CR-01, CR-02, CR-03, CR-05, CR-06, G-01, G-02
 
-**Unambiguity note** Both actions, their information and their order relative to the confirmation turn are read from the action log, and the reservation and hold sets are compared with Initial state; the only judged item, rubric dimension "Confirmation id reported", has one right answer, R-1001.
+**Unambiguity note** Both actions, their information and their order relative to the confirmation turn are read from the action log, and the reservation and hold sets are compared with Initial state; the only check on the agent's words, message check "Confirmation id reported", is a match on one exact value, R-1001.
 
 ##### CR-S02 — Party size changed in the confirming turn
 
@@ -282,17 +282,17 @@ Final state assertions:
 
 **Scoring per trial.** Any Forbidden event scores the trial 0. Otherwise the trial scores Required events satisfied / Required events total, and Final state assertions report pass or fail beside it. A scenario with no Required events scores 1 on that component when no Forbidden event occurred.
 
-**Scenario pass.** A trial passes when it has no Forbidden event, every Required event and Final state assertion holds, and every rubric dimension the scenario uses is graded Pass; Unknown counts as not passed. A data variant passes when every one of its trials passes. A scenario passes only when every data variant passes.
+**Scenario pass.** A trial passes when it has no Forbidden event, every Required event and Final state assertion holds, and every dimension the scenario uses passes; a rubric judge's Unknown counts as not passed. A data variant passes when every one of its trials passes. A scenario passes only when every data variant passes.
 
 **Interaction metrics.** For each scenario with a User-knows set: recall = required questions asked / required questions; precision = required questions asked / all questions asked. Every User-knows pair is a required question unless marked (optional). Both numbers are reported beside pass/fail and are never folded into the score.
 
 **Efficiency.** Turn count, write count and read count are reported per trial, separately from the score. Write count is the number of state-changing calls issued and read count the number of read-only calls issued, by the tool's effect, whether the call is bound in Appendix A or unmapped.
 
-**Graders.** State checks and action-log checks are code graders. LLM-rubric graders cover only assertions that state and the action log cannot show. Each judge grades one dimension and may answer Unknown. Rubric dimensions used in this spec:
+**Graders.** State checks and action-log checks are code graders. A check on the agent's final message is a code grader, called a message check, only when the whole check is that the message contains one or more values the agent copies verbatim from a tool result or Initial state, such as a confirmation id or a reference number. A value the agent can write in more than one form (a date, a time, an amount, a name) is not such a value, and a check with any part that needs judgment (that nothing else was offered, that a detail was withheld, that a result was reported without inventing anything) is a rubric dimension in full, however exact its other parts. LLM-rubric graders cover only those judgments. Each judge grades one dimension and may answer Unknown. Dimensions used in this spec, each with its grader:
 
-| Dimension | Definition | Used by |
-|---|---|---|
-| Confirmation id reported | The agent's final message states the confirmation id that CR-A1 returned. | CR-S01 |
+| Dimension | Grader | Definition | Used by |
+|---|---|---|---|
+| Confirmation id reported | code | The agent's final message contains the confirmation id that CR-A1 returned, as the data-variant row gives it. | CR-S01 |
 
 **pytest-bdd mapping.** Given = Initial state + User knows. When = User. Then = Required events + Final state assertions. Each Forbidden line becomes a negative assertion over the action log. Data variants are the Examples table of a Scenario Outline. The action log is derived from the tool log through Appendix A; that derivation lives in the step definitions, never in the scenarios.
 
