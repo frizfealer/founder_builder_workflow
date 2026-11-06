@@ -108,10 +108,10 @@ Each scenario carries the blocks in the template's order. The rules for filling 
 - **Initial state** holds one concrete fact per line: today's date whenever any phrase is relative to it, every existing record with the fields the rule depends on, availability, and any failure the scenario injects. Write an injected failure as an outcome ("the 19:00 slot is taken"), never as a tool result or exception. A fact that does not vary between rows uses values that match no row's value in any column, so the checker and a grader can tell it from a variant value.
 - **User** holds the turns the user initiates on their own: the request and any unprompted change of mind. A later turn states the point at which it arrives, relative to the agent's actions (for example, "in reply to the agent's proposal, in place of a confirmation"), so the simulator delivers it at one defined point. Dialogue appears only here and in Initial state.
 - **User knows** holds question-answer pairs the simulated user can answer but has not volunteered. Answers to the agent's questions live here, never in User. Every pair is a required question unless marked (optional). A pair marked (after Turn n) is revealed only after Turn n, and one marked (before Turn n) only before it.
-- **Expected: Required events** lists only the state-changing actions that constitute the outcome, each with its values and timing. Read-only actions are never Required. Add an ordering constraint only where an authorizing user turn must precede a write. A read-only capability has Required events: none.
+- **Expected: Required events** lists only the state-changing actions that constitute the outcome, each with its values and timing. Read-only actions are never Required. Add an ordering line where an authorizing user turn must precede a write, and between the agent's own calls whenever a rule orders them. A read-only capability has Required events: none.
 - **Expected: Final state assertions** state what exists, with field values, and what is unchanged. Use full-set forms ("exactly one", "no other record changed").
-- **Forbidden** lists events that must not occur: an action for any proposal other than the confirmed one, an action before its authorizing turn, an action count, or a state that must never hold.
-- **Data variants** is a table of 2 to 3 rows that vary values only. Every value that differs between rows gets a column, including the user's wording of it and any injected failure, so each row fills the scenario's <column> placeholders without guessing. An Initial state fact that depends on a varying value, such as availability for the party size, must hold for every row: state it for every row's value, or give it a column. In Initial state, User, User knows, Expected and Forbidden, a value that has a column is written as <column>; the Reference trajectory uses row 1.
+- **Forbidden** lists events that must not occur: an action for any proposal other than the confirmed one, an action before its authorizing turn, an action count, or a state that must never hold. A line that applies to only some rows carries a condition, as §5.1 defines.
+- **Data variants** is a table of 2 to 6 rows with identical Required events after substituting row values and an identical final-state shape: the same assertions with only their values changed, so "no refund exists" and "exactly one refund exists" are different shapes. Each row differs from the others in a tool outcome or in required behavior, and at most one row per scenario differs only in values or wording. Every value that differs between rows gets a column, including the user's wording of it and any injected failure, so each row fills the scenario's <column> placeholders without guessing. An Initial state fact that depends on a varying value, such as availability for the party size, must hold for every row: state it for every row's value, or give it a column. In Initial state, User, User knows, Expected and Forbidden, a value that has a column is written as <column>; the Reference trajectory uses row 1.
 - **Reference trajectory** is the shortest passing sequence of user turns, actions with their values, and outcomes as the supporting actor reports them. Agent turns are described, not quoted. It must use every required User-knows pair.
 - **Illustrates** names the rule ids the scenario exists for.
 - **Unambiguity note** is one line on why two domain experts reach the same verdict.
@@ -137,6 +137,23 @@ If row 2 is proposed or partial, derive the smallest tool set in which every sta
 In either case, a read-only action gets a table row only when a Forbidden line or a failure row names it; the row's call is then its read, and its Effect on state is none. Every other read stays on the "Unmapped read-only calls" line. A read-only action without a row has no occurrences, so no event line may name it.
 
 Done when Appendix A meets its binding contract and, if any tool was proposed, the user has confirmed the appendix.
+
+### 3.9 Consolidate
+
+Merge scenarios that repeat one key example, before any reviewer reads the spec. Three examples defined properly are worth more than a hundred defined poorly (Adzic, *Specification by Example*, ch. 8, "Don't overspecify examples", p. 126), and similar specifications with minor differences become one specification that focuses on the attributes that differ (ch. 11, "Look for higher-level concepts", p. 185).
+
+Run the checker (step 4.1). Each WARNING names scenarios with identical Required events after substitution. For each group, merge the scenarios whose final-state shape is also identical, as data-variant rows that meet the Data variants rule of step 3.6:
+
+- Keep the lowest id and leave the other ids unused.
+- Forbidden is the union of the merged lines. A line that holds for only some rows carries a condition, as §5.1 defines.
+- Every dimension the merged scenario uses applies to every row, because §5.2 passes a trial only when all of them pass.
+- Illustrates is the union. Rewrite the title and the Unambiguity note to cover every row, and remove the merged ids from the Evaluation table.
+- A row may be the only thing exercising a rule clause or failure row. The coverage conditions of step 3.6 still hold, and a row counts toward them.
+- Record each source row the merged table leaves out as a dropped row.
+
+In an update run, merge only scenarios the run added, because existing ids stay stable.
+
+Done when every WARNING group is merged or has a stated reason to stay apart, the checker prints "0 errors", and the dropped rows are listed for the report.
 
 ## 4. Verify
 
@@ -189,6 +206,7 @@ Done when a round changes nothing and the script prints "0 errors", or round 3 h
 Reply with evidence, so the user can judge the spec without rereading it:
 
 - the file written, and each capability with its scenario count;
+- the merges of step 3.9, and each dropped row with what it exercised;
 - the input ledger's final state, naming any default the user accepted;
 - the proposed tools, which are provisional, and that Appendix A is the part of the spec that architecture notes may change;
 - the checker's count line and coverage table;

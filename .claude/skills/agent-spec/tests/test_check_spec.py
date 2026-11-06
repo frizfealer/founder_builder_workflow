@@ -206,10 +206,49 @@ def test_check_spec_unknown_rule_in_illustrates(tmp_path):
 
 def test_check_spec_single_variant_row(tmp_path):
     """Should report a Data variants table with fewer than two rows."""
-    text = mutate("| 2 | Actually, cancel that, we'll go somewhere else. |\n| 3 | No thanks, I don't want to book anymore. |\n", "")
+    text = mutate("| 2 | Actually, cancel that, we'll go somewhere else. |\n", "")
     code, out = run(text, tmp_path)
     assert code == 1
-    assert "CR-S03: Data variants has 1 rows; expected 2 or 3" in out
+    assert "CR-S03: Data variants has 1 rows; expected 2 to 6" in out
+
+
+def add_cr_s03_rows(count):
+    row2 = "| 2 | Actually, cancel that, we'll go somewhere else. |\n"
+    return mutate(row2, row2 + "".join(f"| {n} | Stop, wording {n}. |\n" for n in range(3, 3 + count)))
+
+
+def test_check_spec_six_variant_rows(tmp_path):
+    """Should accept a Data variants table at the cap of six rows."""
+    code, out = run(add_cr_s03_rows(4), tmp_path)
+    assert code == 0, out
+
+
+def test_check_spec_seven_variant_rows(tmp_path):
+    """Should report a Data variants table over the cap of six rows."""
+    code, out = run(add_cr_s03_rows(5), tmp_path)
+    assert code == 1
+    assert "CR-S03: Data variants has 7 rows; expected 2 to 6" in out
+
+
+def test_check_spec_identical_required_events_warns(tmp_path):
+    """Should warn, without failing, when a literal Required block equals another scenario's after substitution."""
+    literal = "\n".join(
+        line.replace("<date>", "2026-10-30").replace("<time>", "19:00").replace("<party_size>", "2").replace("<name>", "Alex")
+        for line in (S01_HOLD_EVENT, S01_CREATE_EVENT)
+    )
+    text = mutate(
+        "- CR-A3 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 2, before Turn 2.\n- CR-A4 occurs exactly once, for Sunrise Café, 2026-10-30, 19:00, party of 2, after Turn 2.\n\nFinal state assertions:\n- No reservation exists",
+        literal + "\n\nFinal state assertions:\n- No reservation exists",
+    )
+    code, out = run(text, tmp_path)
+    assert code == 0, out
+    assert "WARNING CR-S01, CR-S03: identical Required events after substitution" in out
+
+
+def test_check_spec_distinct_required_events_no_warning(tmp_path):
+    """Should print no warning when every scenario's Required events differ."""
+    code, out = run(EXAMPLE, tmp_path)
+    assert "WARNING" not in out
 
 
 def test_check_spec_blocks_out_of_order(tmp_path):

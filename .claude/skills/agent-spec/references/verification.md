@@ -42,7 +42,7 @@ The report starts with a count line, such as "3 findings: 2 Important, 1 Nit." o
 
 ## Finder: faithfulness
 
-Hunt for **Lies**. Read every rule, failure row, Required event, Forbidden line and reference trajectory against the inputs. Check each tool call's name, parameters and failure modes against the tool list; each domain fact against the domain rules; each authorization rule against the policy. Replay each reference trajectory and confirm its tool results produce exactly the Final state assertions. Confirm each Reference trajectory equals the scenario's blocks with Data variants row 1 substituted for every <column>, and that no other row would change which rule applies.
+Hunt for **Lies**. Read every rule, failure row, Required event, Forbidden line and reference trajectory against the inputs. Check each tool call's name, parameters and failure modes against the tool list; each domain fact against the domain rules; each authorization rule against the policy. Replay each reference trajectory and confirm its tool results produce exactly the Final state assertions. Confirm each Reference trajectory equals the scenario's blocks with Data variants row 1 substituted for every <column>, and that every other row has identical Required events after substitution and an identical final-state shape.
 
 ## Finder: verdicts
 

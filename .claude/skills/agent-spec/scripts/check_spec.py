@@ -11,7 +11,9 @@ Initial-state lines about a supporting actor's response that name no action,
 event lines that rely on the confirmed proposal in a scenario with more than one
 confirmation-form User-knows pair, confirmation-form pairs with equal values in
 scope at once, and dimensions (message checks graded by code, rubric dimensions graded by a
-judge) against the Evaluation table. Judgment
+judge) against the Evaluation table. Scenarios with identical Required events
+after substituting row values are printed as WARNING lines, which do not change
+the exit code. Judgment
 (faithfulness to inputs, unambiguous verdicts, semantic gaps) is left to the
 reviewers in the skill's verification step.
 
@@ -131,8 +133,16 @@ def table_rows(lines):
     return rows[2:]  # drop header and separator
 
 
+def fill_row(text, columns, row):
+    """text with each <column> replaced by its value in row, lowercased with whitespace collapsed."""
+    for c, col in enumerate(columns[1:], 1):
+        text = text.replace(f"<{col}>", row[c] if c < len(row) else "")
+    return " ".join(text.lower().split())
+
+
 def check(text, path):
     errors = []
+    required_groups = {}  # one row's substituted Required events -> scenario ids
     lines = text.splitlines()
 
     # Sections, in order.
@@ -384,8 +394,8 @@ def check(text, path):
             return [(first + i + 1, line) for i, line in enumerate(block(name)[1:])]
 
         rows = table_rows(block("Data variants"))
-        if not 2 <= len(rows) <= 3:
-            errors.append(f"{s.id}: Data variants has {len(rows)} rows; expected 2 or 3")
+        if not 2 <= len(rows) <= 6:
+            errors.append(f"{s.id}: Data variants has {len(rows)} rows; expected 2 to 6")
 
         # A value from a data-variant column is written as <column> in the converted blocks.
         # Longest values match first and their spans are removed, so a value inside a longer one
@@ -442,13 +452,12 @@ def check(text, path):
                     if max(lo1, lo2) >= min(hi1, hi2):
                         continue
                     for r, row in enumerate(rows, 1):
-                        def fill(q):
-                            for c, col in enumerate(variant_cols[1:], 1):
-                                q = q.replace(f"<{col}>", row[c] if c < len(row) else "")
-                            return " ".join(q.lower().split())
-                        if fill(q1) == fill(q2):
+                        if fill_row(q1, variant_cols, row) == fill_row(q2, variant_cols, row):
                             errors.append(f"{s.id}: confirmation-form User-knows pairs {n1} and {n2} have equal values in data-variant row {r} while both are in scope; a question equal to both matches two pairs")
                             break
+        for row in rows:
+            filled = frozenset(fill_row(line, variant_cols, row) for line in required)
+            required_groups.setdefault(filled, set()).add(s.id)
         if confirmation_pairs > 1:
             for n, line in numbered("Required events") + numbered("Forbidden"):
                 if CONFIRMED_PROPOSAL_RE.search(line):
@@ -515,7 +524,12 @@ def check(text, path):
         errors.append(f"dimension \"{d}\" is in the Evaluation table but no scenario names it")
 
     coverage = [(rule_id, sorted(illustrated.get(rule_id, []))) for rule_id in rules]
-    return errors, coverage
+    groups = {frozenset(ids) for ids in required_groups.values() if len(ids) > 1}
+    warnings = [
+        f"{', '.join(ids)}: identical Required events after substitution; merge candidates (skill step 3.9)"
+        for ids in sorted(sorted(group) for group in groups)
+    ]
+    return errors, warnings, coverage
 
 
 def main():
@@ -525,11 +539,13 @@ def main():
 
     with open(args.spec, encoding="utf-8") as f:
         text = f.read()
-    errors, coverage = check(text, args.spec)
+    errors, warnings, coverage = check(text, args.spec)
 
     print(f"{len(errors)} errors")
     for e in errors:
         print(f"ERROR {e}")
+    for w in warnings:
+        print(f"WARNING {w}")
     print()
     print("| Rule | Scenarios |")
     print("|---|---|")

@@ -30,7 +30,7 @@ A key example is a concrete case, with real-looking values, that shows what one 
 
 ## The action (User)
 
-- [ ] **One triggering action.** The User block holds the user's request. In a multi-turn scenario it also holds any unprompted change of mind the user makes on their own; answers to the agent's questions live in User knows, not in User.
+- [ ] **One triggering action.** The User block holds the user's request. In a multi-turn scenario it also holds any unprompted change of mind the user makes on their own; answers to the agent's questions live in User knows, not in User. The calls the agent makes in response are not further triggers: a retry or a chain of calls belongs in Expected, ordered only where a rule orders it (Adzic, ch. 8, p. 129: one action, several postconditions).
 - [ ] **A multi-step action is a missing domain concept.** If the User block needs a scripted sequence of interactions to set up the situation, name the situation and put it in Initial state instead.
 
 ## Expected and Forbidden
@@ -42,9 +42,9 @@ A key example is a concrete case, with real-looking values, that shows what one 
 ## Data variants
 
 - [ ] **Probe the boundaries.** For numbers: values just above and below each threshold, zero, negative. For entities: more than one, none, the same one twice. For text: the surface forms users really type.
-- [ ] **Variants vary values, not rules.** A row that changes which rule applies is a new scenario.
+- [ ] **Rows differ in behavior.** Rows meet the Data variants rule of step 3.6. A row that would need different Required lines is a new scenario.
 - [ ] **Each row is complete.** Every value that differs between rows has its own column, including the user's phrasing of it, so the row can be substituted into the scenario without guessing which literal it replaces.
-- [ ] **Too many columns means a hidden concept.** When the variant table needs many columns to describe one case, name the concept the columns encode ("a confirmed proposal"), define it once, and split the scenario set around it.
+- [ ] **Too many columns means a hidden concept.** When the variant table needs many columns to describe one case, name the concept the columns encode ("a confirmed proposal") and define it once. Split the scenario only when rows would need different Required lines.
 - [ ] **After the set looks done, ask "are we missing anything?"** Try one more boundary (an empty party, a date in the past, the same reservation requested twice).
 
 ## Self-explanatory

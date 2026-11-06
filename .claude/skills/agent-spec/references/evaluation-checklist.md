@@ -15,7 +15,7 @@ Distilled from ToolSandbox (Lu et al., arXiv 2408.04682), AppWorld-UL (Chen, Tri
 
 - [ ] **Outcome, not path.** Expected asserts the world state and the state-changing calls that produced it. Exact call sequences, read-only lookups and "the agent said X" are not Required; agents find valid paths the author did not anticipate, and a path assertion punishes them.
 - [ ] **Required events are state-changing calls with their arguments.** A tool call that only reads is never Required, however useful. Where a Required event's arguments can be checked against the final state instead, prefer the state assertion and keep the call line for the arguments the state does not show.
-- [ ] **Ordering only for authorization.** Add an ordering constraint only when a write must follow a user turn that authorizes it, or must follow another write it depends on. Everything else is unordered.
+- [ ] **Ordering only where required.** Add an ordering line when a write must follow a user turn that authorizes it, or when a rule orders the agent's own calls. Everything else is unordered.
 - [ ] **Forbidden lines name events.** Each Forbidden line is a tool call pattern (name plus the argument condition) or a timing violation (a write before the authorizing turn). A Forbidden line that needs a judgment call about wording belongs in a rubric dimension instead.
 - [ ] **Both directions are covered.** For every rule that says "act only when", one scenario shows the agent acting when it should and one shows it holding back when it should not. One-sided scenarios breed one-sided agents: test only "asks when unsure" and you get an agent that always asks.
 - [ ] **Interaction type matches the gap.** Pick the type by what the agent lacks:
@@ -39,7 +39,7 @@ Distilled from ToolSandbox (Lu et al., arXiv 2408.04682), AppWorld-UL (Chen, Tri
 - [ ] **A User turn's trigger is a defined event.** A User turn's trigger names an event §5.1 defines, such as the confirmation question, never "a proposal" or "an offer".
 - [ ] **Unambiguity.** Two domain experts reading the scenario would give the same pass/fail verdict for any trajectory, and could pass the scenario themselves. If the Unambiguity note is hard to write, the Expected block is underspecified.
 - [ ] **Reference trajectory exists and passes.** It proves the scenario is solvable with the listed tools and that every required User-knows pair is used. A scenario no agent can pass across many trials is almost always a broken scenario.
-- [ ] **Data variants share the Expected shape.** Two to three rows differ in values only (names, dates, quantities, ids). A row that changes which rule applies is a new scenario.
+- [ ] **Data variants share the Expected shape.** Rows meet the Data variants rule of step 3.6. A row that would need different Required lines is a new scenario.
 - [ ] **Every varying value has a column.** When the body states a value as user wording ("this Friday", "for two"), the column holds the wording too, and the row's date must follow from Initial state's today. Otherwise a correct agent fails rows 2 and 3.
 - [ ] **A value turned into a column leaves no row-1 literal behind.** When a value becomes <column>, rewrite any Unambiguity note that names that value's row-1 literal, so the note holds for every row.
 - [ ] **No grader loophole.** Passing must require the behavior: a Required event cannot be satisfied by a call with placeholder arguments, and a Final state assertion cannot be met by leaving the world untouched when a write was required.

@@ -94,7 +94,7 @@ When the user withdraws before CR-A1, the agent releases its hold with CR-A4 and
 
 **Initial state**
 - Today is 2026-10-27, a Tuesday.
-- Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-28 12:00, 2026-10-30 19:00 and 2026-10-31 18:30.
+- Sunrise Café has a free table for every party size from 1 to 8 at 2026-10-30 19:00 and 2026-10-31 18:30.
 - Reservation R-0900 exists for Sam at Sunrise Café on 2026-10-29 at 18:00 for 3, status confirmed.
 - No reservation exists under the name <name>.
 - No hold exists.
@@ -130,8 +130,7 @@ Final state assertions:
 | variant | Turn 1 | date | time | party_size | name | confirmation_id |
 |---|---|---|---|---|---|---|
 | 1 | Book a table at Sunrise Café this Friday at 7pm for two, under Alex. | 2026-10-30 | 19:00 | 2 | Alex | R-1001 |
-| 2 | Book Sunrise Café tomorrow at noon for four, name Priya. | 2026-10-28 | 12:00 | 4 | Priya | R-1002 |
-| 3 | Sunrise Café on October 31st at 6:30pm, party of eight, for Chen. | 2026-10-31 | 18:30 | 8 | Chen | R-1003 |
+| 2 | Sunrise Café on October 31st at 6:30pm, party of eight, for Chen. | 2026-10-31 | 18:30 | 8 | Chen | R-1003 |
 
 **Reference trajectory**
 1. User: "Book a table at Sunrise Café this Friday at 7pm for two, under Alex."
@@ -190,7 +189,6 @@ Final state assertions:
 |---|---|---|
 | 1 | Yes. Actually, make it four people. | 4 |
 | 2 | Yes. Wait, make that six of us. | 6 |
-| 3 | Sounds good, but it'll be three of us. | 3 |
 
 **Reference trajectory**
 1. User: "Book a table at Sunrise Café this Friday at 7pm for two, under Alex."
@@ -248,7 +246,6 @@ Final state assertions:
 |---|---|
 | 1 | Never mind, forget it. |
 | 2 | Actually, cancel that, we'll go somewhere else. |
-| 3 | No thanks, I don't want to book anymore. |
 
 **Reference trajectory**
 1. User: "Book a table at Sunrise Café this Friday at 7pm for two, under Alex."
@@ -283,6 +280,8 @@ Final state assertions:
 **Several confirmation pairs.** A scenario with more than one confirmation-form pair anchors its Required events and Forbidden lines on turns or on explicit values, never on the confirmed proposal.
 
 **When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence. A read-only action with no Appendix A row has no occurrences, and no event line names it.
+
+**Conditional Forbidden lines.** A Forbidden line that applies to only some data variant rows ends with its condition, as in "Ending the trial without a lookup after the second call, when the second call got no answer." The condition must be decidable from the action log: it names calls the agent made and the results those calls returned. When the condition does not hold, the line passes.
 
 **Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions, which are read against Initial state, and in Forbidden lines phrased as state.
 
