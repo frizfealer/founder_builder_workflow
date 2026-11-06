@@ -12,8 +12,8 @@ event lines that rely on the confirmed proposal in a scenario with more than one
 confirmation-form User-knows pair, confirmation-form pairs with equal values in
 scope at once, and dimensions (message checks graded by code, rubric dimensions graded by a
 judge) against the Evaluation table. Scenarios with identical Required events
-after substituting row values are printed as WARNING lines, which do not change
-the exit code. Judgment
+after substituting row values, other than none, are printed as WARNING lines,
+which do not change the exit code. Judgment
 (faithfulness to inputs, unambiguous verdicts, semantic gaps) is left to the
 reviewers in the skill's verification step.
 
@@ -457,7 +457,8 @@ def check(text, path):
                             break
         for row in rows:
             filled = frozenset(fill_row(line, variant_cols, row) for line in required)
-            required_groups.setdefault(filled, set()).add(s.id)
+            if {line.strip("- .") for line in filled} != {"none"}:
+                required_groups.setdefault(filled, set()).add(s.id)
         if confirmation_pairs > 1:
             for n, line in numbered("Required events") + numbered("Forbidden"):
                 if CONFIRMED_PROPOSAL_RE.search(line):

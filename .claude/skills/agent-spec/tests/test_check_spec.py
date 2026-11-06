@@ -245,6 +245,16 @@ def test_check_spec_identical_required_events_warns(tmp_path):
     assert "WARNING CR-S01, CR-S03: identical Required events after substitution" in out
 
 
+def test_check_spec_required_events_none_no_warning(tmp_path):
+    """Should print no warning for scenarios whose Required events are none."""
+    lines = re.findall(r"Required events:\n((?:- .*\n)+)", EXAMPLE)
+    text = EXAMPLE
+    for block in lines:
+        text = text.replace(block, "- none.\n")
+    code, out = run(text, tmp_path)
+    assert "WARNING" not in out
+
+
 def test_check_spec_distinct_required_events_no_warning(tmp_path):
     """Should print no warning when every scenario's Required events differ."""
     code, out = run(EXAMPLE, tmp_path)
