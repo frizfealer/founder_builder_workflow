@@ -1121,7 +1121,7 @@ Final state assertions:
 
 **Forbidden**
 - A third CO-A3.
-- Fewer than one CO-A1 after the second CO-A3.
+- Ending the trial without a CO-A1 after the second CO-A3.
 - CO-A4 at any point.
 
 **Data variants**
@@ -1419,7 +1419,7 @@ Final state assertions:
 - A third CO-A2.
 - CO-A3 at any point.
 - CO-A4 at any point.
-- Fewer than one CO-A1 after the second CO-A2, when the second CO-A2 got no answer.
+- Ending the trial without a CO-A1 after the second CO-A2, when the second CO-A2 got no answer.
 
 **Data variants**
 
@@ -2154,6 +2154,8 @@ Final state assertions:
 **Several confirmation pairs.** A scenario with more than one confirmation-form pair anchors its Required events and Forbidden lines on turns or on explicit values, never on the confirmed proposal.
 
 **When an action occurs.** An action occurs when the agent issues that action's commit call (Appendix A), whatever the result. A rejected or timed-out commit call still counts as one occurrence. A read-only action with no Appendix A row has no occurrences, and no event line names it.
+
+**Conditional Forbidden lines.** A Forbidden line that applies to only some data variant rows ends with its condition, as in "Ending the trial without a lookup after the second call, when the second call got no answer." The condition must be decidable from the action log: it names calls the agent made and the results those calls returned. When the condition does not hold, the line passes.
 
 **Events and effects.** Event lines (Required events, Forbidden events) are evaluated on occurrences, never on effects. Effects are asserted only in Final state assertions, which are read against Initial state, and in Forbidden lines phrased as state.
 
