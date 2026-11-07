@@ -179,7 +179,7 @@ Done when a reviewer could reconstruct every input from the packet and the files
 
 ### 4.3 Find
 
-Dispatch three finders in parallel, each a fresh-context subagent given the shared header and its role section: faithfulness, verdicts, coverage. If an agent type backed by Codex is listed (such as `codex:codex-rescue`), send the verdicts finder there instead, because a second model family misjudges different scenarios. In an update run, scope every finder to the changed capability, the Global Contract and the Evaluation rows it touches, and tag any finding outside that scope Pre-existing.
+Dispatch three finders in parallel, each a fresh-context subagent given the shared header and its role section: faithfulness, verdicts, coverage. In round 1 use the shared header; in round 2 and later use the re-review header. If an agent type backed by Codex is listed (such as `codex:codex-rescue`), send the verdicts finder there instead, because a second model family misjudges different scenarios. In an update run, scope every finder to the changed capability, the Global Contract and the Evaluation rows it touches, and tag any finding outside that scope Pre-existing.
 
 Done when all three finders have returned, each report opening with its count line.
 
@@ -197,7 +197,7 @@ Fix each kept finding, or record why it stands: an input supports the line, or o
 
 When a fix adds a rule, a rule clause or a failure row, apply the coverage conditions of step 3.6 to it before rerunning the checker: the new clause needs a scenario, or a data-variant row, whose Initial state exercises it. The checker counts scenario references per rule and cannot see that a new clause has none.
 
-Then rerun 4.1. If this round changed the spec, save a copy of the spec as it stands at the end of the round in a scratch directory outside the product directory, beside the review packet, so the next round's findings can be told apart by whether they quote a line this round changed; then start the next round at 4.3, scoped to the sections this round changed, and pass every answered finding to the finders as already answered. Stop after round 3, even with findings left: three rounds without converging means the inputs or the approach need the user, so the remaining findings go into the report as open.
+Then rerun 4.1. If this round changed the spec, save a copy of the spec as it stands at the end of the round in a scratch directory outside the product directory, beside the review packet, so the next round's findings can be told apart by whether they quote a line this round changed; then build the re-review bundle — `uv run python .claude/skills/agent-spec/scripts/build_rereview.py <scratch>/round<N-1>/agent-spec.md <spec path> --answered <scratch>/answered.md --out <scratch>/rereview-r<N>.md` — and start the next round at 4.3 with the re-review header. Finders and verifiers in that round read the bundle and the packet, not the spec. Stop after round 3, even with findings left: three rounds without converging means the inputs or the approach need the user, so the remaining findings go into the report as open.
 
 Done when a round changes nothing and the script prints "0 errors", or round 3 has ended.
 
@@ -210,7 +210,7 @@ Reply with evidence, so the user can judge the spec without rereading it:
 - the input ledger's final state, naming any default the user accepted;
 - the proposed tools, which are provisional, and that Appendix A is the part of the spec that architecture notes may change;
 - the checker's count line and coverage table;
-- the findings, opening with a count line by severity, each marked fixed, answered with its reason, open, or Pre-existing, and the number of rounds run; for every round after the first, how many kept findings quote a line the previous round changed (a fix that introduced a defect) and how many quote a line it did not (a defect earlier finders missed), because the two call for different remedies;
+- the findings, opening with a count line by severity, each marked fixed, answered with its reason, open, or Pre-existing, and the number of rounds run; for every round after the first, how many kept findings quote a line the previous round changed (a fix that introduced a defect) and how many quote a line it did not (a defect earlier finders missed), because the two call for different remedies; and how many kept findings fell in a bundle context block rather than a changed block;
 - which reviewers ran as subagents and which ran through Codex;
 - the open questions, each as a "what if" the inputs could not answer;
 - what verification cannot catch: whether the rules are the business's real rules and whether the stakeholder list is complete, which only the user can confirm;

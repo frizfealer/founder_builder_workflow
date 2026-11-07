@@ -40,11 +40,29 @@ The report starts with a count line, such as "3 findings: 2 Important, 1 Nit." o
 >
 > [paste "What a defective spec looks like" and "Finding format"]
 
+## Re-review header (round 2 and later, finders and verifiers)
+
+> You are reviewing the changes one fix round made to an Agent Spec, a behavior contract for an LLM agent whose scenarios will become executable tests. You did not write it. Find defects; do not edit any file.
+>
+> Read, in this order: the re-review bundle at [bundle path], which holds the pattern edits, every block the fix round added or rewrote in full, diff hunks for lightly edited blocks, the unchanged blocks that cite them, and the findings already answered; then the review packet at [packet path] and the sources it lists. Do not read the full spec or the reference checklists. If a line in the bundle names an id the bundle does not define, grep the spec at [spec path] for that id and read only that block.
+>
+> [paste the "A script has already verified …" paragraph from the shared header]
+>
+> Scope: sections 1 to 3 of the bundle. Report a defect in a section-4 context block in one line, tagged Pre-existing, with no Quote or Evidence. Do not report a finding listed under "Findings already answered"; if a fix for one is wrong or incomplete, report that as a new finding quoting the new line.
+>
+> Report only defects in the four classes below, in the finding format below. Every finding quotes the spec and cites evidence; a suspicion without evidence is not a finding. When you find a pattern, report it once and list every instance in Evidence. If nothing is wrong, report "0 findings."
+>
+> [paste "What a defective spec looks like" and "Finding format"]
+
 ## Finder: faithfulness
+
+In a re-review round, 'every' and 'each' mean the blocks in sections 1 to 3 of the bundle.
 
 Hunt for **Lies**. Read every rule, failure row, Required event, Forbidden line and reference trajectory against the inputs. Check each tool call's name, parameters and failure modes against the tool list; each domain fact against the domain rules; each authorization rule against the policy. Replay each reference trajectory and confirm its tool results produce exactly the Final state assertions. Confirm each Reference trajectory equals the scenario's blocks with Data variants row 1 substituted for every <column>, and that every other row has identical Required events and final-state lines after substitution.
 
 ## Finder: verdicts
+
+In a re-review round, 'every' and 'each' mean the blocks in sections 1 to 3 of the bundle.
 
 Hunt for **Ambiguous** and **Untestable**. For each scenario, write down three trajectories in your head:
 
@@ -55,6 +73,8 @@ Hunt for **Ambiguous** and **Untestable**. For each scenario, write down three t
 The scenario must pass the first two and fail the third, and every line must decide its part without judgment. Then turn each Initial state, Required event, Final state and Forbidden line into a Given or Then step; a line that needs rewording or splitting is a finding. Check that each rubric dimension measures something state, tool calls and the message's literal content cannot show, and that each message check is, in full, a match on values the agent copies verbatim, with no part that needs judgment and no date, time, amount or name.
 
 ## Finder: coverage
+
+In a re-review round, 'every' and 'each' mean the blocks in sections 1 to 3 of the bundle.
 
 Hunt for **Gaps**. Build these maps and report every empty cell:
 
@@ -71,7 +91,7 @@ Hunt for **Gaps**. Build these maps and report every empty cell:
 
 > You are checking findings that other reviewers reported on an Agent Spec. You did not write the spec or the findings. Do not edit any file.
 >
-> Read the review packet at [packet path], the sources it lists, and the spec at [spec path]. Then, for each finding below, read the quoted line and the evidence yourself and give one verdict:
+> Read the re-review bundle at [bundle path] when the round has one, otherwise the spec at [spec path]; then the review packet at [packet path] and the sources it lists. Then, for each finding below, read the quoted line and the evidence yourself and give one verdict:
 >
 > - **Real**: the defect exists as described and belongs to its class.
 > - **Not real**: the spec or the inputs refute it. Quote what refutes it.
