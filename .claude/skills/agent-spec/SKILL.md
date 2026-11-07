@@ -13,9 +13,9 @@ Write one file, `agent-spec.md`, in the product directory the user named, or bes
 
 When an `agent-spec.md` already exists and the user passed a findings file, update from the findings. The file may be free-form; each finding names the scenario id and quotes the spec line it is about. Apply a finding only when its fix is to the spec. Report every other finding back unapplied with its reason: it names no scenario id, it quotes no spec line, or its fix belongs elsewhere, such as in the test code or the agent under test. Touch only the lines the applied findings quote and the lines that repeat their pattern, keep every rule and scenario id stable, and apply the coverage conditions of step 3.6 to anything a fix adds.
 
-In every update run, including the fixes of step 4.5, a fix that changes a rule's text stops at that rule. Show the user the rule before and after the proposed change, apply only the other lines the fix quotes, and report the rule change as a proposed finding for the user to decide. This applies to every rule, including one an earlier round of this run added.
+In every run, in the fixes of step 4.5 and in every update, a fix that changes a rule's text stops at that rule. Show the user the rule before and after the proposed change, apply only the other lines the fix quotes, and report the rule change as a proposed finding for the user to decide. This applies to every rule, including one an earlier round of this run added.
 
-In every update run, before verifying, re-sync the spec's §5.1 and §5.2 fixed text from [the template](assets/agent-spec.template.md). The re-sync replaces that text and keeps these values from the spec:
+In every update run, re-sync the spec's §5.1 and §5.2 fixed text from [the template](assets/agent-spec.template.md) before step 4 begins; step 4 itself never edits that text, and a run that starts at step 4 does not re-sync. The re-sync replaces that text and keeps these values from the spec:
 - the dimension table;
 - the trial count;
 - the message cap;
@@ -181,7 +181,7 @@ Done when a reviewer could reconstruct every input from the packet and the files
 
 Dispatch three finders in parallel, each a fresh-context subagent given the shared header and its role section: faithfulness, verdicts, coverage. In round 1 use the shared header; in round 2 and later use the re-review header. If an agent type backed by Codex is listed (such as `codex:codex-rescue`), send the verdicts finder there instead, because a second model family misjudges different scenarios. In an update run, scope every finder to the changed capability, the Global Contract and the Evaluation rows it touches, and tag any finding outside that scope Pre-existing. Do not wait for the Codex-backed verdicts finder: proceed to 4.4 when the other two finders have returned. Fold its findings, when they arrive, into the next round, where its Important findings are verified with that round's; if there is no next round, list them in the report under 'unverified', not applied.
 
-Done when the faithfulness and coverage finders have returned, each report opening with its count line.
+Done when every finder not backed by Codex has returned, each report opening with its count line.
 
 ### 4.4 Verify the findings
 
