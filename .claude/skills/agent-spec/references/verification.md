@@ -91,15 +91,13 @@ Hunt for **Gaps**. Build these maps and report every empty cell:
 
 > You are checking findings that other reviewers reported on an Agent Spec. You did not write the spec or the findings. Do not edit any file.
 >
-> Read the re-review bundle at [bundle path] when the round has one, otherwise the spec at [spec path]; then the review packet at [packet path] and the sources it lists. Then, for each finding below, read the quoted line and the evidence yourself and give one verdict:
+> Read the re-review bundle at [bundle path] when the round has one, otherwise the spec at [spec path]; then the review packet at [packet path] and the sources it lists; then the findings at [findings path]. Then, for each finding, read the quoted line and the evidence yourself and give one verdict:
 >
 > - **Real**: the defect exists as described and belongs to its class.
 > - **Not real**: the spec or the inputs refute it. Quote what refutes it.
 > - **Style only**: it concerns wording or preference and changes no verdict and no agent behavior.
 >
 > Also confirm or change the severity, Important or Nit, using these definitions: [paste the two definitions from "Finding format"]. Give one line of evidence per verdict. Answer every finding.
->
-> Findings: [paste the findings, each with its class, severity, location, quote, evidence and pattern, without the finder's other commentary]
 
 ## Adversarial verifier brief
 
