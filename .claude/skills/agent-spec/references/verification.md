@@ -106,7 +106,7 @@ Hunt for **Gaps**. Build these maps and report every empty cell:
 > Not real or Style only. For each one, look for: a rule, failure row, §5.1 or §5.2 clause, or
 > Unambiguity note that already settles the case the finding raises; a quoted line that does not say
 > what the finding claims; evidence that is not in the packet or the spec; or a defect that changes
-> no verdict and no agent behavior (Style only). Say Real only when you cannot do any of these.
+> no verdict and no agent behavior (Style only). Say Real only when you cannot do any of these. The reference checklists under references/ are the spec's standards and count as evidence for a finding, the same as the packet and the spec. A refutation must show the finding does not fit its class as defined in 'What a defective spec looks like': for a Lies finding that says no input supports a line, showing that no input contradicts the line is not a refutation; for a Gap finding, showing the behavior is settled by a rule is not a refutation unless a scenario or dimension asserts it.
 >
 > Read the re-review bundle at [bundle path] when the round has one, otherwise the spec at [spec
 > path]; then the review packet at [packet path] and the sources it lists; then the findings at
