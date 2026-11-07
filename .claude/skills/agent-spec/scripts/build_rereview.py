@@ -168,6 +168,10 @@ def main():
             by_line[k].changed_lines.append(k)
 
     changed_blocks = [b for b in blocks if b.changed_lines]
+    if not changed and not deleted_lines:
+        sys.exit("build_rereview: PREV and CUR are identical; no bundle written. "
+                 "PREV must be the copy saved at the end of the previous round, "
+                 "CUR the spec after this round's fixes.")
     new_blocks = [b for b in changed_blocks if b.id not in prev_ids and b.kind != "prose"]
     new_ids = {b.id for b in new_blocks}
 
@@ -187,7 +191,9 @@ def main():
         if b.kind == "prose" and b.id == "(between blocks)":
             continue
         substantive = [k for k in b.changed_lines if cur[k].strip() not in pattern_lines]
-        if b.id in new_ids or len(substantive) > a.full_threshold:
+        if b.id in new_ids or b.id not in prev_blocks or len(substantive) > a.full_threshold:
+            # a block with no same-id counterpart in the previous round (new, or a
+            # renamed heading) cannot be shown as a hunk, so it is shown in full
             full.append(b)
         elif substantive:
             light.append(b)
@@ -224,7 +230,12 @@ def main():
 
     out.append("## 2. New and rewritten blocks, in full\n")
     for b in full:
-        tag = "new" if b.id in new_ids else f"{len(b.changed_lines)} of {b.end - b.start} lines changed"
+        if b.id in new_ids:
+            tag = "new"
+        elif b.id not in prev_blocks:
+            tag = "heading changed"
+        else:
+            tag = f"{len(b.changed_lines)} of {b.end - b.start} lines changed"
         out.append(f"### {b.kind}: {b.id} ({tag})\n\n{b.text(cur)}\n")
     if deleted_ids:
         out.append("Ids that appear only in deleted lines: " + ", ".join(deleted_ids) + "\n")
