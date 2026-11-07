@@ -179,15 +179,15 @@ Done when a reviewer could reconstruct every input from the packet and the files
 
 ### 4.3 Find
 
-Dispatch three finders in parallel, each a fresh-context subagent given the shared header and its role section: faithfulness, verdicts, coverage. In round 1 use the shared header; in round 2 and later use the re-review header. If an agent type backed by Codex is listed (such as `codex:codex-rescue`), send the verdicts finder there instead, because a second model family misjudges different scenarios. In an update run, scope every finder to the changed capability, the Global Contract and the Evaluation rows it touches, and tag any finding outside that scope Pre-existing.
+In round 1, dispatch six finders in parallel: two independent sets of the three roles (faithfulness, verdicts, coverage), each a fresh-context subagent given the shared header and its role section, with no knowledge of the other set. A single sweep misses up to half of what two sweeps find, so round 1 sweeps the whole spec twice. In round 2 and later, dispatch one set of three. In round 1 use the shared header; in round 2 and later use the re-review header. If an agent type backed by Codex is listed (such as `codex:codex-rescue`), send the verdicts finder there instead, because a second model family misjudges different scenarios. In an update run, scope every finder to the changed capability, the Global Contract and the Evaluation rows it touches, and tag any finding outside that scope Pre-existing. If the verdicts finder has not returned three minutes after the other finders of its set, continue without it; fold its findings into the next round when they arrive, or into the report if there is no next round.
 
-Done when all three finders have returned, each report opening with its count line.
+Done when all finders, or the three-minute allowance for the verdicts finder has passed, have returned, each report opening with its count line.
 
 ### 4.4 Verify the findings
 
 If the finders reported 0 findings, verification is done; go to step 5.
 
-Otherwise merge duplicate findings, then dispatch three verifier subagents in parallel with the verifier brief and the merged list. Each verifier sees the findings, never the other verifiers' votes. Keep a finding only when at least two verifiers judge it Real, and take the severity most of them gave.
+Merge the finders' reports into one list, dropping duplicates, and tag each finding's severity as the finders gave it. Findings tagged Nit go straight to 4.5: they are rarely wrong and the next round's bundle reviews their fixes. Findings tagged Important go to two fresh-context verifiers dispatched in parallel: one with the verifier brief, one with the adversarial verifier brief. Each returns, per finding, Real, Not real or Style only, with severity and a one-sentence reason. A finding is dropped when the adversarial verifier gives a concrete refutation (a rule, failure row or §5 clause that already settles it, or a quote that does not say what the finding claims) and the standard verifier does not contradict it. When the two disagree, read both reasons, decide, and record the decision and reason with the finding. Severity is the lower of the two when they differ.
 
 Done when every finding has three verdicts and is kept or dropped.
 
@@ -210,7 +210,7 @@ Reply with evidence, so the user can judge the spec without rereading it:
 - the input ledger's final state, naming any default the user accepted;
 - the proposed tools, which are provisional, and that Appendix A is the part of the spec that architecture notes may change;
 - the checker's count line and coverage table;
-- the findings, opening with a count line by severity, each marked fixed, answered with its reason, open, or Pre-existing, and the number of rounds run; for every round after the first, how many kept findings quote a line the previous round changed (a fix that introduced a defect) and how many quote a line it did not (a defect earlier finders missed), because the two call for different remedies; and how many kept findings fell in a bundle context block rather than a changed block;
+- the findings, opening with a count line by severity, each marked fixed, answered with its reason, open, or Pre-existing, and the number of rounds run; for every round after the first, how many kept findings quote a line the previous round changed (a fix that introduced a defect) and how many quote a line it did not (a defect earlier finders missed), because the two call for different remedies; and how many kept findings fell in a bundle context block rather than a changed block; and the verifier drop rate: Important findings dropped over Important findings verified, with each dropped finding's refutation quoted;
 - which reviewers ran as subagents and which ran through Codex;
 - the open questions, each as a "what if" the inputs could not answer;
 - what verification cannot catch: whether the rules are the business's real rules and whether the stakeholder list is complete, which only the user can confirm;

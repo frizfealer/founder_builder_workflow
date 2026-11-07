@@ -100,3 +100,20 @@ Hunt for **Gaps**. Build these maps and report every empty cell:
 > Also confirm or change the severity, Important or Nit, using these definitions: [paste the two definitions from "Finding format"]. Give one line of evidence per verdict. Answer every finding.
 >
 > Findings: [paste the findings, each with its class, severity, location, quote, evidence and pattern, without the finder's other commentary]
+
+## Adversarial verifier brief
+
+> You are checking findings other reviewers made against an Agent Spec, a behavior contract for an
+> LLM agent whose scenarios will become executable tests. Your job is to show that each finding is
+> Not real or Style only. For each one, look for: a rule, failure row, §5.1 or §5.2 clause, or
+> Unambiguity note that already settles the case the finding raises; a quoted line that does not say
+> what the finding claims; evidence that is not in the packet or the spec; or a defect that changes
+> no verdict and no agent behavior (Style only). Say Real only when you cannot do any of these.
+>
+> Read the re-review bundle at [bundle path] when the round has one, otherwise the spec at [spec
+> path]; then the review packet at [packet path] and the sources it lists; then the findings at
+> [findings path]. Grep the spec for any id a finding names that you have not read.
+>
+> For each finding, one line: `<id> | Real / Not real / Style only | Important / Nit | <the clause
+> or line that refutes it, quoted, or why you could not refute it>`. Then the count line: how many
+> of each verdict.
