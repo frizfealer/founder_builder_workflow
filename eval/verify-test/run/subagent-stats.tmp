@@ -9,3 +9,4 @@
 | r3 | finder: faithfulness | general-purpose (inherits parent) | 9 | 139017 | 133537 | 1 |
 | r3 | finder: coverage | general-purpose (inherits parent) | 10 | 152957 | 146288 | 1 |
 | r3 | finder: verdicts | general-purpose (inherits parent) | 8 | 173023 | 141527 | 1 |
+| r3 | verifier: adversarial | general-purpose (inherits parent) | 9 | 72982 | 129532 | 1 |

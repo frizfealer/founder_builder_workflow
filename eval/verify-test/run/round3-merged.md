@@ -71,6 +71,9 @@ Evidence: Appendix A says "The agent may repeat CO-A1 without limit; only commit
 - CO-S14 and CO-S15: "does not answer any CO-A1 the agent makes after its first/second CO-A2"
 - CO-S21: "does not answer any CO-A1 the agent makes after its second CO-A3"
 
+The trial ends only on an agent message, and no limit applies to tool calls. An agent that keeps calling list_orders never sends a message, so the trial never ends and no Final state, Required event or dimension can be computed. No rule tells the agent when to stop retrying a read and report, so a production agent can also hang.
+Pattern: Reads with no retry limit in scenarios where the read never answers, and no end-of-trial bound on tool calls. Instances: CO-S10, CO-S14, CO-S15, CO-S21.
+
 ## R3-09
 Sources: coverage F3
 

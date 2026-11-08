@@ -128,3 +128,41 @@ R3 faithfulness finder returned 2026-11-08T15:44:51Z: 1 finding: 1 Important.
 R3 coverage finder returned 2026-11-08T15:45:14Z: 5 findings: 2 Important, 3 Nit.
 R3 verdicts finder returned 2026-11-08T15:45:42Z: count line "6 findings: 4 Important, 2 Nit."; the findings as tagged are 5 Important (F1-F5), 1 Nit (F6).
 R3 merged 2026-11-08T15:46:08Z: 12 findings: 8 Important, 4 Nit (12 raw; no duplicates within the round). CMD: python3 eval/verify-test/run/tools/merge.py 3 round3-map.txt. Verifier dispatched 2026-11-08T15:46:08Z
+R3 verifier returned 2026-11-08T15:48:01Z: 5 Real, 3 Not real, 0 Style only. Verifier noted R3-08's text was cut off after its Evidence bullets.
+R3-08 was sent to the verifier truncated (merge.py ended a finding at a blank line inside its Evidence). Fixed merge.py (a finding now ends at a blank line only after its Pattern line); regenerated round3-merged.md and round3-to-verify.md; the as-sent copy is round3-to-verify-as-sent.md. Rounds 1 and 2 regenerate identically. R3-08 was not re-verified: the verifier judged the defect Real from the visible part.
+R3 decisions: dropped R3-04, R3-05, R3-06 (verifier Not real; quoted clauses read and agreed). Kept 5 Important + 4 Nit.
+R3 fixes applied with a python3 heredoc script on eval/verify-test/run/agent-spec.md. No rule text changed; R3-01 (CO-08) and R3-02 (CO-07) stop at the rule and are reported as proposed rule changes.
+CMD: uv run python .claude/skills/agent-spec/scripts/check_spec.py eval/verify-test/run/agent-spec.md   (4.5 rerun of 4.1, round 3 end)
+0 errors
+WARNING CO-S01, CO-S02, CO-S03, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S01, CO-S02, CO-S09, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S11, CO-S24: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S13, CO-S25: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S16, CO-S19: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S18, CO-S20: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S22, CO-S23: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S26, CO-S27: identical Required events after substitution; merge candidates (skill step 3.9)
+
+| Rule | Scenarios |
+|---|---|
+| G-01 | CO-S01, CO-S02, CO-S03 |
+| G-02 | CO-S01, CO-S02, CO-S03, CO-S04 |
+| G-03 | CO-S01, CO-S10, CO-S11, CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S23, CO-S24, CO-S26, CO-S27 |
+| G-04 | CO-S11, CO-S12, CO-S13, CO-S14, CO-S15, CO-S16, CO-S22, CO-S25, CO-S26, CO-S27 |
+| CO-01 | CO-S01, CO-S05, CO-S06, CO-S10 |
+| CO-02 | CO-S02, CO-S07 |
+| CO-03 | CO-S01, CO-S08, CO-S09 |
+| CO-04 | CO-S01, CO-S02, CO-S03, CO-S04, CO-S06, CO-S09 |
+| CO-05 | CO-S01, CO-S11, CO-S12, CO-S24, CO-S25, CO-S26 |
+| CO-06 | CO-S11, CO-S12, CO-S13, CO-S15, CO-S16, CO-S17, CO-S18, CO-S22, CO-S23, CO-S25, CO-S26, CO-S27 |
+| CO-07 | CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23, CO-S27 |
+| CO-08 | CO-S01, CO-S16, CO-S19, CO-S25 |
+| CO-09 | CO-S01, CO-S02, CO-S03, CO-S09, CO-S12, CO-S13, CO-S14, CO-S15, CO-S16, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23, CO-S25 |
+| CO-10 | CO-S01, CO-S02, CO-S03, CO-S09, CO-S12, CO-S13, CO-S16, CO-S19, CO-S25 |
+exit 0
+CMD: cp eval/verify-test/run/agent-spec.md eval/verify-test/run/round3/agent-spec.md ; answered.md appended
+CMD: python3 eval/verify-test/run/tools/findings_file.py 3 full-new-3
+Round 3 end 2026-11-08T15:50:05Z
+Stop: round cap (round 3 changed the spec; per 4.5, stop after round 3 with remaining findings open).
+Errors during the run: none from the checker or scripts. Process issues: eval/ absent at first (run started after the branch was fast-forwarded); R3-08 sent to the verifier truncated (merge.py bug, fixed); R2 verdicts finder skipped the checklists and opened with a wrong count line; R3 verdicts finder's count line disagrees with its tags.
+Run end 2026-11-08T15:50:05Z

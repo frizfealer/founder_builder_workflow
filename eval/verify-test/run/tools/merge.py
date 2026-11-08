@@ -10,7 +10,7 @@ def blocks(src):
         if m: cur = m.group(1); out[cur] = [line]; continue
         if line.startswith("```"): cur = None if cur and out.get(cur) and len(out[cur])>3 and False else cur; continue
         if cur:
-            if line.strip()=="" and len(out[cur])>=4: cur=None; continue
+            if line.strip()=="" and any(x.startswith("Pattern:") for x in out[cur]): cur=None; continue
             out[cur].append(line)
     return {k:"\n".join(v).strip() for k,v in out.items()}
 cache = {}
