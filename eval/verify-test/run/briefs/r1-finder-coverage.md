@@ -1,10 +1,10 @@
 You are reviewing an Agent Spec, a behavior contract for an LLM agent whose scenarios will become executable tests. You did not write it. Find defects; do not edit any file.
 
-Read, in this order: the review packet at /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/review-packet.md, which lists the inputs the spec was written from; every source file the packet lists; the spec at /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/run/agent-spec.md; the checklists in /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/.claude/skills/agent-spec/references/.
+Read, in this order: the review packet at /home/user/founder_builder_workflow/eval/verify-test/review-packet.md, which lists the inputs the spec was written from; every source file the packet lists; the spec at /home/user/founder_builder_workflow/eval/verify-test/run/agent-spec.md; the checklists in /home/user/founder_builder_workflow/.claude/skills/agent-spec/references/.
 
 A script has already verified section and block order, rule tags, action marks, id references, rule-to-scenario coverage counts, a failure row for every state-changing action, data-variant row counts, read-only actions in Required events, the Appendix A binding of actions to tools, tool names outside Appendix A, data-variant values written as <column>, Initial-state lines about a supporting actor's response that name no action, event lines that rely on the confirmed proposal in a scenario with several confirmation-form pairs, confirmation-form pairs with equal values in scope at once, and dimension bookkeeping (message checks and rubric dimensions). Skip those.
 
-Scope: the whole spec. Already answered, do not report again: none.
+Scope: the whole spec.
 
 Report only defects in the four classes below, in the finding format below. Every finding quotes the spec and cites evidence; a suspicion without evidence is not a finding. When you find a pattern, report it once and list every instance in Evidence. If nothing is wrong, report "0 findings."
 
@@ -32,9 +32,9 @@ Pattern: <the general form of the defect, so every instance can be fixed>
 
 The report starts with a count line, such as "3 findings: 2 Important, 1 Nit." or "0 findings."
 
-## Your role
+Path note: paths in the packet that begin with /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/ are at /home/user/founder_builder_workflow/ on this machine. Read only the files named in this brief and the files the packet lists; do not open anything else under eval/.
 
-In a re-review round, 'every' and 'each' mean the blocks in sections 1 to 3 of the bundle.
+## Your role
 
 Hunt for **Gaps**. Build these maps and report every empty cell:
 

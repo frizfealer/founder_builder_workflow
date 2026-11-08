@@ -1,0 +1,36 @@
+# run.log (full-new-3)
+
+Setup 2026-11-08T15:20:38Z (first attempt: eval/ absent; resumed after fast-forwarding branch to origin/verify-diff-only 92fde33 at ~15:23Z)
+CMD: rm -rf eval/verify-test/run && mkdir -p eval/verify-test/run/{briefs,reports,round0} && cp eval/verify-test/round0-agent-spec.md eval/verify-test/run/agent-spec.md && cp eval/verify-test/round0-agent-spec.md eval/verify-test/run/round0/agent-spec.md
+Note: uv run prints "warning: The UV_NATIVE_TLS environment variable is deprecated ..." on stderr each run; not an error of the checker.
+Note: no Codex agent type is available in this session; the verdicts finder runs as general-purpose (the current SKILL.md 4.3 names three finders and no Codex).
+Note: briefs are generated from references/verification.md by eval/verify-test/run/tools/make_briefs.py; added lines: a path note mapping the packet's /Users/... paths to /home/user/founder_builder_workflow/, and "Read only the files named in this brief and the files the packet lists; do not open anything else under eval/." (eval/ now holds earlier runs' results).
+
+## Round 1
+Start 2026-11-08T15:23:37Z
+CMD: uv run python .claude/skills/agent-spec/scripts/check_spec.py eval/verify-test/run/agent-spec.md   (4.1, round-1 start)
+0 errors
+WARNING CO-S01, CO-S02, CO-S03, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S01, CO-S02, CO-S09, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S11, CO-S24: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S16, CO-S19: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S18, CO-S20: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S22, CO-S23: identical Required events after substitution; merge candidates (skill step 3.9)
+
+| Rule | Scenarios |
+|---|---|
+| G-01 | CO-S01, CO-S02, CO-S03 |
+| G-02 | CO-S01, CO-S02, CO-S03, CO-S04 |
+| G-03 | CO-S01, CO-S10, CO-S11, CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S23, CO-S24 |
+| G-04 | CO-S11, CO-S12, CO-S13, CO-S14, CO-S15, CO-S16, CO-S22 |
+| CO-01 | CO-S01, CO-S05, CO-S06, CO-S10 |
+| CO-02 | CO-S02, CO-S07 |
+| CO-03 | CO-S01, CO-S08, CO-S09 |
+| CO-04 | CO-S01, CO-S02, CO-S03, CO-S04, CO-S09 |
+| CO-05 | CO-S01, CO-S06, CO-S11, CO-S12, CO-S24 |
+| CO-06 | CO-S11, CO-S12, CO-S13, CO-S15, CO-S16, CO-S17, CO-S18, CO-S22, CO-S23 |
+| CO-07 | CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23 |
+| CO-08 | CO-S01, CO-S16, CO-S19 |
+exit 0
+CMD: python3 eval/verify-test/run/tools/make_briefs.py 1
+Finders dispatched 2026-11-08T15:24:30Z (faithfulness, verdicts, coverage; general-purpose)
