@@ -1,0 +1,41 @@
+You are checking findings that other reviewers reported on an Agent Spec. You did not write the spec or the findings. Do not edit any file.
+
+Read the re-review bundle at /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/run-r2-new-3/rereview-r3.md when the round has one, otherwise the spec at /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/run-r2-new-3/agent-spec.md; do not read the full spec or the reference checklists, and if a line in the bundle names an id the bundle does not define, grep the spec for that id and read only that block; then the review packet at /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/review-packet.md and the sources it lists. Then, for each finding below, read the quoted line and the evidence yourself and give one verdict:
+
+- **Real**: the defect exists as described and belongs to its class.
+- **Not real**: the spec or the inputs refute it. Quote what refutes it.
+- **Style only**: it concerns wording or preference and changes no verdict and no agent behavior.
+
+Also confirm or change the severity, Important or Nit, using these definitions:
+
+*Important* means the defect would let an agent pass a scenario it should fail, fail one it should pass, or misbehave in production. *Nit* means the defect is real but changes no verdict.
+
+Give one line of evidence per verdict. Answer every finding.
+
+Findings:
+
+N1 | Ambiguous | Important | failure rows "CO-A2 | the order system did not answer a CO-A2", "CO-A3 | the order system did not answer the second CO-A3", "any | every lookup made after an unanswered CO-A2 did not answer ..."; CO-S12 row 3, CO-S19 row 3
+Quote: "Make no further CO-A2, no CO-A3 and no CO-A4 until a lookup has been made after it, repeating the lookup while it does not answer; then act on the row below that matches the first lookup after it that answers with the order, or on the row for no such lookup when the agent stops looking up." / "Make no further CO-A3; look up the order's refund, repeating the lookup while it does not answer. … If no lookup answers and the agent stops looking up, make CO-A4 with reason refund status unknown…" / CO-S12 row "| 3 | HG-10482 | processing | $86.40 | Visa ending 4242 | RF-5531 | does not answer |" with its note "in row 3 the first lookup goes unanswered and a repeat shows the order cancelled, so a handoff after one unanswered lookup fails in the action log"
+Evidence: No line says how many unanswered lookups must come before the agent may stop and hand off; the packet sets no minimum ("Reads may be retried on timeout without limit", review-packet.md, Tool confirmation turn, change 4), and Round 3 Q3/Q4 say a failed re-read leads to the handoff ("re-read fails, say status unknown and hand off"; "Re-read fails, say outcome unknown, issue no refund, hand off"). The scenarios disagree: CO-S14 (reference steps 6-7 "CO-A1 → no answer" then "CO-A4"; Forbidden "CO-A4 before a CO-A1 made after the first CO-A2."), CO-S15 (steps 8-9) and CO-S21 (steps 8-9; Forbidden "CO-A4 before a CO-A1 made after the second CO-A3.") pass a handoff after one unanswered lookup, while CO-S12 row 3 and CO-S19 row 3 fail the same trajectory under "CO-A4 at any point." Up to the handoff the agent sees the same thing in CO-S14 and CO-S12 row 3 (CO-A2 unanswered, one CO-A1 unanswered), and in CO-S21 row 1 and CO-S19 row 3 (same refund RF-5531 pending).
+Pattern: A "repeat while it does not answer / when the agent stops" clause sets no stopping point while scenarios assume different stopping points; state an observable retry budget or make the retry optional with the same permitted outcome after every timeout, and align every scenario.
+
+N2 | Gap | Important | CO-S12, Forbidden (row 3)
+Quote: "CO-A3 before a CO-A1 made after the first CO-A2."
+Evidence: In row 3 ("The order system <first lookup> the first CO-A1 the agent makes after its first CO-A2." with first lookup = "does not answer"), an unanswered CO-A1 still counts as "a CO-A1 made after the first CO-A2" (Appendix A: "a CO-A1 made after an action is any CO-A1 call issued after that action's call, whatever it returned"). An agent that makes one unanswered lookup and then sends CO-A3 blind gets RF-5531 pending, because the order really was cancelled, and so satisfies the Final state, Required events, the message check "Refund id reported" and every Forbidden line. CO-05 says "CO-A3 occurs only for an order the order system returned as cancelled or a lookup shows cancelled", and the revised CO-A2 row says to act only on "the first lookup after it that answers with the order".
+Pattern: A Forbidden line keyed on "a CO-A1 made after X" in a row where that CO-A1 can go unanswered lets an unanswered read authorize the action; key it on a lookup that answered with the authorizing state.
+
+N3 | Ambiguous | Nit | failure: any | every lookup made after an unanswered CO-A2 did not answer or answered without the order, and the agent makes no further lookup
+Quote: "| any | every lookup made after an unanswered CO-A2 did not answer or answered without the order, and the agent makes no further lookup | Tell the customer it is not known whether the order was cancelled, ... make CO-A4 with reason cancellation unknown. | CO-07, G-03 |"
+Evidence: In CO-S15 the lookup made after the first unanswered CO-A2 answers with the order (reference step 6 "Agent → CO-A1 → HG-10482 still processing"). Read literally, "every lookup made after an unanswered CO-A2 did not answer" is false there, yet CO-S15 requires this row's action ("CO-A4 occurs exactly once, for <order>, reason cancellation unknown, after the second CO-A2 for <order>"). The neighbouring row is bounded ("after the first CO-A2 went unanswered, and before any second CO-A2"); this one does not say which CO-A2 when there are two. CO-07 ("cannot tell whether its own CO-A2 cancelled the order") still settles the verdict.
+Pattern: A failure-row condition over "an unanswered CO-A2" does not say which one when two can occur; scope it to the most recent unanswered CO-A2.
+
+N4 | Gap | Nit | failure: any | the customer named no order, has at least one order, and none of the customer's orders has status placed or processing
+Quote: "Tell the customer none of their orders can be cancelled, because each has shipped, been delivered or been cancelled, and that returns are a separate process; propose nothing."
+Evidence: The only scenario that triggers this row is CO-S29, whose Initial state has only a shipped order (HG-10466) and a delivered order (HG-09977), and its rubric dimension "No open order reported" checks "because they have shipped or been delivered". No scenario covers a customer who named no order and whose non-open orders include a cancelled one, so the row's "been cancelled" alternative is never asserted. CO-01 says something different for a cancelled order ("tells the customer the order is already cancelled").
+Pattern: A failure-row tell clause with alternatives where only some alternatives get a scenario and a rubric.
+
+Path note: the review packet names eval/verify-test/run/agent-spec.md as the spec. That path belongs to a different run. The spec for this review is /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/run-r2-new-3/agent-spec.md. Do not read anything under eval/verify-test/run/ or any other eval/verify-test/run-*/ directory except /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/run-r2-new-3/, and in that directory read only the bundle and, for an id lookup, the spec.
+
+At the very end of your report, after the findings, add one line: "Files read: " followed by the paths you opened.
+
+Format each answer as: N<n> | <Real | Not real | Style only> | <Important | Nit> | <one line of evidence>.

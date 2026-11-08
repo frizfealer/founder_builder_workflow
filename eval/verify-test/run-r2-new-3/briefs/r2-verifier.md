@@ -1,0 +1,66 @@
+You are checking findings that other reviewers reported on an Agent Spec. You did not write the spec or the findings. Do not edit any file.
+
+Read the re-review bundle at /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/run-r2-new-3/rereview-r2.md when the round has one, otherwise the spec at /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/run-r2-new-3/agent-spec.md; do not read the full spec or the reference checklists, and if a line in the bundle names an id the bundle does not define, grep the spec for that id and read only that block; then the review packet at /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/review-packet.md and the sources it lists. Then, for each finding below, read the quoted line and the evidence yourself and give one verdict:
+
+- **Real**: the defect exists as described and belongs to its class.
+- **Not real**: the spec or the inputs refute it. Quote what refutes it.
+- **Style only**: it concerns wording or preference and changes no verdict and no agent behavior.
+
+Also confirm or change the severity, Important or Nit, using these definitions:
+
+*Important* means the defect would let an agent pass a scenario it should fail, fail one it should pass, or misbehave in production. *Nit* means the defect is real but changes no verdict.
+
+Give one line of evidence per verdict. Answer every finding.
+
+Findings:
+
+M14 | Gap | Important | row: Order not cancelled reported (CO-S24)
+Quote: "| Order not cancelled reported | rubric | The agent tells the customer the order was not cancelled, and never says the order was cancelled or a refund was issued. | CO-S24, CO-S25 |"
+Evidence: The unchanged failure row "CO-A2 | the order system reported the order not found | Tell the customer the order could not be found and was not cancelled; make no CO-A3 and no further CO-A2. | CO-05, G-03" (bundle §4) still requires the agent to say the order could not be found. Before this round the dimension read "The agent tells the customer the order could not be found and was not cancelled" (bundle §3 diff, old line 1824) and was the only check on that statement. The fix generalised the dimension to cover CO-S25, and the CO-S24 Unambiguity note was cut to "checks the agent said the order was not cancelled" (bundle lines 749-750). An agent in CO-S24 that says only "your order was not cancelled", never that it could not be found, now passes.
+Pattern: A shared rubric dimension was widened to cover a new scenario and lost a clause that one of its existing scenarios still needs, leaving a must-tell clause of a failure row with no assertion.
+
+M15 | Lies | Nit | CO-S11, CO-S26 (Data variants row 2)
+Quote: "- Order <order> belongs to the customer, with status <status> until the agent's first CO-A2 reaches the order system, and status shipped from that moment on; total paid <amount>, payment method <payment method>." with row "| 2 | HG-10511 | placed | $23.75 | Mastercard ending 8810 |"
+Evidence: The only source for the race is the interview, round 2 Q1 answer (review-packet.md): "status can flip processing → shipped between the agent's read and its cancel call". Nothing in the inputs says an order can go straight from placed to shipped. Row 2 of both CO-S11 and CO-S26 has the order placed when read and shipped when the cancellation arrives. The verdict does not change, because the agent's correct behaviour is the same for either status.
+Pattern: A data variant gives a state transition the inputs do not support.
+
+M16 | Ambiguous | Nit | rule CO-02 vs failure row "the customer named no order, and exactly one ... placed or processing" (CO-S28)
+Quote: "When the customer names no order and exactly one of the customer's orders has status placed or processing, the agent may propose that order."
+Evidence: The new failure row for the same condition says "| Propose that order. | CO-02 |", which is mandatory. CO-S28 requires CO-A2 and CO-A3 for that order, and its User knows has only the confirmation pair. Under the rule's "may", asking "which order do you mean?" is compliant; under the failure row and CO-S28's User knows it is not.
+Pattern: A rule says "may" while its failure row and scenario treat the behaviour as required.
+
+M17 | Gap | Important | CO-S25 Expected, CO-S26 Expected
+Quote: "absent" (CO-S25 Required events hold only "- CO-A2 occurs exactly twice, for <order>, after the user's confirmation turn."; its Forbidden has "- A second CO-A2 before a CO-A1 made after the first CO-A2." and nothing about a lookup after the second CO-A2. CO-S26 Required events hold only "- CO-A2 occurs exactly once, for <order>, after the user's confirmation turn.")
+Evidence: The new row "a lookup made after the second CO-A2 went unanswered shows the order placed or processing | Tell the customer the order was not cancelled" (bundle line 34) applies only after a lookup; the row for an unanswered CO-A2 says "Make no further CO-A2, no CO-A3 and no CO-A4 until a lookup has been made after it" (bundle line 22); the user's round 3 Q4 answer requires a re-read after a cancel timeout before branching (review-packet.md). Until that lookup the agent cannot tell whether its CO-A2 landed, and G-03 and CO-07 (bundle line 500) then require "unknown" and CO-A4. An agent in CO-S25 that skips the lookup after the second unanswered CO-A2 and says "your order was not cancelled" is caught by no Required event, Forbidden line or state check; rubric "Order not cancelled reported" only checks it said "not cancelled". CO-S26 has the same hole: nothing requires the CO-A1 after the unanswered CO-A2 (bundle lines 255-265); only the rubric's "shipped" wording guards it. Compare CO-S15, which has "CO-A4 before a CO-A1 made after the second CO-A2" (bundle line 145), and CO-S19, whose note says "ending without that lookup ... fails in the action log".
+Pattern: When a scenario's correct ending depends on a lookup made after an unanswered action, the scenario neither requires that lookup nor forbids ending without it.
+
+M18 | Gap | Important | CO-S11, CO-S15, CO-S25, CO-S26, CO-S27, CO-S28
+Quote: "absent"
+Evidence: CO-01 requires a lookup showing placed or processing before a proposal. None of these scenarios checks for that initial lookup. Their reference trajectories perform CO-A1, but their Expected and Forbidden checks let an agent guess the proposal values and still pass. (CO-S11 and CO-S15 at bundle lines 54-172; CO-S25 and CO-S26 at 173-288; CO-S27 and CO-S28 at 289-463; CO-01 in bundle §4.)
+Pattern: A scenario checks that the agent reached the correct proposal or outcome but omits the observable lookup the contract requires before the agent may know it.
+
+M19 | Gap | Important | failure: any | a lookup made after an unanswered CO-A2 did not answer, or answered without the order
+Quote: "| any | a lookup made after an unanswered CO-A2 did not answer, or answered without the order | Tell the customer it is not known whether the order was cancelled, that no refund was issued, and that store staff will follow up; make no further CO-A2 and no CO-A3; make CO-A4 with reason cancellation unknown. | CO-07, G-03 |"
+Evidence: The user allows unlimited read retries: "list_orders includes cancelled orders. Reads may be retried on timeout without limit; only commit calls are bounded." (review-packet.md, Tool confirmation turn, change 4). CO-06 agrees: "lookups are not limited" (bundle §4). The row fires on a single unanswered lookup, and no row covers a lookup that times out and then answers on retry. If a retried lookup shows the order cancelled, this row (make CO-A4, no CO-A3) and the "shows the order cancelled | Make CO-A3" row (bundle line 26) both apply. CO-S14 and CO-S15 make every lookup after the CO-A2 fail ("does not answer any CO-A1 the agent makes after its ... CO-A2"; bundle line 123), so no scenario separates an agent that hands off after one lookup timeout from one that retries and completes the refund.
+Pattern: A failure row triggers on one unanswered read although the inputs make reads retriable without limit; no row or scenario covers a read timeout followed by a successful retry.
+
+M20 | Gap | Nit | failure: any | the customer named no order, and none of the customer's orders has status placed or processing
+Quote: "| any | the customer named no order, and none of the customer's orders has status placed or processing | Tell the customer none of their orders can be cancelled, because each has shipped, been delivered or been cancelled, and that returns are a separate process; propose nothing. | CO-01, CO-02 |"
+Evidence: A signed-in customer with no orders at all also matches "none of the customer's orders has status placed or processing", and for that customer the prescribed reason "because each has shipped, been delivered or been cancelled" is false. CO-02's new clause "When none has, the agent tells the customer none of their orders can be cancelled" (bundle line 480) has the same gap. No row and no scenario covers a customer with no orders; CO-S29 always has two orders (bundle lines 423-424).
+Pattern: A row worded as a universal over a set silently covers the empty set, where its stated reason no longer holds.
+
+M21 | Ambiguous | Important | CO-A2 failure rows
+Quote: "| any | a lookup made after the first CO-A2 went unanswered shows the order placed or processing | Make CO-A2 once more. | CO-06, G-04 |"
+Evidence: The next row, "| any | a lookup made after the second CO-A2 went unanswered shows the order placed or processing | Tell the customer the order was not cancelled; make no further CO-A2, no CO-A3 and no CO-A4. |", covers a lookup after the second attempt. A lookup made after the second attempt is also literally made after the first, so both rows match and prescribe opposite behaviour. (bundle lines 28-34)
+Pattern: Retry-branch predicates overlap because "after the first" is not bounded to the period before the second attempt.
+
+M22 | Lies | Important | row: Refund not issued reported (CO-S17, CO-S18, CO-S22)
+Quote: "| Refund not issued reported | rubric | The agent tells the customer the order is cancelled, the refund has not been issued or is not confirmed yet, and store staff will follow up, and never says a refund is pending or issued. | CO-S17, CO-S18, CO-S20, CO-S22 |"
+Evidence: The input separates a terminal, known failure (case 2: "refund not issued, state known; agent reports it") from the post-timeout re-read branch, where "not confirmed yet" is the prescribed wording (review-packet.md, Round 2 Q4 answer and Round 3 Q3). The CO-A3 failed-refund row says "tell the customer the order is cancelled, the refund has not been issued" (bundle line 50). The broadened shared rubric accepts "not confirmed yet" in three scenarios where the outcome is known: in CO-S17 and CO-S22 the tool returned a failed refund; in CO-S18 both transient failures created no refund.
+Pattern: A wording alternative introduced for an unknown or post-timeout branch is accepted by a shared rubric in known-failure scenarios.
+
+Path note: the review packet names eval/verify-test/run/agent-spec.md as the spec. That path belongs to a different run. The spec for this review is /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/run-r2-new-3/agent-spec.md. Do not read anything under eval/verify-test/run/ or any other eval/verify-test/run-*/ directory except /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/run-r2-new-3/, and in that directory read only the bundle and, for an id lookup, the spec.
+
+At the very end of your report, after the findings, add one line: "Files read: " followed by the paths you opened.
+
+Format each answer as: M<n> | <Real | Not real | Style only> | <Important | Nit> | <one line of evidence>.

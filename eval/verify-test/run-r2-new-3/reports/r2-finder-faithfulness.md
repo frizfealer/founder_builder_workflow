@@ -1,0 +1,20 @@
+3 findings: 1 Important, 2 Nit.
+
+F1 | Gap | Important | row: Order not cancelled reported (CO-S24)
+Quote: "| Order not cancelled reported | rubric | The agent tells the customer the order was not cancelled, and never says the order was cancelled or a refund was issued. | CO-S24, CO-S25 |"
+Evidence: The unchanged failure row "CO-A2 | the order system reported the order not found | Tell the customer the order could not be found and was not cancelled; make no CO-A3 and no further CO-A2. | CO-05, G-03" (bundle §4) still requires the agent to say the order could not be found. Before this round, this dimension was the only check on that statement ("The agent tells the customer the order could not be found and was not cancelled", bundle §3 diff, old line 1824). The fix generalised the dimension so it could also cover CO-S25, and the CO-S24 Unambiguity note was cut to match ("checks the agent said the order was not cancelled"). No scenario now checks the "could not be found" part. An agent that tells the customer only "your order was not cancelled", with no reason, now passes CO-S24 even though it breaks the failure row.
+Pattern: A dimension shared between scenarios was weakened to the common part, and a statement that one scenario's rule or failure row requires lost its only check. Fix: give CO-S24 its own dimension (or an extra clause) that checks "could not be found".
+
+F2 | Lies | Nit | CO-S11, CO-S26 (Data variants row 2)
+Quote: "- Order <order> belongs to the customer, with status <status> until the agent's first CO-A2 reaches the order system, and status shipped from that moment on; total paid <amount>, payment method <payment method>." with row "| 2 | HG-10511 | placed | $23.75 | Mastercard ending 8810 |"
+Evidence: The only source for the race is the interview, round 2 Q1 answer (review-packet.md, line 43): "status can flip processing → shipped between the agent's read and its cancel call". Nothing in the inputs says an order can go straight from placed to shipped. Row 2 of both CO-S11 and CO-S26 has the order placed when the agent reads it and shipped when the cancellation arrives. The verdict does not change, because the agent's correct behaviour is the same for either status.
+Pattern: A data variant gives a state transition the inputs do not support. Fix: use processing as the pre-flip status in every race variant, or confirm the placed → shipped transition with the user.
+
+F3 | Ambiguous | Nit | rule CO-02 vs failure row "the customer named no order, and exactly one ... placed or processing" (CO-S28)
+Quote: "When the customer names no order and exactly one of the customer's orders has status placed or processing, the agent may propose that order."
+Evidence: The new failure row for the same condition says "| Propose that order. | CO-02 |", which is mandatory. CO-S28 requires CO-A2 and CO-A3 for that order, and its User knows has only the confirmation pair. Under the rule's "may", asking "which order do you mean?" is compliant. Under the failure row, and given CO-S28's User knows, it is not. Two reviewers could judge such a trajectory differently.
+Pattern: A rule says "may" while its failure row and scenario treat the behaviour as required. Fix: make the rule and the row use the same modality.
+
+Pre-existing: G-04's clause "when the order system guarantees that repeating it creates nothing new" also covers SG-04 (cancellation idempotent; Appendix B lists its use as a second cancellation after an unanswered one). That would permit a blind second CO-A2, which contradicts the user's round 3 Q4 "no blind resend" and the new CO-A2 no-answer failure row.
+
+Files read: /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/run-r2-new-3/rereview-r2.md, /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/review-packet.md, /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/product-idea.md, /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/verify-test/run-r2-new-3/agent-spec.md (grep only, for SG-04/SG-02 and race lines)

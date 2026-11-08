@@ -1,0 +1,12 @@
+2 findings: 2 Important, 0 Nit.
+Files read: ~/.codex/skills/ground-check/SKILL.md; briefs/r1-finder-verdicts.md; review-packet.md; product-idea.md; run/agent-spec.md; references/cockburn-checklist.html; cockburn-checklist.md; evaluation-checklist.md; specification-by-example-checklist.md; verification.md
+
+F1 | Untestable | Important | CO-S03 and CO-S04, User
+Quote: "- Turn 2, in reply to the agent's first question that proposes cancelling HG-10482 and asks to go ahead, in place of a confirmation: \"<Turn 2>\""
+Evidence: The same free-form trigger appears in agent-spec.md:248 and :308. Section 5.1 defines a confirmation question as stating every proposal value, whereas these triggers neither name that event nor require the refund amount and payment method. evaluation-checklist.md:39 requires a scripted User turn to name a §5.1-defined event and expressly rejects "a proposal" or "an offer" as its trigger. A converter therefore cannot deterministically distinguish a partial cancellation question from the intended full confirmation question without rewording the line.
+Pattern: Scripted User turns are triggered by an informal description of proposal wording instead of a named, mechanically identifiable §5.1 event; every instance must anchor Turn 2 to the defined confirmation question.
+
+F2 | Ambiguous | Important | CO-S19, CO-S20 and CO-S21, Initial state
+Quote: "- The order system does not answer the agent's first or second CO-A3, and together they create refund RF-5531 for HG-10482, amount $86.40, payment method Visa ending 4242, with status <refund status>."
+Evidence: CO-S19 (line 1120), CO-S20 (line 1177) and CO-S21 (line 1236) all assign an aggregate effect to two timed-out refund calls without saying which call creates the refund. In CO-S21, only CO-A1 calls after the second CO-A3 are forced not to answer, so a valid extra lookup between the two calls has an undefined result: it may reveal the refund if the first call created it, or show no refund if the second creates it. This conflicts with the Unambiguity note's claim that the agent can see neither the refund nor its status, and it matters because the scenario's rubric requires "unknown" and forbids reporting pending, issued or failed.
+Pattern: Effects of multiple timed-out writes are specified only in aggregate, leaving intermediate world state undefined; assign the effect of each timed-out call separately so optional intervening reads have one determined result.

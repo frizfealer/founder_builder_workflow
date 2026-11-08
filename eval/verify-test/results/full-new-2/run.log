@@ -1,0 +1,214 @@
+Trial full-new-2 (verification-only run of agent-spec step 4)
+Run start: 2026-11-07T19:21:59Z
+
+## Setup
+$ rm -rf eval/verify-test/run; mkdir -p eval/verify-test/run/round0 eval/verify-test/run/briefs eval/verify-test/run/reports eval/verify-test/results/full-new-2
+$ cp eval/verify-test/round0-agent-spec.md eval/verify-test/run/agent-spec.md
+$ cp eval/verify-test/round0-agent-spec.md eval/verify-test/run/round0/agent-spec.md   (step 4.2's round0 save; packet writing skipped per prompt)
+Review packet: eval/verify-test/review-packet.md (used as is). Scratch: eval/verify-test/run/.
+Run starts at step 4, so no §5.1/§5.2 re-sync (SKILL.md: "a run that starts at step 4 does not re-sync").
+
+## Round 1
+Round 1 start: 2026-11-07T19:21:59Z
+
+### 4.1 checker (round 1 start)
+$ uv run python .claude/skills/agent-spec/scripts/check_spec.py eval/verify-test/run/agent-spec.md
+0 errors
+WARNING CO-S01, CO-S02, CO-S03, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S01, CO-S02, CO-S09, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S11, CO-S24: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S16, CO-S19: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S18, CO-S20: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S22, CO-S23: identical Required events after substitution; merge candidates (skill step 3.9)
+
+| Rule | Scenarios |
+|---|---|
+| G-01 | CO-S01, CO-S02, CO-S03 |
+| G-02 | CO-S01, CO-S02, CO-S03, CO-S04 |
+| G-03 | CO-S01, CO-S10, CO-S11, CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S23, CO-S24 |
+| G-04 | CO-S11, CO-S12, CO-S13, CO-S14, CO-S15, CO-S16, CO-S22 |
+| CO-01 | CO-S01, CO-S05, CO-S06, CO-S10 |
+| CO-02 | CO-S02, CO-S07 |
+| CO-03 | CO-S01, CO-S08, CO-S09 |
+| CO-04 | CO-S01, CO-S02, CO-S03, CO-S04, CO-S09 |
+| CO-05 | CO-S01, CO-S06, CO-S11, CO-S12, CO-S24 |
+| CO-06 | CO-S11, CO-S12, CO-S13, CO-S15, CO-S16, CO-S17, CO-S18, CO-S22, CO-S23 |
+| CO-07 | CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23 |
+| CO-08 | CO-S01, CO-S16, CO-S19 |
+(Warnings are step 3.9 merge candidates; this trial starts at step 4.1, whose done condition is "0 errors".)
+
+$ uv run python -I <scratchpad>/build_briefs.py 1 none   (builds eval/verify-test/run/briefs/r1-finder-{faithfulness,verdicts,coverage}.md and r1-verifier{,-adversarial}.md from references/verification.md: shared header + role section, slots filled)
+
+### 4.3 finders dispatched 2026-11-07T19:23:07Z (three in parallel)
+faithfulness: general-purpose (Opus 5.5), agent a9e8b1fc
+coverage: general-purpose (Opus 5.5), agent a5671c93
+verdicts: codex:codex-rescue (Codex-backed), agent a74e5de1; asked to forward read-only and wait for the Codex job
+Finder return: faithfulness ~19:27:16Z (5 findings: 3 Important, 2 Nit)
+Finder return: coverage ~19:28:00Z (6 findings: 5 Important, 1 Nit)
+Both non-Codex finders returned by 19:28:00Z; per 4.3 the Codex-backed verdicts finder (a74e5de1) is not waited for. It had not returned at 19:28:20Z. Its findings, when they arrive, fold into round 2 (or into 'unverified' if there is no round 2).
+Raw counts (round 1, on-time): faithfulness 5 (3 I, 2 N) + coverage 6 (5 I, 1 N) = 11. Duplicates: faithfulness F1 = coverage F3 (same quote, second-CO-A2 row).
+Merged round 1: 10 findings: 7 Important, 3 Nit.
+$ uv run python -I <scratchpad>/merge.py 1 <scratchpad>/r1map.txt   (wrote eval/verify-test/run/round1-merged.md and round1-to-verify.md: 10 merged, 7 to verify)
+
+### 4.4 verifiers dispatched 2026-11-07T19:28:40Z on eval/verify-test/run/round1-to-verify.md (7 Important)
+standard: general-purpose (Opus 5.5), agent accf2e6c
+adversarial: general-purpose (Opus 5.5), agent a9dce7e6
+Nits straight to 4.5: R1-08, R1-09, R1-10.
+Codex verdicts finder (a74e5de1) report via handback ~19:29:30Z (3 findings: 3 Important, 0 Nit), after the 4.4 verifiers were dispatched (19:28:40Z); folded into round 2 per 4.3.
+Standard verifier returned ~19:30:20Z (Real 7; Important 6, Nit 1). Codex verdicts finder notification 2 (finished, no new report) ~19:30:20Z.
+Adversarial verifier returned ~19:31:00Z (6 Real, 1 Not real, 0 Style only).
+
+### 4.4 decisions (round 1)
+Kept, both Real: R1-01, R1-02, R1-03, R1-04, R1-05, R1-06 (Important).
+Split: R1-07 (standard Real Nit; adversarial Not real Important) -> kept at the lower severity, Nit, adversarial refutation recorded.
+Dropped: none. Verifier drop rate 0/7.
+Nits straight to 4.5: R1-08, R1-09, R1-10.
+
+### 4.5 fixes (round 1)
+$ uv run python -I <scratchpad>/fix_r1.py eval/verify-test/run/agent-spec.md <scratchpad>/r1-new-scenarios.md   (string replacements, each asserted unique; new scenarios CO-S25, CO-S26, CO-S27 inserted before §5)
+Fixed: R1-01, R1-03, R1-04, R1-05, R1-09, R1-10. Answered: R1-07. Open: R1-02, R1-06 (user decisions), R1-08 (proposed rule change to G-04, not applied per the rule-change limit).
+New rule CO-09; new failure row (no order named, none open); rewritten rows "second CO-A2 unanswered", "provider unavailable for the second CO-A3", "second CO-A3 unanswered"; new rows CO-S01 r4, CO-S03 r4, CO-S05 r4, CO-S20 r3; new dimensions Refund not confirmed reported, No arrival date promised, Cancellation not made reported.
+
+### 4.1 checker (after round 1 fixes)
+$ uv run python .claude/skills/agent-spec/scripts/check_spec.py eval/verify-test/run/agent-spec.md
+0 errors
+WARNING CO-S01, CO-S02, CO-S03, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S01, CO-S02, CO-S09, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S11, CO-S24: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S13, CO-S25: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S16, CO-S19: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S18, CO-S20: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S22, CO-S23: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S26, CO-S27: identical Required events after substitution; merge candidates (skill step 3.9)
+(coverage table: G-01..CO-09 all covered; CO-09: CO-S01. Full table in report.md.)
+(CO-S13/CO-S25 stay apart: CO-S25 forbids CO-A3 before a lookup after the second CO-A2, which CO-S13 allows, and this spec's §5.1 defines no conditional Forbidden lines. CO-S26/CO-S27 stay apart: final status and rubric dimension differ.)
+
+$ cp eval/verify-test/run/agent-spec.md eval/verify-test/run/round1/agent-spec.md
+wrote eval/verify-test/run/answered.md (round 1 section)
+$ uv run python .claude/skills/agent-spec/scripts/build_rereview.py eval/verify-test/run/round0/agent-spec.md eval/verify-test/run/round1/agent-spec.md --answered eval/verify-test/run/answered.md --out eval/verify-test/run/rereview-r2.md
+wrote eval/verify-test/run/rereview-r2.md: 81403 chars
+$ uv run python -I <scratchpad>/findings_md.py 1 <scratchpad>/r1dec.json eval/verify-test/results/full-new-2/round1-findings.md
+Round 1 end: 2026-11-07T19:35:20Z
+
+## Round 2
+Round 2 start: 2026-11-07T19:35:20Z
+$ uv run python -I <scratchpad>/build_briefs.py 2 none eval/verify-test/run/rereview-r2.md   (re-review header for finders and verifiers)
+
+### 4.3 finders dispatched 2026-11-07T19:35:35Z (three in parallel, re-review header, bundle rereview-r2.md)
+faithfulness: general-purpose (Opus 5.5), agent ac9d980f
+coverage: general-purpose (Opus 5.5), agent a52364f2
+verdicts: codex:codex-rescue (Codex-backed), agent adb46606
+Late round-1 Codex findings carried in: R2-L1 (= R1-06), R2-L2, R2-L3; Important, verified with round 2's Important findings.
+EVENT ~2026-11-07T19:36:25Z: round 2 verdicts finder (codex:codex-rescue, adb46606) handed back WITHOUT a report: its single codex-companion task call returned only progress lines and ended while Codex was still tracing the bundle (Codex thread 01a1b782-4eac-7313-a54e-7f10d7b819de); notification 1: tool_uses 3, duration_ms 45332, tokens 11521. 2026-11-07T19:36:25Z: SendMessage to it asking it to fetch that thread's result and return the report verbatim.
+Finder return: coverage ~19:38:10Z (5 findings: 1 Important, 4 Nit)
+Finder return: faithfulness ~19:38:45Z (4 findings: 1 Important, 3 Nit; plus 1 Pre-existing line)
+Both non-Codex finders returned by 19:38:45Z; the Codex verdicts finder (adb46606) has no report yet (SendMessage pending) and is not waited for (4.3).
+Raw counts (round 2, on time): faithfulness 4 (1 I, 3 N) + 1 Pre-existing; coverage 5 (1 I, 4 N). Duplicates: faithfulness F2 = coverage F4; faithfulness F3 = coverage F5.
+Late round-1 Codex findings folded in: R2-L1 (= R1-06, duplicate of a finding already verified and kept open; not re-verified), R2-L2, R2-L3 (Important, verified now).
+Merged round 2: 7 findings from round 2 finders (2 Important, 5 Nit) + 2 late Important = 9 to handle; 1 Pre-existing.
+$ uv run python -I <scratchpad>/merge.py 2 <scratchpad>/r2map.txt   (wrote round2-merged.md and round2-to-verify.md: 9 merged, 4 to verify)
+
+### 4.4 verifiers dispatched 2026-11-07T19:39:02Z on eval/verify-test/run/round2-to-verify.md (R2-01, R2-02, R2-L2, R2-L3)
+standard: general-purpose (Opus 5.5), agent a01e74e2
+adversarial: general-purpose (Opus 5.5), agent ad4b4966
+Nits straight to 4.5: R2-03, R2-04, R2-05, R2-06, R2-07.
+Standard verifier (a01e74e2) returned ~19:41:00Z (Real 4: 2 Important, 2 Nit).
+Adversarial verifier (ad4b4966) returned ~19:42:30Z (1 Real, 3 Not real, 0 Style only).
+
+### 4.4 decisions (round 2)
+Kept, both Real: R2-01 (Important).
+Split, kept at the lower severity with the adversarial refutation recorded: R2-02 (std Real Important / adv Not real Nit -> Nit), R2-L2 (std Real Nit / adv Not real Nit -> Nit), R2-L3 (std Real Nit / adv Not real Nit -> Nit).
+Dropped: none. Verifier drop rate 0/4.
+Duplicate, not re-verified: R2-L1 (= R1-06, kept and open since round 1).
+Nits straight to 4.5: R2-03, R2-04, R2-05, R2-06, R2-07. Pre-existing (reported, untouched): first-CO-A2 row message-before-CO-A4 ordering.
+~19:42Z: round 2 Codex verdicts finder notification 2 (after my SendMessage): "waiting on its own background work"; still no report (tool_uses 9, duration_ms 435498, tokens 15621).
+
+### 4.5 fixes (round 2)
+$ uv run python -I <scratchpad>/fix_r2.py eval/verify-test/run/agent-spec.md <scratchpad>/r2-co-s26.md   (string replacements asserted with exact counts; CO-S26 block replaced)
+Fixed: R2-01, R2-03, R2-04, R2-05, R2-06, R2-07, R2-L2, R2-L3. Open: R2-02 (user decision). Pre-existing left untouched: first-CO-A2 row ordering.
+
+### 4.1 checker (after round 2 fixes)
+$ uv run python .claude/skills/agent-spec/scripts/check_spec.py eval/verify-test/run/agent-spec.md
+0 errors
+(same 8 WARNING groups as after round 1; coverage G-01..CO-09 all covered, unchanged from round 1's table)
+
+$ cp eval/verify-test/run/agent-spec.md eval/verify-test/run/round2/agent-spec.md
+appended round 2 section to eval/verify-test/run/answered.md
+$ uv run python .claude/skills/agent-spec/scripts/build_rereview.py eval/verify-test/run/round1/agent-spec.md eval/verify-test/run/round2/agent-spec.md --answered eval/verify-test/run/answered.md --out eval/verify-test/run/rereview-r3.md
+wrote eval/verify-test/run/rereview-r3.md: 29813 chars
+$ uv run python -I <scratchpad>/findings_md.py 2 <scratchpad>/r2dec.json eval/verify-test/results/full-new-2/round2-findings.md
+Round 2 end: 2026-11-07T19:43:39Z
+
+## Round 3
+Round 3 start: 2026-11-07T19:43:39Z
+$ uv run python -I <scratchpad>/build_briefs.py 3 none eval/verify-test/run/rereview-r3.md
+
+### 4.3 finders dispatched 2026-11-07T19:43:55Z (three in parallel, re-review header, bundle rereview-r3.md)
+faithfulness: general-purpose (Opus 5.5), agent a79422c0
+coverage: general-purpose (Opus 5.5), agent ae7eea11
+verdicts: codex:codex-rescue (Codex-backed), agent a63c5571 (forwarding prompt now also tells it to poll status/result if the Codex call returns early)
+Finder return: faithfulness ~19:46:27Z (1 finding: 1 Important; plus 1 Pre-existing line)
+~19:46:30Z: round 2 Codex verdicts finder notification 3: still waiting on background work, no report (tool_uses 12, duration_ms 654466, tokens 19784).
+Finder return: coverage ~19:47:00Z (1 finding: 0 Important, 1 Nit; plus 1 Pre-existing line)
+Both non-Codex finders returned by 19:47:00Z; the round 3 Codex verdicts finder (a63c5571) and the round 2 one (adb46606) have no report yet and are not waited for (4.3).
+Raw counts (round 3): faithfulness 1 (1 I) + 1 Pre-existing; coverage 1 (1 N) + 1 Pre-existing. No duplicates.
+Merged round 3: 2 findings: 1 Important, 1 Nit; 2 Pre-existing.
+$ uv run python -I <scratchpad>/merge.py 3 <scratchpad>/r3map.txt   (wrote round3-merged.md and round3-to-verify.md: 2 merged, 1 to verify)
+
+### 4.4 verifiers dispatched 2026-11-07T19:47:17Z on eval/verify-test/run/round3-to-verify.md (R3-01)
+standard: general-purpose (Opus 5.5), agent afcab726
+adversarial: general-purpose (Opus 5.5), agent a2b18eda
+Nit straight to 4.5: R3-02.
+Standard verifier (afcab726) returned ~19:48:20Z (Real 1, plus the Pre-existing note confirmed).
+Adversarial verifier (a2b18eda) returned ~19:49:20Z (2 Real, both Important: R3-01 and the Pre-existing note).
+
+### 4.4 decisions (round 3)
+Kept, both Real: R3-01 (Important). Dropped: none. Verifier drop rate 0/1.
+Nit straight to 4.5: R3-02. Pre-existing (reported, untouched): first-CO-A2 row lookup-fails branch omits "no refund was issued" (both verifiers confirmed it Real); second-CO-A4-unanswered row untested for reasons other than refund not issued.
+
+### 4.5 fixes (round 3)
+$ uv run python -I <scratchpad>/fix_r3.py eval/verify-test/run/agent-spec.md
+Fixed: R3-01 (both instances). R3-02 fixed in part (new CO-S06 row 3; Turn 1 now a column).
+
+### 4.1 checker (after round 3 fixes, final)
+$ uv run python .claude/skills/agent-spec/scripts/check_spec.py eval/verify-test/run/agent-spec.md
+0 errors
+WARNING CO-S01, CO-S02, CO-S03, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S01, CO-S02, CO-S09, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S11, CO-S24: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S13, CO-S25: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S16, CO-S19: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S18, CO-S20: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S22, CO-S23: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S26, CO-S27: identical Required events after substitution; merge candidates (skill step 3.9)
+
+| Rule | Scenarios |
+|---|---|
+| G-01 | CO-S01, CO-S02, CO-S03 |
+| G-02 | CO-S01, CO-S02, CO-S03, CO-S04 |
+| G-03 | CO-S01, CO-S10, CO-S11, CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S23, CO-S24, CO-S26, CO-S27 |
+| G-04 | CO-S11, CO-S12, CO-S13, CO-S14, CO-S15, CO-S16, CO-S22, CO-S25, CO-S26, CO-S27 |
+| CO-01 | CO-S01, CO-S05, CO-S06, CO-S10 |
+| CO-02 | CO-S02, CO-S07 |
+| CO-03 | CO-S01, CO-S08, CO-S09 |
+| CO-04 | CO-S01, CO-S02, CO-S03, CO-S04, CO-S09 |
+| CO-05 | CO-S01, CO-S06, CO-S11, CO-S12, CO-S24, CO-S25, CO-S26 |
+| CO-06 | CO-S11, CO-S12, CO-S13, CO-S15, CO-S16, CO-S17, CO-S18, CO-S22, CO-S23, CO-S25, CO-S26, CO-S27 |
+| CO-07 | CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23, CO-S27 |
+| CO-08 | CO-S01, CO-S16, CO-S19 |
+| CO-09 | CO-S01 |
+$ cp eval/verify-test/run/agent-spec.md eval/verify-test/run/round3/agent-spec.md
+appended round 3 section to eval/verify-test/run/answered.md
+No re-review bundle built: N is 3 (SKILL.md 4.5). Round cap reached; stop.
+Round 3 end: 2026-11-07T19:49:37Z
+~19:50:00Z: round 3 Codex verdicts finder (a63c5571) report arrived (1 finding: 1 Important), after round 3 ended; no next round, so listed in the report under 'unverified', not applied. Saved at eval/verify-test/run/reports/r3-verdicts-codex.md.
+2026-11-07T19:54:15Z: second SendMessage to the round 2 Codex verdicts finder (adb46606), asking it to fetch the Codex job result or report its status.
+2026-11-07T19:54:26Z: round 2 Codex verdicts finder replied: Codex job task-mw6szlw5-otc7sg (thread 01a1b782-...) still running ('verifying' phase, 18m42s), no report yet; it started a background wait to fetch the result.
+Codex job log task-mw6szlw5-otc7sg.log last written 2026-11-07T19:36:05Z (no output since).
+2026-11-07T22:05:55Z: round 2 Codex verdicts finder notification 5 (finished; its second hand-back was refused by the harness, content not delivered). Third SendMessage sent asking it to resend.
+2026-11-07T22:06:06Z: round 2 Codex verdicts finder final reply: no report exists; Codex job task-mw6szlw5-otc7sg still running ('verifying', 47m10s) with no output since 19:36:05Z, apparently stalled; not cancelled. Recorded as returned with no findings.
+
+## After round 3
+Waited for the outstanding Codex-backed finders, per the trial instruction. Round 3 Codex report arrived ~19:50:00Z (unverified). Round 2 Codex finder returned a final reply with no findings (job stalled). A local log-watch loop (background Bash) was stopped with TaskStop after the last reply. The clock jumped from about 20:15Z to 22:00Z while the run waited, probably because the machine slept.
+Every subagent dispatched has returned a report or a final reply (17 subagents; see subagent-stats.md).
+Wall clock: round 1 start 2026-11-07T19:21:59Z to round 3 end 2026-11-07T19:49:37Z = 27m38s. Run end, after the last subagent reply: 2026-11-07T23:07:10Z.

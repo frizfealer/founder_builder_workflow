@@ -1,0 +1,101 @@
+run start: 2026-11-06 19:09:46 EST
+layout: eval/verify-test created in repo from ~/Downloads/eval (round1-*) and ~/Downloads/eval-1 (round0, packet, product-idea); baseline/ and earlier run/ not copied
+$ uv run python .claude/skills/agent-spec/scripts/check_spec.py eval/verify-test/run/agent-spec.md
+0 errors
+WARNING CO-S01, CO-S02, CO-S03, CO-S12, CO-S27, CO-S28: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S01, CO-S02, CO-S09, CO-S12, CO-S28: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S11, CO-S24, CO-S26: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S16, CO-S19: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S18, CO-S20: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S22, CO-S23: identical Required events after substitution; merge candidates (skill step 3.9)
+
+| Rule | Scenarios |
+|---|---|
+| G-01 | CO-S01, CO-S02, CO-S03, CO-S06 |
+| G-02 | CO-S01, CO-S02, CO-S03, CO-S04, CO-S27 |
+| G-03 | CO-S01, CO-S10, CO-S11, CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S23, CO-S24, CO-S25, CO-S26 |
+| G-04 | CO-S12, CO-S13, CO-S14, CO-S15, CO-S16, CO-S22, CO-S25, CO-S26 |
+| CO-01 | CO-S01, CO-S05, CO-S06, CO-S10, CO-S29 |
+| CO-02 | CO-S02, CO-S07, CO-S28, CO-S29 |
+| CO-03 | CO-S01, CO-S08, CO-S09 |
+| CO-04 | CO-S01, CO-S02, CO-S03, CO-S04, CO-S09, CO-S27, CO-S28 |
+| CO-05 | CO-S01, CO-S11, CO-S12, CO-S24, CO-S26 |
+| CO-06 | CO-S12, CO-S13, CO-S15, CO-S16, CO-S17, CO-S18, CO-S22, CO-S23, CO-S25 |
+| CO-07 | CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23, CO-S25 |
+| CO-08 | CO-S01, CO-S16, CO-S19 |
+
+round 1: frozen, not run (findings in run/round1/answered.md)
+round 2 scope, from section diff of run/round0 vs run/round1: Contract, Failure handling, CO-S01..CO-S29, 5.2 Metrics and graders, Appendix A
+round 2 start: 2026-11-06 19:11:04 EST
+round 2 finders returned: faithfulness 10 (3 Important, 7 Nit); verdicts/Codex 3 (2 Important, 1 Nit); coverage 17 (13 Important, 4 Nit). Merged 30 into 25 (coverage F2+faithfulness F2; coverage F5+verdicts F2; coverage F10+verdicts F1; coverage F12+faithfulness F9; coverage F16+faithfulness F6).
+deviation: verifiers read the merged list from run/r2-merged.md instead of receiving it pasted; same content.
+verifiers dispatched: 19:19:29
+round 2 verifiers returned: A 25 Real (15 Important, 10 Nit); B 25 Real (13 Important, 12 Nit by its per-finding lines; R2-04, R2-14 lowered to Nit; its summary line said 18/7, a miscount); C 25 Real (15 Important, 10 Nit). All kept. Majority severity: 15 Important, 10 Nit.
+verifiers done: 19:23:13
+$ uv run python -I <scratchpad>/r2_fix.py eval/verify-test/run/agent-spec.md <scratchpad>/r2_new_scenarios.md
+$ uv run python .claude/skills/agent-spec/scripts/check_spec.py eval/verify-test/run/agent-spec.md
+0 errors
+WARNING CO-S01, CO-S02, CO-S03, CO-S12, CO-S27, CO-S28: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S01, CO-S02, CO-S09, CO-S12, CO-S28, CO-S32, CO-S36, CO-S37: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S01, CO-S34: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S11, CO-S24, CO-S26: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S13, CO-S30: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S16, CO-S19, CO-S43: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S18, CO-S20, CO-S40: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S22, CO-S23: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S25, CO-S31: identical Required events after substitution; merge candidates (skill step 3.9)
+
+| Rule | Scenarios |
+|---|---|
+| G-01 | CO-S01, CO-S02, CO-S03, CO-S06 |
+| G-02 | CO-S01, CO-S02, CO-S03, CO-S04, CO-S27, CO-S32, CO-S33, CO-S36 |
+| G-03 | CO-S01, CO-S10, CO-S11, CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S23, CO-S24, CO-S25, CO-S26, CO-S31, CO-S38, CO-S39, CO-S40, CO-S43 |
+| G-04 | CO-S12, CO-S13, CO-S14, CO-S15, CO-S16, CO-S22, CO-S25, CO-S26, CO-S30, CO-S31, CO-S43 |
+| CO-01 | CO-S01, CO-S05, CO-S06, CO-S10, CO-S29, CO-S33, CO-S41 |
+| CO-02 | CO-S02, CO-S07, CO-S28, CO-S29, CO-S41, CO-S42 |
+| CO-03 | CO-S01, CO-S08, CO-S09, CO-S32, CO-S34, CO-S37 |
+| CO-04 | CO-S01, CO-S02, CO-S03, CO-S04, CO-S09, CO-S27, CO-S28, CO-S32, CO-S33, CO-S34, CO-S35, CO-S36 |
+| CO-05 | CO-S01, CO-S11, CO-S12, CO-S24, CO-S26, CO-S30, CO-S31 |
+| CO-06 | CO-S12, CO-S13, CO-S15, CO-S16, CO-S17, CO-S18, CO-S22, CO-S23, CO-S25, CO-S30, CO-S31, CO-S38, CO-S39, CO-S43 |
+| CO-07 | CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23, CO-S25, CO-S38, CO-S39, CO-S40, CO-S43 |
+| CO-08 | CO-S01, CO-S16, CO-S19 |
+round 2 end: 2026-11-06 19:29:33 EST
+round 3 start: 2026-11-06 19:29:33 EST
+round 3 finders returned: faithfulness 6 (1 Important, 5 Nit); verdicts/Codex 1 (1 Important); coverage 7 (5 Important, 2 Nit). Merged 14 into 13 (coverage F1+verdicts F1).
+note: round 3 coverage and faithfulness finders opened run/r2-merged.md and faithfulness also run/answered-so-far.md, which were in the scratch directory; neither was named in their brief.
+verifiers dispatched: 19:38:48
+round 3 verifiers returned: A 13 Real (R3-12 raised to Important; R3-11 evidence partly overstated); B 13 Real, no change; C 13 Real, no change. All kept. Majority severity: 6 Important, 7 Nit.
+$ uv run python -I <scratchpad>/r3_fix.py eval/verify-test/run/agent-spec.md <scratchpad>/r3_new_scenarios.md
+$ uv run python .claude/skills/agent-spec/scripts/check_spec.py eval/verify-test/run/agent-spec.md
+0 errors
+WARNING CO-S01, CO-S02, CO-S03, CO-S12, CO-S27, CO-S28: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S01, CO-S02, CO-S09, CO-S12, CO-S28, CO-S32, CO-S36, CO-S37: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S01, CO-S34: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S11, CO-S24, CO-S26: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S13, CO-S30: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S16, CO-S19, CO-S43, CO-S44: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S16, CO-S44: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S18, CO-S20, CO-S40, CO-S45: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S22, CO-S23: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S25, CO-S31: identical Required events after substitution; merge candidates (skill step 3.9)
+
+| Rule | Scenarios |
+|---|---|
+| G-01 | CO-S01, CO-S02, CO-S03, CO-S06 |
+| G-02 | CO-S01, CO-S02, CO-S03, CO-S04, CO-S27, CO-S32, CO-S33, CO-S36, CO-S46 |
+| G-03 | CO-S01, CO-S10, CO-S11, CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S23, CO-S24, CO-S25, CO-S26, CO-S31, CO-S38, CO-S39, CO-S40, CO-S43, CO-S44, CO-S45 |
+| G-04 | CO-S12, CO-S13, CO-S14, CO-S15, CO-S16, CO-S22, CO-S25, CO-S26, CO-S30, CO-S31, CO-S43 |
+| CO-01 | CO-S01, CO-S05, CO-S06, CO-S10, CO-S29, CO-S33, CO-S41 |
+| CO-02 | CO-S02, CO-S07, CO-S28, CO-S29, CO-S41, CO-S42 |
+| CO-03 | CO-S01, CO-S08, CO-S09, CO-S32, CO-S34, CO-S37, CO-S46 |
+| CO-04 | CO-S01, CO-S02, CO-S03, CO-S04, CO-S09, CO-S27, CO-S28, CO-S32, CO-S33, CO-S34, CO-S35, CO-S36, CO-S46 |
+| CO-05 | CO-S01, CO-S11, CO-S12, CO-S24, CO-S26, CO-S30, CO-S31 |
+| CO-06 | CO-S12, CO-S13, CO-S15, CO-S16, CO-S17, CO-S18, CO-S22, CO-S23, CO-S25, CO-S30, CO-S31, CO-S38, CO-S39, CO-S43, CO-S44, CO-S45 |
+| CO-07 | CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23, CO-S25, CO-S38, CO-S39, CO-S40, CO-S43, CO-S44, CO-S45 |
+| CO-08 | CO-S01, CO-S16, CO-S19 |
+round 3 end: 2026-11-06 19:44:26 EST
+stop: round cap reached (round 3 ended). Round 3's fixes were not reviewed by another round.
+errors: none from any script. One shell command failed in zsh on an echo of '=====' (read-only inspection, repeated without it).
+other script commands: section diff run/round0 vs run/round1 and run/round1 vs run/round2 with <scratchpad>/secdiff.py; quote test with an inline python3 script; <scratchpad>/build_findings.py to assemble the findings files.
+deviations from the literal paths: eval/verify-test did not exist in the repo and was built from ~/Downloads/eval and ~/Downloads/eval-1.
+report written; run end: 2026-11-06 19:45:25 EST

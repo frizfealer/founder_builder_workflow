@@ -1,0 +1,22 @@
+r1 | finder faithfulness | general-purpose (Opus 5.5) | a9e8b1fc | tool_uses 12 | duration_ms 232875 | tokens 119208 | report via handback 19:27:16Z, notification 1 right after
+r1 | finder coverage | general-purpose (Opus 5.5) | a5671c93 | tool_uses 11 | duration_ms 276442 | tokens 124014 | report via handback ~19:28:00Z, notification 1 right after
+r1 | finder verdicts | codex:codex-rescue (wrapper; Codex model not reported) | a74e5de1 | notification 1: tool_uses 6 | duration_ms 420762 | tokens 18555 | "waiting on its own background work"; report arrived via handback with it (~19:29:30Z)
+r1 | verifier standard | general-purpose (Opus 5.5) | accf2e6c | tool_uses 7 | duration_ms 98727 | tokens 97377 | report ~19:30:20Z, notification 1
+r1 | finder verdicts | codex:codex-rescue | a74e5de1 | notification 2: tool_uses 6 | duration_ms 423899 | tokens 19175 | finished (background work done); no new report
+r1 | verifier adversarial | general-purpose (Opus 5.5) | a9dce7e6 | tool_uses 8 | duration_ms 131390 | tokens 105112 | report ~19:31:00Z, notification 1
+r2 | finder verdicts | codex:codex-rescue | adb46606 | notification 1: tool_uses 3 | duration_ms 45332 | tokens 11521 | finished WITHOUT a report (Codex call ended while Codex was still working; thread 01a1b782-...); SendMessage sent to collect
+r2 | finder coverage | general-purpose (Opus 5.5) | a52364f2 | tool_uses 9 | duration_ms 148210 | tokens 99800 | report ~19:38:10Z, notification 1
+r2 | finder faithfulness | general-purpose (Opus 5.5) | ac9d980f | tool_uses 9 | duration_ms 172413 | tokens 102699 | report ~19:38:45Z, notification 1
+r2 | verifier standard | general-purpose (Opus 5.5) | a01e74e2 | tool_uses 12 | duration_ms 121069 | tokens 88980 | report ~19:41:00Z, notification 1
+r2 | verifier adversarial | general-purpose (Opus 5.5) | ad4b4966 | tool_uses 15 | duration_ms 185433 | tokens 99141 | report ~19:42:15Z, notification 1
+r2 | finder verdicts | codex:codex-rescue | adb46606 | notification 2 (after my SendMessage): tool_uses 9 | duration_ms 435498 | tokens 15621 | 'waiting on its own background work'; still no report
+r3 | finder faithfulness | general-purpose (Opus 5.5) | a79422c0 | tool_uses 10 | duration_ms 144866 | tokens 85614 | report ~19:46:27Z, notification 1
+r2 | finder verdicts | codex:codex-rescue | adb46606 | notification 3: tool_uses 12 | duration_ms 654466 | tokens 19784 | 'waiting on its own background work'; still no report
+r3 | finder coverage | general-purpose (Opus 5.5) | ae7eea11 | tool_uses 14 | duration_ms 178061 | tokens 94083 | report ~19:47:00Z, notification 1
+r3 | verifier standard | general-purpose (Opus 5.5) | afcab726 | tool_uses 13 | duration_ms 66956 | tokens 69239 | report ~19:48:20Z, notification 1
+r3 | verifier adversarial | general-purpose (Opus 5.5) | a2b18eda | tool_uses 11 | duration_ms 102650 | tokens 83483 | report ~19:49:20Z, notification 1
+r3 | finder verdicts | codex:codex-rescue (wrapper; Codex model not reported) | a63c5571 | tool_uses 4 | duration_ms 379637 | tokens 13893 | report via handback ~19:50:00Z with notification 1 (after round 3 ended at 19:49:37Z)
+r2 | finder verdicts | codex:codex-rescue | adb46606 | notification 4 (after second SendMessage): tool_uses 14 | duration_ms 1131841 | tokens 21506 | 'waiting on its own background work'; reply says Codex job task-mw6szlw5-otc7sg still running, no report
+r2 | finder verdicts | codex:codex-rescue | adb46606 | notification 5: tool_uses 16 | duration_ms 4651401 | tokens 23834 | finished; its second SubagentHandback was refused by the harness; third SendMessage sent to collect
+r2 | finder verdicts | codex:codex-rescue | adb46606 | final reply (to third SendMessage) ~2026-11-07T22:06:06Z: no report; Codex job task-mw6szlw5-otc7sg still 'verifying' at 47m10s with no output after 19:36:05Z, apparently stalled; result fetch said 'No job found'; job not cancelled
+r2 | finder verdicts | codex:codex-rescue | adb46606 | notification 6: tool_uses 1 | duration_ms 8357 | tokens 24754 | finished; carried the final no-report reply
