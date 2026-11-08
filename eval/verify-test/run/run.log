@@ -33,12 +33,12 @@ WARNING CO-S22, CO-S23: identical Required events after substitution; merge cand
 | CO-08 | CO-S01, CO-S16, CO-S19 |
 exit 0
 CMD: python3 eval/verify-test/run/tools/make_briefs.py 1
-Finders dispatched 2026-11-08T15:24:30Z (faithfulness, verdicts, coverage; general-purpose)
+R1 finders dispatched ~2026-11-08T15:24Z (time written by hand, not from date; the first finder notification implies dispatch at or before 15:24:13Z) (faithfulness, verdicts, coverage; general-purpose)
 R1 faithfulness finder returned 2026-11-08T15:26:22Z: 5 findings: 3 Important, 2 Nit.
 R1 coverage finder returned 2026-11-08T15:26:43Z: 6 findings: 4 Important, 2 Nit.
 R1 verdicts finder returned 2026-11-08T15:27:16Z: 9 findings: 9 Important, 0 Nit.
 R1 merged 2026-11-08T15:28:04Z: 18 findings: 15 Important, 3 Nit (20 raw; dups: faithfulness F1=verdicts F8, faithfulness F2=coverage F4). CMD: python3 eval/verify-test/run/tools/merge.py 1 round1-map.txt
-Verifier dispatched 2026-11-08T15:28:04Z
+R1 verifier dispatched 2026-11-08T15:28:04Z
 R1 verifier returned 2026-11-08T15:29:51Z: 11 Real, 4 Not real, 0 Style only.
 R1 decisions: dropped R1-07, R1-09, R1-14, R1-15 (verifier Not real; quoted clauses read and agreed). Kept 11 Important + 3 Nit.
 R1 fixes applied with python3 heredoc scripts and the Edit tool on eval/verify-test/run/agent-spec.md (no rule text changed; new rules CO-09, CO-10 added; new scenarios CO-S25, CO-S26, CO-S27).
