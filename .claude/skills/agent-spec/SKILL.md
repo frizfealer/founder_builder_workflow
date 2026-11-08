@@ -179,7 +179,7 @@ Done when a reviewer could reconstruct every input from the packet and the files
 
 ### 4.3 Find
 
-Dispatch three finders in parallel, each a fresh-context subagent given the shared header and its role section: faithfulness, verdicts, coverage. In an update run, scope every finder to the changed capability, the Global Contract and the Evaluation rows it touches, and tag any finding outside that scope Pre-existing.
+Dispatch three finders in parallel, each a fresh-context subagent given the shared header and its role section: faithfulness, verdicts, coverage. Fill the shared header's [answered path] with <scratch>/answered.md once that file exists (from round 2 on); in round 1 delete that paragraph from the header. In an update run, scope every finder to the changed capability, the Global Contract and the Evaluation rows it touches, and tag any finding outside that scope Pre-existing.
 
 Done when all three finders have returned, each report opening with its count line.
 
