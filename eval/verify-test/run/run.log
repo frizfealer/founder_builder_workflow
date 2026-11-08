@@ -123,3 +123,4 @@ Round 2 end 2026-11-08T15:42:22Z
 ## Round 3
 Start 2026-11-08T15:42:22Z
 CMD: python3 eval/verify-test/run/tools/make_briefs.py 3
+R3 finders dispatched 2026-11-08T15:42:36Z (faithfulness, verdicts, coverage; general-purpose)
