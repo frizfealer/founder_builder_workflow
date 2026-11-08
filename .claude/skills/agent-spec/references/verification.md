@@ -34,7 +34,7 @@ The report starts with a count line, such as "3 findings: 2 Important, 1 Nit." o
 >
 > A script has already verified section and block order, rule tags, action marks, id references, rule-to-scenario coverage counts, a failure row for every state-changing action, data-variant row counts, read-only actions in Required events, the Appendix A binding of actions to tools, tool names outside Appendix A, data-variant values written as <column>, Initial-state lines about a supporting actor's response that name no action, event lines that rely on the confirmed proposal in a scenario with several confirmation-form pairs, confirmation-form pairs with equal values in scope at once, and dimension bookkeeping (message checks and rubric dimensions). Skip those.
 >
-> Scope: [the whole spec | only these sections: …]. Already answered, do not report again: [list of finding summaries, or "none"].
+> Scope: [the whole spec | only these sections: …].
 >
 > Findings already answered in earlier rounds are listed at [answered path] when that file exists. Do not report them again; if a fix for one is wrong or incomplete, report that as a new finding quoting the new line.
 >
@@ -78,8 +78,7 @@ Hunt for **Gaps**. Build these maps and report every empty cell:
 > what the finding claims; evidence that is not in the packet or the spec; or a defect that changes
 > no verdict and no agent behavior (Style only). Say Real only when you cannot do any of these. The reference checklists under references/ are the spec's standards and count as evidence for a finding, the same as the packet and the spec. A refutation must show the finding does not fit its class as defined in 'What a defective spec looks like': for a Lies finding that says no input supports a line, showing that no input contradicts the line is not a refutation; for a Gap finding, showing the behavior is settled by a rule is not a refutation unless a scenario or dimension asserts it.
 >
-> Read the re-review bundle at [bundle path] when the round has one, otherwise the spec at [spec
-> path]; then the review packet at [packet path] and the sources it lists; then the findings at
+> Read the spec at [spec path]; then the review packet at [packet path] and the sources it lists; then the findings at
 > [findings path]; you report, you do not decide: the main thread decides each drop. Grep the spec for any id a finding names that you have not read.
 >
 > For each finding, one line: `<id> | Real / Not real / Style only | Important / Nit | <the clause
