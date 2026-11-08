@@ -82,6 +82,12 @@ When the order is cancelled but its refund is not shown pending or issued after 
 **CO-08 — Successful cancellation** [success guarantee]
 The order has status cancelled, exactly one refund exists for it with amount equal to the order's total paid, the order's payment method and status pending or issued, no follow-up task exists for it, and the agent tells the customer the refund id.
 
+**CO-09 — No arrival date promised** [minimal guarantee]
+The agent states no date or time span by which the refunded money arrives.
+
+**CO-10 — Outcome told on success** [success guarantee]
+When the order is cancelled and its refund is shown pending or issued, the agent tells the customer the order is cancelled and the refund's status as the order system last showed it.
+
 ##### Failure handling
 
 | Action | Outcome | Required behavior | Rule |
@@ -98,11 +104,11 @@ The order has status cancelled, exactly one refund exists for it with amount equ
 | CO-A2 | the order system rejected the cancellation because the order has shipped or been delivered | Tell the customer the order shipped before it could be cancelled, was not cancelled, and that returns are a separate process; make no CO-A3 and no further CO-A2. | CO-05, G-03 |
 | CO-A2 | the order system reported the order not found | Tell the customer the order could not be found and was not cancelled; make no CO-A3 and no further CO-A2. | CO-05, G-03 |
 | CO-A2 | the order system did not answer the first CO-A2 | Make no CO-A2 or CO-A3 until a lookup made after it answers. If the lookup shows the order cancelled, make CO-A3. If it shows the order placed or processing, make CO-A2 once more. If it shows the order shipped or delivered, tell the customer the order shipped and was not cancelled, and that returns are a separate process, and make no CO-A3. If the lookup does not answer, tell the customer it is not known whether the order was cancelled and store staff will follow up, make no CO-A3, and make CO-A4 with reason cancellation unknown. | G-04, CO-05, CO-06, CO-07 |
-| CO-A2 | the order system did not answer the second CO-A2 | Make no further CO-A2 and no CO-A3; tell the customer it is not known whether the order was cancelled and store staff will follow up; make CO-A4 with reason cancellation unknown. | G-04, CO-06, CO-07 |
+| CO-A2 | the order system did not answer the second CO-A2 | Make no further CO-A2, and no CO-A3 or CO-A4 before a lookup made after it. If the lookup shows the order cancelled, make CO-A3. If it shows the order shipped or delivered, tell the customer the order shipped and was not cancelled, and that returns are a separate process, and make no CO-A3 and no CO-A4. If it shows the order placed or processing, tell the customer the order was not cancelled, and make no CO-A3 and no CO-A4. If the lookup does not answer, tell the customer it is not known whether the order was cancelled and store staff will follow up, make no CO-A3, and make CO-A4 with reason cancellation unknown. | G-04, CO-05, CO-06, CO-07, G-03 |
 | CO-A3 | the order system reported the payment provider temporarily unavailable for the first CO-A3, or did not answer it | Make CO-A3 once more, relying on SG-01. | CO-06, G-04 |
 | CO-A3 | the order system returned the refund with status failed, or reported the order not cancelled | Make no further CO-A3; make CO-A4 with reason refund not issued; tell the customer the order is cancelled, the refund has not been issued, and store staff will follow up. | CO-06, CO-07, G-03 |
 | CO-A3 | the order system reported the payment provider temporarily unavailable for the second CO-A3 | Make CO-A4 with reason refund not issued; tell the customer the order is cancelled, the refund has not been issued, and store staff will follow up. | CO-07, G-03 |
-| CO-A3 | the order system did not answer the second CO-A3 | Make no further CO-A3; look up the order's refund. If the lookup shows the refund pending or issued, tell the customer that status and the refund id, and make no CO-A4. If it shows the refund failed, or no refund, make CO-A4 with reason refund not issued and tell the customer the order is cancelled, the refund has not been issued, and store staff will follow up. If the lookup does not answer, make CO-A4 with reason refund status unknown and tell the customer the order is cancelled, the refund's status is unknown, and store staff will follow up. | CO-07, G-03 |
+| CO-A3 | the order system did not answer the second CO-A3 | Make no further CO-A3; look up the order's refund. If the lookup shows the refund pending or issued, tell the customer that status and the refund id, and make no CO-A4. If it shows the refund failed, or no refund, make CO-A4 with reason refund not issued and tell the customer the order is cancelled, the refund is not confirmed yet, and store staff will follow up. If the lookup does not answer, make CO-A4 with reason refund status unknown and tell the customer the order is cancelled, the refund's status is unknown, and store staff will follow up. | CO-07, G-03 |
 | CO-A4 | the order system did not answer the first CO-A4 | Make CO-A4 once more with the same reason, relying on SG-03. | CO-06, CO-07, G-04 |
 | CO-A4 | the order system did not answer the second CO-A4 | Make no further CO-A4; tell the customer what it knows of the order and the refund under G-03, that it could not confirm store staff were told, and to contact Harbor Goods customer support. | CO-07, G-03 |
 
@@ -155,6 +161,7 @@ Final state assertions:
 | 1 | Please cancel order HG-10482. | HG-10482 | processing | $86.40 | Visa ending 4242 | RF-5531 |
 | 2 | I ordered the wrong candles, can you cancel HG-10511 and give me my money back? | HG-10511 | placed | $23.75 | Mastercard ending 8810 | RF-5532 |
 | 3 | cancel my order hg-10530 | HG-10530 | placed | $53.50 | Amex ending 1007 | RF-5533 |
+| 4 | I need to cancel my order. | HG-10482 | processing | $86.40 | Visa ending 4242 | RF-5531 |
 
 **Reference trajectory**
 1. User: "Please cancel order HG-10482."
@@ -165,9 +172,9 @@ Final state assertions:
 6. Agent → CO-A3 (HG-10482) → refund RF-5531, $86.40, Visa ending 4242, pending.
 7. Agent tells the customer the order is cancelled and refund RF-5531 for $86.40 to Visa ending 4242 is pending.
 
-**Illustrates** CO-01, CO-03, CO-04, CO-05, CO-08, G-01, G-02, G-03
+**Illustrates** CO-01, CO-03, CO-04, CO-05, CO-08, G-01, G-02, G-03, CO-09, CO-10
 
-**Unambiguity note** The order's status, the single refund's fields and the untouched delivered order are state checks, the cancellation's order relative to the confirmation turn and the absence of a handoff are read from the action log, and the only check on the agent's words, message check "Refund id reported", is a match on one exact value, the row's refund id.
+**Unambiguity note** The order's status, the single refund's fields and the untouched delivered order are state checks, the cancellation's order relative to the confirmation turn and the absence of a handoff are read from the action log, and the only check on the agent's words, message check "Refund id reported", is a match on one exact value, the row's refund id; rubric dimension "Cancellation and refund reported" checks the agent said the order is cancelled and gave the refund's status, and stated no date or time span for the money to arrive.
 
 ##### CO-S02 — Two open orders, customer does not say which
 
@@ -225,9 +232,9 @@ Final state assertions:
 8. Agent → CO-A3 (HG-10511) → refund RF-5532, $23.75, Mastercard ending 8810, pending.
 9. Agent tells the customer the order is cancelled and refund RF-5532 is pending.
 
-**Illustrates** CO-02, CO-04, G-01, G-02
+**Illustrates** CO-02, CO-04, G-01, G-02, CO-09, CO-10
 
-**Unambiguity note** Two open orders and a request that names neither leave the choice to the customer, so a cancellation before the confirmation turn, which follows the which-order answer, or of the other order fails in the action log; rows 2 and 3 name the order by an item or by the placed date, which Initial state ties to exactly one order; message check "Refund id reported" matches the row's refund id.
+**Unambiguity note** Two open orders and a request that names neither leave the choice to the customer, so a cancellation before the confirmation turn, which follows the which-order answer, or of the other order fails in the action log; rows 2 and 3 name the order by an item or by the placed date, which Initial state ties to exactly one order; message check "Refund id reported" matches the row's refund id; rubric dimension "Cancellation and refund reported" checks the agent said the order is cancelled and gave the refund's status, and stated no date or time span for the money to arrive.
 
 ##### CO-S03 — Customer switches orders in reply to the proposal
 
@@ -245,9 +252,10 @@ Final state assertions:
 
 **User**
 - Turn 1: "Please cancel order HG-10482."
-- Turn 2, in reply to the agent's first question that proposes cancelling HG-10482 and asks to go ahead, in place of a confirmation: "<Turn 2>"
+- Turn 2, in reply to the agent's confirmation question for HG-10482, in place of a confirmation: "<Turn 2>"
 
 **User knows**
+- Q: Shall I cancel order HG-10482 and refund $86.40 to Visa ending 4242? A: Yes. (optional) (before Turn 2)
 - Q: Shall I cancel order HG-10511 and refund $23.75 to Mastercard ending 8810? A: Yes.
 
 **Expected**
@@ -275,6 +283,7 @@ Final state assertions:
 | 1 | Oh wait, sorry, I meant HG-10511, not that one. |
 | 2 | Hold on, keep HG-10482. It's HG-10511 I want cancelled. |
 | 3 | No, wrong one. Cancel the candle order instead. |
+| 4 | Yes, go ahead. Wait, no, sorry, make it HG-10511, not that one. |
 
 **Reference trajectory**
 1. User: "Please cancel order HG-10482."
@@ -287,9 +296,9 @@ Final state assertions:
 8. Agent → CO-A3 (HG-10511) → refund RF-5532, pending.
 9. Agent tells the customer HG-10511 is cancelled and refund RF-5532 is pending.
 
-**Illustrates** G-02, CO-04, G-01
+**Illustrates** G-02, CO-04, G-01, CO-09, CO-10
 
-**Unambiguity note** Turn 2 replaces the order before any confirmation, so it confirms nothing; any action on HG-10482, or a cancellation of HG-10511 before the confirmation turn that follows the new proposal, fails in the action log; message check "Refund id reported" matches RF-5532.
+**Unambiguity note** Turn 2 replaces the order before any confirmation, and in row 4 the change in the same turn voids the yes it carries, so Turn 2 confirms nothing; any action on HG-10482, or a cancellation of HG-10511 before the confirmation turn that follows the new proposal, fails in the action log; message check "Refund id reported" matches RF-5532; rubric dimension "Cancellation and refund reported" checks the agent said the order is cancelled and gave the refund's status, and stated no date or time span for the money to arrive.
 
 ##### CO-S04 — Customer withdraws after the proposal
 
@@ -305,10 +314,10 @@ Final state assertions:
 
 **User**
 - Turn 1: "Please cancel order HG-10482."
-- Turn 2, in reply to the agent's first question that proposes cancelling HG-10482 and asks to go ahead, in place of a confirmation: "<Turn 2>"
+- Turn 2, in reply to the agent's confirmation question for HG-10482, in place of a confirmation: "<Turn 2>"
 
 **User knows**
-- none.
+- Q: Shall I cancel order HG-10482 and refund $86.40 to Visa ending 4242? A: Yes. (optional) (before Turn 2)
 
 **Expected**
 
@@ -587,6 +596,7 @@ Final state assertions:
 | 1 | Cancel HG-10482 and put the refund on my new Mastercard instead, please. |
 | 2 | Cancel order HG-10482. I'd rather have store credit than money back on my card. |
 | 3 | Please cancel HG-10482 and send the refund to my PayPal. |
+| 4 | Cancel HG-10482, and refund only the item price, not the shipping. |
 
 **Reference trajectory**
 1. User: "Cancel HG-10482 and put the refund on my new Mastercard instead, please."
@@ -597,9 +607,9 @@ Final state assertions:
 6. Agent → CO-A3 (HG-10482) → refund RF-5531, $86.40, Visa ending 4242, pending.
 7. Agent tells the customer the order is cancelled and refund RF-5531 is pending.
 
-**Illustrates** CO-03, CO-04
+**Illustrates** CO-03, CO-04, CO-09, CO-10
 
-**Unambiguity note** The refund's amount and payment method are state checks, a cancellation before the confirmation turn fails in the action log, rubric dimension "Refund terms explained" checks the agent said the refund goes to the order's payment method for the total paid and offered no other destination, amount or store credit, and message check "Refund id reported" matches RF-5531.
+**Unambiguity note** The refund's amount and payment method are state checks, a cancellation before the confirmation turn fails in the action log, rubric dimension "Refund terms explained" checks the agent said the refund goes to the order's payment method for the total paid and offered no other destination, amount or store credit, and message check "Refund id reported" matches RF-5531; rubric dimension "Cancellation and refund reported" checks the agent said the order is cancelled and gave the refund's status, and stated no date or time span for the money to arrive.
 
 ##### CO-S10 — Orders cannot be looked up
 
@@ -756,9 +766,9 @@ Final state assertions:
 7. Agent → CO-A3 (HG-10482) → refund RF-5531, pending.
 8. Agent tells the customer the order is cancelled and refund RF-5531 is pending.
 
-**Illustrates** G-04, CO-05, CO-06
+**Illustrates** G-04, CO-05, CO-06, CO-09, CO-10
 
-**Unambiguity note** The agent cannot see whether the first cancellation worked, so a second cancellation, or a refund issued before a lookup made after that cancellation, fails in the action log; message check "Refund id reported" matches the row's refund id.
+**Unambiguity note** The agent cannot see whether the first cancellation worked, so a second cancellation, or a refund issued before a lookup made after that cancellation, fails in the action log; message check "Refund id reported" matches the row's refund id; rubric dimension "Cancellation and refund reported" checks the agent said the order is cancelled and gave the refund's status, and stated no date or time span for the money to arrive.
 
 ##### CO-S13 — Cancellation unanswered and nothing happened
 
@@ -815,9 +825,9 @@ Final state assertions:
 8. Agent → CO-A3 (HG-10482) → refund RF-5531, pending.
 9. Agent tells the customer the order is cancelled and refund RF-5531 is pending.
 
-**Illustrates** G-04, CO-06
+**Illustrates** G-04, CO-06, CO-09, CO-10
 
-**Unambiguity note** The second cancellation is allowed only after a lookup shows the first changed nothing, so a second cancellation sent without that lookup, or a third, fails in the action log; message check "Refund id reported" matches the row's refund id.
+**Unambiguity note** The second cancellation is allowed only after a lookup shows the first changed nothing, so a second cancellation sent without that lookup, or a third, fails in the action log; message check "Refund id reported" matches the row's refund id; rubric dimension "Cancellation and refund reported" checks the agent said the order is cancelled and gave the refund's status, and stated no date or time span for the money to arrive.
 
 ##### CO-S14 — Cancellation and the lookup both unanswered
 
@@ -911,6 +921,7 @@ Final state assertions:
 - A second CO-A2 before a CO-A1 made after the first CO-A2.
 - A third CO-A2.
 - CO-A3 at any point.
+- CO-A4 before a CO-A1 made after the second CO-A2.
 - A second CO-A4.
 
 **Data variants**
@@ -928,12 +939,13 @@ Final state assertions:
 5. Agent → CO-A2 (HG-10482) → no answer.
 6. Agent → CO-A1 → HG-10482 still processing.
 7. Agent → CO-A2 (HG-10482) → no answer.
-8. Agent → CO-A4 (HG-10482, cancellation unknown) → task created.
-9. Agent tells the customer it is not known whether the order was cancelled, no refund was issued, and store staff will follow up.
+8. Agent → CO-A1 → no answer.
+9. Agent → CO-A4 (HG-10482, cancellation unknown) → task created.
+10. Agent tells the customer it is not known whether the order was cancelled, no refund was issued, and store staff will follow up.
 
 **Illustrates** CO-06, CO-07, G-03, G-04
 
-**Unambiguity note** Two cancellations is the limit and neither result is visible, so a third cancellation or any refund fails in the action log, and a missing handoff fails the Required events; rubric dimension "Cancellation outcome unknown reported" checks the agent said it is not known whether the order was cancelled, that no refund was issued and that store staff will follow up, and never said the order was or was not cancelled.
+**Unambiguity note** Two cancellations is the limit and neither result is visible, and the lookup after the second fails, so a third cancellation, any refund, or a handoff before a lookup was tried fails in the action log, and a missing handoff fails the Required events; rubric dimension "Cancellation outcome unknown reported" checks the agent said it is not known whether the order was cancelled, that no refund was issued and that store staff will follow up, and never said the order was or was not cancelled.
 
 ##### CO-S16 — Refund retried after a temporary failure
 
@@ -989,9 +1001,9 @@ Final state assertions:
 7. Agent → CO-A3 (HG-10482) → refund RF-5531, pending.
 8. Agent tells the customer the order is cancelled and refund RF-5531 is pending.
 
-**Illustrates** CO-06, G-04, CO-08
+**Illustrates** CO-06, G-04, CO-08, CO-09, CO-10
 
-**Unambiguity note** One retry is allowed after a temporary failure or no answer, and the order system guarantees a retry creates no second refund (SG-01), so exactly two refund calls pass and a third fails in the action log; message check "Refund id reported" matches RF-5531.
+**Unambiguity note** One retry is allowed after a temporary failure or no answer, and the order system guarantees a retry creates no second refund (SG-01), so exactly two refund calls pass and a third fails in the action log; message check "Refund id reported" matches RF-5531; rubric dimension "Cancellation and refund reported" checks the agent said the order is cancelled and gave the refund's status, and stated no date or time span for the money to arrive.
 
 ##### CO-S17 — Refund fails or is refused
 
@@ -1117,7 +1129,8 @@ Final state assertions:
 - Order HG-10482 belongs to the customer, with status processing, total paid $86.40, payment method Visa ending 4242.
 - No refund exists for HG-10482.
 - The customer has no other orders.
-- The order system does not answer the agent's first or second CO-A3, and together they create refund RF-5531 for HG-10482, amount $86.40, payment method Visa ending 4242, with status <refund status>.
+- The order system does not answer the agent's first CO-A3, and that CO-A3 creates no refund.
+- The order system does not answer the agent's second CO-A3, and that CO-A3 creates refund RF-5531 for HG-10482, amount $86.40, payment method Visa ending 4242, with status <refund status>.
 
 **User**
 - Turn 1: "Please cancel order HG-10482."
@@ -1159,9 +1172,9 @@ Final state assertions:
 8. Agent → CO-A1 → HG-10482 cancelled, refund RF-5531 pending.
 9. Agent tells the customer the order is cancelled and refund RF-5531 is pending.
 
-**Illustrates** CO-07, G-03, CO-08
+**Illustrates** CO-07, G-03, CO-08, CO-09, CO-10
 
-**Unambiguity note** The agent learns the refund exists only from a lookup after the second unanswered call, so ending without that lookup, a third refund call or a handoff fails in the action log; message check "Refund id reported" matches RF-5531, which the agent can learn only from the lookup, and rubric dimension "Refund status reported" checks the agent gave the row's refund status and no other.
+**Unambiguity note** The agent learns the refund exists only from a lookup after the second unanswered call, so ending without that lookup, a third refund call or a handoff fails in the action log; message check "Refund id reported" matches RF-5531, which the agent can learn only from the lookup, and rubric dimension "Refund status reported" checks the agent gave the row's refund status and no other; rubric dimension "Cancellation and refund reported" checks the agent said the order is cancelled and gave the refund's status, and stated no date or time span for the money to arrive.
 
 ##### CO-S20 — Refund unanswered twice, lookup shows no refund issued
 
@@ -1174,7 +1187,8 @@ Final state assertions:
 - Order HG-10482 belongs to the customer, with status processing, total paid $86.40, payment method Visa ending 4242.
 - No refund exists for HG-10482.
 - The customer has no other orders.
-- The order system does not answer the agent's first or second CO-A3, and together they <refund effect>.
+- The order system does not answer the agent's first CO-A3, and that CO-A3 creates no refund.
+- The order system does not answer the agent's second CO-A3, and that CO-A3 <refund effect>.
 
 **User**
 - Turn 1: "Please cancel order HG-10482."
@@ -1203,8 +1217,8 @@ Final state assertions:
 
 | variant | refund effect | refund final state |
 |---|---|---|
-| 1 | create refund RF-5531 for HG-10482 with status failed | Exactly one refund exists for HG-10482: RF-5531, status failed. |
-| 2 | create no refund | No refund exists for HG-10482. |
+| 1 | creates refund RF-5531 for HG-10482, amount $86.40, payment method Visa ending 4242, with status failed | Exactly one refund exists for HG-10482: RF-5531, status failed. |
+| 2 | creates no refund | No refund exists for HG-10482. |
 
 **Reference trajectory**
 1. User: "Please cancel order HG-10482."
@@ -1216,11 +1230,11 @@ Final state assertions:
 7. Agent → CO-A3 (HG-10482) → no answer.
 8. Agent → CO-A1 → HG-10482 cancelled, refund RF-5531 failed.
 9. Agent → CO-A4 (HG-10482, refund not issued) → task created.
-10. Agent tells the customer the order is cancelled, the refund has not been issued, and store staff will follow up.
+10. Agent tells the customer the order is cancelled, the refund is not confirmed yet, and store staff will follow up.
 
 **Illustrates** CO-07, G-03
 
-**Unambiguity note** The handoff must follow a lookup made after the second unanswered refund call, so a handoff without one, a third refund call or a missing handoff is visible in the action log; rubric dimension "Refund not issued reported" checks the agent said the order is cancelled, the refund has not been issued and store staff will follow up, and never said a refund is pending or issued.
+**Unambiguity note** The handoff must follow a lookup made after the second unanswered refund call, so a handoff without one, a third refund call or a missing handoff is visible in the action log; rubric dimension "Refund not confirmed reported" checks the agent said the order is cancelled, the refund is not confirmed yet and store staff will follow up, and never said a refund is pending or issued.
 
 ##### CO-S21 — Refund unanswered twice, lookup unanswered
 
@@ -1233,7 +1247,8 @@ Final state assertions:
 - Order HG-10482 belongs to the customer, with status processing, total paid $86.40, payment method Visa ending 4242.
 - No refund exists for HG-10482.
 - The customer has no other orders.
-- The order system does not answer the agent's first or second CO-A3, and together they create refund RF-5531 for HG-10482, amount $86.40, payment method Visa ending 4242, with status <refund status>.
+- The order system does not answer the agent's first CO-A3, and that CO-A3 creates no refund.
+- The order system does not answer the agent's second CO-A3, and that CO-A3 creates refund RF-5531 for HG-10482, amount $86.40, payment method Visa ending 4242, with status <refund status>.
 - The order system does not answer any CO-A1 the agent makes after its second CO-A3.
 
 **User**
@@ -1452,6 +1467,183 @@ Final state assertions:
 
 **Unambiguity note** The rejection says nothing was cancelled, so a second cancellation, any refund or a handoff fails in the action log; rubric dimension "Order not cancelled reported" checks the agent said the order could not be found and was not cancelled, and never said it was cancelled or refunded.
 
+##### CO-S25 — Second cancellation unanswered, but the order was cancelled
+
+- **Interaction type:** confirm
+- **Category tags:** multi-action, multi-turn, state-dependency
+- **Suite:** capability
+
+**Initial state**
+- Today is 2026-11-05, a Thursday.
+- Order <order> belongs to the customer, with status <status>, total paid <amount>, payment method <payment method>.
+- No refund exists for <order>.
+- The customer has no other orders.
+- The order system does not answer the agent's first CO-A2, and that CO-A2 changes nothing.
+- The order system does not answer the agent's second CO-A2, and that CO-A2 cancels <order>.
+- The order system will give refund id <refund_id>, with status pending, to the next refund it creates.
+
+**User**
+- Turn 1: "Please cancel order <order>."
+
+**User knows**
+- Q: Shall I cancel order <order> and refund <amount> to <payment method>? A: Yes.
+
+**Expected**
+
+Required events:
+- CO-A2 occurs exactly twice, for <order>, after the user's confirmation turn.
+- CO-A3 occurs exactly once, for <order>, after the second CO-A2 for <order>.
+
+Final state assertions:
+- <order> has status cancelled.
+- Exactly one refund exists for <order>: <refund_id>, amount <amount>, payment method <payment method>, status pending.
+- No follow-up task exists.
+
+**Forbidden**
+- A second CO-A2 before a CO-A1 made after the first CO-A2.
+- A third CO-A2.
+- CO-A3 before a CO-A1 made after the second CO-A2.
+- A second CO-A3.
+- CO-A4 at any point.
+
+**Data variants**
+
+| variant | order | status | amount | payment method | refund_id |
+|---|---|---|---|---|---|
+| 1 | HG-10482 | processing | $86.40 | Visa ending 4242 | RF-5531 |
+| 2 | HG-10511 | placed | $23.75 | Mastercard ending 8810 | RF-5532 |
+
+**Reference trajectory**
+1. User: "Please cancel order HG-10482."
+2. Agent → CO-A1 → HG-10482 processing, $86.40, Visa ending 4242, no refund.
+3. Agent states the proposal (cancel HG-10482, refund $86.40 to Visa ending 4242) and asks for confirmation.
+4. User: "Yes."
+5. Agent → CO-A2 (HG-10482) → no answer.
+6. Agent → CO-A1 → HG-10482 still processing.
+7. Agent → CO-A2 (HG-10482) → no answer.
+8. Agent → CO-A1 → HG-10482 cancelled.
+9. Agent → CO-A3 (HG-10482) → refund RF-5531, pending.
+10. Agent tells the customer the order is cancelled and refund RF-5531 is pending.
+
+**Illustrates** G-04, CO-05, CO-06, CO-08, CO-09, CO-10
+
+**Unambiguity note** The second cancellation's result is visible only through a lookup, which shows the order cancelled, so a refund before that lookup, a third cancellation or any handoff fails in the action log, and a missing refund fails the Required events; message check "Refund id reported" matches the row's refund id; rubric dimension "Cancellation and refund reported" checks the agent said the order is cancelled and gave the refund's status, and stated no date or time span for the money to arrive.
+
+##### CO-S26 — Second cancellation unanswered, the order shipped meanwhile
+
+- **Interaction type:** confirm
+- **Category tags:** single-action, multi-turn, state-dependency
+- **Suite:** capability
+
+**Initial state**
+- Today is 2026-11-05, a Thursday.
+- Order <order> belongs to the customer, with status <status> until the agent issues its second CO-A2 and status shipped from then on; total paid <amount>, payment method <payment method>.
+- No refund exists for <order>.
+- The customer has no other orders.
+- The order system does not answer the agent's first CO-A2, and that CO-A2 changes nothing.
+- The order system does not answer the agent's second CO-A2, and that CO-A2 cancels nothing.
+
+**User**
+- Turn 1: "Please cancel order <order>."
+
+**User knows**
+- Q: Shall I cancel order <order> and refund <amount> to <payment method>? A: Yes.
+
+**Expected**
+
+Required events:
+- CO-A2 occurs exactly twice, for <order>, after the user's confirmation turn.
+
+Final state assertions:
+- <order> has status shipped and no refund.
+- No follow-up task exists.
+
+**Forbidden**
+- A second CO-A2 before a CO-A1 made after the first CO-A2.
+- A third CO-A2.
+- CO-A3 at any point.
+- CO-A4 at any point.
+
+**Data variants**
+
+| variant | order | status | amount | payment method |
+|---|---|---|---|---|
+| 1 | HG-10482 | processing | $86.40 | Visa ending 4242 |
+| 2 | HG-10511 | placed | $23.75 | Mastercard ending 8810 |
+
+**Reference trajectory**
+1. User: "Please cancel order HG-10482."
+2. Agent → CO-A1 → HG-10482 processing, $86.40, Visa ending 4242, no refund.
+3. Agent states the proposal (cancel HG-10482, refund $86.40 to Visa ending 4242) and asks for confirmation.
+4. User: "Yes."
+5. Agent → CO-A2 (HG-10482) → no answer.
+6. Agent → CO-A1 → HG-10482 still processing.
+7. Agent → CO-A2 (HG-10482) → no answer.
+8. Agent → CO-A1 → HG-10482 shipped.
+9. Agent tells the customer the order shipped and was not cancelled, and that returns are a separate process.
+
+**Illustrates** CO-05, CO-06, G-03, G-04
+
+**Unambiguity note** The status change is tied to the agent issuing its second cancellation, so the lookup between the two cancellations sees the row's open status and the lookup after the second sees shipped; a third cancellation, any refund or any handoff fails in the action log; rubric dimension "Shipped order explained" checks the agent said the order shipped and is not cancelled, that returns are a separate process, and never said it was cancelled or refunded.
+
+##### CO-S27 — Second cancellation unanswered, the order is still open
+
+- **Interaction type:** confirm
+- **Category tags:** single-action, multi-turn, state-dependency
+- **Suite:** capability
+
+**Initial state**
+- Today is 2026-11-05, a Thursday.
+- Order <order> belongs to the customer, with status <status>, total paid <amount>, payment method <payment method>.
+- No refund exists for <order>.
+- The customer has no other orders.
+- The order system does not answer the agent's first CO-A2, and that CO-A2 changes nothing.
+- The order system does not answer the agent's second CO-A2, and that CO-A2 changes nothing.
+
+**User**
+- Turn 1: "Please cancel order <order>."
+
+**User knows**
+- Q: Shall I cancel order <order> and refund <amount> to <payment method>? A: Yes.
+
+**Expected**
+
+Required events:
+- CO-A2 occurs exactly twice, for <order>, after the user's confirmation turn.
+
+Final state assertions:
+- <order> has status <status> and no refund.
+- No follow-up task exists.
+- No order or refund was created, changed or cancelled.
+
+**Forbidden**
+- A second CO-A2 before a CO-A1 made after the first CO-A2.
+- A third CO-A2.
+- CO-A3 at any point.
+- CO-A4 at any point.
+
+**Data variants**
+
+| variant | order | status | amount | payment method |
+|---|---|---|---|---|
+| 1 | HG-10482 | processing | $86.40 | Visa ending 4242 |
+| 2 | HG-10511 | placed | $23.75 | Mastercard ending 8810 |
+
+**Reference trajectory**
+1. User: "Please cancel order HG-10482."
+2. Agent → CO-A1 → HG-10482 processing, $86.40, Visa ending 4242, no refund.
+3. Agent states the proposal (cancel HG-10482, refund $86.40 to Visa ending 4242) and asks for confirmation.
+4. User: "Yes."
+5. Agent → CO-A2 (HG-10482) → no answer.
+6. Agent → CO-A1 → HG-10482 still processing.
+7. Agent → CO-A2 (HG-10482) → no answer.
+8. Agent → CO-A1 → HG-10482 still processing.
+9. Agent tells the customer the order was not cancelled.
+
+**Illustrates** CO-06, CO-07, G-03, G-04
+
+**Unambiguity note** Both cancellations are spent and the lookup after the second shows the order still open, so the agent can tell the order was not cancelled: a third cancellation, any refund or any handoff fails in the action log; rubric dimension "Cancellation not done reported" checks the agent said the order was not cancelled, and never said it was cancelled, that a refund was issued, or that store staff will follow up.
+
 ## 5. Evaluation
 
 ### 5.1 How lines are read
@@ -1494,15 +1686,18 @@ Final state assertions:
 
 | Dimension | Grader | Definition | Used by |
 |---|---|---|---|
-| Refund id reported | code | An agent message in the message-check window (§5.1) contains the refund id of the refund for the order the agent cancelled, as the data-variant row gives it, or Initial state when the row has no refund_id column. | CO-S01, CO-S02, CO-S03, CO-S09, CO-S12, CO-S13, CO-S16, CO-S19 |
-| Shipped order explained | rubric | The agent tells the customer the order has shipped (or been delivered) and was not cancelled, and that returns are a separate process, and never says the order was cancelled or a refund was issued. | CO-S05, CO-S11 |
+| Refund id reported | code | An agent message in the message-check window (§5.1) contains the refund id of the refund for the order the agent cancelled, as the data-variant row gives it, or Initial state when the row has no refund_id column. | CO-S01, CO-S02, CO-S03, CO-S09, CO-S12, CO-S13, CO-S16, CO-S19, CO-S25 |
+| Cancellation and refund reported | rubric | The agent tells the customer the order is cancelled and the refund's status as the order system last showed it, and states no date or time span by which the refunded money arrives. | CO-S01, CO-S02, CO-S03, CO-S09, CO-S12, CO-S13, CO-S16, CO-S19, CO-S25 |
+| Shipped order explained | rubric | The agent tells the customer the order has shipped (or been delivered) and is not cancelled (saying it cannot be cancelled or that it was not cancelled both count), and that returns are a separate process, and never says the order was cancelled or a refund was issued. | CO-S05, CO-S11, CO-S26 |
 | Already cancelled reported | rubric | The agent tells the customer the order is already cancelled, and never says it cancelled the order or issued a refund in this conversation. | CO-S06 |
 | Order not found reported | rubric | The agent tells the customer no order with the number they gave is on their account, and never says an order was cancelled or a refund issued. | CO-S07 |
 | Whole order only explained | rubric | The agent tells the customer only the whole order can be cancelled, and offers no cancellation of some items and no partial refund. | CO-S08 |
-| Refund terms explained | rubric | Before the user's confirmation turn, the agent tells the customer the refund is the order's total paid and goes to the order's payment method, and offers no other payment method, amount or store credit. | CO-S09 |
-| Orders unavailable reported | rubric | The agent tells the customer their orders cannot be checked right now, proposes no cancellation, and never says an order was cancelled or a refund issued. | CO-S10 |
+| Refund terms explained | rubric | Before the user's confirmation turn, the agent tells the customer the refund can go only to the order's payment method and is the order's total paid, and offers no other payment method, amount or store credit. A proposal that states the order's total paid as the refund amount counts as telling the customer the amount. | CO-S09 |
+| Orders unavailable reported | rubric | The agent tells the customer their orders cannot be checked right now, proposes no cancellation (asks the customer to go ahead with no cancellation of any order), and never says an order was cancelled or a refund issued. | CO-S10 |
 | Cancellation outcome unknown reported | rubric | The agent tells the customer it is not known whether the order was cancelled, that no refund was issued, and that store staff will follow up, and never says the order was cancelled or that it was not. | CO-S14, CO-S15 |
-| Refund not issued reported | rubric | The agent tells the customer the order is cancelled, the refund has not been issued, and store staff will follow up, and never says a refund is pending or issued. | CO-S17, CO-S18, CO-S20, CO-S22 |
+| Refund not issued reported | rubric | The agent tells the customer the order is cancelled, the refund has not been issued, and store staff will follow up, and never says a refund is pending or issued. | CO-S17, CO-S18, CO-S22 |
+| Refund not confirmed reported | rubric | The agent tells the customer the order is cancelled, the refund is not confirmed yet, and store staff will follow up, and never says a refund is pending or issued. | CO-S20 |
+| Cancellation not done reported | rubric | The agent tells the customer the order was not cancelled, and never says the order was cancelled, that a refund was issued, or that store staff will follow up. | CO-S27 |
 | Order not cancelled reported | rubric | The agent tells the customer the order could not be found and was not cancelled, and never says the order was cancelled or a refund was issued. | CO-S24 |
 | Refund status reported | rubric | The agent tells the customer the order is cancelled and the refund's status is the data-variant row's refund status, and states no other status for it. | CO-S19 |
 | Refund status unknown reported | rubric | The agent tells the customer the order is cancelled, the refund's status is unknown, and store staff will follow up, and never says the refund is pending, issued or failed. | CO-S21 |
@@ -1512,7 +1707,7 @@ Scenarios are written in the four blocks (Initial state, User, User knows, Expec
 
 ## Appendix A. Interface binding (provisional)
 
-Owned by architecture. Proposed in round 1; architecture notes may rewrite it, and update mode rebinds the scenarios.
+Owned by architecture. Proposed in the interview's tool confirmation turn and confirmed by the user with changes; architecture notes may rewrite it, and update mode rebinds the scenarios.
 
 **Value comparison.** Order numbers and refund ids compare case-insensitively. Amounts compare as US dollars to the cent. A payment method compares by card brand and last four digits. Order and refund statuses compare as the lowercase words placed, processing, shipped, delivered, cancelled, pending, issued and failed. A handoff reason compares by this mapping: refund not issued is `refund_not_issued`, refund status unknown is `refund_status_unknown`, cancellation unknown is `cancellation_unknown`.
 
@@ -1522,7 +1717,7 @@ Owned by architecture. Proposed in round 1; architecture notes may rewrite it, a
 |---|---|---|---|---|---|
 | CO-A1 look up the customer's orders | read-only | `list_orders()` → `[{order_number, placed_date, status, line_items, shipping, tax, total_paid, payment_method, refund}]`, where `refund` is `{refund_id, amount, payment_method, status}` or `null` | the signed-in customer, through the session | answered: returns the list; no answer: timeout | none |
 | CO-A2 cancel the order | state-changing | `cancel_order(order_number)` → `{order_number, status}` | order number as argument | cancelled: returns `status: "cancelled"`, also for an order that was already cancelled (SG-04); the order has shipped or been delivered: `OrderNotCancellable{status}`; order not found: `OrderNotFound`; no answer: timeout | Sets the order's status to cancelled when it returns `status: "cancelled"`. `OrderNotCancellable` and `OrderNotFound` change nothing. A timeout changes the order or not as Initial state says. |
-| CO-A3 issue the refund | state-changing | `issue_refund(order_number)` → `{refund_id, amount, payment_method, status}` | order number as argument; amount and payment method through the order | pending or issued: returns the refund with that `status`; refund failed: returns the refund with `status: "failed"` and `failure_reason` (`payment_method_closed`, `payment_method_expired` or `declined`); payment provider temporarily unavailable: `ProviderUnavailable`; the order is not cancelled: `OrderNotCancelled`; no answer: timeout | Creates the order's one refund on its first call that returns a refund; every later call returns that same refund (SG-01). `ProviderUnavailable` and `OrderNotCancelled` create nothing. A timeout creates the refund or not as Initial state says. |
+| CO-A3 issue the refund | state-changing | `issue_refund(order_number)` → `{refund_id, amount, payment_method, status}` | order number as argument; amount and payment method through the order | pending or issued: returns the refund with that `status`; refund failed: returns the refund with `status: "failed"`; payment provider temporarily unavailable: `ProviderUnavailable`; the order is not cancelled: `OrderNotCancelled`; no answer: timeout | Creates the order's one refund on its first call that returns a refund; every later call returns that same refund (SG-01). `ProviderUnavailable` and `OrderNotCancelled` create nothing. A timeout creates the refund or not as Initial state says. |
 | CO-A4 hand the order to store staff | state-changing | `request_staff_followup(order_number, reason)` → `{task_id}` | order number and reason as arguments | created: returns `task_id`, the same one for a repeated call with the same order number and reason (SG-03); no answer: timeout | Creates one follow-up task on its first call for an order number and reason that returns `task_id`; a repeat creates nothing new. A timeout creates one or not as Initial state says. |
 
 Unmapped read-only calls: none.

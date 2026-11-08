@@ -1,0 +1,17 @@
+# Answered findings
+
+## Round 1
+- R1-01 (open): issue_refund's OrderNotCancelled for an order CO-A2 returned cancelled (CO-A3 failure row "returned the refund with status failed, or reported the order not cancelled", CO-S17 row 3): the inputs give no handling; only the user can decide. Left unchanged; open question.
+- R1-02 (fixed): failure row "the order system did not answer the second CO-A2" now requires a lookup and branches on it (cancelled: CO-A3; shipped/delivered: shipped report, no CO-A3/CO-A4; placed/processing: not-cancelled report, no CO-A3/CO-A4; no answer: CO-A4 cancellation unknown). Lines touched: that failure row; CO-S15 Forbidden (new "CO-A4 before a CO-A1 made after the second CO-A2."), CO-S15 Reference trajectory steps 8-10, CO-S15 Unambiguity note; new CO-S25, CO-S26, CO-S27; dimensions "Shipped order explained" (Used by + CO-S26), new "Cancellation not done reported" (CO-S27), "Refund id reported" (Used by + CO-S25).
+- R1-03 (fixed): failed-or-no-refund branch of "did not answer the second CO-A3" now says "the refund is not confirmed yet" (round 3 Q3). Lines touched: that failure row; CO-S20 Reference trajectory step 10 and Unambiguity note; new dimension "Refund not confirmed reported" (CO-S20); "Refund not issued reported" Used by drops CO-S20. Grep: remaining "has not been issued" lines are the provider-unavailable, failed-refund and handoff paths (known case 2).
+- R1-04 (fixed): new rule CO-09 "No arrival date promised" [minimal guarantee]; asserted by new dimension "Cancellation and refund reported".
+- R1-05 (fixed): new rule CO-10 "Outcome told on success" [success guarantee] (CO-08's text left unchanged); new dimension "Cancellation and refund reported" used by CO-S01, CO-S02, CO-S03, CO-S09, CO-S12, CO-S13, CO-S16, CO-S19, CO-S25. Lines touched: Illustrates (+ CO-09, CO-10) and Unambiguity note of each of those scenarios.
+- R1-06 (fixed): CO-S03 Data variants row 4 ("Yes, go ahead. Wait, no, sorry, make it HG-10511, not that one."), a change in the same turn as a yes; CO-S03 Unambiguity note.
+- R1-08 (fixed): CO-S19, CO-S20, CO-S21 Initial state: "together they ..." split into one line per call (first CO-A3 creates no refund; second CO-A3 creates the refund / <refund effect>); CO-S20 Data variants "refund effect" values reworded to fit. Grep "together they": 0.
+- R1-10 (fixed): CO-S03 and CO-S04 Turn 2 now "in reply to the agent's confirmation question for HG-10482"; each gets a confirmation-form pair for HG-10482 marked (optional) (before Turn 2). Grep "first question that proposes": 0.
+- R1-11 (fixed): dimension "Shipped order explained" now accepts "cannot be cancelled" or "was not cancelled" ("is not cancelled").
+- R1-12 (fixed): dimension "Refund terms explained" now says a proposal stating the total paid as the refund amount counts as telling the amount.
+- R1-13 (fixed): dimension "Orders unavailable reported" defines "proposes no cancellation" (asks the customer to go ahead with no cancellation of any order).
+- R1-16 (fixed): Appendix A CO-A3 row: removed `failure_reason` and its values. Grep "failure_reason": 0.
+- R1-17 (fixed): Appendix A preamble: "Proposed in round 1" -> "Proposed in the interview's tool confirmation turn and confirmed by the user with changes". Grep: 0.
+- R1-18 (fixed): CO-S01 Data variants row 4 ("I need to cancel my order.", one open order, no number given); CO-S09 Data variants row 4 (asks for a different amount).
