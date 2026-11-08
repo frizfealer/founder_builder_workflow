@@ -125,3 +125,6 @@ Start 2026-11-08T15:42:22Z
 CMD: python3 eval/verify-test/run/tools/make_briefs.py 3
 R3 finders dispatched 2026-11-08T15:42:36Z (faithfulness, verdicts, coverage; general-purpose)
 R3 faithfulness finder returned 2026-11-08T15:44:51Z: 1 finding: 1 Important.
+R3 coverage finder returned 2026-11-08T15:45:14Z: 5 findings: 2 Important, 3 Nit.
+R3 verdicts finder returned 2026-11-08T15:45:42Z: count line "6 findings: 4 Important, 2 Nit."; the findings as tagged are 5 Important (F1-F5), 1 Nit (F6).
+R3 merged 2026-11-08T15:46:08Z: 12 findings: 8 Important, 4 Nit (12 raw; no duplicates within the round). CMD: python3 eval/verify-test/run/tools/merge.py 3 round3-map.txt. Verifier dispatched 2026-11-08T15:46:08Z
