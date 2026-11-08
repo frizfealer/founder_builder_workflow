@@ -1,0 +1,13 @@
+R2-01 faithfulness:F1,verdicts:F2
+R2-02 coverage:F1
+R2-03 coverage:F2
+R2-04 verdicts:F1
+R2-05 verdicts:F3
+R2-06 verdicts:F4
+R2-07 verdicts:F5
+R2-08 verdicts:F6
+R2-09 faithfulness:F2
+R2-10 faithfulness:F3
+R2-11 faithfulness:F4
+R2-12 coverage:F3
+R2-13 verdicts:F7

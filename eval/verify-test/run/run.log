@@ -81,3 +81,7 @@ Round 1 end 2026-11-08T15:35:15Z
 Start 2026-11-08T15:35:15Z
 CMD: python3 eval/verify-test/run/tools/make_briefs.py 2
 R2 finders dispatched 2026-11-08T15:35:26Z (faithfulness, verdicts, coverage; general-purpose)
+R2 faithfulness finder returned 2026-11-08T15:37:52Z: 4 findings: 1 Important, 3 Nit.
+R2 coverage finder returned 2026-11-08T15:37:56Z: 3 findings: 2 Important, 1 Nit.
+R2 verdicts finder returned 2026-11-08T15:38:27Z: 7 findings: 6 Important, 1 Nit. (Report opened with a false count line '3 findings: 3 Important, 0 Nit... wait' then corrected itself; it says it did not read the references/ checklists the brief names.)
+R2 merged 2026-11-08T15:39:02Z: 13 findings: 8 Important, 5 Nit (14 raw; dup: faithfulness F1 = verdicts F2). CMD: python3 eval/verify-test/run/tools/merge.py 2 round2-map.txt. Verifier dispatched 2026-11-08T15:39:02Z

@@ -2,3 +2,6 @@
 | r1 | finder: coverage | general-purpose (inherits parent) | 10 | 139088 | 135526 | 1 |
 | r1 | finder: verdicts | general-purpose (inherits parent) | 11 | 178851 | 140105 | 1 |
 | r1 | verifier: adversarial | general-purpose (inherits parent) | 8 | 91131 | 128789 | 1 |
+| r2 | finder: faithfulness | general-purpose (inherits parent) | 8 | 137040 | 136413 | 1 |
+| r2 | finder: coverage | general-purpose (inherits parent) | 10 | 137414 | 141645 | 1 |
+| r2 | finder: verdicts | general-purpose (inherits parent) | 9 | 166890 | 133605 | 1 |
