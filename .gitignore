@@ -2,3 +2,7 @@
 __pycache__/
 SKILL.html
 agent-spec.html
+
+# skill-eval scratch
+eval/*/run/
+eval/*/run-*/
