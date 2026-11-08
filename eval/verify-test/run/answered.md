@@ -15,3 +15,13 @@
 - R1-16 (fixed): Appendix A CO-A3 row: removed `failure_reason` and its values. Grep "failure_reason": 0.
 - R1-17 (fixed): Appendix A preamble: "Proposed in round 1" -> "Proposed in the interview's tool confirmation turn and confirmed by the user with changes". Grep: 0.
 - R1-18 (fixed): CO-S01 Data variants row 4 ("I need to cancel my order.", one open order, no number given); CO-S09 Data variants row 4 (asks for a different amount).
+
+## Round 2
+- R2-02 (fixed): CO-09's "states no date or time span" clause added to the failure-path dimensions "Refund not issued reported", "Refund not confirmed reported", "Refund status unknown reported", "Staff contact unconfirmed reported", "Cancellation outcome unknown reported"; CO-09 added to Illustrates and a clause added to the Unambiguity note of CO-S14, CO-S15, CO-S17, CO-S18, CO-S20, CO-S21, CO-S22, CO-S23.
+- R2-05 (fixed): "Refund not confirmed reported" lists the forms that count (not confirmed, has not been issued, has failed).
+- R2-08 (fixed): Forbidden "CO-A2 before the user's confirmation turn." added to every confirm scenario that had no line anchored before the confirmation turn: CO-S11, CO-S12, CO-S13, CO-S14, CO-S15, CO-S16, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23, CO-S24, CO-S25, CO-S26, CO-S27 (CO-S04 already forbids CO-A2 at any point).
+- R2-09 (fixed): Reference trajectory step 6 of CO-S17, CO-S22, CO-S23: "refund RF-5531, failed, card closed" -> "refund RF-5531, failed" (tool returns no reason). Grep "failed, card closed": 0.
+- R2-10 (fixed): CO-S06 Illustrates CO-01, CO-05 -> CO-01, CO-04.
+- R2-11 (open): whether the re-read of known case 3 also applies when the first CO-A3 timed out and the retry answered (the spec re-reads only after two unanswered calls) is not settled by the inputs ("retries once, then re-reads" vs round 3 Q3 "after the retry"); left for the user.
+- R2-12 (fixed): failure rows "shipped or delivered" and "cancelled" now also cover the customer's only order when they named none; CO-S05 Data variants row 4 ("I need to cancel my order.", delivered) and Unambiguity note. An account with no orders at all is not covered (the trigger presumes an order the customer placed).
+- R2-13 (answered): stands. CO-04 defines a proposal as the full proposal (order number, refund amount and payment method); CO-S08's whole-order question states no amount or payment method, so it is not a proposal under that definition, and no CO-S08 check depends on it (the R1-13 fix covered the instance a verdict depends on).

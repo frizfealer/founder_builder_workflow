@@ -85,3 +85,41 @@ R2 faithfulness finder returned 2026-11-08T15:37:52Z: 4 findings: 1 Important, 3
 R2 coverage finder returned 2026-11-08T15:37:56Z: 3 findings: 2 Important, 1 Nit.
 R2 verdicts finder returned 2026-11-08T15:38:27Z: 7 findings: 6 Important, 1 Nit. (Report opened with a false count line '3 findings: 3 Important, 0 Nit... wait' then corrected itself; it says it did not read the references/ checklists the brief names.)
 R2 merged 2026-11-08T15:39:02Z: 13 findings: 8 Important, 5 Nit (14 raw; dup: faithfulness F1 = verdicts F2). CMD: python3 eval/verify-test/run/tools/merge.py 2 round2-map.txt. Verifier dispatched 2026-11-08T15:39:02Z
+R2 verifier returned 2026-11-08T15:40:54Z: 3 Real, 5 Not real, 0 Style only.
+R2 decisions: dropped R2-01, R2-03, R2-04, R2-06, R2-07 (verifier Not real; quoted clauses read and agreed). Kept 3 Important + 5 Nit.
+R2 fixes applied with python3 heredoc scripts on eval/verify-test/run/agent-spec.md (no rule text changed). A first pass also added the CO-A2-before-confirmation Forbidden line to CO-S04, where "CO-A2 at any point." already covers it; removed.
+CMD: uv run python .claude/skills/agent-spec/scripts/check_spec.py eval/verify-test/run/agent-spec.md   (4.5 rerun of 4.1, round 2 end)
+0 errors
+WARNING CO-S01, CO-S02, CO-S03, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S01, CO-S02, CO-S09, CO-S12: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S11, CO-S24: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S13, CO-S25: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S16, CO-S19: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S18, CO-S20: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S22, CO-S23: identical Required events after substitution; merge candidates (skill step 3.9)
+WARNING CO-S26, CO-S27: identical Required events after substitution; merge candidates (skill step 3.9)
+
+| Rule | Scenarios |
+|---|---|
+| G-01 | CO-S01, CO-S02, CO-S03 |
+| G-02 | CO-S01, CO-S02, CO-S03, CO-S04 |
+| G-03 | CO-S01, CO-S10, CO-S11, CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S23, CO-S24, CO-S26, CO-S27 |
+| G-04 | CO-S11, CO-S12, CO-S13, CO-S14, CO-S15, CO-S16, CO-S22, CO-S25, CO-S26, CO-S27 |
+| CO-01 | CO-S01, CO-S05, CO-S06, CO-S10 |
+| CO-02 | CO-S02, CO-S07 |
+| CO-03 | CO-S01, CO-S08, CO-S09 |
+| CO-04 | CO-S01, CO-S02, CO-S03, CO-S04, CO-S06, CO-S09 |
+| CO-05 | CO-S01, CO-S11, CO-S12, CO-S24, CO-S25, CO-S26 |
+| CO-06 | CO-S11, CO-S12, CO-S13, CO-S15, CO-S16, CO-S17, CO-S18, CO-S22, CO-S23, CO-S25, CO-S26, CO-S27 |
+| CO-07 | CO-S14, CO-S15, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23, CO-S27 |
+| CO-08 | CO-S01, CO-S16, CO-S19, CO-S25 |
+| CO-09 | CO-S01, CO-S02, CO-S03, CO-S09, CO-S12, CO-S13, CO-S14, CO-S15, CO-S16, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23, CO-S25 |
+| CO-10 | CO-S01, CO-S02, CO-S03, CO-S09, CO-S12, CO-S13, CO-S16, CO-S19, CO-S25 |
+exit 0
+CMD: cp eval/verify-test/run/agent-spec.md eval/verify-test/run/round2/agent-spec.md ; answered.md appended
+CMD: python3 eval/verify-test/run/tools/findings_file.py 2 full-new-3
+Round 2 end 2026-11-08T15:42:22Z
+
+## Round 3
+Start 2026-11-08T15:42:22Z
+CMD: python3 eval/verify-test/run/tools/make_briefs.py 3
