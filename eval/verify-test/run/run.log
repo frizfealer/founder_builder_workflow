@@ -34,3 +34,5 @@ WARNING CO-S22, CO-S23: identical Required events after substitution; merge cand
 exit 0
 CMD: python3 eval/verify-test/run/tools/make_briefs.py 1
 Finders dispatched 2026-11-08T15:24:30Z (faithfulness, verdicts, coverage; general-purpose)
+R1 faithfulness finder returned 2026-11-08T15:26:22Z: 5 findings: 3 Important, 2 Nit.
+R1 coverage finder returned 2026-11-08T15:26:43Z: 6 findings: 4 Important, 2 Nit.
