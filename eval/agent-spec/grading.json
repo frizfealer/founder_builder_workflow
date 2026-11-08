@@ -1,0 +1,33 @@
+{
+  "skill": "agent-spec",
+  "fixture": "Harbor Goods order-support spec frozen before verification (round0-agent-spec.md); step 4 of the skill run with the given review packet.",
+  "kinds": {
+    "full":   {"description": "step 4 from round0-agent-spec.md, rounds 1-3", "baseline_labels": ["baseline-1", "full-new-3"]},
+    "round2": {"description": "rounds 2-3 from the frozen round1-agent-spec.md and round1-answered.md", "baseline_labels": ["r2-old-1"]}
+  },
+  "key": {
+    "full":   {"file": "baseline/round1-findings.md", "ids": ["M1", "M2", "M7", "M8", "M9", "M10", "M12", "M13"]},
+    "round2": {"file": "baseline/round2-findings.md", "ids": ["N1", "N2", "N9", "N10"]}
+  },
+  "judge_context": {
+    "spec_for_kind": {"full": "round0-agent-spec.md", "round2": "round1-agent-spec.md"},
+    "packet": "review-packet.md",
+    "inputs": ["product-idea.md"],
+    "verifier_brief": "../../.claude/skills/agent-spec/references/verification.md"
+  },
+  "tolerance": 0.10,
+  "metrics": [
+    {"name": "integrity",            "kind": "code",  "gate": true,  "direction": "pass",   "about": "no script error, checker printed 0 errors, no question to the user"},
+    {"name": "recall_key",           "kind": "judge", "gate": true,  "direction": "higher", "min": 0.75, "about": "share of key Important defects the trial reported (same block, same defect)"},
+    {"name": "false_positives",      "kind": "judge", "gate": true,  "direction": "lower",  "max": 1,    "about": "kept findings the judge rules Not real after reading spec and inputs"},
+    {"name": "wall_clock_s",         "kind": "code",  "gate": true,  "direction": "lower",  "about": "first round start to last round end"},
+    {"name": "finder_tool_calls_max","kind": "code",  "gate": true,  "direction": "lower",  "about": "max tool_uses over non-Codex finders"},
+    {"name": "finder_duration_max_s","kind": "code",  "gate": false, "direction": "lower"},
+    {"name": "tokens_total_k",       "kind": "code",  "gate": false, "direction": "lower",  "about": "sum of subagent_tokens, thousands (Codex wrapper tokens only)"},
+    {"name": "rounds_run",           "kind": "code",  "gate": false, "direction": "report"},
+    {"name": "kept_total",           "kind": "code",  "gate": false, "direction": "report"},
+    {"name": "important_kept",       "kind": "code",  "gate": false, "direction": "report"},
+    {"name": "verifier_drop_rate",   "kind": "code",  "gate": false, "direction": "report", "about": "dropped / (kept + dropped)"},
+    {"name": "codex_subagents",      "kind": "code",  "gate": false, "direction": "report"}
+  ]
+}

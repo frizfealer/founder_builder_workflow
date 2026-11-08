@@ -1,0 +1,27 @@
+---
+description: Run n trials of a skill on its frozen inputs, in parallel and isolated, each writing results/<set>-k/trial.json; then grade the set
+argument-hint: <skill> <set> [--n 3]
+---
+
+Run trials of skill `$ARGUMENTS` (default n = 3).
+
+1. Read `eval/<skill>/PROMPT.md` and `eval/<skill>/grading.json`. Record the skill's current
+   commit (`git rev-parse --short HEAD`) and confirm the working tree of the skill's files is
+   clean; a dirty skill is not a trial of any commit, so stop and say so.
+2. For k in 1..n, dispatch one background subagent with `PROMPT.md`, label `<set>-k`, and a
+   scratch dir of its own (`eval/<skill>/run-<set>-k/`). Parallel trials never share a scratch
+   dir or a results folder. Each writes `eval/<skill>/results/<set>-k/` including `trial.json`
+   with `skill_commit` set.
+3. Wait for every trial's completion notification. A trial that dies on infrastructure (a
+   stalled subagent, a harness timeout, a collision) is rerun under the same label after its
+   folder is cleared, and the rerun is noted in `trial.json.warnings`; it is not counted as a
+   result. Three attempts, then report the failure under *Needs you*.
+4. Validate each `trial.json` against `references/trial-schema.md`: every round has start and
+   end, `kept + dropped + preexisting + unknown_kept == merged`, every subagent has a row. A file
+   that fails validation is fixed from the trial's own log files, not from memory; what could
+   not be determined goes in `warnings`.
+5. Run `/grade <skill> --set <set>`.
+6. Report the table, the set summary, wall clock per trial, and any rerun.
+
+Trials never edit the skill, `grading.json`, frozen inputs or baseline folders. Product
+questions the skill raises about the fixture are left open in the trial's own report.
