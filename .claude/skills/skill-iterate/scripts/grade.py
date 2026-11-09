@@ -69,6 +69,8 @@ def write_judge_task(eval_dir, t, g, metric, folder):
     ctx = g["judge_context"]
     spec = Path(ctx["spec_for_kind"][kind])  # paths below are relative to eval_dir; the judge runs from there
     folder = Path("results") / folder.name
+    findings_glob = t.get("findings_glob") or f"{folder}/round*-findings.md"
+    final_spec = t.get("final_spec", f"{folder}/agent-spec-final.md")
     kept = [f for f in t["findings"] if f.get("kept")]
     if metric == "recall_key":
         key = g["key"][kind]
@@ -76,7 +78,7 @@ def write_judge_task(eval_dir, t, g, metric, folder):
         body = [f"# Judge task: recall_key for trial {t['label']}", "",
                 "You are matching known defects against a trial's findings. You did not write either. Read only; edit nothing.", "",
                 f"Spec the findings refer to: `{spec}`. Review packet: `{ctx['packet']}`.",
-                f"The trial's full findings, with evidence, are in `{folder}/round*-findings.md`.", "",
+                f"The trial's full findings, with evidence, are in `{findings_glob}`.", "",
                 "For each KEY defect below, decide whether any finding in the trial reports the SAME defect in the SAME block of the spec: the same rule, failure row, scenario or dimension, and the same thing wrong with it. A finding that touches the same block but names a different defect is not a match. A finding that names the same defect under a wider pattern that includes this block is a match.", "",
                 "Output exactly one JSON object, nothing else, as the file `judge/recall_key.verdict.json`:",
                 '```json', '{"metric": "recall_key", "matches": {"<KEY id>": "<trial finding id or null>"}, "evidence": {"<KEY id>": "<one line: the trial quote or location that matches, or why nothing does>"}}', '```', "",
@@ -90,7 +92,7 @@ def write_judge_task(eval_dir, t, g, metric, folder):
         body = [f"# Judge task: false_positives for trial {t['label']}", "",
                 "You are checking whether each kept finding is a real defect. You did not write the spec or the findings. Read only; edit nothing.", "",
                 f"Read the review packet `{ctx['packet']}`, the sources it lists, and the spec `{spec}`. Apply the verifier brief in `{ctx['verifier_brief']}`: a finding is Real when the defect exists as described and belongs to its class; Not real when the spec or the inputs refute it (quote what refutes it); Style only when it concerns wording or preference and changes no verdict.", "",
-                f"The findings with their evidence are in `{folder}/round*-findings.md`; the ids to judge are listed below. A finding whose round is 2 or 3 refers to the spec as it stood after the previous round's fixes; `{folder}/agent-spec-final.md` is the end state.", "",
+                f"The findings with their evidence are in `{findings_glob}`; the ids to judge are listed below. A finding whose round is 2 or 3 refers to the spec as it stood after the previous round's fixes" + (f"; `{final_spec}` is the end state." if final_spec else "; no end-state copy exists for this trial, judge from the finding's own evidence.") + "", "",
                 "Output exactly one JSON object, nothing else, as the file `judge/false_positives.verdict.json`:",
                 '```json', '{"metric": "false_positives", "verdicts": {"<finding id>": "Real|Not real|Style only"}, "evidence": {"<finding id>": "<one line>"}}', '```', "",
                 "## Findings to judge", ""]
@@ -110,12 +112,24 @@ def judge_metrics(eval_dir, t, g, folder):
         vf = folder / "judge" / f"{m['name']}.verdict.json"
         if vf.exists():
             v = load(vf)
+            if v.get("error"):
+                write_judge_task(eval_dir, t, g, m["name"], folder)
+                out[m["name"]] = "pending"
+                t.setdefault("warnings", []).append(f"judge {m['name']}: {v['error']}")
+                continue
             if m["name"] == "recall_key":
                 ids = g["key"][t["kind"]]["ids"]
                 hit = sum(1 for k in ids if v.get("matches", {}).get(k))
                 out[m["name"]] = round(hit / len(ids), 2)
             elif m["name"] == "false_positives":
-                out[m["name"]] = sum(1 for x in v.get("verdicts", {}).values() if x.lower() in ("not real", "style only"))
+                vals = list(v.get("verdicts", {}).values())
+                if not vals or all(x is None for x in vals):
+                    write_judge_task(eval_dir, t, g, m["name"], folder)
+                    out[m["name"]] = "pending"
+                    continue
+                out[m["name"]] = sum(1 for x in vals if isinstance(x, str) and x.lower() in ("not real", "style only"))
+                if any(x is None for x in vals):
+                    t.setdefault("warnings", []).append(f"judge false_positives: {sum(1 for x in vals if x is None)} null verdicts counted as Real")
         else:
             write_judge_task(eval_dir, t, g, m["name"], folder)
             out[m["name"]] = "pending"

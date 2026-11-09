@@ -488,5 +488,7 @@
  ],
  "warnings": [
   "reconstructed from baseline/subagent-stats.md prose: round times to the minute, finder durations 177-323 s not per subagent, only some tool_uses known"
- ]
+ ],
+ "findings_glob": "baseline/round*-findings.md",
+ "final_spec": null
 }

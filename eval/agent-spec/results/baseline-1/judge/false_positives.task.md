@@ -5,7 +5,7 @@ You are checking whether each kept finding is a real defect. You did not write t
 
 Read the review packet `review-packet.md`, the sources it lists, and the spec `round0-agent-spec.md`. Apply the verifier brief in `../../.claude/skills/agent-spec/references/verification.md`: a finding is Real when the defect exists as described and belongs to its class; Not real when the spec or the inputs refute it (quote what refutes it); Style only when it concerns wording or preference and changes no verdict.
 
-The findings with their evidence are in `results/baseline-1/round*-findings.md`; the ids to judge are listed below. A finding whose round is 2 or 3 refers to the spec as it stood after the previous round's fixes; `results/baseline-1/agent-spec-final.md` is the end state.
+The findings with their evidence are in `baseline/round*-findings.md`; the ids to judge are listed below. A finding whose round is 2 or 3 refers to the spec as it stood after the previous round's fixes; no end-state copy exists for this trial, judge from the finding's own evidence.
 
 Output exactly one JSON object, nothing else, as the file `judge/false_positives.verdict.json`:
 ```json
