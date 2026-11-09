@@ -42,11 +42,14 @@ r2-new-3 attempt died when the Codex finder stalled; rerun completed. In every t
 kept findings quote a line the previous round changed (fixes introducing defects), not lines the
 bundle hid.
 
-**Grade.** Not graded. Recall of N1/N2/N9/N10 and false positives were never computed, so
-"fewer findings" is unexplained: either fewer defects or lower recall.
+**Grade (2026-11-08, first /grade run).** PASS in all three trials on every gated metric vs
+r2-old-1: recall_key 0.75 / 0.25 / 0.50 vs 0.25; false_positives 1 / 0 / 1 vs 1; wall clock
+1554 / 1386 / 1632 s vs 2002; max finder tool calls 13 / 9 / 7 vs 18. N10 counted as found on
+half of a two-part defect in all three. Baseline is one sample; the recall spread across the
+three identical-skill trials (0.25-0.75) exceeds any difference measured.
 
-**Outcome.** Removed in E4 without a grade. Open: the three result folders still exist and can
-be graded.
+**Outcome.** Removed in E4 before it was graded. The grade says it was an improvement on cost
+with no measured loss of recall. Candidate to re-add on top of E4 if round 2/3 cost matters.
 
 ## E2 — Two finder sets in round 1; two verifiers on Important only (2026-11-07, session 2)
 
@@ -68,10 +71,11 @@ Did not converge; round 3 still added a scenario (CO-S29). Verifiers dropped 5 o
 Codex finders raised 7 defects no Claude finder did; 2 kept, 3 dropped, 2 never verified. Codex
 arrived late or stalled in both rounds it ran.
 
-**Grade.** Not graded.
+**Grade (2026-11-08).** FAIL vs full-new-3: recall_key 0.86 (6 of 7); recall_found 1.0 — M13 was
+reported (R1-18) and dropped by a verifier. false_positives 0. Slowest full trial (2270 s).
 
 **Outcome.** Reverted to one finder set in E3 after one trial. Overlap between set A and set B
-was never measured, so the hypothesis is untested.
+was never measured. The grade shows the finders found everything; the loss was in verification.
 
 ## E3 — One finder set; Codex non-gating; adversarial evidence rule; both-verifier drop rule; rule-change limit in every run (2026-11-07, session 2)
 
@@ -88,7 +92,9 @@ too. §5.1/§5.2 re-sync moved before step 4.
 21 kept, 0 of 12 Important dropped. Round-2 Codex finder never returned (stalled job); run end
 delayed ~3 h waiting on it. Every round changed the spec; stopped at the cap.
 
-**Grade.** Not graded.
+**Grade (2026-11-08).** FAIL vs full-new-3: false_positives 3 (vs 2 for baseline-1, 0 for
+full-new-3); recall_key 1.0; 1658 s. One of the three FPs is R2-L2, the M12 pattern, which the
+key no longer counts as a defect.
 
 **Outcome.** Codex removed in E4.
 
@@ -111,7 +117,10 @@ previous round did *not* change (6 of 8, 8 of 9): the full sweep is finding miss
 only fix defects. 4 of round 3's 8 Important findings re-reported findings dropped earlier,
 because `answered.md` lists only kept findings; each cost a verifier pass.
 
-**Grade.** Not graded. Only one trial; two more are needed before this is a baseline.
+**Grade (2026-11-08).** Best full trial on the table: recall_key 1.0, recall_found 1.0,
+false_positives 0 (original run: 2), wall clock 1588 s (original: 2154, -26 %), max finder tool
+calls 11 (original: 19), verifier drop rate 0.28 with nothing from the key dropped. Serves as the
+full-kind recall baseline; only one trial, so two more are needed before the baseline is real.
 
 **Outcome.** Current skill. Candidate first fix from the trial: list dropped findings with their
 refutations in `answered.md` so finders stop re-reporting them.
@@ -125,5 +134,8 @@ refutations in `answered.md` so finders stop re-reporting them.
   finders.
 - Codex stalled or arrived late in 4 of the 6 trials that used it, and parallel trials colliding
   on `run/` cost one trial. Infrastructure failures, not skill signal.
-- The grading README's two judgment metrics (recall, false positives) have never been computed
-  by anyone. Every decision E1–E4 rests on count lines and wall clock.
+- First graded table 2026-11-08 (skill-iterate /grade): E1 passed everything and had been
+  removed; E2 and E3 failed; E4 is the best full run. The decisions E1–E4 were made on count
+  lines; the grades disagree with two of the four.
+- Key defects with two parts (N10, M8) were counted as found on one part. Split them into two
+  key entries when the key is rebuilt from three baseline trials.
