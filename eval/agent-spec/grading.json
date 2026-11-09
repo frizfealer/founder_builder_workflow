@@ -3,10 +3,13 @@
   "fixture": "Harbor Goods order-support spec frozen before verification (round0-agent-spec.md); step 4 of the skill run with the given review packet.",
   "kinds": {
     "full": {
-      "description": "step 4 from round0-agent-spec.md, rounds 1-3",
+      "description": "step 4 from round0-agent-spec.md, rounds 1-3; baseline = four runs of the E4 skill (c731759..e622e24) plus baseline-1 for cost metrics only",
       "baseline_labels": [
         "baseline-1",
-        "full-new-3"
+        "full-new-3",
+        "e4-base-1",
+        "e4-base-2",
+        "e4-base-3"
       ]
     },
     "round2": {

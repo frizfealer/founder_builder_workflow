@@ -41,5 +41,5 @@ Rules for the writer:
 - A subagent that never returned still gets a row, with `tool_uses` and `duration_ms` null.
 - Round-2-only kinds start at round 2; `rounds` then has no `n: 1`.
 
-Judge verdicts live beside it in `judge/<metric>.verdict.json`; `grade.py` writes the task
+Per-round snapshots of the artifact live beside it in `rounds/round<N>-<artifact>` (round0 = before round 1). Judge verdicts live in `judge/<metric>.verdict.json`; `grade.py` writes the task
 file `judge/<metric>.task.md` when the verdict is missing.

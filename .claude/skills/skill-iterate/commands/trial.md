@@ -16,12 +16,14 @@ Run trials of skill `$ARGUMENTS` (default n = 3).
    stalled subagent, a harness timeout, a collision) is rerun under the same label after its
    folder is cleared, and the rerun is noted in `trial.json.warnings`; it is not counted as a
    result. Three attempts, then report the failure under *Needs you*.
-4. Validate each `trial.json` against `references/trial-schema.md`: every round has start and
+4. Copy each round snapshot the run saved (`round<N>/<artifact>`, round0 included) into
+   `results/<set>-k/rounds/round<N>-<artifact>`; judges read a finding against the text it quoted.
+5. Validate each `trial.json` against `references/trial-schema.md`: every round has start and
    end, `kept + dropped + preexisting + unknown_kept == merged`, every subagent has a row. A file
    that fails validation is fixed from the trial's own log files, not from memory; what could
    not be determined goes in `warnings`.
-5. Run `/grade <skill> --set <set>`.
-6. Report the table, the set summary, wall clock per trial, and any rerun.
+6. Run `/grade <skill> --set <set>`.
+7. Report the table, the set summary, wall clock per trial, and any rerun.
 
 Trials never edit the skill, `grading.json`, frozen inputs or baseline folders. Product
 questions the skill raises about the fixture are left open in the trial's own report.

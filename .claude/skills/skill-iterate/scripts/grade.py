@@ -71,6 +71,8 @@ def write_judge_task(eval_dir, t, g, metric, folder):
     folder = Path("results") / folder.name
     findings_glob = t.get("findings_glob") or f"{folder}/round*-findings.md"
     final_spec = t.get("final_spec", f"{folder}/agent-spec-final.md")
+    snaps = sorted(p.name for p in (eval_dir / folder / "rounds").glob("round*-agent-spec.md")) if (eval_dir / folder / "rounds").exists() else []
+    snap_note = (f" The spec as it stood after each round is in `{folder}/rounds/` ({', '.join(snaps)}); read a round-N finding against round{{N-1}}, which is the text it quoted.") if snaps else " No per-round snapshots exist for this trial; judge round-2 and round-3 findings from their own quoted text."
     kept = [f for f in t["findings"] if f.get("kept")]
     if metric in ("recall_key", "recall_found"):
         key = g["key"][kind]
@@ -93,7 +95,7 @@ def write_judge_task(eval_dir, t, g, metric, folder):
         body = [f"# Judge task: false_positives for trial {t['label']}", "",
                 "You are checking whether each kept finding is a real defect. You did not write the spec or the findings. Read only; edit nothing.", "",
                 f"Read the review packet `{ctx['packet']}`, the sources it lists, and the spec `{spec}`. Apply the verifier brief in `{ctx['verifier_brief']}`: a finding is Real when the defect exists as described and belongs to its class; Not real when the spec or the inputs refute it (quote what refutes it); Style only when it concerns wording or preference and changes no verdict.", "",
-                f"The findings with their evidence are in `{findings_glob}`; the ids to judge are listed below. A finding whose round is 2 or 3 refers to the spec as it stood after the previous round's fixes" + (f"; `{final_spec}` is the end state." if final_spec else "; no end-state copy exists for this trial, judge from the finding's own evidence.") + "", "",
+                f"The findings with their evidence are in `{findings_glob}`; the ids to judge are listed below. A finding whose round is 2 or 3 refers to the spec as it stood after the previous round's fixes" + (f"; `{final_spec}` is the end state." if final_spec else "; no end-state copy exists for this trial, judge from the finding's own evidence.") + snap_note, "",
                 "Output exactly one JSON object, nothing else, as the file `judge/false_positives.verdict.json`:",
                 '```json', '{"metric": "false_positives", "verdicts": {"<finding id>": "Real|Not real|Style only"}, "evidence": {"<finding id>": "<one line>"}}', '```', "",
                 "## Findings to judge", ""]
