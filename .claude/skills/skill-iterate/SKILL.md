@@ -35,14 +35,29 @@ baseline trials.
   metric; rerun `grade.py`; print the table.
 - `/iterate <skill> "<problem>"` — advisor proposes an edit → editor applies it on a branch →
   advisor answers the editor's consistency flags (two rounds at most, then the human) →
-  `/trial` → `/grade` → advisor's verdict → `REPORT.md`. *Not built yet; the agents it uses
-  are defined under `agents/`.*
+  `/trial` → `/grade` → advisor's verdict → `REPORT.md`. One human touch: the merge /
+  revert / next-problem question at the end.
 
 ## What the human decides
 
 Read `references/escalation.md`. In short: the measurement, the experiment's direction when the
 table is inconclusive, anything outside the repo, and anything that loses results. Everything
 else the agent decides and logs under *Decided for you*.
+
+## Installing in a repo
+
+Claude Code loads project slash commands from `.claude/commands/` and subagents from
+`.claude/agents/`, not from inside a skill folder. Link them (the skill folder stays the
+source):
+
+```
+ln -s ../skills/skill-iterate/commands/{setup-eval,trial,grade,iterate}.md .claude/commands/
+ln -s ../skills/skill-iterate/agents/judge.md   .claude/agents/skill-eval-judge.md
+ln -s ../skills/skill-iterate/agents/advisor.md .claude/agents/skill-advisor.md
+ln -s ../skills/skill-iterate/agents/editor.md  .claude/agents/skill-editor.md
+```
+
+Commands load at session start; open a new session after linking.
 
 ## Files
 
