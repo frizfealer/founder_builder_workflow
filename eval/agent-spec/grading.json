@@ -81,8 +81,7 @@
       "kind": "judge",
       "gate": true,
       "direction": "lower",
-      "max": 1,
-      "about": "kept findings the judge rules Not real after reading spec and inputs"
+      "about": "kept findings the judge rules Not real or Style only after reading spec and inputs; gated against the baseline only"
     },
     {
       "name": "wall_clock_s",
@@ -149,5 +148,5 @@
       "recall_found"
     ]
   },
-  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines."
+  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist."
 }
