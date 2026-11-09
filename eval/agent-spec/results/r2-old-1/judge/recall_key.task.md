@@ -49,7 +49,7 @@ Pattern: A shared rubric with unscoped alternatives whose correct choice depends
 
 ```
 
-## Trial findings (kept), summary lines
+## Trial findings (kept only), summary lines
 
 - R2-01 | Gap | Important | CO-02, CO-S02 Expected / Forbidden
   Quote: "When more than one has, the agent asks which and proposes nothing until the customer names one."

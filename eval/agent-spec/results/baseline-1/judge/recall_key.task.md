@@ -4,7 +4,7 @@ Run from `agent-spec`'s parent: all paths below are relative to `eval/agent-spec
 You are matching known defects against a trial's findings. You did not write either. Read only; edit nothing.
 
 Spec the findings refer to: `round0-agent-spec.md`. Review packet: `review-packet.md`.
-The trial's full findings, with evidence, are in `results/baseline-1/round*-findings.md`.
+The trial's full findings, with evidence, are in `baseline/round*-findings.md`.
 
 For each KEY defect below, decide whether any finding in the trial reports the SAME defect in the SAME block of the spec: the same rule, failure row, scenario or dimension, and the same thing wrong with it. A finding that touches the same block but names a different defect is not a match. A finding that names the same defect under a wider pattern that includes this block is a match.
 
@@ -65,14 +65,6 @@ Pattern: A reachable world state the spec's own failure paths produce, with no r
 
 ```
 
-### M12
-```
-M12 | Ambiguous | Important | CO-S01–CO-S21, CO-S23, CO-S24, Initial state and Final state assertions
-Quote: "- No follow-up task exists." / "- Exactly one follow-up task exists: for <order>, reason cancellation unknown."
-Evidence: These Initial-state blocks never state whether follow-up tasks already exist, yet every scenario asserts an exact final task count; an identical trajectory passes or fails depending on unstated initial tasks. Evaluation checklist: every fact a grader needs is in Initial state with a value.
-Pattern: A final-state cardinality assertion on an entity whose initial set is not stated.
-```
-
 ### M13
 ```
 M13 | Untestable | Important | CO-S03 and CO-S04, User block
@@ -81,7 +73,7 @@ Evidence: §5.1 defines the "confirmation question" as an event; this trigger is
 Pattern: A scripted reply anchored to an informal description rather than a §5.1-defined event.
 ```
 
-## Trial findings (kept), summary lines
+## Trial findings (kept only), summary lines
 
 - M1 | Lies/Gap | Important | CO-A2 failure row "did not answer the second CO-A2"; CO-S15
   Quote: "| CO-A2 | the order system did not answer the second CO-A2 | Make no further CO-A2 and no CO-A3; tell the customer it is not known whether the order was cancelled and store staff will follow up; make CO-A4 with reason cancellation unknown. | G-04, CO-06, CO-07 |"

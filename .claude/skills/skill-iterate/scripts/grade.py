@@ -72,21 +72,22 @@ def write_judge_task(eval_dir, t, g, metric, folder):
     findings_glob = t.get("findings_glob") or f"{folder}/round*-findings.md"
     final_spec = t.get("final_spec", f"{folder}/agent-spec-final.md")
     kept = [f for f in t["findings"] if f.get("kept")]
-    if metric == "recall_key":
+    if metric in ("recall_key", "recall_found"):
         key = g["key"][kind]
         keytext = key_findings_text(eval_dir, key)
-        body = [f"# Judge task: recall_key for trial {t['label']}", "",
+        pool = kept if metric == "recall_key" else [f for f in t["findings"] if f.get("kept") is not None]
+        body = [f"# Judge task: {metric} for trial {t['label']}", "",
                 "You are matching known defects against a trial's findings. You did not write either. Read only; edit nothing.", "",
                 f"Spec the findings refer to: `{spec}`. Review packet: `{ctx['packet']}`.",
                 f"The trial's full findings, with evidence, are in `{findings_glob}`.", "",
                 "For each KEY defect below, decide whether any finding in the trial reports the SAME defect in the SAME block of the spec: the same rule, failure row, scenario or dimension, and the same thing wrong with it. A finding that touches the same block but names a different defect is not a match. A finding that names the same defect under a wider pattern that includes this block is a match.", "",
-                "Output exactly one JSON object, nothing else, as the file `judge/recall_key.verdict.json`:",
-                '```json', '{"metric": "recall_key", "matches": {"<KEY id>": "<trial finding id or null>"}, "evidence": {"<KEY id>": "<one line: the trial quote or location that matches, or why nothing does>"}}', '```', "",
+                f"Output exactly one JSON object, nothing else, as the file `judge/{metric}.verdict.json`:",
+                '```json', '{"metric": "' + metric + '", "matches": {"<KEY id>": "<trial finding id or null>"}, "evidence": {"<KEY id>": "<one line: the trial quote or location that matches, or why nothing does>"}}', '```', "",
                 "## KEY defects", ""]
         for fid in key["ids"]:
             body += [f"### {fid}", "```", keytext.get(fid, "(not found in key file)"), "```", ""]
-        body += ["## Trial findings (kept), summary lines", ""]
-        for f in kept:
+        body += ["## Trial findings (" + ("kept only" if metric == "recall_key" else "kept AND dropped: a dropped finding still counts as reported") + "), summary lines", ""]
+        for f in pool:
             body.append(f"- {f['id']} | {f.get('class')} | {f.get('severity')} | {f.get('location')}\n  Quote: {f.get('quote', '')[:300]}")
     elif metric == "false_positives":
         body = [f"# Judge task: false_positives for trial {t['label']}", "",
@@ -117,7 +118,7 @@ def judge_metrics(eval_dir, t, g, folder):
                 out[m["name"]] = "pending"
                 t.setdefault("warnings", []).append(f"judge {m['name']}: {v['error']}")
                 continue
-            if m["name"] == "recall_key":
+            if m["name"] in ("recall_key", "recall_found"):
                 ids = g["key"][t["kind"]]["ids"]
                 hit = sum(1 for k in ids if v.get("matches", {}).get(k))
                 out[m["name"]] = round(hit / len(ids), 2)
@@ -167,8 +168,9 @@ def evaluate(eval_dir, labels, g):
             bt = load(tj)
             bm = code_metrics(bt)
             bm.update(judge_metrics(eval_dir, bt, g, results_dir / bl))
+            excl = set(g.get("baseline_exclude", {}).get(bl, []))
             for k, v in bm.items():
-                if isinstance(v, (int, float)):
+                if isinstance(v, (int, float)) and k not in excl:
                     vals.setdefault(k, []).append(v)
         refs[kind] = vals
     # gate decisions
@@ -264,6 +266,13 @@ def main():
     trials, refs = evaluate(eval_dir, labels, g)
     print(f"# Grades: {g['skill']}  ({eval_dir})\n")
     print(table(trials, g, refs))
+    print("\nMetrics (* = gated; a gated metric fails below its bound or when worse than the worst baseline by more than "
+          f"{int(g.get('tolerance', 0.1) * 100)} %):")
+    for m in g["metrics"]:
+        bound = f" (min {m['min']})" if "min" in m else f" (max {m['max']})" if "max" in m else ""
+        print(f"- {'*' if m.get('gate') else ''}{m['name']}{bound}: {m.get('about', m['direction'])}")
+    if g.get("notes"):
+        print("- note: " + g["notes"])
     if prefix:
         print(set_summary(trials, prefix, g))
     pend = [f"{lab}/judge/{m}.task.md" for lab, tr in trials.items() for m, v in tr["metrics"].items() if v == "pending"]

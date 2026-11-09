@@ -65,14 +65,6 @@ Pattern: A reachable world state the spec's own failure paths produce, with no r
 
 ```
 
-### M12
-```
-M12 | Ambiguous | Important | CO-S01–CO-S21, CO-S23, CO-S24, Initial state and Final state assertions
-Quote: "- No follow-up task exists." / "- Exactly one follow-up task exists: for <order>, reason cancellation unknown."
-Evidence: These Initial-state blocks never state whether follow-up tasks already exist, yet every scenario asserts an exact final task count; an identical trajectory passes or fails depending on unstated initial tasks. Evaluation checklist: every fact a grader needs is in Initial state with a value.
-Pattern: A final-state cardinality assertion on an entity whose initial set is not stated.
-```
-
 ### M13
 ```
 M13 | Untestable | Important | CO-S03 and CO-S04, User block
@@ -81,7 +73,7 @@ Evidence: §5.1 defines the "confirmation question" as an event; this trigger is
 Pattern: A scripted reply anchored to an informal description rather than a §5.1-defined event.
 ```
 
-## Trial findings (kept), summary lines
+## Trial findings (kept only), summary lines
 
 - R1-01 | Lies | Important | §4.1 Failure handling, rows "CO-A2 / did not answer the second CO-A2" and "CO-A3 / payment provider temporarily unavailable for the second CO-A3"
   Quote: "| CO-A2 | the order system did not answer the second CO-A2 | Make no further CO-A2 and no CO-A3; tell the customer it is not known whether the order was cancelled and store staff will follow up; make CO-A4 with reason cancellation unknown. | G-04, CO-06, CO-07 |"

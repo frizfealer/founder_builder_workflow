@@ -49,7 +49,7 @@ Pattern: A shared rubric with unscoped alternatives whose correct choice depends
 
 ```
 
-## Trial findings (kept), summary lines
+## Trial findings (kept only), summary lines
 
 - R2-1 | Gap | Important | CO-S25 and CO-S26, Expected / Forbidden
   Quote: "absent" (CO-S25's only lookup-ordering line is "- A second CO-A2 before a CO-A1 made after the first CO-A2."; CO-S26 has no lookup-ordering line)

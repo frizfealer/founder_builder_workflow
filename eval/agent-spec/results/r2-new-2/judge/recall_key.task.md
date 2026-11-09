@@ -49,7 +49,7 @@ Pattern: A shared rubric with unscoped alternatives whose correct choice depends
 
 ```
 
-## Trial findings (kept), summary lines
+## Trial findings (kept only), summary lines
 
 - M14 | Gap | Important | CO-S25, CO-S26, Expected / Forbidden
   Quote: CO-S25: "- CO-A2 occurs exactly twice, for <order>, after the user's confirmation turn." (only Required event); CO-S26: "- CO-A2 occurs exactly once, for <order>, after the user's confirmation turn." (only Required event); neither has a Forbidden line requiring a CO-A1 after the last unanswered CO-A

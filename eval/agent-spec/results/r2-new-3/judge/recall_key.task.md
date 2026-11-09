@@ -49,7 +49,7 @@ Pattern: A shared rubric with unscoped alternatives whose correct choice depends
 
 ```
 
-## Trial findings (kept), summary lines
+## Trial findings (kept only), summary lines
 
 - M14 | Gap | Important | row: Order not cancelled reported (CO-S24)
   Quote: "| Order not cancelled reported | rubric | The agent tells the customer the order was not cancelled, and never says the order was cancelled or a refund was issued. | CO-S24, CO-S25 |"
