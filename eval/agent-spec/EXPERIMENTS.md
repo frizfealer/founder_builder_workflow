@@ -125,6 +125,44 @@ full-kind recall baseline; only one trial, so two more are needed before the bas
 **Outcome.** Current skill. Candidate first fix from the trial: list dropped findings with their
 refutations in `answered.md` so finders stop re-reporting them.
 
+## E5 — Verifier may not refute with a permission-only clause or the quoted line (2026-11-09, /iterate set it1)
+
+**Hypothesis.** The adversarial verifier dropped M2 (CO-S17 row 3 injects OrderNotCancelled after
+CO-A2 returned cancelled) in the E4 runs by citing §5.1's supporting-actor clause and the CO-A3
+failure row M2 quotes. Ruling out both moves raises recall_key to 1.0 in every trial without
+raising false_positives above the baseline worst (2).
+
+**Change.** Commits e473b91, 9fddf59 and 29e7be1 on `iterate/agent-spec/it1`. One paragraph of the
+adversarial verifier brief in `references/verification.md`:
+- A permission clause does not refute a finding that an injected outcome contradicts the scenario's
+  Initial state or its earlier call results.
+- The outcome's Appendix A entry must be able to hold at that call.
+- Restating the quoted line is not a refutation.
+
+**Trials** it1-1..3 (full kind, skill 29e7be1). The runners had no Agent tool, so the finders and
+verifiers ran as `claude -p` processes, not native subagents.
+
+| trial | integrity | recall_key | recall_found | false_positives | wall_clock_s | finder_tool_calls_max |
+|---|---|---|---|---|---|---|
+| it1-1 | pass | 0.86 | 0.86 | 3 | 2309 | 11 |
+| it1-2 | pass | 1.0 | 1.0 | 1 | 1424 | 11 |
+| it1-3 | FAIL | 0.86 | 0.86 | 1 | 1226 | 11 |
+| baseline worst | | 0.86 | 1.0 | 2 | 2162 | 19 |
+
+- **M2:** kept in 3 of 3 trials (baselines: 2 of 4). The verifier applied the new limit to CO-S24's
+  OrderNotFound as well.
+- **recall misses:** both 0.86 values are M10, which no finder reported. That is a finder miss,
+  which the edit does not touch.
+- **it1-1's three FPs** (M14, M7, P4) are all unverified Nits, so the verifier never saw them.
+- **it1-3's integrity FAIL** counts a runner's own fix-script abort. Other trials recorded 0 for
+  the same kind of event.
+
+**Verdict.** INCONCLUSIVE (advisor). `grade.py` marks the set FAIL: false_positives worst 3 vs 2,
+plus the integrity count. The hypothesis was not met: recall_key was 0.86 / 1.0 / 0.86.
+
+**Outcome.** Pending the human; see `results/it1/REPORT.md`. The open questions are the integrity
+counting, the infrastructure difference, and whether to rerun on native subagents.
+
 ## Standing observations
 
 - Round-1 finding count varies 13 → 24 between two runs of the same skill on the same input.
