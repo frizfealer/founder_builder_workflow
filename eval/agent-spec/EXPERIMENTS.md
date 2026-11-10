@@ -160,8 +160,29 @@ verifiers ran as `claude -p` processes, not native subagents.
 **Verdict.** INCONCLUSIVE (advisor). `grade.py` marks the set FAIL: false_positives worst 3 vs 2,
 plus the integrity count. The hypothesis was not met: recall_key was 0.86 / 1.0 / 0.86.
 
-**Outcome.** Pending the human; see `results/it1/REPORT.md`. The open questions are the integrity
-counting, the infrastructure difference, and whether to rerun on native subagents.
+**Rerun** it1b-1..3 (2026-11-09, skill 9b7479f = 29e7be1 plus the scoped and wrapped paragraph,
+native subagents, so comparable with e4-base). Measurement decisions taken first: script_errors
+counts only the skill's own scripts (it1-3 recounted to pass); false_positives stays gated on all
+kept findings, with report-only fp_verified / fp_unverified.
+
+| trial | recall_key | recall_found | FP (verified / unverified) | wall clock | drop rate |
+|---|---|---|---|---|---|
+| it1b-1 | 1.0 | 1.0 | 0 (0 / 0) | 2352 s | 0.09 |
+| it1b-2 | 1.0 | 1.0 | 2 (0 / 2) | 2016 s | 0.12 |
+| it1b-3 | 0.86 | 1.0 | 1 (1 / 0) | 2185 s | 0.11 |
+| baseline worst (e4-base + full-new-3) | 0.86 | 1.0 | 2 | 2162 s | 0.14-0.34 |
+
+**Grade.** PASS, every gate in every trial. M2 kept 3 of 3 (6 of 6 with it1) vs 2 of 4 in the
+baseline. Verifier drop rate halved with no rise in verified false positives. Wall clock about
+14 % higher on average (2184 vs 1908 s), within the per-trial tolerance; more kept findings
+means more fixes per round. The one recall miss is M10, reported (N9) and dropped by the
+verifier in round 2 — a different refutation pattern from M2's. The runner overrode the
+verifier twice (M3, judge Real; P4, judge Not real).
+
+**Outcome.** Kept; merged 2026-11-09 into claude/agent-spec-verification-test-iayxp5. Full
+baseline rolled to it1b-1..3. Queued: (1) unverified Nits are the whole false_positives column
+(it1-1 3/3, it1b-2 2/2); (2) the M10/N9 round-2 drop; (3) runner overrides of the verifier are
+right 1 of 2 times.
 
 ## Standing observations
 

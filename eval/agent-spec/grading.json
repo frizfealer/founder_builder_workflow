@@ -3,13 +3,12 @@
   "fixture": "Harbor Goods order-support spec frozen before verification (round0-agent-spec.md); step 4 of the skill run with the given review packet.",
   "kinds": {
     "full": {
-      "description": "step 4 from round0-agent-spec.md, rounds 1-3; baseline = four runs of the E4 skill (c731759..e622e24) plus baseline-1 for cost metrics only",
+      "description": "step 4 from round0-agent-spec.md, rounds 1-3; baseline = three runs of the skill at 9b7479f (E5 verifier limits, merged 2026-11-09) plus baseline-1 for cost metrics only",
       "baseline_labels": [
         "baseline-1",
-        "full-new-3",
-        "e4-base-1",
-        "e4-base-2",
-        "e4-base-3"
+        "it1b-1",
+        "it1b-2",
+        "it1b-3"
       ]
     },
     "round2": {
@@ -165,5 +164,5 @@
       "recall_found"
     ]
   },
-  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09)."
+  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09). Baseline rolled to it1b-1..3 on 2026-11-09 (E5 merged); e4-base-1..3 and full-new-3 are history."
 }
