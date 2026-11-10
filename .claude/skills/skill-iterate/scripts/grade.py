@@ -285,7 +285,8 @@ def main():
         print("- note: " + g["notes"])
     if prefix:
         print(set_summary(trials, prefix, g))
-    pend = [f"{lab}/judge/{m}.task.md" for lab, tr in trials.items() for m, v in tr["metrics"].items() if v == "pending"]
+    derived = {"fp_verified", "fp_unverified"}  # computed from the false_positives verdict; no task of their own
+    pend = [f"{lab}/judge/{m}.task.md" for lab, tr in trials.items() for m, v in tr["metrics"].items() if v == "pending" and m not in derived]
     if pend:
         print(f"\n{len(pend)} judge task(s) written, run them and re-grade:")
         for p in pend:
