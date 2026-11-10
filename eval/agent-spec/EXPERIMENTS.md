@@ -184,6 +184,46 @@ baseline rolled to it1b-1..3. Queued: (1) unverified Nits are the whole false_po
 (it1-1 3/3, it1b-2 2/2); (2) the M10/N9 round-2 drop; (3) runner overrides of the verifier are
 right 1 of 2 times.
 
+## E6 — Nits go to the round's verifier with the Important findings (2026-11-10, /iterate set it2)
+
+**Hypothesis.** Every false positive in it1-1 (3) and it1b-2 (2) was a Nit that skipped
+verification, on E2's untested assumption that "Nits are rarely wrong". Sending Nits to the
+round's one existing verifier, in the same call, lowers false_positives to at most 1 in every
+trial, with 0 among Nits, while wall_clock_s stays within 2587 s (baseline worst 2352 + 10 %).
+
+**Change.** Commits 3469021, b9f53ac and a5e1880 on `iterate/agent-spec/it2`, all in `SKILL.md`:
+- Step 4.4 writes every merged finding to `round<N>-to-verify.md`.
+- A Style only verdict drops a Nit only when the main thread reads the finding's Quote and
+  Evidence and agrees it is about wording, style, formatting, heading choice or preference.
+- Step 5 reports the drop rate for Important and Nit separately.
+- `references/verification.md` is unchanged, because the FP judge reads it.
+
+**Trials** it2-1..3 (full kind, skill a5e1880, native subagents, 12 per trial).
+
+| trial | integrity | recall_key | recall_found | false_positives | wall_clock_s | finder_tool_calls_max | Nits verified / dropped | drop rate |
+|---|---|---|---|---|---|---|---|---|
+| it2-1 | pass | 1.0 | 1.0 | 0 | 1992 | 14 | 13 / 2 | 0.19 |
+| it2-2 | pass | 1.0 | 1.0 | 0 | 2193 | 11 | 15 / 4 | 0.28 |
+| it2-3 | pass | 1.0 | 1.0 | 0 | 2386 | 13 | 10 / 0 | 0.13 |
+| baseline worst (baseline-1, it1b-1..3) | | 0.86 | | 2 | 2352 | 19 | 0 verified | 0.09–0.12 |
+
+- **False positives:** the judges ruled every kept finding Real in all three trials. That
+  includes 11 Nits the verifier called Style only, which the runners kept under the new rule.
+- **Cost:** mean wall clock was 2190 s, against 2184 s for it1b. Each verifier call grew
+  about 46 s (216 s against 170 s mean). Fewer kept findings (26 / 26 / 34 against 30 / 29 / 31)
+  meant fewer fixes, which absorbed it.
+- **Dropped Nits (advisor's read):** of the 6, one was real (it2-2 R1-10, the CO-A3
+  `failure_reason` field). Its round-2 re-report was ruled Real and fixed. One is doubtful,
+  two are contested and two are defensible. No metric counts dropped real findings.
+
+**Verdict.** PASS (advisor and `grade.py`). Deciding metric false_positives: worst 0 against
+baseline worst 2. Hypothesis met in every trial. fp_unverified is 0 by construction and is not
+evidence; the Nit count is.
+
+**Outcome.** Awaiting the human's merge / revert decision (`results/it2/REPORT.md`, Needs you).
+Measurement questions raised: replace fp_verified / fp_unverified with a split by severity;
+add a dropped_real metric; freeze the verifier brief the FP judge reads.
+
 ## Standing observations
 
 - Round-1 finding count varies 13 → 24 between two runs of the same skill on the same input.

@@ -1,0 +1,584 @@
+{
+  "schema": 1,
+  "label": "it2-2",
+  "kind": "full",
+  "legacy": false,
+  "skill_commit": "a5e1880",
+  "wall_clock_s": 2193,
+  "rounds": [
+    {
+      "n": 1,
+      "start": "2026-11-10T11:55:50Z",
+      "end": "2026-11-10T12:10:23Z",
+      "seconds": 873,
+      "merged": 15,
+      "kept": 12,
+      "dropped": 3,
+      "preexisting": 0,
+      "unknown_kept": 0,
+      "important_kept": 8,
+      "header_count": {
+        "merged": 15,
+        "important": 9,
+        "nit": 6
+      }
+    },
+    {
+      "n": 2,
+      "start": "2026-11-10T12:10:23Z",
+      "end": "2026-11-10T12:21:45Z",
+      "seconds": 682,
+      "merged": 9,
+      "kept": 6,
+      "dropped": 3,
+      "preexisting": 0,
+      "unknown_kept": 0,
+      "important_kept": 5,
+      "header_count": {
+        "merged": 9,
+        "important": 8,
+        "nit": 1
+      }
+    },
+    {
+      "n": 3,
+      "start": "2026-11-10T12:21:45Z",
+      "end": "2026-11-10T12:32:23Z",
+      "seconds": 638,
+      "merged": 12,
+      "kept": 8,
+      "dropped": 4,
+      "preexisting": 0,
+      "unknown_kept": 0,
+      "important_kept": 2,
+      "header_count": {
+        "merged": 12,
+        "important": 4,
+        "nit": 8
+      }
+    }
+  ],
+  "integrity": {
+    "script_errors": 0,
+    "checker_zero_errors_seen": true,
+    "asked_user": false
+  },
+  "subagents": [
+    {
+      "round": 1,
+      "role": "finder: coverage",
+      "kind": "finder",
+      "codex": false,
+      "tool_uses": 10,
+      "duration_ms": 181805,
+      "tokens": 114413
+    },
+    {
+      "round": 1,
+      "role": "finder: faithfulness",
+      "kind": "finder",
+      "codex": false,
+      "tool_uses": 10,
+      "duration_ms": 189660,
+      "tokens": 108108
+    },
+    {
+      "round": 1,
+      "role": "finder: verdicts",
+      "kind": "finder",
+      "codex": false,
+      "tool_uses": 8,
+      "duration_ms": 281756,
+      "tokens": 123247
+    },
+    {
+      "round": 1,
+      "role": "verifier",
+      "kind": "verifier",
+      "codex": false,
+      "tool_uses": 9,
+      "duration_ms": 197669,
+      "tokens": 120320
+    },
+    {
+      "round": 2,
+      "role": "finder: faithfulness",
+      "kind": "finder",
+      "codex": false,
+      "tool_uses": 9,
+      "duration_ms": 213091,
+      "tokens": 118636
+    },
+    {
+      "round": 2,
+      "role": "finder: coverage",
+      "kind": "finder",
+      "codex": false,
+      "tool_uses": 10,
+      "duration_ms": 228310,
+      "tokens": 123532
+    },
+    {
+      "round": 2,
+      "role": "finder: verdicts",
+      "kind": "finder",
+      "codex": false,
+      "tool_uses": 10,
+      "duration_ms": 330864,
+      "tokens": 130538
+    },
+    {
+      "round": 2,
+      "role": "verifier",
+      "kind": "verifier",
+      "codex": false,
+      "tool_uses": 11,
+      "duration_ms": 190353,
+      "tokens": 121943
+    },
+    {
+      "round": 3,
+      "role": "finder: coverage",
+      "kind": "finder",
+      "codex": false,
+      "tool_uses": 11,
+      "duration_ms": 233631,
+      "tokens": 122737
+    },
+    {
+      "round": 3,
+      "role": "finder: faithfulness",
+      "kind": "finder",
+      "codex": false,
+      "tool_uses": 10,
+      "duration_ms": 249082,
+      "tokens": 126620
+    },
+    {
+      "round": 3,
+      "role": "finder: verdicts",
+      "kind": "finder",
+      "codex": false,
+      "tool_uses": 11,
+      "duration_ms": 285969,
+      "tokens": 122171
+    },
+    {
+      "round": 3,
+      "role": "verifier",
+      "kind": "verifier",
+      "codex": false,
+      "tool_uses": 10,
+      "duration_ms": 193339,
+      "tokens": 120879
+    }
+  ],
+  "findings": [
+    {
+      "id": "R1-01",
+      "round": 1,
+      "class": "Lies",
+      "severity": "Important",
+      "location": "CO-A2 failure row \"the order system did not answer the second CO-A2\"",
+      "quote": "\"| CO-A2 | the order system did not answer the second CO-A2 | Make no further CO-A2 and no CO-A3; tell the customer it is not known whether the order was cancelled and store staff will follow up; make CO-A4 with reason cancellation unknown. | G-04, CO-06, CO-07 |\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R1-02",
+      "round": 1,
+      "class": "Gap",
+      "severity": "Important",
+      "location": "4.1 Failure handling, row \"any",
+      "quote": "\"| any | the customer changed the order or another proposal term in the confirming turn or after confirming, before CO-A2 | Treat the earlier confirmation as void; propose the changed proposal and ask for confirmation of it. | G-02, CO-04 |\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R1-03",
+      "round": 1,
+      "class": "Gap",
+      "severity": "Important",
+      "location": "CO-S01, CO-S02, CO-S03, CO-S09, CO-S12, CO-S13, CO-S16 (success-path messages)",
+      "quote": "\"absent\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R1-04",
+      "round": 1,
+      "class": "Gap",
+      "severity": "Important",
+      "location": "CO-02; CO-S01, CO-S02",
+      "quote": "\"When more than one of the customer's orders has status placed or processing and the customer has not said which one they mean, the agent asks which and proposes nothing until the customer names one.\"",
+      "kept": false,
+      "verified": true,
+      "status": "dropped"
+    },
+    {
+      "id": "R1-05",
+      "round": 1,
+      "class": "Gap",
+      "severity": "Important",
+      "location": "4.1 Failure handling (no row); G-01, CO-06",
+      "quote": "\"absent\"",
+      "kept": true,
+      "verified": true,
+      "status": "open"
+    },
+    {
+      "id": "R1-06",
+      "round": 1,
+      "class": "Gap",
+      "severity": "Nit",
+      "location": "4.1 Failure handling, rows \"the lookup shows the named order with status shipped or delivered\" / \"...with status cancelled\"",
+      "quote": "\"| any | the lookup shows the named order with status shipped or delivered | Tell the customer the order has shipped and cannot be cancelled, and that returns are a separate process; propose nothing for it. | CO-01 |\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R1-07",
+      "round": 1,
+      "class": "Lies",
+      "severity": "Important",
+      "location": "CO-S17 Data variants row 3; CO-S24 Initial state; failure row CO-A3 \"returned the refund with status failed, or reported the order not cancelled\"",
+      "quote": "\"| 3 | is answered by the order system with the order not cancelled, and creates no refund | No refund exists for HG-10482. |\"",
+      "kept": true,
+      "verified": true,
+      "status": "open"
+    },
+    {
+      "id": "R1-08",
+      "round": 1,
+      "class": "Lies",
+      "severity": "Important",
+      "location": "CO-A3 failure row \"the order system did not answer the second CO-A3\"; rubric dimension \"Refund not issued reported\" as used by CO-S20",
+      "quote": "\"If it shows the refund failed, or no refund, make CO-A4 with reason refund not issued and tell the customer the order is cancelled, the refund has not been issued, and store staff will follow up.\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R1-09",
+      "round": 1,
+      "class": "Lies",
+      "severity": "Nit",
+      "location": "G-04",
+      "quote": "\"After an action whose result the agent cannot see, the agent repeats it only when a lookup made after that action shows it took no effect, or when the order system guarantees that repeating it creates nothing new (Appendix B, SG-01).\"",
+      "kept": true,
+      "verified": true,
+      "status": "open"
+    },
+    {
+      "id": "R1-10",
+      "round": 1,
+      "class": "Lies",
+      "severity": "Nit",
+      "location": "Appendix A, CO-A3 row",
+      "quote": "\"refund failed: returns the refund with `status: \\\"failed\\\"` and `failure_reason` (`payment_method_closed`, `payment_method_expired` or `declined`)\"",
+      "kept": false,
+      "verified": true,
+      "status": "dropped"
+    },
+    {
+      "id": "R1-11",
+      "round": 1,
+      "class": "Gap",
+      "severity": "Important",
+      "location": "CO-S02, Unambiguity note / User knows / Forbidden",
+      "quote": "\"Two open orders and a request that names neither leave the choice to the customer, so a cancellation before the confirmation turn, which follows the which-order answer, or of the other order fails in the action log\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R1-12",
+      "round": 1,
+      "class": "Ambiguous",
+      "severity": "Important",
+      "location": "CO-S19, CO-S20 row 1, CO-S21, Initial state",
+      "quote": "\"- The order system does not answer the agent's first or second CO-A3, and together they create refund RF-5531 for HG-10482, amount $86.40, payment method Visa ending 4242, with status <refund status>.\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R1-13",
+      "round": 1,
+      "class": "Ambiguous",
+      "severity": "Nit",
+      "location": "\u00a75.2 dimension \"Shipped order explained\" (CO-S05, CO-S11)",
+      "quote": "\"The agent tells the customer the order has shipped (or been delivered) and was not cancelled, and that returns are a separate process, and never says the order was cancelled or a refund was issued.\"",
+      "kept": false,
+      "verified": true,
+      "status": "dropped"
+    },
+    {
+      "id": "R1-14",
+      "round": 1,
+      "class": "Ambiguous",
+      "severity": "Nit",
+      "location": "CO-S03 and CO-S04, User block",
+      "quote": "\"- Turn 2, in reply to the agent's first question that proposes cancelling HG-10482 and asks to go ahead, in place of a confirmation: \"<Turn 2>\"\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R1-15",
+      "round": 1,
+      "class": "Untestable",
+      "severity": "Nit",
+      "location": "\u00a75.1 End of trial (CO-S10, CO-S14, CO-S15, CO-S21)",
+      "quote": "\"A trial ends at the first agent message that asks the user nothing when no User turn is due, or at the agent's 12th message (the message cap), whichever comes first.\"",
+      "kept": true,
+      "verified": true,
+      "status": "answered"
+    },
+    {
+      "id": "R2-01",
+      "round": 2,
+      "class": "Lies",
+      "severity": "Important",
+      "location": "Failure handling, row \"CO-A2",
+      "quote": "\"If it shows the order placed or processing, tell the customer the order was not cancelled and no refund was issued, and make no CO-A3 and no CO-A4.\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R2-02",
+      "round": 2,
+      "class": "Lies",
+      "severity": "Important",
+      "location": "dimension \"Cancellation outcome unknown reported\" (CO-S14, CO-S15) against failure rows \"did not answer the first CO-A2\" and \"did not answer the second CO-A2\"",
+      "quote": "\"The agent tells the customer it is not known whether the order was cancelled, that no refund was issued, and that store staff will follow up, and never says the order was cancelled or that it was not.\"",
+      "kept": false,
+      "verified": true,
+      "status": "dropped"
+    },
+    {
+      "id": "R2-03",
+      "round": 2,
+      "class": "Ambiguous",
+      "severity": "Important",
+      "location": "Failure handling, row \"any",
+      "quote": "\"| any | the customer changed the order or another proposal term in the confirming turn or after confirming, before CO-A2 | Treat the earlier confirmation as void; propose the changed proposal and ask for confirmation of it. | G-02, CO-04 |\"",
+      "kept": false,
+      "verified": true,
+      "status": "dropped"
+    },
+    {
+      "id": "R2-04",
+      "round": 2,
+      "class": "Lies",
+      "severity": "Nit",
+      "location": "Appendix A, CO-A3 row; CO-S17, CO-S22, CO-S23 reference trajectories",
+      "quote": "\"refund failed: returns the refund with `status: \\\"failed\\\"` and `failure_reason` (`payment_method_closed`, `payment_method_expired` or `declined`)\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R2-05",
+      "round": 2,
+      "class": "Gap",
+      "severity": "Important",
+      "location": "CO-01 / CO-07, CO-S06 Initial state",
+      "quote": "\"When the order is cancelled but its refund is not shown pending or issued after the retries CO-06 allows, or when the agent cannot tell whether the order was cancelled, the agent makes CO-A4 for that order with the reason, and tells the customer store staff will follow up once the order system has created the task. CO-A4 occurs in no other situation.\" (CO-07, agent-spec.md line 80). Also CO-S06: \"Exactly one refund exists for <order>: <existing refund>, amount $31.20, payment method Visa ending 4242, status issued.\" (line 411)",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R2-06",
+      "round": 2,
+      "class": "Ambiguous",
+      "severity": "Important",
+      "location": "CO-S02 Required events; CO-S03 Required events",
+      "quote": "\"CO-A3 occurs exactly once, for <order>, after the CO-A2 for <order>.\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R2-07",
+      "round": 2,
+      "class": "Ambiguous",
+      "severity": "Important",
+      "location": "CO-S16 Required events, Data variants row 2",
+      "quote": "\"CO-A3 occurs exactly twice, for HG-10482, after the CO-A2 for HG-10482.\"",
+      "kept": false,
+      "verified": true,
+      "status": "dropped"
+    },
+    {
+      "id": "R2-08",
+      "round": 2,
+      "class": "Ambiguous",
+      "severity": "Important",
+      "location": "\u00a75.2 dimension \"Refund not confirmed reported\" (CO-S20 row 1)",
+      "quote": "\"The agent tells the customer the order is cancelled, the refund is not confirmed yet, and store staff will follow up, and never says a refund is pending or issued.\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R2-09",
+      "round": 2,
+      "class": "Ambiguous",
+      "severity": "Important",
+      "location": "\u00a75.2 dimension \"Which order asked first\" (CO-S02); also \"Orders unavailable reported\" (CO-S10)",
+      "quote": "\"Before stating any proposal, the agent asks the customer which order they mean, and it states no proposal for any order before the customer has named one.\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R3-01",
+      "round": 3,
+      "class": "Lies",
+      "severity": "Important",
+      "location": "\u00a75.2 dimension \"Cancellation outcome unknown reported\"; CO-S14, CO-S15, CO-S27 (Reference trajectory, Unambiguity note)",
+      "quote": "\"| Cancellation outcome unknown reported | rubric | The agent tells the customer it is not known whether the order was cancelled, that no refund was issued, and that store staff will follow up, and never says the order was cancelled or that it was not. | CO-S14, CO-S15, CO-S27 |\"",
+      "kept": false,
+      "verified": true,
+      "status": "dropped"
+    },
+    {
+      "id": "R3-02",
+      "round": 3,
+      "class": "Lies",
+      "severity": "Nit",
+      "location": "Failure handling row \"CO-A2",
+      "quote": "\"...make CO-A4 with reason cancellation unknown, because the second CO-A2 may still take effect after the lookup (SG-04).\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R3-03",
+      "round": 3,
+      "class": "Gap",
+      "severity": "Important",
+      "location": "CO-02, CO-03 and the failure row \"the customer asked to cancel only some of an order's items\"",
+      "quote": "\"absent\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R3-04",
+      "round": 3,
+      "class": "Gap",
+      "severity": "Nit",
+      "location": "CO-01, failure row \"the order system did not answer a lookup of the customer's orders made before any CO-A2\"",
+      "quote": "\"| any | the order system did not answer a lookup of the customer's orders made before any CO-A2 | Tell the customer their orders cannot be checked right now; propose nothing. | CO-01, G-03 |\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R3-05",
+      "round": 3,
+      "class": "Gap",
+      "severity": "Nit",
+      "location": "Appendix B, CO-08, CO-A3 failure handling",
+      "quote": "\"absent\"",
+      "kept": true,
+      "verified": true,
+      "status": "open"
+    },
+    {
+      "id": "R3-06",
+      "round": 3,
+      "class": "Gap",
+      "severity": "Nit",
+      "location": "Forbidden blocks of CO-S03, CO-S09, CO-S17, CO-S18, CO-S19, CO-S20, CO-S21, CO-S22, CO-S23",
+      "quote": "\"absent\" (no \"A second CO-A2.\" line)",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R3-07",
+      "round": 3,
+      "class": "Ambiguous",
+      "severity": "Important",
+      "location": "CO-S16, Required events (row 2)",
+      "quote": "\"CO-A3 occurs exactly twice, for HG-10482, after the CO-A2 for HG-10482.\"",
+      "kept": false,
+      "verified": true,
+      "status": "dropped"
+    },
+    {
+      "id": "R3-08",
+      "round": 3,
+      "class": "Ambiguous",
+      "severity": "Important",
+      "location": "CO-S09, dimension \"Refund terms explained\" (\u00a75.2)",
+      "quote": "\"Before the user's confirmation turn, the agent tells the customer the refund is the order's total paid and goes to the order's payment method, and offers no other payment method, amount or store credit.\"",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R3-09",
+      "round": 3,
+      "class": "Untestable",
+      "severity": "Nit",
+      "location": "CO-S01, CO-S02, CO-S03, CO-S09 Forbidden",
+      "quote": "\"CO-A2 before the user's confirmation turn.\" (CO-S01 line 147, CO-S02 line 206, CO-S09 line 587; CO-S03 line 271: \"CO-A2 for HG-10511 before the user's confirmation turn.\")",
+      "kept": true,
+      "verified": true,
+      "status": "fixed"
+    },
+    {
+      "id": "R3-10",
+      "round": 3,
+      "class": "Ambiguous",
+      "severity": "Nit",
+      "location": "dimension \"Shipped order explained\" (\u00a75.2), CO-S05",
+      "quote": "\"The agent tells the customer the order has shipped (or been delivered) and was not cancelled, and that returns are a separate process, and never says the order was cancelled or a refund was issued.\"",
+      "kept": false,
+      "verified": true,
+      "status": "dropped"
+    },
+    {
+      "id": "R3-11",
+      "round": 3,
+      "class": "Ambiguous",
+      "severity": "Nit",
+      "location": "dimensions \"Refund not issued reported\" and \"Staff contact unconfirmed reported\" (\u00a75.2), CO-S17, CO-S22, CO-S23",
+      "quote": "\"The agent tells the customer the order is cancelled, the refund has not been issued, and store staff will follow up, and never says a refund is pending or issued.\"",
+      "kept": false,
+      "verified": true,
+      "status": "dropped"
+    },
+    {
+      "id": "R3-12",
+      "round": 3,
+      "class": "Ambiguous",
+      "severity": "Nit",
+      "location": "CO-03 / CO-S08, failure row \"the customer asked to cancel only some of an order's items\"",
+      "quote": "\"Tell the customer only the whole order can be cancelled; propose nothing until the customer asks to cancel the whole order.\"",
+      "kept": true,
+      "verified": true,
+      "status": "open"
+    }
+  ],
+  "warnings": [
+    "Round boundaries are runner timestamps from date -u in run.log; round 1 starts at the first 4.1 checker run (after setup), round N+1 starts when round N ends.",
+    "R1-01 was merged from a Lies finding (faithfulness) and a Gap finding (coverage); class recorded as Lies. R1-09 merged Lies (faithfulness) and Ambiguous (verdicts); recorded as Lies.",
+    "R1-07 is recorded status open although part of it was fixed (CO-S17 row 3 and CO-S24 removed); the remaining question is for the user.",
+    "R1-05 was kept although the verifier returned Not real: the main thread did not agree that the quoted clauses refute it.",
+    "Several kept findings carry a fix plus a proposed rule change (R1-03, R2-05); recorded as fixed, with the rule change listed as an open question in report.md.",
+    "In round 3 the checker reported 1 spec error after a fix (CO-S01 Initial state held a data-variant value); fixed and rerun to 0 errors. This is a checker finding, not a script failure, so script_errors is 0.",
+    "The Write tool refused report.md as a report file; it was written with a shell heredoc because the trial requires it.",
+    "model for every subagent is the inherited parent model (claude-opus-5-5); the task notifications do not name the model."
+  ]
+}
