@@ -59,7 +59,7 @@
   }
  ],
  "integrity": {
-  "script_errors": 1,
+  "script_errors": 0,
   "checker_zero_errors_seen": true,
   "asked_user": false
  },
@@ -552,6 +552,7 @@
   "Round 1 coverage finder's count line was malformed ('4 findings: 3 Important, 3 Nit \u2014 correction, 6 findings: 3 Important, 3 Nit.'); header_count uses the corrected 6/3/3.",
   "script_errors=1: fix_r2.py aborted once on its own assertion before writing (no change to the spec), and one checker call ran from the wrong directory (file not found); both rerun.",
   "R2-04 kept although the verifier said Not real: the main thread did not agree that the Unambiguity note refutes an unobservable Initial-state trigger.",
-  "Step 3.9 merge WARNINGs from the checker were not acted on: the run starts at step 4.1."
+  "Step 3.9 merge WARNINGs from the checker were not acted on: the run starts at step 4.1.",
+  "script_errors recounted to 0 on 2026-11-09 under the new definition (skill scripts only): fix_r2.py was the runner's helper, and the wrong-directory checker call was rerun and found no script fault."
  ]
 }

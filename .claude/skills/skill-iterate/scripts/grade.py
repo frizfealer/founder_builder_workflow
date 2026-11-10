@@ -124,6 +124,8 @@ def judge_metrics(eval_dir, t, g, folder):
                 ids = g["key"][t["kind"]]["ids"]
                 hit = sum(1 for k in ids if v.get("matches", {}).get(k))
                 out[m["name"]] = round(hit / len(ids), 2)
+            elif m["name"] in ("fp_verified", "fp_unverified"):
+                continue  # derived from the false_positives verdict below
             elif m["name"] == "false_positives":
                 vals = list(v.get("verdicts", {}).values())
                 if not vals or all(x is None for x in vals):
@@ -131,8 +133,14 @@ def judge_metrics(eval_dir, t, g, folder):
                     out[m["name"]] = "pending"
                     continue
                 out[m["name"]] = sum(1 for x in vals if isinstance(x, str) and x.lower() in ("not real", "style only"))
+                sev = {f["id"]: (f.get("verified") if f.get("verified") is not None else f.get("severity") == "Important") for f in t["findings"]}
+                fps = [fid for fid, x in v.get("verdicts", {}).items() if isinstance(x, str) and x.lower() in ("not real", "style only")]
+                out["fp_verified"] = sum(1 for fid in fps if sev.get(fid))
+                out["fp_unverified"] = sum(1 for fid in fps if not sev.get(fid))
                 if any(x is None for x in vals):
                     t.setdefault("warnings", []).append(f"judge false_positives: {sum(1 for x in vals if x is None)} null verdicts counted as Real")
+        elif m["name"] in ("fp_verified", "fp_unverified"):
+            out.setdefault(m["name"], "pending")
         else:
             write_judge_task(eval_dir, t, g, m["name"], folder)
             out[m["name"]] = "pending"
@@ -218,7 +226,7 @@ def table(trials, g, refs):
     for kind, vals in refs.items():
         if vals:
             rows.append(f"| baseline worst ({kind}) | {kind} | " + " | ".join(
-                (str(max(vals[n]) if g_dir(g, n) == "lower" else min(vals[n])) if n in vals else "") for n in names) + " | |")
+                (str(max(vals[n]) if g_dir(g, n) == "lower" else min(vals[n])) if n in vals and g_dir(g, n) in ("lower", "higher") else "") for n in names) + " | |")
     return "\n".join(rows)
 
 

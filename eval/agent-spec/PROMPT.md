@@ -1,4 +1,4 @@
-Run a verification-only trial of the agent-spec skill. Label: baseline-2
+Run a verification-only trial of the agent-spec skill. Label: <label>
 
 Setup:
 1. Read .claude/skills/agent-spec/SKILL.md and .claude/skills/agent-spec/references/verification.md.

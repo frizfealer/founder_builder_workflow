@@ -17,7 +17,10 @@ the latest `REPORT.md` for this skill if one exists. Search the references `DECI
 
 Given a problem statement and the grade table, write ONE edit prompt for the editor:
 
-- Exactly which file, which paragraph (quote its first words), and the replacement text.
+- Exactly which file, which paragraph (quote its first words), and the replacement text, with
+  the sentence before and the sentence after the edit quoted verbatim so the editor can check
+  that the new text agrees with its neighbours (a "Done when" line, a list the text refers back
+  to, a placeholder it uses).
 - One hypothesis in one sentence: what metric should move, which way, and why.
 - What must not change (the measurement, other skills, examples).
 - The commit message.

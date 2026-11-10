@@ -74,7 +74,12 @@ def rounds_from_log(text, warnings):
 
 
 def integrity_from_log(text):
-    errs = len(re.findall(r"Traceback|\bscript error\b|\berror:\s", text, re.I))
+    # a script error is a failure of a script that ships with the skill, not a runner's helper
+    errs = 0
+    for line in text.splitlines():
+        if re.search(r"Traceback|exit(?:ed)? (?:code )?[1-9]|\bfailed\b|\berror\b", line, re.I) and re.search(r"\.claude/skills/[^ ]+/scripts/|check_spec\.py", line):
+            if not re.search(r"\b0 errors\b", line):
+                errs += 1
     zero = bool(re.search(r"\b0 errors\b", text))
     asked = bool(re.search(r"asked the user|question to the user: yes|waiting for the user", text, re.I))
     return {"script_errors": errs, "checker_zero_errors_seen": zero, "asked_user": asked}

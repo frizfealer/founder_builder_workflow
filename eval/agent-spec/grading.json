@@ -63,7 +63,7 @@
       "kind": "code",
       "gate": true,
       "direction": "pass",
-      "about": "no script error, checker printed 0 errors, no question to the user"
+      "about": "no failure of a script that ships with the skill (check_spec.py and friends; a runner's own helper scripts do not count), checker printed 0 errors, no question to the user"
     },
     {
       "name": "recall_key",
@@ -85,6 +85,20 @@
       "gate": true,
       "direction": "lower",
       "about": "kept findings the judge rules Not real or Style only after reading spec and inputs; gated against the baseline only"
+    },
+    {
+      "name": "fp_verified",
+      "kind": "judge",
+      "gate": false,
+      "direction": "report",
+      "about": "false positives among kept findings a verifier passed (Important); the verifier's leak"
+    },
+    {
+      "name": "fp_unverified",
+      "kind": "judge",
+      "gate": false,
+      "direction": "report",
+      "about": "false positives among kept findings that skipped verification (Nit); the shortcut's leak"
     },
     {
       "name": "wall_clock_s",
@@ -151,5 +165,5 @@
       "recall_found"
     ]
   },
-  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist."
+  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09)."
 }

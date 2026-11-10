@@ -27,6 +27,7 @@ the agent's memory of them.
     {"id": "R1-01", "round": 1, "class": "Lies", "severity": "Important",
      "location": "CO-A3 failure row ...", "quote": "...",
      "kept": true,                      // true kept, false dropped, null pre-existing/unknown
+     "verified": true,                  // true when a verifier ruled on it; false when it went straight to fix
      "status": "fixed"}                 // fixed | answered | open | dropped | pre-existing
   ],
   "warnings": []                        // anything the writer could not determine
@@ -35,6 +36,8 @@ the agent's memory of them.
 
 Rules for the writer:
 
+- `script_errors` counts failures of scripts that ship with the skill under test (its checker,
+  its lints). A helper the runner wrote during the run does not count.
 - `kept` is the verifier/decision outcome, not the finder's opinion. Pre-existing findings are
   `kept: null`, `status: "pre-existing"`.
 - `wall_clock_s` excludes waiting for a subagent after the last round ended.

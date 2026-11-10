@@ -76,7 +76,25 @@ Hunt for **Gaps**. Build these maps and report every empty cell:
 > Not real or Style only. For each one, look for: a rule, failure row, §5.1 or §5.2 clause, or
 > Unambiguity note that already settles the case the finding raises; a quoted line that does not say
 > what the finding claims; evidence that is not in the packet or the spec; or a defect that changes
-> no verdict and no agent behavior (Style only). Say Real only when you cannot do any of these. The reference checklists under references/ are the spec's standards and count as evidence for a finding, the same as the packet and the spec. Every refutation above is limited as follows. A refutation must show the finding does not fit its class as defined in 'What a defective spec looks like': for a Lies finding that says no input supports a line, showing that no input contradicts the line is not a refutation; for a Gap finding, showing the behavior is settled by a rule is not a refutation unless a scenario or dimension asserts it. A clause that only permits a kind of line does not refute a finding that one such line contradicts the spec's own definitions, the scenario's Initial state, or the results of the scenario's earlier calls: §5.1's "A supporting actor answers every call normally unless an Initial-state line says otherwise" lets a scenario inject an outcome, but that outcome's own entry in Appendix A's "Outcomes, as tool results" cell must still describe something that can be true of the scenario at that call, given its Initial state and the results of the calls before it. A line the finding quotes as defective does not refute the finding by restating what it says; refute it with an input or another spec line that supports what this line says in this case, not one that only permits lines of its kind.
+> no verdict and no agent behavior (Style only). Say Real only when you cannot do any of these. The
+> reference checklists under references/ are the spec's standards and count as evidence for a
+> finding, the same as the packet and the spec.
+>
+> The first two routes, a clause that settles the case and a quoted line that does not say what the
+> finding claims, are limited as follows. The other two, missing evidence and Style only, are not.
+> - A refutation must show the finding does not fit its class as defined in 'What a defective spec
+>   looks like': for a Lies finding that says no input supports a line, showing that no input
+>   contradicts the line is not a refutation; for a Gap finding, showing the behavior is settled by a
+>   rule is not a refutation unless a scenario or dimension asserts it.
+> - A clause that only permits a kind of line does not refute a finding that one such line
+>   contradicts the spec's own definitions, the scenario's Initial state, or the results of the
+>   scenario's earlier calls. §5.1's "A supporting actor answers every call normally unless an
+>   Initial-state line says otherwise" lets a scenario inject an outcome, but that outcome's entry in
+>   Appendix A's "Outcomes, as tool results" cell must still describe something that can be true of
+>   the scenario at that call, given its Initial state and the results of the calls before it.
+> - The line a finding quotes as defective does not refute the finding by restating what it says.
+>   Refute it with an input or another spec line that supports what this line says in this case, not
+>   one that only permits lines of its kind.
 >
 > Read the spec at [spec path]; then the review packet at [packet path] and the sources it lists; then the findings at
 > [findings path]; you report, you do not decide: the main thread decides each drop. Grep the spec for any id a finding names that you have not read.

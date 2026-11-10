@@ -5,6 +5,9 @@ argument-hint: <skill> <set> [--n 3]
 
 Run trials of skill `$ARGUMENTS` (default n = 3).
 
+0. Trials run on the same machinery as the baseline. If this session cannot dispatch native
+   subagents (no Agent tool), stop and say so: a trial whose finders run as separate `claude -p`
+   processes is not comparable on cost or recall, and its results would be discarded.
 1. Read `eval/<skill>/PROMPT.md` and `eval/<skill>/grading.json`. Record the skill's current
    commit (`git rev-parse --short HEAD`) and confirm the working tree of the skill's files is
    clean; a dirty skill is not a trial of any commit, so stop and say so.
