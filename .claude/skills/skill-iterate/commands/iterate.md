@@ -36,8 +36,10 @@ exactly, runs the skill's checks, commits, and returns the commit and its incons
 
 If the list is non-empty, send it to the advisor; it returns follow-up edits or "intended,
 because …" per flag. Dispatch the editor again with the follow-ups. Two rounds at most. Flags
-still open after round two go under *Needs you*; the iteration continues with them noted,
-because an open wording flag does not block a trial.
+still open after round two are ruled on by the advisor, not the human: a wording or consistency
+flag gets a final one-line fix applied by the editor before the trial and is logged under
+*Decided for you*; a flag that would change what the skill does goes under *Needs you* with a
+recommendation. The two-round cap limits editor churn, not the advisor's authority.
 
 ## 4. Trial
 

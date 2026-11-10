@@ -3,12 +3,12 @@
   "fixture": "Harbor Goods order-support spec frozen before verification (round0-agent-spec.md); step 4 of the skill run with the given review packet.",
   "kinds": {
     "full": {
-      "description": "step 4 from round0-agent-spec.md, rounds 1-3; baseline = three runs of the skill at 9b7479f (E5 verifier limits, merged 2026-11-09) plus baseline-1 for cost metrics only",
+      "description": "step 4 from round0-agent-spec.md, rounds 1-3; baseline = three runs of the skill at a5e1880 (E6: Nits verified, merged 2026-11-10) plus baseline-1 for cost metrics only",
       "baseline_labels": [
         "baseline-1",
-        "it1b-1",
-        "it1b-2",
-        "it1b-3"
+        "it2-1",
+        "it2-2",
+        "it2-3"
       ]
     },
     "round2": {
@@ -53,7 +53,7 @@
     "inputs": [
       "product-idea.md"
     ],
-    "verifier_brief": "../../.claude/skills/agent-spec/references/verification.md"
+    "verifier_brief": "judge-verifier-brief.md"
   },
   "tolerance": 0.1,
   "metrics": [
@@ -86,18 +86,25 @@
       "about": "kept findings the judge rules Not real or Style only after reading spec and inputs; gated against the baseline only"
     },
     {
-      "name": "fp_verified",
+      "name": "fp_important",
       "kind": "judge",
       "gate": false,
       "direction": "report",
-      "about": "false positives among kept findings a verifier passed (Important); the verifier's leak"
+      "about": "false positives among kept Important findings"
     },
     {
-      "name": "fp_unverified",
+      "name": "fp_nit",
       "kind": "judge",
       "gate": false,
       "direction": "report",
-      "about": "false positives among kept findings that skipped verification (Nit); the shortcut's leak"
+      "about": "false positives among kept Nit findings"
+    },
+    {
+      "name": "dropped_real",
+      "kind": "judge",
+      "gate": false,
+      "direction": "report",
+      "about": "dropped findings the judge rules Real: defects the verifier threw away (recall_key sees only the 7 key items)"
     },
     {
       "name": "wall_clock_s",
@@ -164,5 +171,5 @@
       "recall_found"
     ]
   },
-  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09). Baseline rolled to it1b-1..3 on 2026-11-09 (E5 merged); e4-base-1..3 and full-new-3 are history."
+  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09). Baseline rolled to it1b-1..3 on 2026-11-09 (E5 merged); e4-base-1..3 and full-new-3 are history. Baseline rolled to it2-1..3 on 2026-11-10 (E6 merged). fp_verified/fp_unverified retired: every finding is verified from E6 on."
 }

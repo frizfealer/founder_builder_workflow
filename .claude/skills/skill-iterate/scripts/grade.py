@@ -91,15 +91,16 @@ def write_judge_task(eval_dir, t, g, metric, folder):
         body += ["## Trial findings (" + ("kept only" if metric == "recall_key" else "kept AND dropped: a dropped finding still counts as reported") + "), summary lines", ""]
         for f in pool:
             body.append(f"- {f['id']} | {f.get('class')} | {f.get('severity')} | {f.get('location')}\n  Quote: {f.get('quote', '')[:300]}")
-    elif metric == "false_positives":
-        body = [f"# Judge task: false_positives for trial {t['label']}", "",
-                "You are checking whether each kept finding is a real defect. You did not write the spec or the findings. Read only; edit nothing.", "",
+    elif metric in ("false_positives", "dropped_real"):
+        pool = kept if metric == "false_positives" else [f for f in t["findings"] if f.get("kept") is False]
+        body = [f"# Judge task: {metric} for trial {t['label']}", "",
+                ("You are checking whether each kept finding is a real defect." if metric == "false_positives" else "You are checking whether each DROPPED finding was a real defect the verifier should have kept. The verifier's refutation is recorded with the finding; judge the finding, not the refutation.") + " You did not write the spec or the findings. Read only; edit nothing.", "",
                 f"Read the review packet `{ctx['packet']}`, the sources it lists, and the spec `{spec}`. Apply the verifier brief in `{ctx['verifier_brief']}`: a finding is Real when the defect exists as described and belongs to its class; Not real when the spec or the inputs refute it (quote what refutes it); Style only when it concerns wording or preference and changes no verdict.", "",
                 f"The findings with their evidence are in `{findings_glob}`; the ids to judge are listed below. A finding whose round is 2 or 3 refers to the spec as it stood after the previous round's fixes" + (f"; `{final_spec}` is the end state." if final_spec else "; no end-state copy exists for this trial, judge from the finding's own evidence.") + snap_note, "",
-                "Output exactly one JSON object, nothing else, as the file `judge/false_positives.verdict.json`:",
-                '```json', '{"metric": "false_positives", "verdicts": {"<finding id>": "Real|Not real|Style only"}, "evidence": {"<finding id>": "<one line>"}}', '```', "",
+                f"Output exactly one JSON object, nothing else, as the file `judge/{metric}.verdict.json`:",
+                '```json', '{"metric": "' + metric + '", "verdicts": {"<finding id>": "Real|Not real|Style only"}, "evidence": {"<finding id>": "<one line>"}}', '```', "",
                 "## Findings to judge", ""]
-        for f in kept:
+        for f in pool:
             body.append(f"- {f['id']} (round {f['round']}) | {f.get('class')} | {f.get('severity')} | {f.get('location')}")
     else:
         return
@@ -124,8 +125,16 @@ def judge_metrics(eval_dir, t, g, folder):
                 ids = g["key"][t["kind"]]["ids"]
                 hit = sum(1 for k in ids if v.get("matches", {}).get(k))
                 out[m["name"]] = round(hit / len(ids), 2)
-            elif m["name"] in ("fp_verified", "fp_unverified"):
+            elif m["name"] in ("fp_important", "fp_nit"):
                 continue  # derived from the false_positives verdict below
+            elif m["name"] == "dropped_real":
+                vals = list(v.get("verdicts", {}).values())
+                if not vals or all(x is None for x in vals):
+                    out[m["name"]] = 0 if not [f for f in t["findings"] if f.get("kept") is False] else "pending"
+                    if out[m["name"]] == "pending":
+                        write_judge_task(eval_dir, t, g, m["name"], folder)
+                    continue
+                out[m["name"]] = sum(1 for x in vals if isinstance(x, str) and x.lower() == "real")
             elif m["name"] == "false_positives":
                 vals = list(v.get("verdicts", {}).values())
                 if not vals or all(x is None for x in vals):
@@ -133,14 +142,16 @@ def judge_metrics(eval_dir, t, g, folder):
                     out[m["name"]] = "pending"
                     continue
                 out[m["name"]] = sum(1 for x in vals if isinstance(x, str) and x.lower() in ("not real", "style only"))
-                sev = {f["id"]: (f.get("verified") if f.get("verified") is not None else f.get("severity") == "Important") for f in t["findings"]}
+                sev = {f["id"]: f.get("severity") == "Important" for f in t["findings"]}
                 fps = [fid for fid, x in v.get("verdicts", {}).items() if isinstance(x, str) and x.lower() in ("not real", "style only")]
-                out["fp_verified"] = sum(1 for fid in fps if sev.get(fid))
-                out["fp_unverified"] = sum(1 for fid in fps if not sev.get(fid))
+                out["fp_important"] = sum(1 for fid in fps if sev.get(fid))
+                out["fp_nit"] = sum(1 for fid in fps if not sev.get(fid))
                 if any(x is None for x in vals):
                     t.setdefault("warnings", []).append(f"judge false_positives: {sum(1 for x in vals if x is None)} null verdicts counted as Real")
-        elif m["name"] in ("fp_verified", "fp_unverified"):
+        elif m["name"] in ("fp_important", "fp_nit"):
             out.setdefault(m["name"], "pending")
+        elif m["name"] == "dropped_real" and not [f for f in t["findings"] if f.get("kept") is False]:
+            out[m["name"]] = 0  # nothing was dropped, nothing to judge
         else:
             write_judge_task(eval_dir, t, g, m["name"], folder)
             out[m["name"]] = "pending"
@@ -285,7 +296,7 @@ def main():
         print("- note: " + g["notes"])
     if prefix:
         print(set_summary(trials, prefix, g))
-    derived = {"fp_verified", "fp_unverified"}  # computed from the false_positives verdict; no task of their own
+    derived = {"fp_important", "fp_nit"}  # computed from the false_positives verdict; no task of their own
     pend = [f"{lab}/judge/{m}.task.md" for lab, tr in trials.items() for m, v in tr["metrics"].items() if v == "pending" and m not in derived]
     if pend:
         print(f"\n{len(pend)} judge task(s) written, run them and re-grade:")

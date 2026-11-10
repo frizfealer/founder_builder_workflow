@@ -42,5 +42,5 @@ One per managed skill at `eval/<skill>/grading.json`. Changing it is a human dec
 
 Code metrics `grade.py` knows: integrity, wall_clock_s, finder_tool_calls_max,
 finder_duration_max_s, tokens_total_k, rounds_run, kept_total, important_kept,
-verifier_drop_rate, codex_subagents. Judge metrics: recall_key, false_positives. Adding a metric
+verifier_drop_rate, codex_subagents. Judge metrics: recall_key, recall_found, false_positives (with derived fp_important / fp_nit), dropped_real. Adding a metric
 means adding it to `grade.py` and to this list in the same commit.

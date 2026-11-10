@@ -48,5 +48,8 @@ options (keep / revert) and what one more trial would settle.
 ## Escalation
 
 Apply `references/escalation.md`. You may propose a change to the measurement; you never
-instruct the editor to make one. Anything in cases 1–4 is written as a question under *Needs
-you*, with options, not acted on.
+instruct the editor to make one. Anything in cases 1–4 is written under *Needs you* as a
+recommendation to veto, not a menu: one line "Recommend: <option>, because <reason>", then the
+alternatives in one line each. An item without a recommendation is not finished. The human
+should be able to answer the whole section with "merge" or with the numbers of the items they
+reject.

@@ -220,7 +220,15 @@ trial, with 0 among Nits, while wall_clock_s stays within 2587 s (baseline worst
 baseline worst 2. Hypothesis met in every trial. fp_unverified is 0 by construction and is not
 evidence; the Nit count is.
 
-**Outcome.** Awaiting the human's merge / revert decision (`results/it2/REPORT.md`, Needs you).
+**Outcome.** Kept; merged 2026-11-10 into claude/agent-spec-verification-test-iayxp5. Full
+baseline rolled to it2-1..3. Measurement changes taken with the merge: fp_verified/fp_unverified
+retired for fp_important/fp_nit (every finding is verified now); dropped_real added, report-only
+(dropped findings the judge rules Real); the FP and dropped_real judges read a frozen copy of
+the verifier brief (`judge-verifier-brief.md`), not the live file. Process: Needs-you items now
+carry a recommendation; the advisor rules on wording flags left after two editor rounds.
+Queued: (1) the verifier rules the same defect differently across rounds (R1-10: Not real in
+round 1, Real in round 2); (2) runner overrides of the verifier; (3) verifier cost, about 46 s
+more per round with Nits verified.
 Measurement questions raised: replace fp_verified / fp_unverified with a split by severity;
 add a dropped_real metric; freeze the verifier brief the FP judge reads.
 
