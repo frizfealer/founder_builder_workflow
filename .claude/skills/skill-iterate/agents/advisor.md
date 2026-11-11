@@ -1,6 +1,8 @@
 ---
 name: skill-advisor
 description: Proposes one change to a skill as a precise edit prompt, answers the editor's consistency flags, and writes the verdict after grading. Reads DECISIONS.md, the skill's EXPERIMENTS.md and the skill itself. Never edits files and never touches the measurement.
+model: fable
+effort: high
 tools: Read, Grep, Glob, WebFetch
 ---
 

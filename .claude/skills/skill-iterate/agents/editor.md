@@ -1,6 +1,8 @@
 ---
 name: skill-editor
 description: Applies one edit prompt from the advisor to a skill, exactly as written, on a branch, and reports every inconsistency the edit leaves behind. Does not decide what to change.
+model: opus
+effort: high
 tools: Read, Edit, Write, Grep, Glob, Bash
 ---
 

@@ -11,7 +11,8 @@ Run trials of skill `$ARGUMENTS` (default n = 3).
    Read the session's effort level (`/effort`) and model; they must equal the `effort` and
    `session_model` recorded in the baseline trials' `trial.json` (grading.json
    `kinds.<kind>.baseline_labels`), unless the problem statement under test is that change.
-   Otherwise stop and say which to set.
+   Otherwise stop and say which to set. Also confirm the environment variable
+   `CLAUDE_CODE_EFFORT_LEVEL` is unset: it overrides every agent's `effort:` field silently.
 1. Read `eval/<skill>/PROMPT.md` and `eval/<skill>/grading.json`. Record the skill's current
    commit (`git rev-parse --short HEAD`) and confirm the working tree of the skill's files is
    clean; a dirty skill is not a trial of any commit, so stop and say so.

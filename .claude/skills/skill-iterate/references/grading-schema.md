@@ -39,6 +39,9 @@ One per managed skill at `eval/<skill>/grading.json`. Changing it is a human dec
   cannot pass ungraded.
 - **direction** — `lower` or `higher` is better; `pass` is boolean; `report` is shown, never
   gated.
+- **the judge's model and effort** (`agents/judge.md` frontmatter) are part of the measurement
+  even though they live outside this file; change them only with the human, and re-judge the
+  baseline when you do.
 - **model_rates** — USD per million tokens per model alias, plus `default`; `cost_usd` multiplies
   each subagent's tokens by the rate for its `model`. Keep the values current with the pricing
   page; they are part of the measurement.

@@ -52,5 +52,4 @@ fresh-context `skill-eval-judge` subagent from the task files `grade.py` writes;
 once by grading ~20 findings yourself and comparing, before trusting its verdicts.
 
 Baselines per kind are listed in `grading.json`. As of 2026-11-08 the `full` kind has two
-(`baseline-1`, `full-new-3`) and `round2` has one (`r2-old-1`); three per kind is the minimum
-for a regression to be told from run-to-run variance.
+(see `grading.json`); the `round2` kind is retired and kept only so the `r2-*` folders grade.

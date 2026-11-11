@@ -12,7 +12,7 @@
       ]
     },
     "round2": {
-      "description": "rounds 2-3 from the frozen round1-agent-spec.md and round1-answered.md",
+      "description": "RETIRED 2026-11-11: rounds 2-3 from a frozen round-1 state; its inputs (round1-agent-spec.md, round1-answered.md) and prompts were removed. Kept so the four r2-* result folders, E1's evidence, still grade.",
       "baseline_labels": [
         "r2-old-1"
       ]
@@ -182,10 +182,14 @@
   "baseline_exclude": {
     "baseline-1": [
       "recall_key",
-      "recall_found"
+      "recall_found",
+      "false_positives",
+      "fp_important",
+      "fp_nit",
+      "dropped_real"
     ]
   },
-  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09). Baseline rolled to it1b-1..3 on 2026-11-09 (E5 merged); e4-base-1..3 and full-new-3 are history. Baseline rolled to it2-1..3 on 2026-11-10 (E6 merged). fp_verified/fp_unverified retired: every finding is verified from E6 on. dropped_real gated from 2026-11-10 (baseline worst 1). cost_usd added, report-only, with placeholder model rates.",
+  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09). Baseline rolled to it1b-1..3 on 2026-11-09 (E5 merged); e4-base-1..3 and full-new-3 are history. Baseline rolled to it2-1..3 on 2026-11-10 (E6 merged). fp_verified/fp_unverified retired: every finding is verified from E6 on. dropped_real gated from 2026-11-10 (baseline worst 1). cost_usd added, report-only, with placeholder model rates. baseline-1 excluded from all judge metrics from 2026-11-11 (it is the pre-E5 original run, kept for cost only). round2 kind retired.",
   "model_rates": {
     "_about": "USD per million tokens. in/out/cache_read are used when a subagent row carries tokens_in/tokens_out/tokens_cache_read; blended is used when it carries only tokens. PLACEHOLDERS: set from the current pricing page.",
     "opus": {
