@@ -3,12 +3,15 @@
   "fixture": "Harbor Goods order-support spec frozen before verification (round0-agent-spec.md); step 4 of the skill run with the given review packet.",
   "kinds": {
     "full": {
-      "description": "step 4 from round0-agent-spec.md, rounds 1-3; baseline = three runs of the skill at a5e1880 (E6: Nits verified, merged 2026-11-10) plus baseline-1 for cost metrics only",
+      "description": "step 4 from round0-agent-spec.md, rounds 1-3; baseline = six runs of the skill at 58cdc2f (E8: a refutation must answer the whole case; merged 2026-11-11) plus baseline-1 for cost metrics only",
       "baseline_labels": [
         "baseline-1",
-        "it2-1",
-        "it2-2",
-        "it2-3"
+        "it4-1",
+        "it4-2",
+        "it4-3",
+        "it4b-1",
+        "it4b-2",
+        "it4b-3"
       ]
     },
     "round2": {
@@ -189,26 +192,26 @@
       "dropped_real"
     ]
   },
-  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09). Baseline rolled to it1b-1..3 on 2026-11-09 (E5 merged); e4-base-1..3 and full-new-3 are history. Baseline rolled to it2-1..3 on 2026-11-10 (E6 merged). fp_verified/fp_unverified retired: every finding is verified from E6 on. dropped_real gated from 2026-11-10 (baseline worst 1). cost_usd added, report-only, with placeholder model rates. baseline-1 excluded from all judge metrics from 2026-11-11 (it is the pre-E5 original run, kept for cost only). round2 kind retired. M13 removed from the key 2026-11-11; key is 6 items.",
+  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09). Baseline rolled to it1b-1..3 on 2026-11-09 (E5 merged); e4-base-1..3 and full-new-3 are history. Baseline rolled to it2-1..3 on 2026-11-10 (E6 merged). fp_verified/fp_unverified retired: every finding is verified from E6 on. dropped_real gated from 2026-11-10 (baseline worst 1). cost_usd added, report-only, with placeholder model rates. baseline-1 excluded from all judge metrics from 2026-11-11 (it is the pre-E5 original run, kept for cost only). round2 kind retired. M13 removed from the key 2026-11-11; key is 6 items. Baseline rolled to it4-1..3 + it4b-1..3 on 2026-11-11 (E8 merged; six samples). Blended rates re-derived from it4b-3's token split.",
   "model_rates": {
-    "_about": "USD per million tokens. in/out/cache_read are used when a subagent row carries tokens_in/tokens_out/tokens_cache_read; blended is used when it carries only tokens. PLACEHOLDERS: set from the current pricing page.",
+    "_about": "USD per million tokens. in/out/cache_read are used when a subagent row carries tokens_in/tokens_out/tokens_cache_read; blended is used when it carries only tokens. blended = in x 1.96, measured on it4b-3 (2026-11-11): output 19 % of counted tokens, cache reads 4.9x the counted tokens. Re-measure when the brief or roles change.",
     "opus": {
       "in": 4.0,
       "out": 20.0,
       "cache_read": 0.2,
-      "blended": 5.28
+      "blended": 7.84
     },
     "sonnet": {
       "in": 2.0,
       "out": 10.0,
       "cache_read": 0.1,
-      "blended": 2.64
+      "blended": 3.92
     },
     "haiku": {
       "in": 0.5,
       "out": 2.5,
       "cache_read": 0.05,
-      "blended": 0.66
+      "blended": 0.98
     },
     "codex": {
       "in": 0.0,

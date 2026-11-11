@@ -281,6 +281,14 @@ model earns its price. Finders-to-sonnet parked: the finder-side signal (recall_
 
 **Verdict.** None. Rule 1 holds: no next change until it4-1..3 are graded.
 
+**Outcome.** Kept; merged 2026-11-11 into re-create-from-scratch. Trials it4-1..3 and it4b-1..3 (six,
+native subagents, skill 58cdc2f): recall_key 1.0 in all six (after M13 left the key as Style only),
+false_positives 0 in five and 1 in one (a Nit, it4-3), dropped_real 0 in all six vs it2's 0/1/0;
+kept findings up ~30 % with fp_important 0, so the extra keeps are real; wall clock 2100-2523 s
+(+7 % mean). Pass condition fixed before it4b: FP <= 1 and dropped_real <= 1 summed over six,
+recall 1.0 everywhere. Full baseline rolled to the six trials. M8 stays a half-match until the key
+is rebuilt and two-part items are split.
+
 ## Standing observations
 
 - Round-1 finding count varies 13 → 24 between two runs of the same skill on the same input.

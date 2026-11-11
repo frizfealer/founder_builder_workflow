@@ -4,7 +4,7 @@ Setup:
 1. Read .claude/skills/agent-spec/SKILL.md and .claude/skills/agent-spec/references/verification.md.
 2. Your scratch directory is eval/agent-spec/run-<label>/. Delete it if it exists. Create it. Copy eval/agent-spec/round0-agent-spec.md to eval/agent-spec/run-<label>/agent-spec.md. That copy is the spec under review; edit only it. Do not touch anything under examples/.
 3. Copy eval/agent-spec/review-packet.md to eval/agent-spec/run-<label>/review-packet.md, replacing every `eval/agent-spec/run/` with `eval/agent-spec/run-<label>/`; change nothing else in it. Give reviewers that copy. Skip step 4.2; do not rewrite the packet.
-4. Use eval/agent-spec/run-<label>/ for round copies, briefs and findings files. Save the spec as it stands at the end of every round as run-<label>/round<N>/agent-spec.md (round0 = before round 1).
+4. Use eval/agent-spec/run-<label>/ for round copies, briefs, findings files and any helper script you write; never the shared session scratchpad, which parallel runners collide in. Save the spec as it stands at the end of every round as run-<label>/round<N>/agent-spec.md (round0 = before round 1).
 
 Run:
 5. Start at step 4.1 and follow step 4 exactly as the skill states it, through its stop condition (a round that changes nothing, or the round cap). Dispatch finders and verifiers as the skill says, including the Codex verdicts finder if that agent type is available.
@@ -12,7 +12,7 @@ Run:
 
 Record, at the end, in eval/agent-spec/results/<label>/:
 7. round1-findings.md, round2-findings.md, round3-findings.md — the merged findings of each round, verbatim, each marked kept or dropped with its verifier verdicts, and fixed / answered / open / Pre-existing.
-8. subagent-stats.md — one line per subagent dispatched: round, role, model (the alias you dispatched it with, also written to trial.json subagents[].model), and, when the notification or stream reports them, input, output and cache-read tokens separately (trial.json tokens_in / tokens_out / tokens_cache_read, with tokens as the total), and the tool_uses, duration_ms and subagent_tokens from its task notification. Mark any subagent whose notification did not arrive.
+8. subagent-stats.md — one line per subagent dispatched: round, role, model (the alias you dispatched it with, also written to trial.json subagents[].model), and input, output and cache-read tokens separately, read from each subagent's transcript (always; this is how cost is computed) (trial.json tokens_in / tokens_out / tokens_cache_read, with tokens as the total), and the tool_uses, duration_ms and subagent_tokens from its task notification. Mark any subagent whose notification did not arrive.
 9. run.log — the checker output of every 4.1 run, the command line of every script you ran, any error, and the start and end timestamp of each round.
 10. agent-spec-final.md — the spec as it stands when the run ends.
 11. report.md — the step-5 report as the skill specifies it. If the harness refuses the write, return the report text in your hand-back under the heading REPORT.MD and the main session writes it; do not write it by another route.
