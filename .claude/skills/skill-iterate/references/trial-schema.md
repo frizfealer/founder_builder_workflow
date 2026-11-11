@@ -21,7 +21,8 @@ the agent's memory of them.
   "integrity": {"script_errors": 0, "checker_zero_errors_seen": true, "asked_user": false},
   "subagents": [
     {"round": 1, "role": "finder: faithfulness", "kind": "finder",   // finder | verifier | other
-     "codex": false, "tool_uses": 8, "duration_ms": 128993, "tokens": 134288}
+     "codex": false, "model": "opus",   // alias as dispatched: opus | sonnet | haiku | codex; costs via grading.json model_rates
+     "tool_uses": 8, "duration_ms": 128993, "tokens": 134288}
   ],
   "findings": [
     {"id": "R1-01", "round": 1, "class": "Lies", "severity": "Important",

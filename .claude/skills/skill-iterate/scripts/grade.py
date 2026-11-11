@@ -24,8 +24,34 @@ def load(p):
     return json.loads(Path(p).read_text())
 
 
-def code_metrics(t):
+def model_of(sub, default):
+    """A subagent's model: its own field, else a name found in its role/agent text, else the default."""
+    m = (sub.get("model") or "").lower()
+    if not m:
+        text = (sub.get("role", "") + " " + str(sub.get("agent", ""))).lower()
+        for k in ("sonnet", "haiku", "opus", "codex"):
+            if k in text:
+                m = k
+                break
+    if sub.get("codex") and not m:
+        m = "codex"
+    for k in ("sonnet", "haiku", "opus", "codex"):
+        if k in m:
+            return k
+    return default
+
+
+def code_metrics(t, g=None):
     subs = t.get("subagents", [])
+    rates = (g or {}).get("model_rates", {})
+    default_model = rates.get("default", "opus")
+    cost = None
+    if rates:
+        cost = 0.0
+        for s_ in subs:
+            if s_.get("tokens") is not None:
+                cost += s_["tokens"] * float(rates.get(model_of(s_, default_model), rates.get(default_model, 0))) / 1e6
+        cost = round(cost, 2)
     finders = [s for s in subs if s["kind"] == "finder" and not s.get("codex")]
     kept = sum(r.get("kept", 0) for r in t["rounds"])
     dropped = sum(r.get("dropped", 0) for r in t["rounds"])
@@ -39,6 +65,7 @@ def code_metrics(t):
         "finder_tool_calls_max": max(tool) if tool else None,
         "finder_duration_max_s": round(max(dur) / 1000) if dur else None,
         "tokens_total_k": round(sum(tok) / 1000) if tok else None,
+        "cost_usd": cost,
         "rounds_run": len(t["rounds"]),
         "kept_total": kept,
         "important_kept": sum(r.get("important_kept", 0) for r in t["rounds"]),
@@ -175,7 +202,7 @@ def evaluate(eval_dir, labels, g):
             print(f"skip {lab}: no trial.json", file=sys.stderr)
             continue
         t = load(tj)
-        row = code_metrics(t)
+        row = code_metrics(t, g)
         row.update(judge_metrics(eval_dir, t, g, results_dir / lab))
         trials[lab] = {"kind": t["kind"], "metrics": row, "warnings": t.get("warnings", [])}
     # baseline references per kind
@@ -187,7 +214,7 @@ def evaluate(eval_dir, labels, g):
             if not tj.exists():
                 continue
             bt = load(tj)
-            bm = code_metrics(bt)
+            bm = code_metrics(bt, g)
             bm.update(judge_metrics(eval_dir, bt, g, results_dir / bl))
             excl = set(g.get("baseline_exclude", {}).get(bl, []))
             for k, v in bm.items():

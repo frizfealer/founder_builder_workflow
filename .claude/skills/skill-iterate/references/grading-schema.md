@@ -39,6 +39,9 @@ One per managed skill at `eval/<skill>/grading.json`. Changing it is a human dec
   cannot pass ungraded.
 - **direction** — `lower` or `higher` is better; `pass` is boolean; `report` is shown, never
   gated.
+- **model_rates** — USD per million tokens per model alias, plus `default`; `cost_usd` multiplies
+  each subagent's tokens by the rate for its `model`. Keep the values current with the pricing
+  page; they are part of the measurement.
 
 Code metrics `grade.py` knows: integrity, wall_clock_s, finder_tool_calls_max,
 finder_duration_max_s, tokens_total_k, rounds_run, kept_total, important_kept,

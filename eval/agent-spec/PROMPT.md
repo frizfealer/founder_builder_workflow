@@ -12,7 +12,7 @@ Run:
 
 Record, at the end, in eval/agent-spec/results/<label>/:
 7. round1-findings.md, round2-findings.md, round3-findings.md — the merged findings of each round, verbatim, each marked kept or dropped with its verifier verdicts, and fixed / answered / open / Pre-existing.
-8. subagent-stats.md — one line per subagent dispatched: round, role, model, and the tool_uses, duration_ms and subagent_tokens from its task notification. Mark any subagent whose notification did not arrive.
+8. subagent-stats.md — one line per subagent dispatched: round, role, model (the alias you dispatched it with, also written to trial.json subagents[].model), and the tool_uses, duration_ms and subagent_tokens from its task notification. Mark any subagent whose notification did not arrive.
 9. run.log — the checker output of every 4.1 run, the command line of every script you ran, any error, and the start and end timestamp of each round.
 10. agent-spec-final.md — the spec as it stands when the run ends.
 11. report.md — the step-5 report as the skill specifies it.
