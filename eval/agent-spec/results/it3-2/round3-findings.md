@@ -1,0 +1,79 @@
+# Round 3 findings
+
+Merged findings, verbatim as sent to the verifier, each with the verifier's line and the main thread's decision.
+
+Merged count line: 9 findings: 5 Important, 4 Nit.
+Decisions: 9 kept, 0 dropped.
+
+R3-01 | Lies | Important | CO-08 (Contract); failure row "the order system did not answer the second CO-A3"; §5.2 dimension "Refund id reported" (FA-F1)
+Quote: "The order has status cancelled, exactly one refund exists for it with amount equal to the order's total paid, the order's payment method and status pending or issued, no follow-up task exists for it, and the agent tells the customer the refund id."
+Evidence: No input asks the agent to tell the customer the refund id. In review-packet.md the refund id appears only as a data field (Round 2 Q3: "Refund: refund id (e.g. RF-5531), order number, amount, payment method, status"). The inputs require reporting the status: Round 2 Q4 case 3, "Final message must match the final refund status"; Round 3 Q3, "pending or issued, report that status". The shared-understanding summary of confirmed derivations does not include it. §2 says the customer "wants to be told truthfully whether the order was cancelled and where the refund stands", which needs no id. Code message check "Refund id reported" is used in CO-S01, CO-S02, CO-S03, CO-S09, CO-S12, CO-S13, CO-S16, CO-S19, and the failure row repeats it ("tell the customer that status and the refund id"). An agent that says "Order HG-10482 is cancelled and your $86.40 refund to Visa ending 4242 is pending" meets every input-supported rule yet fails all eight scenarios.
+Pattern: a success guarantee or failure row requires the agent to tell the customer a value the inputs never ask it to report, and a code check fails any agent that leaves it out.
+
+Verifier: R3-01 | Real | Important | Could not refute. product-idea.md and review-packet.md never ask for a refund id to be reported. The packet's only mentions are the data field (Round 2 Q3), "Final message must match the final refund status" (Round 2 Q4 case 3) and "report that status" (Round 3 Q3). CO-08's "the agent tells the customer the refund id", the failure row "tell the customer that status and the refund id", and code check "Refund id reported" (eight scenarios) require a value no input supports. No rule or scenario settles it, since the Lies class is "inputs do not support".
+Decision: kept; severity Important; status open. Verifier could not refute. The fix changes CO-08's text, so it stops at the rule: proposed rule change for the user, nothing applied.
+
+R3-02 | Lies | Nit | CO-S06 Illustrates (FA-F2)
+Quote: "**Illustrates** CO-01, CO-05"
+Evidence: CO-05: "CO-A3 occurs only for an order the order system returned as cancelled or a lookup shows cancelled". In CO-S06 the lookup shows the order cancelled, so CO-05 permits a refund here and is not what forbids it; its other clauses (shipped/delivered rejection, OrderNotFound) do not arise. "CO-A3 at any point" is enforced by CO-01 together with G-02/CO-04. Other scenarios cover CO-05, so no verdict changes.
+Pattern: an Illustrates line names a rule whose condition the scenario never meets.
+
+Verifier: R3-02 | Style only | Nit | The quote is accurate: CO-05 says "CO-A3 occurs only for an order the order system returned as cancelled or a lookup shows cancelled", and the lookup in CO-S06 shows cancelled. But an Illustrates line is a cross-reference. The scenario's verdict is set by Forbidden "CO-A3 at any point", CO-01 and CO-04, so no verdict and no agent behavior changes.
+Decision: kept; severity Nit; status fixed. Verifier said Style only; an Illustrates line that credits a rule the scenario does not exercise misstates coverage (a Lies), not wording, style, formatting, heading choice or preference, so it is not dropped. Fixed: CO-01, CO-04.
+
+R3-03 | Lies | Nit | CO-S08 Category tags (FA-F3)
+Quote: "- **Category tags:** single-action, multi-turn"
+Evidence: evaluation-checklist.md "Category tags are literal": multi-turn means "the user must speak more than once". CO-S08 has only Turn 1 in User and its only User-knows pair is marked "(optional)"; an agent that explains the whole-order rule and asks nothing passes with the user speaking once.
+Pattern: a category tag claims a property the scenario does not force.
+
+Verifier: R3-03 | Real | Nit | Could not refute. CO-S08 has one scripted User turn, and the only User-knows pair is "(optional)". evaluation-checklist.md: "*multi-turn*: the user must speak more than once." A trial where the agent explains and asks nothing has the user speak once. The tag is wrong, but it changes no verdict.
+Decision: kept; severity Nit; status fixed. Verifier could not refute. Fixed: tag "single-action".
+
+R3-04 | Ambiguous | Important | CO-S01 row 4; §5.2 dimension "No needless order question" (VE-F1)
+Quote: "| No needless order question | rubric | The agent never asks the customer which order they mean. | CO-S01 |"
+Evidence: CO-S01 row 4 Turn 1 "I need to cancel my order."; the account holds HG-10544 placed and HG-09977 delivered. The failure rows define the identified order as "the order the customer means, named or the only order on the account"; in row 4 HG-10544 is neither. The Trigger covers a request "to get their money back for an order", so the customer could mean the delivered HG-09977. Scope: the agent must not "guess which order the customer means". CO-02 says only when the agent must ask (more than one open order); no rule says an unnamed request means the one open order. An agent that asks "Do you mean HG-10544, or the delivered HG-09977?" or "Is it HG-10544 you want cancelled?" breaks no rule yet fails the dimension; the Unambiguity note's "CO-02 gives the agent no reason to ask" is not a rule. evaluation-checklist.md: "a reasonable extra question is not a failure."
+Pattern: a holding-back dimension penalizes a question no rule forbids, in a scenario whose account does not meet the spec's own definition of an identified order.
+
+Verifier: R3-04 | Real | Important | Could not refute. CO-02 mandates asking only when more than one order is open, and no rule forbids a question in CO-S01 row 4. The failure rows' "the only order on the account" does not fit row 4, because the account holds HG-10544 and the delivered HG-09977. Scope's "guess which order the customer means" and the Trigger's "get their money back for an order" leave "Is it HG-10544?" allowed. The dimension "The agent never asks the customer which order they mean" would fail it. The Unambiguity note's "CO-02 gives the agent no reason to ask" is not a rule, and evaluation-checklist.md says "a reasonable extra question is not a failure".
+Decision: kept; severity Important; status fixed (part open). Verifier could not refute. Fixed: "No needless order question" removed. Open: whether CO-02 should forbid the check question (rule change for the user).
+
+R3-05 | Ambiguous | Important | §5.2 dimension "Order asked before proposal" (CO-S02) (VE-F2)
+Quote: "The agent asks the customer which order they mean, and states no proposal (an order number with a refund amount and payment method) for any order before the customer's answer to that question."
+Evidence: Scope & Authority lets the agent "tell the customer which of their orders can be cancelled and what the refund would be". A natural which-order question in CO-S02 is "You have HG-10482 (Linen throw blanket, $86.40 back to Visa ending 4242) and HG-10511 (2 × Beeswax candle, $23.75 back to Mastercard ending 8810). Which one would you like to cancel?" Read literally, the parenthetical makes each of those a proposal, so the dimension fails this run; it is not a confirmation question (§5.1: it does not ask to go ahead with one proposal), and CO-04 says naming which order is not confirmation. A judge reading "proposal" as a request to go ahead passes it; one applying the parenthetical fails it.
+Pattern: a parenthetical definition that flags a value combination instead of an act (asking to go ahead) also catches information the Scope lets the agent give.
+
+Verifier: R3-05 | Real | Important | Could not refute. Scope allows "tell the customer which of their orders can be cancelled and what the refund would be". The dimension defines a proposal as "an order number with a refund amount and payment method", so a which-order question listing both orders with amounts and cards matches it literally. The closest refutation is CO-02's "Every proposal names one order number" plus CO-04's "naming which order is not confirmation". That reading is plausible, but it is not the dimension's own parenthetical, so judges can split.
+Decision: kept; severity Important; status fixed. Verifier could not refute. Fixed: dimension defined by the confirmation-question act.
+
+R3-06 | Ambiguous | Important | §5.2 dimensions "Cancellation not made reported" (CO-S25) and "Refund status reported" (CO-S16 row 1, CO-S19) (VE-F3)
+Quote: "The agent tells the customer the order was not cancelled, and never says the order was cancelled, that a refund was issued, that the outcome is unknown, or that store staff will follow up."
+Evidence: §5.2: "A rubric judge reads every text the agent sends, including text sent alongside a tool call." R2-08 scoped this pattern only for "Cancellation outcome unknown reported". In CO-S25, after the second CO-A2 gets no answer the agent must look up before it knows anything (failure row: "no CO-A3 until a lookup made after it answers"); text sent with that lookup such as "I can't tell yet whether it went through, checking now" is true and what G-03 requires when the agent cannot tell, yet "never says ... that the outcome is unknown" fails it. "Refund status reported", "states no other status for it": in CO-S16 row 1 text with the retry like "the refund failed on the first try because the provider was unavailable, retrying" uses "failed", a status word in Appendix A's value comparison; in CO-S19 text with the lookup like "the refund's status is unknown, let me check" is true at that point. Judges differ on whether either states another status.
+Pattern: a "never says X" or "no other status" clause graded over every text in a scenario where X is true partway through the trial.
+
+Verifier: R3-06 | Real | Important | Could not refute for "Cancellation not made reported" in CO-S25. §5.2 says "A rubric judge reads every text the agent sends, including text sent alongside a tool call". After the second unanswered CO-A2 the failure row bars CO-A3 until a lookup answers, so "I can't tell yet whether it went through" is true and G-03-required at that point, yet the dimension says "never says ... that the outcome is unknown". Only R2-08 scoped the text window, for the "Cancellation outcome unknown reported" dimension. The "Refund status reported" part (CO-S16 row 1, CO-S19) is weaker, because "unknown" is not in Appendix A's status set. The CO-S25 part carries the finding.
+Decision: kept; severity Important; status fixed. Verifier could not refute. Fixed: "Cancellation not made reported" and "Refund status reported" scoped to text after the settling event.
+
+R3-07 | Ambiguous | Nit | §5.2 dimension "Refund terms explained", CO-S09 row 4 (VE-F4)
+Quote: "Before the user's confirmation turn, the agent tells the customer the refund goes to the order's payment method and is the order's total paid, where stating the order's total paid as the refund amount in its proposal counts as telling the second, and offers no other payment method, amount or store credit."
+Evidence: The R2-11 allowance covers only the amount. Row 4 ("just refund the item price, not the shipping") asks only about the amount; a valid run explains the amount rule and then proposes "cancel HG-10482 and refund $86.40 to Visa ending 4242", so the payment method appears only inside the proposal. The definition does not say whether naming the order's payment method in the proposal counts as telling the customer the refund goes there.
+Pattern: an allowance written for one row group does not fit a row added later that asks the opposite question.
+
+Verifier: R3-07 | Real | Nit | Weak, but I could not refute it. The dimension's allowance covers only "stating the order's total paid as the refund amount in its proposal". The payment-method clause has no such allowance, so in row 4 a judge may or may not accept "refund $86.40 to Visa ending 4242" as telling the customer the refund goes to the order's payment method.
+Decision: kept; severity Nit; status fixed. Verifier could not refute. Fixed: allowance covers both terms.
+
+R3-08 | Gap | Important | Failure row "the customer changed the order or another proposal term in the confirming turn or after confirming, before CO-A2"; CO-S03 row 4 (CV-F1)
+Quote: "| 4 | Yes, go ahead, but make it HG-10511 instead of that one. |"
+Evidence: The R1-08 fix added CO-S03 row 4, which changes only the order. No scenario has a "yes" that changes another proposal term (payment method or amount); CO-S09's requests come in Turn 1, before any proposal, and its confirmation is a bare "Yes.". An agent that hears "Yes, but put the refund on my Mastercard instead" in reply to "cancel HG-10482 and refund $86.40 to Visa ending 4242", treats it as a yes and cancels and refunds to Visa passes every scenario, breaking G-02 ("Any change to a proposal term after confirmation voids that confirmation"), review-packet Round 1 Q4 ("any change after confirmation voids it") and the §2 customer interest "wants nothing cancelled or refunded that they did not agree to". The row's "propose the changed proposal" cannot apply to a payment-method or amount change because the CO-03 row says "propose only that".
+Pattern: a failure row whose condition lists several triggers joined by "or" gets a scenario for only one of them.
+
+Verifier: R3-08 | Real | Important | Could not refute. The failure row lists "the order or another proposal term", but the only scenario for it is CO-S03 row 4, which changes the order. CO-S09 changes terms in Turn 1, and its confirmation is a bare "Yes.". No scenario or dimension asserts the void-and-re-propose behavior for a payment-method or amount change in the confirming turn, so G-02 is untested there. The CO-03 row's "propose only that" also conflicts with "propose the changed proposal".
+Decision: kept; severity Important; status fixed. Verifier could not refute. Fixed: failure row wording for disallowed changes; new CO-S28.
+
+R3-09 | Gap | Nit | Failure row "the customer asked to cancel only some of an order's items"; CO-S08 (CV-F2)
+Quote: "| any | the customer asked to cancel only some of an order's items | Tell the customer only the whole order can be cancelled; propose nothing until the customer asks to cancel the whole order. | CO-03 |"
+Evidence: The row is an act-only-when clause; its only scenario, CO-S08, tests just the holding-back side (User knows "No, I'll keep it. (optional)"; Forbidden bans every CO-A2, CO-A3, CO-A4). No scenario has a customer who first asks for some items and then asks to cancel the whole order, so an agent that never proposes after a partial request passes. evaluation-checklist.md "Both directions are covered".
+Pattern: an act-only-when clause inside a failure row has a holding-back scenario but no acting scenario.
+
+Verifier: R3-09 | Real | Nit | Could not refute. CO-S08 tests only the holding-back side. Its optional User-knows answer is "No, I'll keep it" and its Forbidden bans every CO-A2, CO-A3 and CO-A4. No scenario has a customer who asks for some items and then for the whole order. The failure row's "propose nothing until the customer asks to cancel the whole order" is an act-only-when clause. CO-S01 shows acting in general but not after a partial request. evaluation-checklist.md: "Both directions are covered."
+Decision: kept; severity Nit; status fixed. Verifier could not refute. Fixed: new CO-S29.
+

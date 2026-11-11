@@ -232,6 +232,45 @@ more per round with Nits verified.
 Measurement questions raised: replace fp_verified / fp_unverified with a split by severity;
 add a dropped_real metric; freeze the verifier brief the FP judge reads.
 
+## E7 — The step-4.4 verifier runs on sonnet, not the inherited model (2026-11-11, /iterate set it3)
+
+**Hypothesis.** Dispatching the one verifier with `model: sonnet` lowers cost_usd (about 6.4–7.2 per
+trial, against it2's 7.35 / 7.67 / 8.11) and verifier time, while recall_key, false_positives and
+dropped_real stay no worse than it2's worst (1.0, 0, 1) in every trial.
+
+**Change.** Commit 840bee9 on `iterate/agent-spec/it3`: one sentence of `SKILL.md` step 4.4. The
+finders still inherit the session's model; `references/verification.md` is unchanged.
+
+**Trials** it3-1..3 (full kind, skill 840bee9, session opus at effort high, native subagents,
+12 per trial; every verifier row `sonnet`, every finder row `opus`, checked by hand).
+
+| trial | integrity | recall_key | recall_found | false_positives | dropped_real | wall_clock_s | finder_tool_calls_max | cost_usd | verifier s (3 rounds) | drop rate |
+|---|---|---|---|---|---|---|---|---|---|---|
+| it3-1 | pass | 0.86 | 1.0 | 1 | 3 | 2148 | 14 | 6.74 | 251 | 0.23 |
+| it3-2 | pass | 0.86 | 0.86 | 1 | 2 | 2234 | 15 | 6.74 | 226 | 0.18 |
+| it3-3 | pass | 1.0 | 1.0 | 1 | 2 | 1877 | 16 | 6.69 | 184 | 0.06 |
+| baseline worst (baseline-1, it2-1..3) | | 1.0 | | 2 (it2: 0) | 1 | 2386 | 19 | 8.11 | 581–741 (it2) | 0.13–0.28 (it2) |
+
+- **Recall:** it3-1's miss is M10, reported (R1-04) and dropped by the sonnet verifier. it3-2's miss
+  is M10 again, but no finder reported it.
+- **Dropped real findings:** 7 across the set (it3-1 R1-04, R2-07, R2-16; it3-2 R2-05, R2-10; it3-3
+  R1-12, R2-06). The drop rate did not rise; sonnet dropped the wrong findings.
+- **False positives:** one kept Nit per trial, against it2's 0.
+- **Cost and time:** mean cost_usd 6.72 against 7.71 (−13 %); verifier time −65 %; mean wall clock
+  2086 s against 2190, because the runs kept and fixed more findings (36 / 32 / 30).
+- **Judge disagreement:** in it3-3 the FP judge ruled R2-10 Not real and the dropped_real judge ruled
+  R1-12 Real; both are the same CO-S11 defect. Either reading leaves the set failing.
+
+**Verdict.** FAIL (advisor and `grade.py`). Deciding metric dropped_real: worst 3 (3 / 2 / 2) against
+baseline worst 1. recall_key also fails (0.86). Hypothesis not met: cost and time fell, and all three
+quality gates were worse than it2's worst.
+
+**Outcome.** Reverted 2026-11-11; results kept as history (it3-1..3). A verifier on sonnet dropped
+7 real findings across three trials (dropped_real 3 / 2 / 2 vs it2's worst 1) for a 13 % cost
+saving; drop rate unchanged, so it dropped the wrong ones. Verification is where the stronger
+model earns its price. Finders-to-sonnet parked: the finder-side signal (recall_found on a
+7-item key) is too weak to register a loss. Baseline stays it2-1..3.
+
 ## Standing observations
 
 - Round-1 finding count varies 13 → 24 between two runs of the same skill on the same input.
