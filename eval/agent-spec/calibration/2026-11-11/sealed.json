@@ -1,0 +1,191 @@
+{
+ "findings": {
+  "F1": {
+   "trial": "it4b-3",
+   "id": "R3-05",
+   "pool": "kept_important",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round2 \u00a75.2 'A rubric judge reads every text the agent sends, including text sent alongside a tool call', and the 'never says'/'states no other status' clauses of the three named dimensions are not limited to the final message."
+  },
+  "F2": {
+   "trial": "it4b-3",
+   "id": "R1-14",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Not real",
+   "judge_evidence": "round0 Appendix A CO-A3 row: issue_refund(order_number) carries 'amount and payment method through the order'; the confirmed outcome list (packet tool confirmation turn) names no wrong-amount refund and no input says what the agent must do, so cockburn's 'Keep a failure only if the agent can detect it and must do something about it' prunes it."
+  },
+  "F3": {
+   "trial": "it4b-3",
+   "id": "R2-12",
+   "pool": "kept_nit",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round1 row 89 'did not answer a lookup ... made before any CO-A2 | ... propose nothing' covers a re-read after confirmation but does not say whether the confirmed CO-A2 proceeds; CO-S10 fails every lookup from Turn 1."
+  },
+  "F4": {
+   "trial": "it2-2",
+   "id": "R1-10",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Real",
+   "judge_evidence": "Confirmed refund fields are 'refund id, order number, amount, payment method, status' with status 'pending, issued, failed' (packet Round 2 Q3 and answer). Round 3 Q3 names the terminal causes but no result field, so Appendix A's `failure_reason` enum is an invented contract field (round0 line 1525). The same defect was ruled Real as R2-04."
+  },
+  "F5": {
+   "trial": "it4b-3",
+   "id": "R2-02",
+   "pool": "kept_important",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round1 SG-04 Covers 'A second cancellation call that reaches the order system after a first, unanswered one took effect late' implies a post-timeout lookup can be stale, yet row 102 and CO-S26 treat a lookup showing 'placed or processing' as settling 'not cancelled' with no CO-A4."
+  },
+  "F6": {
+   "trial": "it2-2",
+   "id": "R1-15",
+   "pool": "kept_nit",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round0 \u00a75.1 End of trial counts only agent messages while Appendix A says 'The agent may repeat CO-A1 without limit' and CO-S10 leaves every CO-A1 unanswered."
+  },
+  "F7": {
+   "trial": "it4b-3",
+   "id": "R1-17",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Style only",
+   "judge_evidence": "round0 CO-S19 Forbidden 'Fewer than one CO-A1 after the second CO-A3.' is a count computable from the tool log (Appendix A defines 'a CO-A1 made after'); the lookup is mandated by the 'did not answer the second CO-A3' row and the finding concedes no verdict changes, since 'Refund id reported' already fails a run without it."
+  },
+  "F8": {
+   "trial": "it4b-3",
+   "id": "R1-11",
+   "pool": "kept_nit",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round0 CO-03 requires telling both 'only the whole order can be cancelled' and 'the refund is the total paid to the order's payment method'; CO-S08 'Whole order only explained' and CO-S09 'Refund terms explained' each assert only one half."
+  },
+  "F9": {
+   "trial": "it4b-3",
+   "id": "R3-07",
+   "pool": "kept_nit",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "Packet round 2 Q1 'no time limit' has no rule; round2 CO-01 turns only on status and only CO-S02 has placed dates (1-2 days old), so an invented age cutoff passes every scenario."
+  },
+  "F10": {
+   "trial": "it4b-3",
+   "id": "R3-04",
+   "pool": "kept_important",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round2 CO-S29 optional pair 'Would you like to cancel the whole order HG-10530 instead?' and the confirmation pair can both match one right-value question; \u00a75.1's tie-break covers only confirmation-form pairs."
+  },
+  "F11": {
+   "trial": "it4b-3",
+   "id": "R2-04",
+   "pool": "kept_important",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round1 row 97 'propose the changed proposal' vs row 96 'propose only that' for a refund-term change in the confirming turn; CO-S03 row 4 changes only the order and CO-S09 changes the refund term only in Turn 1."
+  },
+  "F12": {
+   "trial": "it2-2",
+   "id": "R1-13",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Not real",
+   "judge_evidence": "round0 CO-01/row 92 require 'has shipped and cannot be cancelled', which entails 'was not cancelled'. An agent that follows CO-S05's row therefore meets the shared 'Shipped order explained' definition, and no verdict diverges."
+  },
+  "F13": {
+   "trial": "it4b-3",
+   "id": "R1-08",
+   "pool": "kept_important",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round0 CO-S02 rows 1 and 3 confirm HG-10511; a guessed proposal 'Shall I cancel order HG-10511 and refund $23.75 ...' matches the User-knows pair and no Forbidden line or dimension enforces CO-02's 'proposes nothing until the customer names one'."
+  },
+  "F14": {
+   "trial": "it2-2",
+   "id": "R3-02",
+   "pool": "kept_nit",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round2 row 102 '...may still take effect after the lookup (SG-04)': SG-04's guarantee and its input (user change 1) state only idempotency, not late effects after a lookup."
+  },
+  "F15": {
+   "trial": "it4b-3",
+   "id": "R3-08",
+   "pool": "kept_nit",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round2 row 92 requires 'for each of their orders, what CO-01 says for its status', but its only scenario, CO-S05 row 4, has 'The customer has no other orders.'"
+  },
+  "F16": {
+   "trial": "it2-2",
+   "id": "R1-02",
+   "pool": "kept_important",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round0 CO-S03 Turn 2 is said 'in place of a confirmation' and its rows 1-3 carry no yes; no scenario triggers row 96 'in the confirming turn or after confirming'."
+  },
+  "F17": {
+   "trial": "it2-2",
+   "id": "R2-05",
+   "pool": "kept_important",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round1 CO-S06 is the only already-cancelled scenario and its refund is 'status issued', so CO-01 vs CO-07 ('cancelled but its refund is not shown pending or issued') for a failed/missing refund is never tested."
+  },
+  "F18": {
+   "trial": "it2-2",
+   "id": "R2-03",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Not real",
+   "judge_evidence": "CO-03 'Every proposal cancels the whole order and refunds its total paid to its payment method ... and proposes nothing else', plus the sibling row 'propose only that'. So a changed proposal can differ only in the order, and no expert passes a Mastercard re-proposal."
+  },
+  "F19": {
+   "trial": "it4b-3",
+   "id": "R1-09",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Not real",
+   "judge_evidence": "round0 CO-S11 Unambiguity note (line 704): 'in row 2 the agent learns the order shipped only from a lookup after the unanswered cancellation', together with 'CO-A2 occurs exactly once' and 'A second CO-A2.', settles that the unanswered first CO-A2 flips the status; Appendix A 'A timeout changes the order or not as Initial state says'."
+  },
+  "F20": {
+   "trial": "it2-2",
+   "id": "R1-03",
+   "pool": "kept_important",
+   "skill_decision": "kept",
+   "judge": "Real",
+   "judge_evidence": "round0 \u00a75.2 'Refund status reported' is used only by CO-S19; CO-S01 note calls 'Refund id reported' 'the only check on the agent's words', so 'issued' for a pending refund or an arrival date passes."
+  }
+ },
+ "recall": {
+  "R1": {
+   "trial": "it4b-3",
+   "key": "M7",
+   "match": "R1-05"
+  },
+  "R2": {
+   "trial": "it2-2",
+   "key": "M13",
+   "match": "R1-14"
+  },
+  "R3": {
+   "trial": "it2-2",
+   "key": "M2",
+   "match": "R1-07"
+  },
+  "R4": {
+   "trial": "it2-2",
+   "key": "M10",
+   "match": "R2-05"
+  },
+  "R5": {
+   "trial": "it4b-3",
+   "key": "M10",
+   "match": "R2-03"
+  }
+ }
+}
