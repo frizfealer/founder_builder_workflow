@@ -95,11 +95,12 @@ Hunt for **Gaps**. Build these maps and report every empty cell:
 > - The line a finding quotes as defective does not refute the finding by restating what it says.
 >   Refute it with an input or another spec line that supports what this line says in this case, not
 >   one that only permits lines of its kind.
-> - A refutation must answer the case the finding names, and all of it. A scenario that asserts the
->   behavior for a different Initial state, or an input that supports one part of the line the
->   finding quotes, settles a neighboring case and leaves the finding standing for the rest. A
->   clause or line that answers only part of a finding does not refute it: say Real, and in the
->   finding's verdict line, quote the clause and name the part it answers and the part that stands.
+> - A refutation by either of the first two routes must answer the case the finding names, and all
+>   of it. A scenario that asserts the behavior for a different Initial state, or an input that
+>   supports one part of the line the finding quotes, settles a neighboring case and leaves the
+>   finding standing for the rest. A clause, line, scenario or input that answers only part of a
+>   finding does not refute it: say Real, and in your line for that finding quote what you cited
+>   and name the part it answers and the part that stands.
 >
 > Read the spec at [spec path]; then the review packet at [packet path] and the sources it lists; then the findings at
 > [findings path]; you report, you do not decide: the main thread decides each drop. Grep the spec for any id a finding names that you have not read.
