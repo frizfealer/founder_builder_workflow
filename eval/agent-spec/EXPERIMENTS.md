@@ -271,6 +271,16 @@ saving; drop rate unchanged, so it dropped the wrong ones. Verification is where
 model earns its price. Finders-to-sonnet parked: the finder-side signal (recall_found on a
 7-item key) is too weak to register a loss. Baseline stays it2-1..3.
 
+## E8 — A refutation must answer the case the finding names, all of it (2026-11-11, /iterate set it4)
+
+**Hypothesis.** Every recorded cross-round flip went drop then keep, and the first drop was wrong. Examples: it2-2 R1-10 then R2-04, and it3-3 R1-12 then R2-10 and R2-06 then R3-01. In each case the verifier's quoted clause answered a neighboring case, not the one the finding named. Requiring a clause or line refutation to answer the whole named case should hold dropped_real at ≤ 1 per trial and ≤ 1 summed, with no drop-then-keep pairs, and keep recall_key at 1.0, false_positives at 0 and wall_clock_s ≤ 2625 s.
+
+**Change.** Commits 0862313, a277cec and 6c52278 on `claude/verifier-ruling-stability-4811l2`. They add one bullet to the adversarial verifier brief's limits in `references/verification.md`. SKILL.md and the frozen judge brief are unchanged.
+
+**Trials.** Not trialed. The runners were subagents of a cloud session with no Agent tool, so none could dispatch finders or verifiers. See `results/it4/REPORT.md`.
+
+**Verdict.** None. Rule 1 holds: no next change until it4-1..3 are graded.
+
 ## Standing observations
 
 - Round-1 finding count varies 13 → 24 between two runs of the same skill on the same input.
