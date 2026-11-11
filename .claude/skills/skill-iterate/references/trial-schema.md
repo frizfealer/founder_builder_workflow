@@ -22,7 +22,8 @@ the agent's memory of them.
   "subagents": [
     {"round": 1, "role": "finder: faithfulness", "kind": "finder",   // finder | verifier | other
      "codex": false, "model": "opus",   // alias as dispatched: opus | sonnet | haiku | codex; costs via grading.json model_rates
-     "tool_uses": 8, "duration_ms": 128993, "tokens": 134288}
+     "tool_uses": 8, "duration_ms": 128993, "tokens": 134288,
+     "tokens_in": 120000, "tokens_out": 9000, "tokens_cache_read": 5288}   // when the harness reports the split; tokens stays the total
   ],
   "findings": [
     {"id": "R1-01", "round": 1, "class": "Lies", "severity": "Important",

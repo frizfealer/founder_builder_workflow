@@ -138,7 +138,7 @@
       "kind": "code",
       "gate": false,
       "direction": "lower",
-      "about": "sum over subagents of tokens x model_rates[model] / 1e6; tokens are not split input/output, so this compares models, it does not invoice"
+      "about": "USD from grading.json model_rates: tokens_in/out/cache_read x per-kind rates when the row has them, else tokens x blended; cross-model ratios are right either way, absolute dollars only with the split"
     },
     {
       "name": "rounds_run",
@@ -180,11 +180,31 @@
   },
   "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09). Baseline rolled to it1b-1..3 on 2026-11-09 (E5 merged); e4-base-1..3 and full-new-3 are history. Baseline rolled to it2-1..3 on 2026-11-10 (E6 merged). fp_verified/fp_unverified retired: every finding is verified from E6 on. dropped_real gated from 2026-11-10 (baseline worst 1). cost_usd added, report-only, with placeholder model rates.",
   "model_rates": {
-    "_about": "USD per million tokens, blended toward input since subagent_tokens is one number. PLACEHOLDERS: set from the current pricing page before trusting cost_usd across models.",
-    "opus": 15.0,
-    "sonnet": 3.0,
-    "haiku": 1.0,
-    "codex": 0.0,
+    "_about": "USD per million tokens. in/out/cache_read are used when a subagent row carries tokens_in/tokens_out/tokens_cache_read; blended is used when it carries only tokens. PLACEHOLDERS: set from the current pricing page.",
+    "opus": {
+      "in": 15.0,
+      "out": 75.0,
+      "cache_read": 1.5,
+      "blended": 20.0
+    },
+    "sonnet": {
+      "in": 3.0,
+      "out": 15.0,
+      "cache_read": 0.3,
+      "blended": 4.0
+    },
+    "haiku": {
+      "in": 1.0,
+      "out": 5.0,
+      "cache_read": 0.1,
+      "blended": 1.3
+    },
+    "codex": {
+      "in": 0.0,
+      "out": 0.0,
+      "cache_read": 0.0,
+      "blended": 0.0
+    },
     "default": "opus"
   }
 }

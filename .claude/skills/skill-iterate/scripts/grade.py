@@ -49,8 +49,15 @@ def code_metrics(t, g=None):
     if rates:
         cost = 0.0
         for s_ in subs:
-            if s_.get("tokens") is not None:
-                cost += s_["tokens"] * float(rates.get(model_of(s_, default_model), rates.get(default_model, 0))) / 1e6
+            r = rates.get(model_of(s_, default_model), rates.get(default_model, {}))
+            if isinstance(r, (int, float)):  # old flat form
+                r = {"blended": float(r), "in": float(r), "out": float(r), "cache_read": float(r)}
+            if s_.get("tokens_in") is not None or s_.get("tokens_out") is not None:
+                cost += (s_.get("tokens_in") or 0) * r.get("in", 0) / 1e6
+                cost += (s_.get("tokens_out") or 0) * r.get("out", 0) / 1e6
+                cost += (s_.get("tokens_cache_read") or 0) * r.get("cache_read", 0) / 1e6
+            elif s_.get("tokens") is not None:
+                cost += s_["tokens"] * r.get("blended", 0) / 1e6
         cost = round(cost, 2)
     finders = [s for s in subs if s["kind"] == "finder" and not s.get("codex")]
     kept = sum(r.get("kept", 0) for r in t["rounds"])
