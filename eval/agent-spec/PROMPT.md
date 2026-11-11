@@ -17,6 +17,6 @@ Record, at the end, in eval/agent-spec/results/<label>/:
 10. agent-spec-final.md — the spec as it stands when the run ends.
 11. report.md — the step-5 report as the skill specifies it.
 12. rounds/round<N>-agent-spec.md — a copy of each round<N>/agent-spec.md snapshot, round0 included, so judges can read a finding against the spec it quoted.
-13. trial.json — per .claude/skills/skill-iterate/references/trial-schema.md, with skill_commit set; numbers from task notifications, timestamps and the checker, never from memory.
+13. trial.json — per .claude/skills/skill-iterate/references/trial-schema.md, with skill_commit, effort (the session's /effort level) and session_model set; numbers from task notifications, timestamps and the checker, never from memory.
 
 Then reply with the count line of each round and the total wall clock.

@@ -573,6 +573,9 @@
   "M1 is 'fixed' for the impossible scenarios (CO-S17 row 3, CO-S24 removed); the agent's handling of OrderNotCancelled and of cancel_order OrderNotFound is reported as an open question, and their failure rows now have no scenario.",
   "Step 3.9 merge WARNINGs from the checker were not acted on: the run starts at step 4.1.",
   "The Write tool refused report.md as a report file; report.md was written with a shell heredoc because the run prompt requires it.",
-  "Round-3 fixes were applied after the round-3 verifier and are not reviewed by any finder (round cap)."
- ]
+  "Round-3 fixes were applied after the round-3 verifier and are not reviewed by any finder (round cap).",
+  "effort/session_model backfilled 2026-11-10 from the owner's statement that every trial so far ran at high effort on opus"
+ ],
+ "effort": "high",
+ "session_model": "opus"
 }

@@ -78,6 +78,7 @@ def code_metrics(t, g=None):
         "important_kept": sum(r.get("important_kept", 0) for r in t["rounds"]),
         "verifier_drop_rate": round(dropped / (kept + dropped), 2) if (kept + dropped) else None,
         "codex_subagents": sum(1 for s in subs if s.get("codex")),
+        "effort": t.get("effort") or "?",
     }
 
 
@@ -228,9 +229,23 @@ def evaluate(eval_dir, labels, g):
                 if isinstance(v, (int, float)) and k not in excl:
                     vals.setdefault(k, []).append(v)
         refs[kind] = vals
+    # machinery check: a trial's effort must match its kind's baseline
+    base_effort = {}
+    for kind, spec in g["kinds"].items():
+        effs = set()
+        for bl in spec["baseline_labels"]:
+            tj = results_dir / bl / "trial.json"
+            if tj.exists():
+                e = load(tj).get("effort")
+                if e:
+                    effs.add(e)
+        base_effort[kind] = effs
     # gate decisions
     for lab, tr in trials.items():
         fails = []
+        be = base_effort.get(tr["kind"], set())
+        if be and tr["metrics"].get("effort") not in be and lab not in g["kinds"][tr["kind"]]["baseline_labels"]:
+            fails.append(f"effort {tr['metrics'].get('effort')} vs baseline {'/'.join(sorted(be))}")
         for m in g["metrics"]:
             if not m.get("gate"):
                 continue

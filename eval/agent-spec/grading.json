@@ -170,6 +170,13 @@
       "kind": "code",
       "gate": false,
       "direction": "report"
+    },
+    {
+      "name": "effort",
+      "kind": "code",
+      "gate": false,
+      "direction": "report",
+      "about": "the session's effort level the trial ran at; a trial whose effort differs from its baseline's fails the gate"
     }
   ],
   "baseline_exclude": {

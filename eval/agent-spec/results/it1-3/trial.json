@@ -553,6 +553,9 @@
   "script_errors=1: fix_r2.py aborted once on its own assertion before writing (no change to the spec), and one checker call ran from the wrong directory (file not found); both rerun.",
   "R2-04 kept although the verifier said Not real: the main thread did not agree that the Unambiguity note refutes an unobservable Initial-state trigger.",
   "Step 3.9 merge WARNINGs from the checker were not acted on: the run starts at step 4.1.",
-  "script_errors recounted to 0 on 2026-11-09 under the new definition (skill scripts only): fix_r2.py was the runner's helper, and the wrong-directory checker call was rerun and found no script fault."
- ]
+  "script_errors recounted to 0 on 2026-11-09 under the new definition (skill scripts only): fix_r2.py was the runner's helper, and the wrong-directory checker call was rerun and found no script fault.",
+  "effort/session_model backfilled 2026-11-10 from the owner's statement that every trial so far ran at high effort on opus"
+ ],
+ "effort": "high",
+ "session_model": "opus"
 }

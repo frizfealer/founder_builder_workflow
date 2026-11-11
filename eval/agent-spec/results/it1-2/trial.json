@@ -572,6 +572,9 @@
   "Round 1 finder streams were not saved (stream logging was added before the round-1 verifier), so their file reads could not be audited for isolation; the round 1 verifier and every round 2 and 3 subagent read only allowed paths.",
   "review-packet.md lists source paths from another machine (/Users/...); briefs told reviewers the on-machine paths. The packet copy itself was left unchanged apart from the run/ to run-it1-2/ replacement, as PROMPT.md says.",
   "The run hit the round cap: round 3 changed the spec, and its fixes were not reviewed by a fourth round.",
-  "One fix script in round 2 failed an assertion before it wrote anything; it was corrected and rerun. The checker never reported an error at the end of a round (one intermediate checker error in round 1 was fixed before the round ended)."
- ]
+  "One fix script in round 2 failed an assertion before it wrote anything; it was corrected and rerun. The checker never reported an error at the end of a round (one intermediate checker error in round 1 was fixed before the round ended).",
+  "effort/session_model backfilled 2026-11-10 from the owner's statement that every trial so far ran at high effort on opus"
+ ],
+ "effort": "high",
+ "session_model": "opus"
 }

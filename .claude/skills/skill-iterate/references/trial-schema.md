@@ -12,6 +12,8 @@ the agent's memory of them.
   "kind": "full",                       // a key of grading.json "kinds"
   "legacy": false,                      // true when built by legacy_extract.py
   "skill_commit": "e622e24",            // git rev of the skill under test
+  "effort": "high",                     // the session's effort level; subagents inherit it
+  "session_model": "opus",              // the session's model alias; subagents inherit it unless dispatched otherwise
   "wall_clock_s": 1588,                 // first round start to last round end
   "rounds": [
     {"n": 1, "start": "2026-11-08T15:23:37Z", "end": "2026-11-08T15:35:15Z", "seconds": 698,

@@ -539,5 +539,9 @@
    "status": "pre-existing"
   }
  ],
- "warnings": []
+ "warnings": [
+  "effort/session_model backfilled 2026-11-10 from the owner's statement that every trial so far ran at high effort on opus"
+ ],
+ "effort": "high",
+ "session_model": "opus"
 }

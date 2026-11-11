@@ -487,8 +487,11 @@
   }
  ],
  "warnings": [
-  "reconstructed from baseline/subagent-stats.md prose: round times to the minute, finder durations 177-323 s not per subagent, only some tool_uses known"
+  "reconstructed from baseline/subagent-stats.md prose: round times to the minute, finder durations 177-323 s not per subagent, only some tool_uses known",
+  "effort/session_model backfilled 2026-11-10 from the owner's statement that every trial so far ran at high effort on opus"
  ],
  "findings_glob": "baseline/round*-findings.md",
- "final_spec": null
+ "final_spec": null,
+ "effort": "high",
+ "session_model": "opus"
 }

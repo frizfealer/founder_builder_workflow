@@ -24,8 +24,10 @@ baseline trials.
    its scripts in one iteration; `grading.json`, the key, thresholds, frozen inputs or baseline
    folders in another, with the human.
 6. Every iteration ends with one `REPORT.md`: *Done*, *Decided for you*, *Needs you*.
-7. Trials run on the same machinery as their baseline: same subagent mechanism, same model.
-   A cloud session without native subagents can run the advisor and editor steps, not trials.
+7. Trials run on the same machinery as their baseline: same subagent mechanism, same model,
+   same effort level (subagents inherit the session's). A cloud session without native subagents
+   can run the advisor and editor steps, not trials. A model or effort change is itself an
+   iteration, recorded on the trial, never a difference between a trial and its baseline.
 
 ## Commands
 
