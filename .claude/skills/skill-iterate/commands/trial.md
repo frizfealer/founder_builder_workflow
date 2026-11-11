@@ -24,6 +24,9 @@ Run trials of skill `$ARGUMENTS` (default n = 3).
    stalled subagent, a harness timeout, a collision) is rerun under the same label after its
    folder is cleared, and the rerun is noted in `trial.json.warnings`; it is not counted as a
    result. Three attempts, then report the failure under *Needs you*.
+3b. If a runner's hand-back carries a REPORT.MD section because the harness refused its write,
+   write that text to `results/<set>-k/report.md` yourself (standing approval from the human,
+   2026-11-11) and log it under *Decided for you*.
 4. Copy each round snapshot the run saved (`round<N>/<artifact>`, round0 included) into
    `results/<set>-k/rounds/round<N>-<artifact>`; judges read a finding against the text it quoted.
 5. Validate each `trial.json` against `references/trial-schema.md`: every round has start and

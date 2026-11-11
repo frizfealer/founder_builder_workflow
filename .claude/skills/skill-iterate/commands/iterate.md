@@ -15,6 +15,11 @@ Preconditions, checked before anything else; any failure ends the run with a one
   trials are ungraded (rule 1: one change at a time).
 - The problem statement names a metric in `grading.json` that should move.
 
+Where it runs: steps 1–3 (propose, apply, resolve flags) run anywhere; steps 4–5 need native
+subagents on the baseline's machinery (rule 7). In a session without them (a cloud session),
+say so in the first line of your reply, do steps 1–3, push the branch, and end with the exact
+`/trial` and `/grade` commands to run locally; do not substitute other machinery.
+
 Set defaults: `--set` = `it<N>` where N is one more than the highest `it*` set in
 `results/`; `--n` = 3. The branch is `iterate/<skill>/<set>`.
 

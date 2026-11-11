@@ -15,7 +15,8 @@ Record, at the end, in eval/agent-spec/results/<label>/:
 8. subagent-stats.md — one line per subagent dispatched: round, role, model (the alias you dispatched it with, also written to trial.json subagents[].model), and, when the notification or stream reports them, input, output and cache-read tokens separately (trial.json tokens_in / tokens_out / tokens_cache_read, with tokens as the total), and the tool_uses, duration_ms and subagent_tokens from its task notification. Mark any subagent whose notification did not arrive.
 9. run.log — the checker output of every 4.1 run, the command line of every script you ran, any error, and the start and end timestamp of each round.
 10. agent-spec-final.md — the spec as it stands when the run ends.
-11. report.md — the step-5 report as the skill specifies it.
+11. report.md — the step-5 report as the skill specifies it. If the harness refuses the write, return the report text in your hand-back under the heading REPORT.MD and the main session writes it; do not write it by another route.
+11b. runner-notes.md — your own reasons for keep/drop decisions, dispatch timing and anything else you record for yourself, written here in results/, never in the scratch dir: reviewers grep the scratch dir and must not see your conclusions.
 12. rounds/round<N>-agent-spec.md — a copy of each round<N>/agent-spec.md snapshot, round0 included, so judges can read a finding against the spec it quoted.
 13. trial.json — per .claude/skills/skill-iterate/references/trial-schema.md, with skill_commit, effort (the session's /effort level) and session_model set; numbers from task notifications, timestamps and the checker, never from memory.
 

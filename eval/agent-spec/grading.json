@@ -27,11 +27,11 @@
         "M7",
         "M8",
         "M9",
-        "M10",
-        "M13"
+        "M10"
       ],
       "excluded": {
-        "M12": "2026-11-08: not a defect under \u00a75.1 'read against Initial state' and the checklist's no-leftovers rule; adversarial verifier (full-new-2) and FP judge agree"
+        "M12": "2026-11-08: not a defect under \u00a75.1 'read against Initial state' and the checklist's no-leftovers rule; adversarial verifier (full-new-2) and FP judge agree",
+        "M13": "2026-11-11: Style only, not Important; the trigger wording changes no verdict (it4-1 finder R1-17, verifier and dropped_real judge agree). Inherited overcall from the original run, like M12."
       }
     },
     "round2": {
@@ -189,7 +189,7 @@
       "dropped_real"
     ]
   },
-  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09). Baseline rolled to it1b-1..3 on 2026-11-09 (E5 merged); e4-base-1..3 and full-new-3 are history. Baseline rolled to it2-1..3 on 2026-11-10 (E6 merged). fp_verified/fp_unverified retired: every finding is verified from E6 on. dropped_real gated from 2026-11-10 (baseline worst 1). cost_usd added, report-only, with placeholder model rates. baseline-1 excluded from all judge metrics from 2026-11-11 (it is the pre-E5 original run, kept for cost only). round2 kind retired.",
+  "notes": "baseline-1's findings ARE the key, so its recall is circular and excluded from the recall baselines. Both judge metrics are gated relative to the baseline only; absolute bounds return once three baseline trials per kind exist. script_errors counts only the skill's own scripts (decided 2026-11-09). Baseline rolled to it1b-1..3 on 2026-11-09 (E5 merged); e4-base-1..3 and full-new-3 are history. Baseline rolled to it2-1..3 on 2026-11-10 (E6 merged). fp_verified/fp_unverified retired: every finding is verified from E6 on. dropped_real gated from 2026-11-10 (baseline worst 1). cost_usd added, report-only, with placeholder model rates. baseline-1 excluded from all judge metrics from 2026-11-11 (it is the pre-E5 original run, kept for cost only). round2 kind retired. M13 removed from the key 2026-11-11; key is 6 items.",
   "model_rates": {
     "_about": "USD per million tokens. in/out/cache_read are used when a subagent row carries tokens_in/tokens_out/tokens_cache_read; blended is used when it carries only tokens. PLACEHOLDERS: set from the current pricing page.",
     "opus": {
