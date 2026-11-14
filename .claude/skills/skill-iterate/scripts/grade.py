@@ -14,6 +14,7 @@ cell shows "pending". The /grade command dispatches those judges and reruns this
 A gated metric fails when it misses its absolute bound (min/max) or is worse than the worst
 baseline value by more than `tolerance`. Baseline labels per kind come from grading.json.
 """
+import difflib
 import json
 import re
 import sys
@@ -22,6 +23,27 @@ from pathlib import Path
 
 def load(p):
     return json.loads(Path(p).read_text())
+
+
+def applies(m, kind):
+    """A metric applies to every kind unless it lists its kinds."""
+    return kind in m.get("kinds", [kind])
+
+
+def final_spec_path(t, label):
+    """The trial's end-state artifact, relative to the eval dir."""
+    return t.get("final_spec") or f"results/{label}/agent-spec-final.md"
+
+
+def golden_distance(eval_dir, t, label, m):
+    """1 - difflib ratio over whitespace-normalised non-blank lines of the trial's final spec and the golden file."""
+    def lines(p):
+        return [re.sub(r"\s+", " ", l).strip() for l in Path(p).read_text().splitlines() if l.strip()]
+    trial = eval_dir / final_spec_path(t, label)
+    if not trial.exists():
+        return None
+    ratio = difflib.SequenceMatcher(None, lines(eval_dir / m["golden"]), lines(trial), autojunk=False).ratio()
+    return round(1 - ratio, 3)
 
 
 def model_of(sub, default):
@@ -97,12 +119,34 @@ def key_findings_text(eval_dir, key):
     return out
 
 
+def blind_finding_text(folder, fid, rnd):
+    """A finding's own block (header, Quote, Evidence, Pattern) from round<rnd>-findings.md, with every
+    verifier / decision / status line cut, so a judge rules on the finding, not on the refutation."""
+    f = folder / f"round{rnd}-findings.md"
+    if not f.exists():
+        return ""
+    lines = f.read_text().splitlines()
+    hdr = re.compile(r"^(?:##\s*)?" + re.escape(fid) + r"\b")
+    start = next((i for i, l in enumerate(lines) if hdr.match(l)), None)
+    if start is None:
+        return ""
+    head = re.sub(r"\s+[\u2014-]+\s+(kept|dropped|Pre-existing)\b.*$", "", lines[start], flags=re.I)
+    out = [head]
+    for l in lines[start + 1:]:
+        if re.match(r"^(?:##\s*)?[A-Z]\d-L?\d+\s*(\||\()", l) or l.startswith("## "):
+            break
+        if re.match(r"^\**\s*(Verifier|Verifiers?|Decision|Decision reason|Status|Routing|Standard verifier|Adversarial verifier|Outcome|Kept|Dropped|Disposition)\b", l.strip(), re.I):
+            break
+        out.append(l)
+    return "\n".join(out).strip()
+
+
 def write_judge_task(eval_dir, t, g, metric, folder):
     jd = folder / "judge"
     jd.mkdir(exist_ok=True)
     kind = t["kind"]
     ctx = g["judge_context"]
-    spec = Path(ctx["spec_for_kind"][kind])  # paths below are relative to eval_dir; the judge runs from there
+    spec = Path(ctx["spec_for_kind"].get(kind) or "")  # paths below are relative to eval_dir; the judge runs from there
     folder = Path("results") / folder.name
     findings_glob = t.get("findings_glob") or f"{folder}/round*-findings.md"
     final_spec = t.get("final_spec", f"{folder}/agent-spec-final.md")
@@ -128,15 +172,41 @@ def write_judge_task(eval_dir, t, g, metric, folder):
             body.append(f"- {f['id']} | {f.get('class')} | {f.get('severity')} | {f.get('location')}\n  Quote: {f.get('quote', '')[:300]}")
     elif metric in ("false_positives", "dropped_real"):
         pool = kept if metric == "false_positives" else [f for f in t["findings"] if f.get("kept") is False]
+        real_folder = eval_dir / folder
         body = [f"# Judge task: {metric} for trial {t['label']}", "",
                 ("You are checking whether each kept finding is a real defect." if metric == "false_positives" else "You are checking whether each DROPPED finding was a real defect the verifier should have kept. The verifier's refutation is recorded with the finding; judge the finding, not the refutation.") + " You did not write the spec or the findings. Read only; edit nothing.", "",
                 f"Read the review packet `{ctx['packet']}`, the sources it lists, and the spec `{spec}`. Apply the verifier brief in `{ctx['verifier_brief']}`: a finding is Real when the defect exists as described and belongs to its class; Not real when the spec or the inputs refute it (quote what refutes it); Style only when it concerns wording or preference and changes no verdict.", "",
-                f"The findings with their evidence are in `{findings_glob}`; the ids to judge are listed below. A finding whose round is 2 or 3 refers to the spec as it stood after the previous round's fixes" + (f"; `{final_spec}` is the end state." if final_spec else "; no end-state copy exists for this trial, judge from the finding's own evidence.") + snap_note, "",
+                (f"The findings with their evidence are in `{findings_glob}`; the ids to judge are listed below." if metric == "false_positives"
+                 else "Each finding's own text (header, Quote, Evidence, Pattern) is reproduced below. Do NOT open the round*-findings.md files: they carry the verifier's refutation, and you are judging the finding against the spec and the inputs, not the refutation. Calibration on 2026-11-11 showed the judge agreeing with refutations a human rejected.")
+                + " A finding whose round is 2 or 3 refers to the spec as it stood after the previous round's fixes" + (f"; `{final_spec}` is the end state." if final_spec else "; no end-state copy exists for this trial, judge from the finding's own evidence.") + snap_note, "",
                 f"Output exactly one JSON object, nothing else, as the file `judge/{metric}.verdict.json`:",
                 '```json', '{"metric": "' + metric + '", "verdicts": {"<finding id>": "Real|Not real|Style only"}, "evidence": {"<finding id>": "<one line>"}}', '```', "",
                 "## Findings to judge", ""]
         for f in pool:
             body.append(f"- {f['id']} (round {f['round']}) | {f.get('class')} | {f.get('severity')} | {f.get('location')}")
+            if metric == "dropped_real":
+                txt = blind_finding_text(real_folder, f["id"], f["round"])
+                body += ["", "```", txt or f"(text not found) Quote: {f.get('quote', '')}", "```", ""]
+    elif metric in ("input_coverage", "unsupported_statements"):
+        inputs = ", ".join(f"`{p}`" for p in [ctx["packet"]] + ctx.get("inputs", []))
+        body = [f"# Judge task: {metric} for trial {t['label']}", "",
+                "You are checking a spec the trial wrote from scratch against the inputs it was written from. You did not write the spec or the inputs. Read only; edit nothing.", "",
+                f"Inputs: {inputs}. The interview answers, the shared-understanding summary and the tool confirmation turn in the packet are the user's words; the packet's ledger and tool table summarise them. The spec: `{final_spec}`.", ""]
+        if metric == "input_coverage":
+            key = g["key"][kind]
+            keytext = key_findings_text(eval_dir, key)
+            body += ["For each checklist item below, decide whether the spec asserts it the way the item says it must be asserted: the named kind of rule, failure row, Appendix line or scenario exists, and what it asserts matches the input. `covered` when it does; `missing` when no such line exists or it asserts only part of the item; `contradicted` when the spec asserts something the item's input rules out. Ids in the spec are the trial's own; match on substance, not on ids.", "",
+                     f"Output exactly one JSON object, nothing else, as the file `judge/{metric}.verdict.json`:",
+                     '```json', '{"metric": "input_coverage", "items": {"<item id>": "covered|missing|contradicted"}, "evidence": {"<item id>": "<one line: the spec rule/scenario id and quote that covers it, or what is missing>"}}', '```', "",
+                     "## Checklist items", ""]
+            for fid in key["ids"]:
+                body += [keytext.get(fid, f"{fid} | (not found in key file)").splitlines()[0], ""]  # one line per item
+        else:
+            body += ["List every UNSUPPORTED statement in the spec. A statement is one rule, precondition, Scope & Authority line, failure row, Appendix A or Appendix B row, data-model field or tool outcome. It is unsupported when it asserts a product fact (a policy, limit, time window, fee, field, status, tool parameter or outcome, staff or store behaviour, or a promise to the customer) that the inputs neither state nor follow from, or that the inputs contradict.", "",
+                     "Not unsupported: a rule the inputs imply; handling the inputs leave to the writer when it adds no new product fact (the user asked the writer to derive further failure cases); the generic guarantees every Agent Spec carries (truthful reporting, no change outside the request, authorization current at each write, no blind retry after an unknown result); template text in the Evaluation section; illustrative values in scenarios (order numbers, amounts, names, dates); anything the spec itself marks as an open question or assumption for the user to confirm.", "",
+                     "Count each distinct unsupported fact once, at its first or clearest occurrence, even when several lines repeat it.", "",
+                     f"Output exactly one JSON object, nothing else, as the file `judge/{metric}.verdict.json`:",
+                     '```json', '{"metric": "unsupported_statements", "statements": [{"location": "<rule, row or section id>", "quote": "<the spec line>", "why": "<one line: what the inputs say instead, or that they are silent>"}]}', '```', ""]
     else:
         return
     body.insert(2, f"Run from `{eval_dir.name}`'s parent: all paths below are relative to `eval/{eval_dir.name}/`.")
@@ -146,7 +216,7 @@ def write_judge_task(eval_dir, t, g, metric, folder):
 def judge_metrics(eval_dir, t, g, folder):
     out = {}
     for m in g["metrics"]:
-        if m["kind"] != "judge":
+        if m["kind"] != "judge" or not applies(m, t["kind"]):
             continue
         vf = folder / "judge" / f"{m['name']}.verdict.json"
         if vf.exists():
@@ -162,6 +232,20 @@ def judge_metrics(eval_dir, t, g, folder):
                 out[m["name"]] = round(hit / len(ids), 2)
             elif m["name"] in ("fp_important", "fp_nit"):
                 continue  # derived from the false_positives verdict below
+            elif m["name"] == "input_coverage":
+                ids = g["key"][t["kind"]]["ids"]
+                items = v.get("items") or {}
+                if not items:
+                    write_judge_task(eval_dir, t, g, m["name"], folder)
+                    out[m["name"]] = "pending"
+                    continue
+                out[m["name"]] = round(sum(1 for k in ids if items.get(k) == "covered") / len(ids), 2)
+            elif m["name"] == "unsupported_statements":
+                if not isinstance(v.get("statements"), list):
+                    write_judge_task(eval_dir, t, g, m["name"], folder)
+                    out[m["name"]] = "pending"
+                    continue
+                out[m["name"]] = len(v["statements"])
             elif m["name"] == "dropped_real":
                 vals = list(v.get("verdicts", {}).values())
                 if not vals or all(x is None for x in vals):
@@ -201,6 +285,15 @@ def worse(direction, value, ref, tol):
     return False
 
 
+def artifact_metrics(eval_dir, t, g, label):
+    """Code metrics read from the trial's files rather than trial.json."""
+    out = {}
+    for m in g["metrics"]:
+        if m["name"] == "golden_distance" and applies(m, t["kind"]):
+            out[m["name"]] = golden_distance(eval_dir, t, label, m)
+    return out
+
+
 def evaluate(eval_dir, labels, g):
     results_dir = eval_dir / "results"
     trials = {}
@@ -211,6 +304,7 @@ def evaluate(eval_dir, labels, g):
             continue
         t = load(tj)
         row = code_metrics(t, g)
+        row.update(artifact_metrics(eval_dir, t, g, lab))
         row.update(judge_metrics(eval_dir, t, g, results_dir / lab))
         trials[lab] = {"kind": t["kind"], "metrics": row, "warnings": t.get("warnings", [])}
     # baseline references per kind
@@ -223,6 +317,7 @@ def evaluate(eval_dir, labels, g):
                 continue
             bt = load(tj)
             bm = code_metrics(bt, g)
+            bm.update(artifact_metrics(eval_dir, bt, g, bl))
             bm.update(judge_metrics(eval_dir, bt, g, results_dir / bl))
             excl = set(g.get("baseline_exclude", {}).get(bl, []))
             for k, v in bm.items():
@@ -247,7 +342,7 @@ def evaluate(eval_dir, labels, g):
         if be and tr["metrics"].get("effort") not in be and lab not in g["kinds"][tr["kind"]]["baseline_labels"]:
             fails.append(f"effort {tr['metrics'].get('effort')} vs baseline {'/'.join(sorted(be))}")
         for m in g["metrics"]:
-            if not m.get("gate"):
+            if not m.get("gate") or not applies(m, tr["kind"]):
                 continue
             v = tr["metrics"].get(m["name"])
             if v == "pending":
@@ -274,24 +369,22 @@ def evaluate(eval_dir, labels, g):
 
 
 def table(trials, g, refs):
-    names = [m["name"] for m in g["metrics"]]
+    kinds = {tr["kind"] for tr in trials.values()}
+    shown = [m for m in g["metrics"] if any(applies(m, k) for k in kinds)]
+    names = [m["name"] for m in shown]
     gated = {m["name"] for m in g["metrics"] if m.get("gate")}
     head = "| trial | kind | " + " | ".join(("*" if n in gated else "") + n for n in names) + " | verdict |"
     sep = "|" + "---|" * (len(names) + 3)
     rows = [head, sep]
     for lab, tr in trials.items():
-        cells = [str(tr["metrics"].get(n, "")) for n in names]
+        cells = [str(tr["metrics"].get(m["name"], "")) if applies(m, tr["kind"]) else "" for m in shown]
         verdict = "baseline" if lab in sum((k["baseline_labels"] for k in g["kinds"].values()), []) else ("PASS" if not tr["fails"] else "FAIL: " + "; ".join(tr["fails"]))
         rows.append(f"| {lab} | {tr['kind']} | " + " | ".join(cells) + f" | {verdict} |")
     for kind, vals in refs.items():
-        if vals:
+        if vals and kind in kinds:
             rows.append(f"| baseline worst ({kind}) | {kind} | " + " | ".join(
-                (str(max(vals[n]) if g_dir(g, n) == "lower" else min(vals[n])) if n in vals and g_dir(g, n) in ("lower", "higher") else "") for n in names) + " | |")
+                (str(max(vals[m["name"]]) if m["direction"] == "lower" else min(vals[m["name"]])) if m["name"] in vals and m["direction"] in ("lower", "higher") and applies(m, kind) else "") for m in shown) + " | |")
     return "\n".join(rows)
-
-
-def g_dir(g, name):
-    return next(m["direction"] for m in g["metrics"] if m["name"] == name)
 
 
 def set_summary(trials, prefix, g):
@@ -302,7 +395,9 @@ def set_summary(trials, prefix, g):
     for m in g["metrics"]:
         if not m.get("gate") or m["direction"] == "pass":
             continue
-        vals = [t["metrics"].get(m["name"]) for t in members.values()]
+        vals = [t["metrics"].get(m["name"]) for t in members.values() if applies(m, t["kind"])]
+        if not vals:
+            continue
         nums = [v for v in vals if isinstance(v, (int, float))]
         if len(nums) < len(vals):
             lines.append(f"- {m['name']}: pending in {len(vals) - len(nums)} trial(s)")

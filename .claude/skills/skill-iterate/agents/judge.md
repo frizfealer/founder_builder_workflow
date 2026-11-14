@@ -22,6 +22,8 @@ How to judge:
 - Read the whole finding before ruling. The summary line in the task file is for navigation;
   the finding's Quote, Evidence and Pattern are in the `round*-findings.md` files.
 - Do not grade the fix. Whether the finding was fixed well is not your metric.
+- Do not grade the refutation. When a task reproduces a finding's text and tells you not to open the
+  findings file, obey: the verifier's reasons are not evidence either way.
 
 Output: write the JSON object the task specifies to the path it names, and nothing else. No
 prose outside the JSON file. If a file the task names is missing, write the JSON with every

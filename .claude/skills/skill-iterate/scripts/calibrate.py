@@ -156,9 +156,13 @@ def score(folder):
     sealed = load(folder / "sealed.json")
     answers = {}
     for l in (folder / "answers.md").read_text().splitlines():
-        m = re.match(r"^([FR]\d+)\s*\|\s*([^|]*)\|?(.*)$", l)
+        m = re.match(r"^([FR]\d+)\s*\|\s*(.*)$", l)
         if m and m.group(2).strip():
-            answers[m.group(1)] = (norm(m.group(2)), m.group(3).strip())
+            rest = m.group(2)
+            # ruling = the first recognised word; everything after it is the note
+            rm = re.match(r"\s*(not real|style only|style|real|same|different)\b[\s\u258e|.,:-]*(.*)$", rest, re.I)
+            if rm:
+                answers[m.group(1)] = (norm(rm.group(1)), rm.group(2).strip())
     rows, agree, total = [], 0, 0
     by_pool = {}
     for item, s in sealed["findings"].items():
@@ -168,9 +172,11 @@ def score(folder):
         judge = norm(s["judge"])
         # the judge's Real/Not real on a dropped finding vs the human's: compare directly
         ok = human == judge
-        total += 1; agree += ok
+        # the metrics treat Not real and Style only alike (neither should be kept)
+        same_bucket = (human == "Real") == (judge == "Real")
+        total += 1; agree += same_bucket
         by_pool.setdefault(s["pool"], [0, 0]); by_pool[s["pool"]][0] += ok; by_pool[s["pool"]][1] += 1
-        rows.append(f"| {item} | {s['trial']} {s['id']} | {s['skill_decision']} | {judge} | {human} | {'✓' if ok else '✗'} | {why[:60]} |")
+        rows.append(f"| {item} | {s['trial']} {s['id']} | {s['skill_decision']} | {judge} | {human} | {'✓' if same_bucket else ('~' if ok else '✗')} | {why[:60]} |")
     r_agree = r_total = 0
     for item, s in sealed["recall"].items():
         if item not in answers:
@@ -179,6 +185,7 @@ def score(folder):
         ok = human == "same"
         r_total += 1; r_agree += ok
         rows.append(f"| {item} | {s['trial']} {s['match']}→{s['key']} | match | same | {human} | {'✓' if ok else '✗'} | {why[:60]} |")
+    print("Agreement is on the metric's bucket: Real vs (Not real | Style only). '~' = same bucket, different label.")
     print("| item | finding | skill | judge | you | agree | your note |")
     print("|---|---|---|---|---|---|---|")
     print("\n".join(rows))

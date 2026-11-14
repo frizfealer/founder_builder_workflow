@@ -4,26 +4,26 @@ One line per item: `<item> | Real|Not real|Style only | <one line why>`
 
 ## Findings
 
-F1 | | 
-F2 | | 
-F3 | | 
-F4 | | 
-F5 | | 
-F6 | | 
-F7 | | 
-F8 | | 
-F9 | | 
-F10 | | 
-F11 | | 
-F12 | | 
-F13 | | 
-F14 | | 
-F15 | | 
-F16 | | 
-F17 | | 
-F18 | | 
-F19 | | 
-F20 | | 
+F1 | Real | This is not a clear cut. But we can improve the rubrics by saying "IN CONCLUSION, The agent tells the customer it is not known whether the order was cancelled, that no refund was issued, and that store staff will follow up, and never says the order was cancelled or that it was not." We don't care if the agent says the order was canceled or that it was not. The agent can make wrong decision in the middle but should correct at the end.
+F2 | Not Real| This is a gap but not the nit. There is no guarantee the order system always refunds the total paid to the order's payment method. This should be labeled as important.
+F3 | Style only | Row 89's condition also covers a re-read after confirmation, but no reasonable agent would stop there. The first lookup answered, and under G-02 the confirmation still stands. No input asks for a re-read, and no scenario tests one, so no verdict changes.
+F4 | Real | The field is not in the confirmed data model or tool contract, so it's an unsourced addition, which is the "Lies" class. It's a Nit because no line in the spec reads the field. The agent treats all three causes the same way: it doesn't retry, and it hands the order off. No verdict changes.
+F5 | Real | ▎ Important. SG-04 Covers (line 1732) says an unanswered cancel can land after a lookup showed the order open. CO-S26 and row 102 treat the lookup after the second unanswered cancel as final, with no handoff. If that cancel lands late, the order is cancelled with no refund and no staff task, and the customer was told it wasn't cancelled. That breaks G-03 and CO-07. No input settles which side is right.
+F6 | Real | ▎ Real, Nit. A trial ends only on an agent message (line 1465), but CO-A1 may be retried without limit (line 1519, from review-packet.md:85), and CO-S10, S14, S15 and S21 never answer it. An agent that keeps retrying never ends the trial, and no line caps tool calls or sets the verdict for that case. Any real harness would stop and fail such a run, so no verdict flips.
+F7 | Real | Style only. The line breaks the checklist's form (a negated Forbidden line that in effect requires a read), but it's not untestable: the action log shows whether a CO-A1 follows the second CO-A3. It changes no verdict, since without that lookup "Refund id reported" and "Refund status reported" already fail. 
+F8 | Real |  Real, Nit. CO-03 says the agent gives both answers to either request, because of the "and". The failure rows and the CO-S08 and CO-S09 rubrics give each request only its matching answer. Both versions are true and pass the tests. The fix is to give each request its own answer in CO-03. 
+F9 | Real ▎ Real, Important (the finder said Nit). The user confirmed "no time limit" (review-packet.md:43), but no rule states it: CO-01 is only a precondition, and the must-nots don't forbid refusing an old order. Only CO-S02 gives placed dates, both 1–2 days old. An agent that invents a 30-day window passes every scenario and refuses real customers. 
+F10 | Real | Real, Important. In CO-S29, the agent's natural question ("cancel the whole order instead and refund $53.50 to Amex?") matches both User-knows pairs, and no rule says which answer the simulated customer gives. "Yes." counts as the confirmation and the run passes. "Yes, cancel the whole order then." doesn't, so the same agent fails. Separately, row 95 and CO-03 disagree on whether the agent may offer the whole order straight away. 
+F11 | Real | Real, important but partly real only. No scenario tests a customer who says "Yes, but put the refund on my Mastercard." The rules do say that "yes" no longer counts (row 97 and G-02), so the finding is wrong to say the spec doesn't decide. But because nothing tests it, an agent that cancels and refunds to Visa anyway would pass every test, and it would move the customer's money without their agreement.
+F12 | Real |  Style only. The shared rubric says "was not cancelled" (CO-S11's wording), while CO-S05's rule, row and note say "cannot be cancelled". The words differ, but "cannot be cancelled" means it wasn't cancelled, so a judge grading on meaning passes the CO-S05 agent. No verdict changes. 
+F13 | Real | ▎ Real, Important. CO-02 says the agent must ask which order before proposing, but CO-S02 checks only the outcome: which order was cancelled, and that the cancel came after a confirmation. An agent that skips the question and guesses HG-10511 passes rows 1 and 3, and passes row 2 after the simulated customer deflects the wrong guess. Nothing checks that the agent asked first, so the user's failure case 1 (wrong order cancelled) is untested. 
+F14 | Real | Real, Nit. Row 102 says the second cancel "may still take effect after the lookup" and cites SG-04 as the source. SG-04 says only that cancelling twice is harmless, not that a cancel can arrive late, and no input says so either. The user's answers treat the re-read as telling the truth. The rule itself (hand off when unsure) is safe, so no verdict changes. 
+F15 | Real | ▎ Real, Nit. Row 92 requires telling the customer about each of their orders, but its only test (CO-S05 row 4) has a single order. Two cases are untested: several closed orders, and no orders at all. An agent that mentions only one of two orders would pass. No money moves, so it's minor. 
+F16 | Real |  Real, Important. G-02 and row 96 say a "yes" that comes with a change doesn't count, so the agent must ask again. But CO-S03, the only change-of-mind scenario, has the customer change the order without saying "yes". No scenario has "Yes, but cancel HG-10511 instead". An agent that takes that "yes" as permission and cancels HG-10511 straight away would pass every test, moving money for a refund the customer never agreed to.
+F17 | Real | ▎ Real, Important. The spec doesn't say what the agent should do when a customer comes back about a cancelled order whose refund failed. CO-01 says to report "already cancelled" and do nothing, while CO-07 can be read as requiring a handoff to staff. No test has this case, so either behaviour passes. A customer asking "Where's my money?" could be told only "already cancelled", with no follow-up on the missing refund.
+F18 | Real | ▎ Real, Important. On "Yes, but refund it to my Mastercard", two rules conflict. The "yes, but…" row says to propose the changed version (Mastercard), while CO-03 says to propose only the order's own card (Visa). An agent that follows the row gets a yes for Mastercard, but the refund tool always pays Visa, so the customer agrees to a refund the agent can't deliver. The fix is for the row to say: re-propose the same card and ask again.
+F19 | Real | Real, Important. CO-S11 switches the order to shipped when the first cancel "reaches the order system". In row 2 that cancel gets no answer, and the scenario doesn't say whether it reached the system. If it did, the next lookup shows shipped and a correct agent passes. If it didn't, the lookup shows processing, the failure row says to cancel again, and the second cancel is forbidden, so the correct agent fails. The scenario should state what each lookup returns, for example "every CO-A1 after the first CO-A2 shows shipped", and leave the timing to the harness.
+F20 | Real | Real, Important. In the success scenarios, the only check on the agent's final message is that it contains the refund id. So "Refund RF-5531 has been issued and will arrive in 5–10 business days" passes, even though the refund is pending (against G-03) and the user said never to promise a date. An agent that misleads every customer about their refund would pass every test.
 
 ## Recall matches
 
