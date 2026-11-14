@@ -50,10 +50,11 @@ Claims, column by column:
   nobody has answered).
 - **system**: required for kind `system`, and must name a row of the Systems table. Blank
   otherwise.
-- **source**: `owner's words`, `proposed, accepted`, `spec only` or `nobody`.
-- **quote**: required when the source is `owner's words` or `proposed, accepted`. The text is
-  copied from the interview record: the owner's reply for `owner's words`, the accepted
-  question for `proposed, accepted`.
+- **source**: `owner's words`, `proposed, accepted`, `docs`, `spec only` or `nobody`. `docs` means
+  the skill read the claim in the system's docs (added 2026-11-14, SWITCH-PLAN.md ruling 1).
+- **quote**: required when the source is `owner's words`, `proposed, accepted` or `docs`. For the
+  first two the text is copied from the interview record: the owner's reply for `owner's words`,
+  the accepted question for `proposed, accepted`. For `docs` it is the page and the sentence.
 - **what ends it**: for kind `limit`, what stops the thing being limited. For a numeric bound
   this is the bound ("the second call"). For a limit set to none, it is what ends it anyway,
   or the bound the skill proposed. Blank for other kinds.
@@ -141,3 +142,8 @@ counts the complete paths that fit: one path, no path, or several (ambiguous).
 
 `answered_by` is `record` when the owner stand-in found the answer in the fixture, and
 `stand-in default` when it accepted the recommendation because the record is silent.
+
+A question that puts claims to the owner because of the skill's decision filter ends with the
+mark `Claims put to the owner: C-07, C-10.` The runner copies questions verbatim, so the mark
+reaches the log. The `owner_flags` metric counts the distinct ids in these marks (added
+2026-11-14, SWITCH-PLAN.md ruling 3).

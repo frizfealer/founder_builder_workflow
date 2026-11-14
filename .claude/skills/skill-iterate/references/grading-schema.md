@@ -61,7 +61,7 @@ The script belongs to the eval dir, not to the skill, so a skill change cannot m
 metrics read this way, by `eval/agent-spec/new-format/grader/grade_spec.py`: lint_errors,
 checker_selftest, unlisted_breaks, listed_breaks, one_path_share, uncovered_steps, quote_valid,
 unsourced_claims, answer_reach, guard_recommend, guard_none_limits, guard_money, guard_systems,
-owner_lines, chart_arrows, stand_in_defaults.
+owner_lines, chart_arrows, stand_in_defaults, questions_asked, owner_flags.
 
 `grade.py --grading <file>` grades against another grading file in the eval dir, such as a draft
 for a new kind. Trials whose kind that file does not define are skipped.

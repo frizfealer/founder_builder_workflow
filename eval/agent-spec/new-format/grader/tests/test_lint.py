@@ -68,3 +68,20 @@ def test_lint_quoted_source_without_quote(clean, copy_of):
     p = d / "claims.md"
     p.write_text(p.read_text().replace("| owner's words | at most one refund per order |", "| owner's words | |", 1))
     assert "claims.md: C-40 is sourced 'owner's words' but has no quote" in lint.lint(lint.parse(d))
+
+
+def test_lint_docs_source_accepted(clean, copy_of):
+    """Should accept a claim sourced to docs when it carries the page and sentence as its quote."""
+    d = copy_of(clean)
+    p = d / "claims.md"
+    p.write_text(p.read_text().replace("| owner's words | at most one refund per order |",
+                                       "| docs | docs.stripe.com/refunds: \"Refunds can fail.\" |", 1))
+    assert lint.lint(lint.parse(d)) == []
+
+
+def test_lint_docs_source_without_quote(clean, copy_of):
+    """Should report a claim sourced to docs that names no page or sentence."""
+    d = copy_of(clean)
+    p = d / "claims.md"
+    p.write_text(p.read_text().replace("| owner's words | at most one refund per order |", "| docs | |", 1))
+    assert "claims.md: C-40 is sourced 'docs' but has no quote" in lint.lint(lint.parse(d))

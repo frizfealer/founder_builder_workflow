@@ -22,8 +22,8 @@ CLAIMS_HEAD = ["id", "claim", "kind", "system", "source", "quote", "what ends it
 AGENT_HEAD = ["situation", "the agent", "rules"]
 DECISIONS_HEAD = ["id", "decision", "decided by", "reason"]
 KINDS = {"system", "policy", "limit", "money", "missing"}
-SOURCES = {"owner's words", "proposed, accepted", "spec only", "nobody"}
-QUOTED = {"owner's words", "proposed, accepted"}
+SOURCES = {"owner's words", "proposed, accepted", "docs", "spec only", "nobody"}
+QUOTED = {"owner's words", "proposed, accepted", "docs"}
 
 
 def blank(cell):

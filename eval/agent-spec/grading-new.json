@@ -183,6 +183,20 @@
    "about": "questions the stand-in answered by accepting the recommendation / questions asked"
   },
   {
+   "name": "questions_asked",
+   "kind": "code",
+   "gate": false,
+   "direction": "report",
+   "about": "entries in interview-log.json (SWITCH-PLAN.md ruling 3)"
+  },
+  {
+   "name": "owner_flags",
+   "kind": "code",
+   "gate": false,
+   "direction": "report",
+   "about": "distinct claims the skill's decision filter put to the owner, from the closing mark 'Claims put to the owner: C-..' of each question in interview-log.json; the owner's limit is 10 (SWITCH-PLAN.md ruling 3)"
+  },
+  {
    "name": "wall_clock_s",
    "kind": "code",
    "gate": true,

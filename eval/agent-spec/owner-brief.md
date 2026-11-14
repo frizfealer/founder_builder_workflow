@@ -8,5 +8,5 @@ interview in `review-packet.md`.
 | System | What it does for the agent | Owner | Docs |
 |---|---|---|---|
 | Order system | Lists the customer's orders, cancels an order, and issues the refund for an order. | Harbor Goods | None. |
-| Payment provider | Moves the refunded money back to the customer's payment method. The order system calls it; the agent does not. | An outside service like Stripe. | Public docs. |
+| Payment provider | Moves the refunded money back to the customer's payment method. The order system calls it; the agent does not. | An outside service like Stripe. | Public docs: Stripe's, at docs.stripe.com. |
 | Staff task queue | Takes the follow-up tasks the agent creates for store staff. | Harbor Goods | None. |

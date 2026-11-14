@@ -46,14 +46,23 @@ def quote_valid(spec, sources):
                  len(rows))
 
 
+def flagged(question):
+    """Claim ids a question names in its closing mark "Claims put to the owner: C-07, C-10." (FORMAT.md)."""
+    m = re.search(r"Claims put to the owner:\s*(C-\d+(?:\s*,\s*C-\d+)*)", question)
+    return re.findall(r"C-\d+", m.group(1)) if m else []
+
+
 def interview(trial):
     path = Path(trial) / "interview-log.json"
+    none = {"guard_recommend": None, "stand_in_defaults": None, "questions_asked": None, "owner_flags": None}
     if not path.exists():
-        return {"guard_recommend": None, "stand_in_defaults": None}
+        return none
     qs = json.loads(path.read_text(encoding="utf-8")).get("questions", [])
     if not qs:
-        return {"guard_recommend": None, "stand_in_defaults": None}
+        return none
     return {
+        "questions_asked": len(qs),
+        "owner_flags": len({c for q in qs for c in flagged(q.get("question", ""))}),
         "guard_recommend": round(sum(bool((q.get("recommended") or "").strip()) for q in qs) / len(qs), 2),
         "stand_in_defaults": round(sum(q.get("answered_by") == "stand-in default" for q in qs) / len(qs), 2),
     }
