@@ -1,0 +1,1 @@
+{"item": "F8", "verdict": "Real", "why": "CO-03 (line 68) requires both statements in every listed case, but failure rows (lines 94-95) and dimensions 'Whole order only explained' / 'Refund terms explained' (lines 1501-1502) each require only one, so two parts of the spec disagree and CO-S08 would pass an agent that omits the refund-terms statement the rule requires."}

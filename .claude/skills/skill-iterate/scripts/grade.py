@@ -2,12 +2,15 @@
 """Grade skill trials against a baseline, from eval/<skill>/grading.json and results/*/trial.json.
 
 Usage:
-  grade.py <eval-dir> [--labels a,b,c] [--set <prefix>] [--gate] [--json out.json]
+  grade.py <eval-dir> [--grading <file>] [--labels a,b,c] [--set <prefix>] [--gate] [--json out.json]
 
 Code metrics are computed here. Judge metrics (kind "judge" in grading.json) are read from
 results/<label>/judge/<metric>.verdict.json when present; otherwise a task file
 results/<label>/judge/<metric>.task.md is written for a fresh-context judge to answer, and the
 cell shows "pending". The /grade command dispatches those judges and reruns this script.
+
+--grading names the grading file inside <eval-dir> (default grading.json). Trials whose kind
+the grading file does not define are skipped.
 
 --set <prefix> groups labels <prefix>-1, <prefix>-2, ... and reports min/max across them.
 --gate exits 1 when any gated metric fails in any trial of the set (or of all labels given).
@@ -17,6 +20,7 @@ baseline value by more than `tolerance`. Baseline labels per kind come from grad
 import difflib
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -81,9 +85,10 @@ def code_metrics(t, g=None):
             elif s_.get("tokens") is not None:
                 cost += s_["tokens"] * r.get("blended", 0) / 1e6
         cost = round(cost, 2)
-    finders = [s for s in subs if s["kind"] == "finder" and not s.get("codex")]
-    kept = sum(r.get("kept", 0) for r in t["rounds"])
-    dropped = sum(r.get("dropped", 0) for r in t["rounds"])
+    rounds = t.get("rounds", [])  # kinds without finder rounds have none
+    finders = [s for s in subs if s.get("kind") == "finder" and not s.get("codex")]
+    kept = sum(r.get("kept", 0) for r in rounds)
+    dropped = sum(r.get("dropped", 0) for r in rounds)
     tool = [s["tool_uses"] for s in finders if s.get("tool_uses") is not None]
     dur = [s["duration_ms"] for s in finders if s.get("duration_ms") is not None]
     tok = [s["tokens"] for s in subs if s.get("tokens") is not None]
@@ -95,9 +100,9 @@ def code_metrics(t, g=None):
         "finder_duration_max_s": round(max(dur) / 1000) if dur else None,
         "tokens_total_k": round(sum(tok) / 1000) if tok else None,
         "cost_usd": cost,
-        "rounds_run": len(t["rounds"]),
+        "rounds_run": len(rounds),
         "kept_total": kept,
-        "important_kept": sum(r.get("important_kept", 0) for r in t["rounds"]),
+        "important_kept": sum(r.get("important_kept", 0) for r in rounds),
         "verifier_drop_rate": round(dropped / (kept + dropped), 2) if (kept + dropped) else None,
         "codex_subagents": sum(1 for s in subs if s.get("codex")),
         "effort": t.get("effort") or "?",
@@ -181,7 +186,7 @@ def write_judge_task(eval_dir, t, g, metric, folder):
     final_spec = t.get("final_spec", f"{folder}/agent-spec-final.md")
     snaps = sorted(p.name for p in (eval_dir / folder / "rounds").glob("round*-agent-spec.md")) if (eval_dir / folder / "rounds").exists() else []
     snap_note = (f" The spec as it stood after each round is in `{folder}/rounds/` ({', '.join(snaps)}); read a round-N finding against round{{N-1}}, which is the text it quoted.") if snaps else " No per-round snapshots exist for this trial; judge round-2 and round-3 findings from their own quoted text."
-    kept = [f for f in t["findings"] if f.get("kept")]
+    kept = [f for f in t.get("findings", []) if f.get("kept")]  # kinds without findings have none
     if metric in ("recall_key", "recall_found"):
         key = g["key"][kind]
         keytext = key_findings_text(eval_dir, key)
@@ -216,6 +221,19 @@ def write_judge_task(eval_dir, t, g, metric, folder):
             if metric == "dropped_real":
                 txt = blind_finding_text(real_folder, f["id"], f["round"])
                 body += ["", "```", txt or f"(text not found) Quote: {f.get('quote', '')}", "```", ""]
+    elif metric == "key_recall":
+        key = g["key"][kind]
+        keytext = key_findings_text(eval_dir, key)
+        inputs = ", ".join(f"`{p}`" for p in [ctx["packet"]] + ctx.get("inputs", []))
+        body = [f"# Judge task: key_recall for trial {t['label']}", "",
+                "You are checking whether known defects remain in a spec a trial wrote. You did not write the spec or the key. Read only; edit nothing.", "",
+                f"Apply the brief `{ctx['key_brief']}`. The final spec is the folder `{final_spec}`; read every file in it. The trial's interview log is `{folder}/interview-log.json`. Inputs: {inputs}.", "",
+                "For each KEY item below, decide whether the defect it describes is present in the final spec, avoided, or put to the owner as a decision, as the brief defines them.", "",
+                f"Output exactly one JSON object, nothing else, as the file `judge/{metric}.verdict.json`:",
+                '```json', '{"metric": "key_recall", "items": {"<KEY id>": "present|avoided|decision"}, "evidence": {"<KEY id>": "<one line: the file, row or rule and its words that show it>"}}', '```', "",
+                "## KEY items", ""]
+        for fid in key["ids"]:
+            body += [f"### {fid}", "```", keytext.get(fid, "(not found in key file)"), "```", ""]
     elif metric in ("input_coverage", "unsupported_statements"):
         inputs = ", ".join(f"`{p}`" for p in [ctx["packet"]] + ctx.get("inputs", []))
         body = [f"# Judge task: {metric} for trial {t['label']}", "",
@@ -269,6 +287,14 @@ def judge_metrics(eval_dir, t, g, folder):
                     out[m["name"]] = "pending"
                     continue
                 out[m["name"]] = round(sum(1 for k in ids if items.get(k) == "covered") / len(ids), 2)
+            elif m["name"] == "key_recall":
+                ids = g["key"][t["kind"]]["ids"]
+                items = v.get("items") or {}
+                if not items:
+                    write_judge_task(eval_dir, t, g, m["name"], folder)
+                    out[m["name"]] = "pending"
+                    continue
+                out[m["name"]] = round(sum(1 for k in ids if items.get(k) in ("avoided", "decision")) / len(ids), 2)
             elif m["name"] == "unsupported_statements":
                 if not isinstance(v.get("statements"), list):
                     write_judge_task(eval_dir, t, g, m["name"], folder)
@@ -314,12 +340,34 @@ def worse(direction, value, ref, tol):
     return False
 
 
+def spec_grader_metrics(eval_dir, t, g, label):
+    """Code metrics from the grading file's "spec_grader" script: run it on the trial's final spec, read its JSON.
+    Paths in "args" are relative to the eval dir; a comma-separated value is a list of paths."""
+    sg = g.get("spec_grader")
+    if not sg or t["kind"] not in sg.get("kinds", [t["kind"]]):
+        return {}
+    cmd = [sys.executable, str(eval_dir / sg["script"]), "--spec", str(eval_dir / final_spec_path(t, label)),
+           "--trial", str(eval_dir / "results" / label)]
+    for k, v in sg.get("args", {}).items():
+        cmd += [f"--{k}", ",".join(str(eval_dir / p) for p in v.split(","))]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0:
+        t.setdefault("warnings", []).append(f"spec_grader failed: {r.stderr.strip().splitlines()[-1:] or r.returncode}")
+        return {}
+    vals = json.loads(r.stdout)
+    if vals.get("_checker_error"):
+        t.setdefault("warnings", []).append(f"spec_grader checker: {vals['_checker_error']}")
+    names = {m["name"] for m in g["metrics"] if m["kind"] == "code" and applies(m, t["kind"])}
+    return {k: v for k, v in vals.items() if k in names}
+
+
 def artifact_metrics(eval_dir, t, g, label):
     """Code metrics read from the trial's files rather than trial.json."""
     out = {}
     for m in g["metrics"]:
         if m["name"] == "golden_distance" and applies(m, t["kind"]):
             out[m["name"]] = golden_distance(eval_dir, t, label, m)
+    out.update(spec_grader_metrics(eval_dir, t, g, label))
     return out
 
 
@@ -332,6 +380,9 @@ def evaluate(eval_dir, labels, g):
             print(f"skip {lab}: no trial.json", file=sys.stderr)
             continue
         t = load(tj)
+        if t["kind"] not in g["kinds"]:
+            print(f"skip {lab}: kind {t['kind']} is not in the grading file", file=sys.stderr)
+            continue
         row = code_metrics(t, g)
         row.update(artifact_metrics(eval_dir, t, g, lab))
         row.update(judge_metrics(eval_dir, t, g, results_dir / lab))
@@ -443,7 +494,7 @@ def main():
         print(__doc__)
         sys.exit(2)
     eval_dir = Path(args[0]).resolve()
-    g = load(eval_dir / "grading.json")
+    g = load(eval_dir / (args[args.index("--grading") + 1] if "--grading" in args else "grading.json"))
     labels = None
     prefix = None
     gate = "--gate" in args

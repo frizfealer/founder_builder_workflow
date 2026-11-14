@@ -1,0 +1,6 @@
+{"questions": [
+ {"n": 1, "question": "Which systems will the agent call, who owns each, and where are their docs?", "recommended": "The order system and the staff task queue, both owned by Harbor Goods; the payment provider behind refunds, an outside service.", "reply": "Yes.", "answered_by": "record"},
+ {"n": 2, "question": "Which orders can the agent cancel?", "recommended": "Only orders that have not shipped yet.", "reply": "Yes to all", "answered_by": "record"},
+ {"n": 3, "question": "Lookups may be retried without limit. What ends the retries?", "recommended": "Three tries, then treat the lookup as unanswered.", "reply": "Yes.", "answered_by": "stand-in default"},
+ {"n": 4, "question": "What should the agent say while it waits?", "recommended": "", "reply": "(no record)", "answered_by": "stand-in default"}
+]}

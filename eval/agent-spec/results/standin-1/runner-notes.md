@@ -1,0 +1,34 @@
+# Runner notes — standin-1
+
+- Setup: rule 6 points at new-format/FORMAT.md for the interview-log format, though rule 3 forbids new-format/. I grepped FORMAT.md for "interview-log". The 40 lines of grep context also showed part of its index.md and claims.md rules (column names). That was accidental exposure. I did not use it.
+- Step 1: the ledger was written from product-idea.md alone. Row 2 was marked proposed.
+- Step 2: grilling ran in 4 turns (12 questions). The stand-in quoted record passages beyond my questions, for example a later tool-set summary in turn 3, "issue_refund(order_number) (supplied)". I used its replies verbatim as the owner's answers. In the packet I marked issue_refund supplied because the record says so. My questions never asked about tools before step 3.8.
+- Step 3: I wrote 14 scenarios. The first checker run had 2 errors. Step 3.8 confirmation came back with 4 changes:
+  - cancel_order is idempotent, with OrderNotFound added.
+  - issue_refund gets OrderNotCancelled.
+  - The follow-up request is idempotent and retried once on no answer, then the agent sends the customer to support.
+  - list_orders includes cancelled orders.
+  These changed CO-08's text during writing, not as a step-4 fix, so I did not ask again. I added CO-S14.
+- Step 3.9: no merges. Final-state lines differed in every WARNING group.
+- Dispatch: all subagents were general-purpose, model opus. The three finders ran in parallel and each verifier ran after its merge. The harness did not report the token split (in, out, cache), only subagent_tokens.
+- Round 1 keep/drop:
+  - All 14 kept.
+  - R1-01: kept at the verifier's lower severity (Nit).
+  - R1-10: the verifier said Style only, but I kept it as a Nit. Rows with different Required counts break the Data variants rule of step 3.6, so the finding is structural, not about wording.
+  - R1-03: OrderNotFound has no plausible triggering state, so I left it open.
+- Round 2 keep/drop:
+  - R2-07 dropped. I agree that CO-07 and failure row 109 require the repeat outright.
+  - R2-08 dropped. I agree that the trajectory, note and dimension of CO-S17 require the proposal. The verifier called it borderline.
+  - R2-03 and R2-04: fixed only the parts the verifier could not refute.
+  - R2-01: I removed my own CO-S16 rather than invent a store/order-system disagreement.
+  - R2-02: changed a rule (CO-09), so it went to the stand-in as a before/after. It was accepted (stand-in default).
+  - R2-09: left open. A bound on unanswered reads would contradict the owner's "without limit".
+- Round 3 keep/drop:
+  - R3-09 dropped as Style only. I still reworded the step while fixing R3-04.
+  - R3-02: changed G-03, so it went to the stand-in and was accepted (stand-in default).
+  - R3-08: left open. The second unanswered cancel with the order still open is undecided by the inputs.
+  - R3-05: covered "refund to another card" before confirming. A change after confirming is open.
+- Round 3 ended at the cap. Its fixes were not reviewed again.
+- The stand-in was dispatched 7 times (turns 1–7), with 15 questions in all. 11 were answered from the record and 4 by stand-in default (Q9, Q12, Q14, Q15).
+- report.md: the Write tool refused it ("Subagents should return findings as text"). The report text goes in the hand-back under REPORT.MD, as rule 17 says.
+- Helper scripts I wrote are in run-standin-1/: build_log.py, merge.py, fix_r1.py, fix_r2.py and fix_r3.py. They do not count as script errors. The skill's checker never failed to run. Its non-zero exits were spec errors that I fixed.

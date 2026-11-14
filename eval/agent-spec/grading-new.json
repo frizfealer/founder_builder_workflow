@@ -1,0 +1,242 @@
+{
+ "skill": "agent-spec",
+ "status": "DRAFT 2026-11-14 (HARNESS-PLAN.md step 5). Not in use: grading.json stays the live file until the build2 baseline is graded (step 8). Run with: grade.py eval/agent-spec --grading grading-new.json --labels <labels>.",
+ "fixture": "Harbor Goods: product-idea.md, the recorded owner answers in review-packet.md, and owner-brief.md (step 7); the skill runs steps 1-5 with an owner stand-in and writes a new-format spec folder (new-format/FORMAT.md).",
+ "kinds": {
+  "build2": {
+   "description": "steps 1-5 from product-idea.md with the owner stand-in (PROMPT-build2.md, step 7); output is a new-format spec folder named by trial.json final_spec, plus interview-log.json in the results folder. Baseline: three trials of the switched skill (step 8).",
+   "baseline_labels": []
+  }
+ },
+ "key": {
+  "build2": {
+   "file": "new-format/key-build2.md",
+   "ids": [
+    "M1",
+    "M3",
+    "P7",
+    "P10",
+    "P21",
+    "P25",
+    "P26",
+    "F2",
+    "F8"
+   ],
+   "status": "FROZEN 2026-11-14 (HARNESS-PLAN.md step 6): section 4's 9 items. Reported, not gated, until the owner reviews the items (owner ruling 3)."
+  }
+ },
+ "judge_context": {
+  "spec_for_kind": {
+   "build2": null
+  },
+  "packet": "review-packet.md",
+  "inputs": [
+   "product-idea.md",
+   "owner-brief.md"
+  ],
+  "key_brief": "new-format/judge-brief-key.md"
+ },
+ "spec_grader": {
+  "script": "new-format/grader/grade_spec.py",
+  "kinds": [
+   "build2"
+  ],
+  "args": {
+   "sources": "review-packet.md,owner-brief.md",
+   "units": "new-format/grader/answer-units.json"
+  },
+  "about": "Frozen copies of the lint and the checker, not the skill's own scripts (skill-iterate rule 5). answer-units.json is frozen (step 6)."
+ },
+ "tolerance": 0.1,
+ "metrics": [
+  {
+   "name": "integrity",
+   "kind": "code",
+   "gate": true,
+   "direction": "pass",
+   "about": "no failure of a script that ships with the skill, the skill's checker ended at 0 errors, no question to the user"
+  },
+  {
+   "name": "lint_errors",
+   "kind": "code",
+   "gate": true,
+   "direction": "lower",
+   "max": 0,
+   "about": "errors from the frozen lint (new-format/grader/lint.py) on the final spec: missing files or fields, ids that repeat or do not resolve, a rule resting on nothing, a scenario citing no rule, broken links"
+  },
+  {
+   "name": "checker_selftest",
+   "kind": "code",
+   "gate": true,
+   "direction": "pass",
+   "about": "the frozen checker runs the trial's model.py and the model's deliberately broken SELFTEST rule yields a break"
+  },
+  {
+   "name": "unlisted_breaks",
+   "kind": "code",
+   "gate": true,
+   "direction": "lower",
+   "max": 0,
+   "about": "breaks the frozen checker finds that policy.md does not list (rule id and reason must match)"
+  },
+  {
+   "name": "listed_breaks",
+   "kind": "code",
+   "gate": false,
+   "direction": "report",
+   "about": "breaks listed on policy.md; each one is an owner decision"
+  },
+  {
+   "name": "one_path_share",
+   "kind": "code",
+   "gate": true,
+   "direction": "higher",
+   "about": "model-path scenarios that replay to exactly one path / model-path scenarios; gated against the build2 baseline"
+  },
+  {
+   "name": "uncovered_steps",
+   "kind": "code",
+   "gate": false,
+   "direction": "lower",
+   "about": "steps the frozen checker finds reachable (chart state and step label) that no scenario's path takes; reported, not gated"
+  },
+  {
+   "name": "quote_valid",
+   "kind": "code",
+   "gate": true,
+   "direction": "higher",
+   "min": 1.0,
+   "about": "claims rows sourced \"owner's words\" whose quote is in the sources verbatim (after lower-casing and collapsing whitespace) / such rows"
+  },
+  {
+   "name": "unsourced_claims",
+   "kind": "code",
+   "gate": false,
+   "direction": "lower",
+   "about": "claims rows sourced \"nobody\" or \"spec only\""
+  },
+  {
+   "name": "answer_reach",
+   "kind": "code",
+   "gate": true,
+   "direction": "higher",
+   "about": "recorded answer units (answer-units.json) that some claims row quotes / units; gated against the build2 baseline"
+  },
+  {
+   "name": "guard_recommend",
+   "kind": "code",
+   "gate": true,
+   "direction": "higher",
+   "min": 1.0,
+   "about": "questions in interview-log.json with a recommended answer / questions asked"
+  },
+  {
+   "name": "guard_none_limits",
+   "kind": "code",
+   "gate": true,
+   "direction": "higher",
+   "min": 1.0,
+   "about": "claims rows of kind limit with 'what ends it' filled / limit rows (1.0 when there are none)"
+  },
+  {
+   "name": "guard_money",
+   "kind": "code",
+   "gate": true,
+   "direction": "higher",
+   "min": 1.0,
+   "about": "claims rows of kind money with the mismatch column filled / money rows (1.0 when there are none)"
+  },
+  {
+   "name": "guard_systems",
+   "kind": "code",
+   "gate": true,
+   "direction": "higher",
+   "min": 1.0,
+   "about": "systems (Systems rows, and systems named by system claims) whose Systems row has owner and docs filled / systems"
+  },
+  {
+   "name": "key_recall",
+   "kind": "judge",
+   "gate": false,
+   "direction": "higher",
+   "about": "key items (new-format/key-build2.md) the final spec avoids or puts to the owner as a decision / 9; judge applies new-format/judge-brief-key.md; reported, not gated (owner ruling 3)"
+  },
+  {
+   "name": "owner_lines",
+   "kind": "code",
+   "gate": true,
+   "direction": "lower",
+   "about": "non-blank lines of index.md, claims.md, rules.md and policy.md; gated against growth"
+  },
+  {
+   "name": "chart_arrows",
+   "kind": "code",
+   "gate": false,
+   "direction": "report",
+   "about": "arrows in chart.mmd, not counting the start arrow; DECISIONS asks for about 20"
+  },
+  {
+   "name": "stand_in_defaults",
+   "kind": "code",
+   "gate": false,
+   "direction": "report",
+   "about": "questions the stand-in answered by accepting the recommendation / questions asked"
+  },
+  {
+   "name": "wall_clock_s",
+   "kind": "code",
+   "gate": true,
+   "direction": "lower",
+   "about": "step 1 start to step 5 end"
+  },
+  {
+   "name": "tokens_total_k",
+   "kind": "code",
+   "gate": false,
+   "direction": "lower",
+   "about": "sum of subagent tokens / 1000"
+  },
+  {
+   "name": "cost_usd",
+   "kind": "code",
+   "gate": false,
+   "direction": "lower",
+   "about": "subagent tokens x model_rates"
+  },
+  {
+   "name": "effort",
+   "kind": "code",
+   "gate": false,
+   "direction": "report",
+   "about": "session effort level"
+  }
+ ],
+ "model_rates": {
+  "_about": "USD per million tokens. in/out/cache_read are used when a subagent row carries tokens_in/tokens_out/tokens_cache_read; blended is used when it carries only tokens. blended = in x 1.96, measured on it4b-3 (2026-11-11): output 19 % of counted tokens, cache reads 4.9x the counted tokens. Re-measure when the brief or roles change.",
+  "opus": {
+   "in": 4.0,
+   "out": 20.0,
+   "cache_read": 0.2,
+   "blended": 7.84
+  },
+  "sonnet": {
+   "in": 2.0,
+   "out": 10.0,
+   "cache_read": 0.1,
+   "blended": 3.92
+  },
+  "haiku": {
+   "in": 0.5,
+   "out": 2.5,
+   "cache_read": 0.05,
+   "blended": 0.98
+  },
+  "codex": {
+   "in": 0.0,
+   "out": 0.0,
+   "cache_read": 0.0,
+   "blended": 0.0
+  },
+  "default": "opus"
+ }
+}

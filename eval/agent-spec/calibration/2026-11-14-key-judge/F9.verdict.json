@@ -1,0 +1,1 @@
+{"item": "F9", "verdict": "Real", "why": "Owner confirmed 'no time limit' (packet round 2 Q1); CO-01 (line 62) turns only on status and the only placed dates in any Initial state are CO-S02's 2026-11-03/04 (line 182), so no scenario would fail an agent that invents a cancellation window, a test-passes-a-rule-breaker defect."}

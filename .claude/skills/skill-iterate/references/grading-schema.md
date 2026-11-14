@@ -17,7 +17,8 @@ One per managed skill at `eval/<skill>/grading.json`. Changing it is a human dec
     "spec_for_kind": {"<kind>": "<frozen artifact the findings refer to>"},
     "packet": "<inputs the reviewers were given>",
     "inputs": ["..."],
-    "verifier_brief": "<rubric the false-positive judge applies>"
+    "verifier_brief": "<rubric the false-positive judge applies>",
+    "key_brief": "<rubric the key_recall judge applies>"
   },
   "tolerance": 0.10,
   "metrics": [
@@ -48,5 +49,19 @@ One per managed skill at `eval/<skill>/grading.json`. Changing it is a human dec
 
 Code metrics `grade.py` knows: integrity, wall_clock_s, finder_tool_calls_max,
 finder_duration_max_s, tokens_total_k, rounds_run, kept_total, important_kept,
-verifier_drop_rate, codex_subagents. Judge metrics: recall_key, recall_found, false_positives (with derived fp_important / fp_nit), dropped_real. Adding a metric
+verifier_drop_rate, codex_subagents. Judge metrics: recall_key, recall_found, false_positives (with derived fp_important / fp_nit), dropped_real, key_recall (share of the kind's
+key items the final spec avoids or puts to the owner as a decision). Adding a metric
 means adding it to `grade.py` and to this list in the same commit.
+
+**spec_grader** (optional) — `{"script": "<path>", "kinds": ["..."], "args": {"<name>": "<path>[,<path>]"}}`.
+For each trial of those kinds, `grade.py` runs the script with `--spec <final_spec> --trial
+<results folder>` plus `--<name> <path>` for each arg (paths relative to the eval dir), reads one
+JSON object from its stdout, and takes the values of the code metrics the grading file lists.
+The script belongs to the eval dir, not to the skill, so a skill change cannot move it. Code
+metrics read this way, by `eval/agent-spec/new-format/grader/grade_spec.py`: lint_errors,
+checker_selftest, unlisted_breaks, listed_breaks, one_path_share, uncovered_steps, quote_valid,
+unsourced_claims, answer_reach, guard_recommend, guard_none_limits, guard_money, guard_systems,
+owner_lines, chart_arrows, stand_in_defaults.
+
+`grade.py --grading <file>` grades against another grading file in the eval dir, such as a draft
+for a new kind. Trials whose kind that file does not define are skipped.

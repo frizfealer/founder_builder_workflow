@@ -1,0 +1,1 @@
+{"item": "F6", "verdict": "Real", "why": "§5.1 End of trial counts only agent messages (text sent with a tool call is not one), Appendix A and CO-06 let CO-A1 repeat without limit, and CO-S10/S14/S15/S21 leave later CO-A1 calls unanswered, so nothing in the spec ends a trial where the agent keeps retrying the lookup; no verdict is defined for it."}
