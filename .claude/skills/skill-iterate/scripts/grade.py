@@ -121,25 +121,54 @@ def key_findings_text(eval_dir, key):
 
 def blind_finding_text(folder, fid, rnd):
     """A finding's own block (header, Quote, Evidence, Pattern) from round<rnd>-findings.md, with every
-    verifier / decision / status line cut, so a judge rules on the finding, not on the refutation."""
+    verifier / decision / status line cut, so a judge rules on the finding, not on the refutation.
+    Handles three layouts seen so far: bare body under the header; body in a code fence; and
+    'Finder <name> wrote:' followed by a fenced copy under the finder's local id (F4, N2, ...)."""
     f = folder / f"round{rnd}-findings.md"
     if not f.exists():
         return ""
     lines = f.read_text().splitlines()
-    hdr = re.compile(r"^(?:##\s*)?" + re.escape(fid) + r"\b")
+    hdr = re.compile(r"^(?:##+\s*)?" + re.escape(fid) + r"\b")
     start = next((i for i, l in enumerate(lines) if hdr.match(l)), None)
     if start is None:
         return ""
     head = re.sub(r"\s+[\u2014-]+\s+(kept|dropped|Pre-existing)\b.*$", "", lines[start], flags=re.I)
-    out = [head]
+    any_id = r"(?:R\d-L?\d+|[MNP]\d+)"
+    # 1. the finding's section: up to the next finding header
+    section = []
     for l in lines[start + 1:]:
-        if re.match(r"^(?:##\s*)?[A-Z]\d-L?\d+\s*(\||\()", l) or l.startswith("## "):
+        m = re.match(r"^(?:##+\s*)?(" + any_id + r")\b", l)
+        if (m and m.group(1) != fid) or (l.startswith("## ") and not hdr.match(l)):
             break
-        if re.match(r"^\**\s*(Verifier|Verifiers?|Decision|Decision reason|Status|Routing|Standard verifier|Adversarial verifier|Outcome|Kept|Dropped|Disposition)\b", l.strip(), re.I):
+        section.append(l)
+    has_body = lambda txt: re.search(r"^(Quote|Evidence|Pattern):", txt, re.M) is not None
+    meta = re.compile(r"^\**\s*(Verifier|Verifiers?|Decision|Decision reason|Status|Routing|Standard verifier|Adversarial verifier|Outcome|Kept|Dropped|Disposition)\b", re.I)
+    # 2. prefer a fenced copy of the finding, unless a verifier line introduces the fence
+    i, prev = 0, ""
+    while i < len(section):
+        l = section[i]
+        if l.strip().startswith("```"):
+            j = i + 1
+            while j < len(section) and not section[j].strip().startswith("```"):
+                j += 1
+            block = "\n".join(section[i + 1:j]).strip()
+            if has_body(block) and not re.search(r"verifier|adversarial|refut", prev, re.I):
+                return (head + "\n" + block).strip()
+            i = j + 1
+            continue
+        if l.strip():
+            prev = l
+        i += 1
+    # 3. bare body: walk until a verifier / decision line
+    out = [head]
+    for l in section:
+        if meta.match(l.strip()):
             break
+        if l.strip() == "```":
+            continue
         out.append(l)
-    return "\n".join(out).strip()
-
+    body = "\n".join(out).strip()
+    return body if has_body(body) else ""
 
 def write_judge_task(eval_dir, t, g, metric, folder):
     jd = folder / "judge"
@@ -177,7 +206,7 @@ def write_judge_task(eval_dir, t, g, metric, folder):
                 ("You are checking whether each kept finding is a real defect." if metric == "false_positives" else "You are checking whether each DROPPED finding was a real defect the verifier should have kept. The verifier's refutation is recorded with the finding; judge the finding, not the refutation.") + " You did not write the spec or the findings. Read only; edit nothing.", "",
                 f"Read the review packet `{ctx['packet']}`, the sources it lists, and the spec `{spec}`. Apply the verifier brief in `{ctx['verifier_brief']}`: a finding is Real when the defect exists as described and belongs to its class; Not real when the spec or the inputs refute it (quote what refutes it); Style only when it concerns wording or preference and changes no verdict.", "",
                 (f"The findings with their evidence are in `{findings_glob}`; the ids to judge are listed below." if metric == "false_positives"
-                 else "Each finding's own text (header, Quote, Evidence, Pattern) is reproduced below. Do NOT open the round*-findings.md files: they carry the verifier's refutation, and you are judging the finding against the spec and the inputs, not the refutation. Calibration on 2026-11-11 showed the judge agreeing with refutations a human rejected.")
+                 else "Each finding's own text (header, Quote, Evidence, Pattern) is reproduced below. The ONLY files you may open are the spec snapshots named here, the review packet, the inputs it lists, and the judge brief. Do NOT open round*-findings.md, report.md, run.log, runner-notes.md or any other file in the results folder: they carry the verifier's refutation and the runner's reasons, and you are judging the finding against the spec and the inputs, not the refutation. If a finding's text below is missing, return null for it with the reason; do not reconstruct it from other files. Calibration on 2026-11-11 showed the judge agreeing with refutations a human rejected.")
                 + " A finding whose round is 2 or 3 refers to the spec as it stood after the previous round's fixes" + (f"; `{final_spec}` is the end state." if final_spec else "; no end-state copy exists for this trial, judge from the finding's own evidence.") + snap_note, "",
                 f"Output exactly one JSON object, nothing else, as the file `judge/{metric}.verdict.json`:",
                 '```json', '{"metric": "' + metric + '", "verdicts": {"<finding id>": "Real|Not real|Style only"}, "evidence": {"<finding id>": "<one line>"}}', '```', "",
