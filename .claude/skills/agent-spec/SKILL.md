@@ -1,25 +1,23 @@
 ---
 name: agent-spec
-description: Write an Agent Spec, the behavior contract for an LLM agent, with numbered rules, key-example scenarios that a downstream skill converts to executable tests line by line, without rewording, and an evaluation plan.
-argument-hint: <product dir, documents or code paths> [capability to add or change | findings file]
+description: Write an Agent Spec, the behavior contract for an LLM agent, as a folder the owner reads in three pages (claims, rules, policy), with a policy model a checker tests in every reachable state and scenarios derived from it.
+argument-hint: <product dir, documents or code paths> [change to the capability | findings file]
 disable-model-invocation: true
 ---
 
 # Agent Spec
 
-An Agent Spec is a behavior contract for an LLM agent. It states what the agent may do, what it must not do, when it is authorized to act, what counts as success or violation, and which invariants hold across world states. Every rule is illustrated by at least one key example, and every key example is written so that a downstream skill converts it into an executable test without rewording.
+An Agent Spec is a behavior contract for an LLM agent. It says what the agent relies on about outside systems and the business, what the agent must and must not do, and the owner's decisions behind each rule. A small policy model states the rules as states and steps, and a checker tests every rule in every state the model can reach.
 
-Write one file, `agent-spec.md`, in the product directory the user named, or beside the inputs when no directory was named. Nothing else changes: product code, tests, architecture notes and tickets are other skills' work. When an `agent-spec.md` already exists and the user named a capability to add or change, touch only that capability's section and the Evaluation table rows it affects, keep every existing rule and scenario id stable, and apply the coverage conditions of step 3.6 to every rule, rule clause and failure row the change adds before verifying.
+Write one folder, `agent-spec/`, in the product directory the user named, or beside the inputs when none was named. It holds the files of the templates in [assets/](assets/), plus `policy.md` and `chart.mmd`, which the checker writes. The owner reads three pages, in this order, from `index.md`: `claims.md`, `rules.md`, `policy.md`. `model.py` and `scenarios.md` are for programs and later stages. [The café example](examples/cafe/) is a finished spec folder with its interview log; match its shape and detail. Nothing else changes: product code, tests, architecture notes and tickets are other skills' work.
 
-When an `agent-spec.md` already exists and the user passed a findings file, update from the findings. The file may be free-form; each finding names the scenario id and quotes the spec line it is about. Apply a finding only when its fix is to the spec. Report every other finding back unapplied with its reason: it names no scenario id, it quotes no spec line, or its fix belongs elsewhere, such as in the test code or the agent under test. Touch only the lines the applied findings quote and the lines that repeat their pattern, keep every rule and scenario id stable, and apply the coverage conditions of step 3.6 to anything a fix adds.
+One folder holds one capability, because `model.py` is one model. A second capability gets its own folder.
 
-In every run, in the fixes of step 4.5 and in every update, a fix that changes a rule's text stops at that rule. Show the user the rule before and after the proposed change, apply only the other lines the fix quotes, and report the rule change as a proposed finding for the user to decide. This applies to every rule, including one an earlier round of this run added.
+**Plain words.** Write every claim, rule and decision in the owner's words. A term you coin is defined in one line where it first appears, and used in its everyday sense or not at all. A rule id never stands in for a sentence the owner needs to read.
 
-In every update run, re-sync the spec's §5.1 and §5.2 fixed text from [the template](assets/agent-spec.template.md) before step 4 begins; step 4 itself never edits that text, and a run that starts at step 4 does not re-sync. The re-sync replaces that text and keeps these values from the spec:
-- the dimension table;
-- the trial count;
-- the message cap;
-- any metric the user asked for.
+**Updates.** When the folder exists and the user names a change to its capability, change only the claims, rules, model lines and scenarios the change touches, keep every id stable, and run steps 3.3 to 5. When the user passes a findings file instead, apply each finding whose fix is to the spec; report every other finding back unapplied with its reason (it quotes no spec line, or its fix belongs in the test code or the agent under test); then run steps 3.3 to 5.
+
+**A fix that changes a rule's text stops at that rule.** In every run, show the owner the rule before and after the proposed change, apply only the other lines the fix touches, and report the rule change as a proposal for the owner to decide. This holds for every rule, including one this run added.
 
 ## 1. Collect the inputs
 
@@ -27,191 +25,170 @@ Read every document and code path the user passed before asking anything. Then f
 
 | # | Input | Required | Status | Source or gap |
 |---|---|---|---|---|
-| 1 | Capabilities, each marked state-changing or read-only | yes | found / partial / missing | |
-| 2 | Tools: name, parameters, return values, failure modes | yes | | |
-| 3 | Data model: entities and fields | yes | | |
-| 4 | Authorization policy: what counts as permission to act, what invalidates it | no | | |
+| 1 | The capability: the customer's goal and what starts it | yes | found / partial / missing | |
+| 2 | Systems and tools: each system the tools reach, its owner and its docs; each tool's parameters, returns and failures | yes | | |
+| 3 | Data: the records and fields the rules depend on | yes | | |
+| 4 | Authorization: what counts as permission to act, what voids it | no | | |
 | 5 | Domain rules | no | | |
 | 6 | Known failure cases or transcripts | no | | |
 
-For input 2, also note which tools only read and which change state; Appendix A needs the read-only list.
+*Found* means complete enough to write from; *partial* means a named piece is missing; *missing* means nothing was supplied. Row 2 may be *proposed* when the inputs define no tools: step 3.4 then proposes the tool set. Code counts as a source: a tool's signature and its raised exceptions are row 2.
 
-*Found* means the input is complete enough to write from. *Partial* means it exists but a named piece is missing (a tool with no failure modes, an entity with no fields). *Missing* means nothing was supplied. *Proposed* applies to row 2 only: if the inputs define no tools at all, mark row 2 proposed instead of missing, and step 3.8 proposes the tool set. Code counts as a source: a tool's signature and its raised exceptions are input 2, a schema or model class is input 3.
+Check row 1 against the user-goal tests of [the use-case checklist](references/cockburn-checklist.md).
 
 Done when every row has a status and either a source or a one-line description of the gap.
 
-## 2. Interview for the gaps
+## 2. Interview
 
-Interview only for the product inputs, rows 1 and 3 to 6, that are marked partial or missing. Row 2 waits for step 3.8, because the tools follow from actions that step 3 writes. Ask at most 4 questions per turn, the most blocking first, each with your recommended answer so that "yes" accepts it.
+These rules hold for every question you put to the owner, in this step and in steps 3.4 and 4.5.
 
-If the available skills include `grilling` or `grill-with-docs` (under any plugin prefix), invoke `grilling` with those partial and missing rows as the agenda; use `grill-with-docs` only when `grilling` is absent. The 4-questions-per-turn cap still applies. Otherwise interview directly in the same format.
+> **Facts are your job; decisions are the owner's.** Ask at most 4 questions per turn. Every
+> question carries your recommended answer, written so that "yes" accepts it. Do not send a
+> question without one.
+>
+> **First question: the systems.** Before any other question, ask which systems the agent's tools
+> reach, directly or behind another system, who owns each, and where its docs are. Recommend the
+> systems the inputs name. Write one row per system in the Systems table.
+>
+> **Claims about a system.** For each claim about how a system behaves (what a call returns, what
+> a lookup shows and when, what a repeated call does): if the system has docs, read them and settle
+> the claim yourself; record the page and the sentence. Ask the owner only when the docs contradict
+> what the owner said, and quote both. If the system has no docs, compare the claim with common
+> systems of that kind. Where it differs, ask the owner, as a decision: state the difference and
+> what the agent does under each answer.
+>
+> **Policy choices.** Never call a policy choice unusual, common or risky. Show what it leads to:
+> the shortest path through the policy where the choice changes what the agent does, in plain
+> steps. Recommend the choice the owner's words support.
+>
+> **Limits set to none.** When the owner sets a limit to none, or nothing in the inputs bounds a
+> repeated thing (retries, lookups, follow-ups, orders per conversation), ask what ends it. If
+> nothing does, recommend a bound and what the agent does when it is reached. Write the answer in
+> the claim's "what ends it" cell.
+>
+> **Money from a tool.** For each amount the agent states or passes on from a tool, ask what the
+> agent does when the tool's value differs from the value the customer confirmed. Recommend: the
+> agent makes no further change with the new value, tells the customer the value the tool
+> returned, and hands the case to staff. Write the answer in the claim's "if it differs" cell.
+>
+> **The decision filter.** Put a claim to the owner only when all three hold: no source settles
+> it (the owner did not say or accept it, and no docs state it); a rule rests on it; and the other
+> answer would change a step of `model.py` (a tool outcome, a starting state, or what the agent
+> does). Record every other claim with its source and do not ask. If more than 10 claims pass,
+> ask the 10 whose other answer would move money or change an order, and write the rest as kind
+> `missing`, source `nobody`.
 
-For the optional inputs, ask once. If the user has nothing, record *none* and proceed. For input 4 when it is none, propose this default and ask the user to confirm it in the same turn: a state-changing call is authorized only by the user's explicit confirmation of the full proposal that call executes, and any change to the proposal voids the confirmation.
+End a question that puts claims to the owner under the decision filter with the line `Claims put to the owner: C-07, C-10.`, naming each claim it puts.
 
-Done when rows 1 and 3 are found and every optional row is found or recorded as none, with any default the user accepted written into the ledger.
+In this step, ask the systems question, then the gaps of rows 1 and 3 to 6, most blocking first. Row 2's tools wait for step 3.4 when they are proposed. For an optional row, ask once; if the owner has nothing, record *none*. For row 4 when it is none, recommend: a write happens only after the customer says yes to the full proposal it carries out, and any change to the proposal voids that yes.
+
+Keep every question, its recommendation and the reply verbatim; step 4.2 copies them, and every quote in `claims.md` is copied from them.
+
+Done when the Systems table has a row for every system, rows 1 and 3 are found, and every optional row is found or recorded as none.
 
 ## 3. Write the spec
 
-Fill [the template](assets/agent-spec.template.md) in its section order with its headings. [The café example](examples/cafe/agent-spec.md) shows one capability with its scenarios; match the shape and detail of each block. Its scenario count is a sample, not a target. Write the sections in the order below, because each depends on the one before.
+### 3.1 Claims and rules
 
-### 3.1 Purpose
+Fill `claims.md`, `rules.md` and `index.md` from the templates in [assets/](assets/). Work the tool outcomes with the brainstorm in [the use-case checklist](references/cockburn-checklist.md) first, so each outcome the agent can detect becomes a system claim and a row of "What the agent does".
 
-One paragraph: what the agent is for, who uses it, which parts of the world it may change.
+- Every claim names its source. *owner's words* and *proposed, accepted* carry the reply or the accepted question as their quote, copied verbatim; *docs* carries the page and the sentence. A claim you could not source is *spec only*; a question nobody has answered is kind `missing`, source `nobody`.
+- Every rule rests on the claims and decisions it comes from. Every choice the owner made, or accepted from a recommendation, is a decision row.
+- "What the agent does" has one row per situation the agent can be in, in the order a conversation meets them. It is the policy the model encodes.
 
-### 3.2 Stakeholders & Interests
+Done when every interview answer is carried by a claim or a rule, and every rule rests on something.
 
-Name the primary actor, the supporting actors and the offstage stakeholders, each with its interest as a sentence. Apply the Stakeholders section of [the use-case checklist](references/cockburn-checklist.md). Write this before any rule: the interests are where the rules come from, and the reviewers in step 4 read the rules against this list.
+### 3.2 The model
 
-Done when every party has at least one stated interest and every interest names its party.
+Write `model.py` from [the model template](assets/model.template.py), whose docstring states the interface the checker uses. One setup step per starting situation `claims.md` allows, one system step per outcome a system claim gives a tool call, one agent step per row of "What the agent does". Give every rule the model can express an entry in RULES, and keep SELFTEST a rule that must break.
 
-### 3.3 Capability list
+Name chart states for what the owner would see happening, group them into PHASES, and give an `action` to steps the owner would call one action, so the chart has about 20 arrows. Bound every repeated thing by its claim's "what ends it", so the model is finite.
 
-List the capabilities from input 1 and test each against the user-goal tests in the use-case checklist: it passes the go-home-happy test (when it is done, the user can stop and be satisfied), and it fits one conversation. Raise a capability that is really a step by asking why the user wants it; split one that is really two goals. Give each a two-letter prefix and keep its state-changing or read-only mark. A capability is state-changing when any of its actions is, and read-only otherwise.
+Done when `model.py` imports and every row of "What the agent does" has its agent step.
 
-Done when every capability passes the user-goal tests and has a unique prefix.
+### 3.3 Check
 
-### 3.4 Global Contract
+```bash
+uv run python .claude/skills/agent-spec/scripts/check.py <product dir>/agent-spec --write
+```
 
-Write the rules that hold for every state-changing capability, numbered G-01 onward, each tagged [minimal guarantee] or [success guarantee]. Derive them from the authorization policy (input 4) and the offstage interests: truthful reporting of outcomes, no changes outside the current request, authorization current at the moment of each write, no blind retry after an unknown result. A rule that holds for only one capability belongs in that capability.
+It runs the lint, walks the model, and writes `policy.md` and `chart.mmd`. Its first line counts errors. Fix every error and rerun. For each break it lists:
 
-Done when every global rule traces to an interest or to the authorization policy.
+- If the model does something its row does not say, fix the model.
+- If the rules disagree, or leave a case with no row (the break `no-step`), the case goes to the owner in step 3.4.
 
-### 3.5 Each capability
+Done when the first line reads "0 errors" and every break left is one only the owner can settle.
 
-For each capability, in this order:
+### 3.4 Decision turn
 
-- **Scope & Authority.** "The agent may" lists the actions inside the goal, at the level of intent. "The agent must not" lists the adjacent writes and inferences the capability does not authorize.
-- **Preconditions and Trigger.** A precondition is guaranteed before the capability starts and never re-checked inside it. The trigger is an event the agent can perceive.
-- **Contract.** Rules numbered `<PREFIX>-01` onward, each tagged [minimal guarantee] (holds on every exit, including abandonment) or [success guarantee] (holds on success). Write the guarantees by asking what would make each stakeholder unhappy on failure and on success, then writing the negation. Rules name intent, never tool mechanics or wording.
-- **Failure handling.** Brainstorm before writing: walk every state-changing action the capability takes and list each failure in the checklist (timeout, unknown result, partial success, stale data, ambiguous match, and the rest), plus, when row 2 was found or partial, every failure mode input 2 declares for the tool that will commit that action. Name each outcome as the supporting actor reports it. Then prune to failures the agent can detect and must handle, merge those with the same handling, and write one table row each with the rule it serves. A failure no existing rule covers gets a new rule. A failure the agent cannot act on, because no agent turn exists when it applies, becomes an SG row in Appendix B, and the failure row cites it.
+Put to the owner, under the interview rules of step 2, at most two turns:
 
-The Contract and Failure sections of the use-case checklist carry the tests for each part.
+- each break left, as its shortest path from `policy.md` in plain steps, with the rule change you recommend;
+- the claims that pass the decision filter;
+- each limit with no end, and each money claim with no mismatch handling;
+- when row 2 is proposed, the smallest tool set in which every write has one call and every fact the agent needs before it acts has a read, as system claims, for the owner to confirm.
 
-Done when every state-changing action has at least one failure row, and every row names a rule.
+Apply each answer to the claims, rules, decisions and model, then rerun step 3.3. A break the owner leaves open stays listed on `policy.md` as an open decision.
 
-### 3.6 Scenarios
+Done when every question has a reply and step 3.3 reads "0 errors".
 
-Scenarios are the key examples of the Contract. Write them with [the Specification-by-Example checklist](references/specification-by-example-checklist.md) and [the evaluation checklist](references/evaluation-checklist.md) open; the first governs precision and scope, the second governs interaction types, category tags, Required and Forbidden lines, and metrics.
+### 3.5 Scenarios
 
-Coverage, before writing any scenario:
+```bash
+uv run python .claude/skills/agent-spec/scripts/check.py <product dir>/agent-spec --derive
+```
 
-- Every rule in the capability and every global rule it touches has at least one scenario that illustrates it.
-- Every rule of the form "act only when" has one scenario where the agent acts and one where it holds back.
-- Every failure row that changes the outcome has a scenario whose Initial state causes that failure.
-- Write the plain single-action, single-turn scenario first, then derive the harder ones from it: a missing detail (clarify), an unavailable request (infeasible), a write that needs approval (confirm), an action that depends on state, a request in a surface form that needs canonicalizing, a request nothing can satisfy.
+It prints one scenario per step no scenario takes yet, each a shortest complete path through that step. Append them to `scenarios.md`. Give each a title in plain words and fill its Rules line with the rules its path exercises. Add a conversational scenario, with its reason, for each rule the model cannot express and each case it cannot reach (two requests in one message, a request about another record).
 
-Each scenario carries the blocks in the template's order. The rules for filling them:
-
-- **Interaction type** is chosen by what the agent lacks: a choice (clarify), a feasible path (infeasible), an approval (confirm), or nothing (none). Combine only non-conflicting gaps.
-- **Category tags** are literal counts and conditions, defined in the evaluation checklist.
-- **Suite** is regression for behavior that must already hold and never break, capability for behavior being built or a hard interaction case. Scenarios from known failure cases (input 6) start in capability.
-- **Initial state** holds one concrete fact per line: today's date whenever any phrase is relative to it, every existing record with the fields the rule depends on, availability, and any failure the scenario injects. Write an injected failure as an outcome ("the 19:00 slot is taken"), never as a tool result or exception. A fact that does not vary between rows uses values that match no row's value in any column, so the checker and a grader can tell it from a variant value.
-- **User** holds the turns the user initiates on their own: the request and any unprompted change of mind. A later turn states the point at which it arrives, relative to the agent's actions (for example, "in reply to the agent's proposal, in place of a confirmation"), so the simulator delivers it at one defined point. Dialogue appears only here and in Initial state.
-- **User knows** holds question-answer pairs the simulated user can answer but has not volunteered. Answers to the agent's questions live here, never in User. Every pair is a required question unless marked (optional). A pair marked (after Turn n) is revealed only after Turn n, and one marked (before Turn n) only before it.
-- **Expected: Required events** lists only the state-changing actions that constitute the outcome, each with its values and timing. Read-only actions are never Required. Add an ordering line where an authorizing user turn must precede a write, and between the agent's own calls whenever a rule orders them. A read-only capability has Required events: none.
-- **Expected: Final state assertions** state what exists, with field values, and what is unchanged. Use full-set forms ("exactly one", "no other record changed").
-- **Forbidden** lists events that must not occur: an action for any proposal other than the confirmed one, an action before its authorizing turn, an action count, or a state that must never hold. A line that applies to only some rows carries a condition, as §5.1 defines.
-- **Data variants** is a table of 2 to 6 rows with identical Required events and final-state lines after substituting row values, so the lines differ only in the values their <column> placeholders take. Each row differs from the others in a tool outcome or in required behavior, and at most one row per scenario differs only in values or wording. A row at a rule's boundary value counts as differing in outcome. Every value that differs between rows gets a column, including the user's wording of it and any injected failure, so each row fills the scenario's <column> placeholders without guessing. An Initial state fact that depends on a varying value, such as availability for the party size, must hold for every row: state it for every row's value, or give it a column. In Initial state, User, User knows, Expected and Forbidden, a value that has a column is written as <column>; the Reference trajectory uses row 1.
-- **Reference trajectory** is the shortest passing sequence of user turns, actions with their values, and outcomes as the supporting actor reports them. Agent turns are described, not quoted. It must use every required User-knows pair.
-- **Illustrates** names the rule ids the scenario exists for.
-- **Unambiguity note** is one line on why two domain experts reach the same verdict.
-
-Expected and Forbidden assert on world state and on what the agent did or did not do, never on the agent's wording. When a rule can only be checked by reading the agent's words, name the check in the Unambiguity note and register it in the Evaluation table under the same name, with its grader. It is a `message check "<name>"`, graded by code, only when the whole check is that the agent's messages, from the event that made the value available to the end of the trial, contain values the agent copies verbatim from a tool result or Initial state, such as a confirmation id. A date, a time, an amount or a name is not such a value, because the agent can write it in more than one form and nothing defines how message text is compared. It is a `rubric dimension "<name>"`, graded by an LLM judge, when any part of the check needs judgment: uncertainty was communicated, alternatives were presented and nothing else was, a detail was withheld, a not-found result was reported without inventing anything. A check is one or the other in full; an exact part does not split a rubric check into two. Code before judge where code decides the whole check.
-
-Write every line as one proposition, because each line is converted on its own, as one line.
-
-Done when the coverage conditions above hold for every capability and every scenario has every block filled.
-
-### 3.7 Evaluation
-
-The template carries the Evaluation section. Fill its slots: the trials per scenario (default 5) and the dimension table, one row per dimension with its grader (code for a message check, rubric for a judgment), its definition and the scenarios that use it. Change the fixed text only when the user asked for a different metric.
-
-### 3.8 Interface binding
-
-Write Appendix A from the actions in every Scope & Authority, the "act only when" rules and the failure rows.
-
-If row 2 was found, bind the supplied tools and ask nothing. Give each state-changing action its commit call, and list the remaining read-only calls on the "Unmapped read-only calls" line.
-
-If row 2 is proposed or partial, derive the smallest tool set in which every state-changing action has one commit call and every fact the agent must know before it can act or decide has a read. The facts are the conditions of the "act only when" rules and the Initial state facts the scenarios set, such as existing records and availability. One tool may commit several actions and one read may return several facts, so the smallest set is the fewest tools that still cover every action and every fact. Each commit call's outcomes are the failure-row outcomes of the actions it commits. For a partial row 2, keep the supplied tools and propose only the missing pieces. Write the tools into Appendix A, with the reads on the "Unmapped read-only calls" line with their parameters and return values. Then run the checker (step 4.1), so the appendix the user confirms has already passed it, show the appendix to the user, and ask them to confirm it in one turn. Record the confirmed tool set in row 2 of the ledger, marked proposed or supplied per tool.
-
-In either case, a read-only action gets a table row only when a Forbidden line or a failure row names it; the row's call is then its read, and its Effect on state is none. Every other read stays on the "Unmapped read-only calls" line. A read-only action without a row has no occurrences, so no event line may name it.
-
-Done when Appendix A meets its binding contract and, if any tool was proposed, the user has confirmed the appendix.
-
-### 3.9 Consolidate
-
-Merge scenarios that repeat one key example, before any reviewer reads the spec. Three examples defined properly are worth more than a hundred defined poorly (Adzic, *Specification by Example*, ch. 8, "Don't overspecify examples", p. 126), and similar specifications with minor differences become one specification that focuses on the attributes that differ (ch. 11, "Look for higher-level concepts", p. 185).
-
-Run the checker (step 4.1). Each WARNING names scenarios with identical Required events after substitution, leaving out scenarios whose Required events are none. For each group, merge the scenarios whose final-state lines are also identical after substitution, as data-variant rows that meet the Data variants rule of step 3.6:
-
-- Keep the lowest id and leave the other ids unused.
-- Forbidden is the union of the merged lines. A line that holds for only some rows carries a condition, as §5.1 defines.
-- Every dimension the merged scenario uses applies to every row, because §5.2 passes a trial only when all of them pass.
-- Illustrates is the union. Rewrite the title and the Unambiguity note to cover every row, and remove the merged ids from the Evaluation table.
-- A row may be the only thing exercising a rule clause or failure row. The coverage conditions of step 3.6 still hold, and a row counts toward them.
-- Record each source row the merged table leaves out as a dropped row.
-
-In an update run, merge only scenarios the run added, because existing ids stay stable.
-
-Done when every WARNING group is merged or has a stated reason to stay apart, the checker prints "0 errors", and the dropped rows are listed for the report.
+Done when step 3.3 reads "0 errors" and reports "Steps no scenario takes: 0".
 
 ## 4. Verify
 
-You are the worst reviewer of this spec, because the assumptions that shaped a rule also shape your reading of it. Verification therefore runs in layers: a script decides everything mechanical, fresh-context finders hunt for defects that need judgment, and separate verifiers vote on each finding before you act on it. [The verification briefs](references/verification.md) define what a defective spec looks like, the finding format, and the brief for each reviewer.
+You are the worst reviewer of this spec, because the assumptions that shaped a rule also shape your reading of it. The lint and the checker have settled what a program can. One fresh finder reads the spec against the owner's answers, and one fresh verifier rules on its findings before you act on them. [The verification briefs](references/verification.md) define the defects, the finding format and both briefs.
 
-### 4.1 Run the mechanical check
+### 4.1 Check again
 
-Run the checker:
+Run step 3.3's command without `--write`. Keep its output for the report.
 
-```bash
-uv run python .claude/skills/agent-spec/scripts/check_spec.py <path>/agent-spec.md
-```
-
-Fix every error it prints and rerun it. Keep the final output, including its coverage table of rules against scenarios, because the report quotes it.
-
-Done when the script prints "0 errors".
+Done when it reads "0 errors".
 
 ### 4.2 Write the review packet
 
-Reviewers get the inputs, never your conclusions. Choose a scratch directory outside the product directory, written <scratch> below, and write <scratch>/review-packet.md there, holding the final input ledger, every interview answer verbatim, any default the user accepted, the tool set as confirmed, marked proposed or supplied per tool, and the path of every source document and code file you read. Leave out your reasoning about why the rules are right. Save a copy of the spec as <scratch>/round0/agent-spec.md now, before any round changes it.
+Reviewers get the inputs, never your conclusions. Choose a scratch directory outside the product directory, written <scratch> below, and write <scratch>/review-packet.md: the final input ledger, every question with its recommendation and the reply verbatim, the docs pages you read, and the path of every source document and code file you read. Leave out your reasoning about why the rules are right. Copy the spec folder to <scratch>/round0/.
 
 Done when a reviewer could reconstruct every input from the packet and the files it lists.
 
 ### 4.3 Find
 
-Dispatch three finders in parallel, each a fresh-context subagent given the shared header and its role section: faithfulness, verdicts, coverage. Fill the shared header's [answered path] with <scratch>/answered.md once that file exists (from round 2 on); in round 1 delete that paragraph from the header. In an update run, scope every finder to the changed capability, the Global Contract and the Evaluation rows it touches, and tag any finding outside that scope Pre-existing.
+Dispatch one fresh-context subagent with the shared header and the faithfulness finder. In an update run, scope it to the claims and rules the change touched.
 
-Done when all three finders have returned, each report opening with its count line.
+Done when it has returned, its report opening with its count line.
 
 ### 4.4 Verify the findings
 
-If the finders reported 0 findings, verification is done; go to step 5.
+If the finder reported 0 findings, go to step 5.
 
-Merge the finders' reports into one list, dropping duplicates, and tag each finding's severity as the finders gave it. Write every merged finding, Important and Nit, with its severity, to <scratch>/round<N>-to-verify.md and dispatch one fresh-context verifier with the adversarial verifier brief and that path. It returns, per finding, Real, Not real or Style only, a severity, and either the quoted clause that refutes the finding or 'could not refute'. The verifier does not drop findings. Drop a finding only when you read the quoted clause yourself and agree it refutes the finding; record the refutation and your reason with the finding (for a Nit dropped on a Style only verdict, record the finding's own Quote and your reason in place of a refuting clause; step 5 quotes that). A Nit already claims it changes no verdict, so for a Style only verdict on a Nit, the finding's own Quote and Evidence take the place of the quoted clause in that rule: drop the Nit only when you read them yourself and agree the finding is about wording, style, formatting, heading choice or preference, the kinds that "What a defective spec looks like" in [the verification briefs](references/verification.md) says are not findings. Keep every other finding, at the verifier's severity when it is lower, and record the refutation beside any it offered.
+Write every finding, Important and Nit, to <scratch>/round1-to-verify.md and dispatch one fresh-context verifier with the adversarial verifier brief and that path, on the session's own model. It returns, per finding, Real, Not real or Style only, a severity, and either the quoted line that refutes the finding or "could not refute". The verifier does not drop findings. Drop a finding only when you read the quoted line yourself and agree it refutes the finding; for a Nit with a Style only verdict, read the finding's own Quote and Evidence and drop it only when you agree it is a preference about phrasing. Record the refutation and your reason with each dropped finding. Keep every other finding, at the verifier's severity when it is lower.
 
-Done when every finding, Important and Nit, has the verifier's line and a kept-or-dropped decision with its reason.
+Done when every finding has the verifier's line and a kept-or-dropped decision with its reason.
 
 ### 4.5 Answer every kept finding
 
-Verification changes only what a kept finding names. Template text, including §5.1 and §5.2 fixed text, is not re-synced or edited in step 4. Fix each kept finding, or record why it stands: an input supports the line, or only the user can decide it. A finding only the user can decide becomes an open question in the report. Fix the pattern, not the line: search the spec for every instance of the finding's pattern and fix them all. After fixing a pattern finding, grep the spec for the pattern's signature (the removed field, the old wording, the id) and list in <scratch>/answered.md every line the fix touched. Pre-existing findings are reported and left untouched.
+Fix each kept finding, or record why it stands: an input supports the line, or only the owner can decide it, which makes it an open question in the report. Fix the pattern, not the line: search the spec for every instance and fix them all. A fix that changes a rule's text goes to the owner as a proposal, in one turn, under the interview rules.
 
-When a fix adds a rule, a rule clause or a failure row, apply the coverage conditions of step 3.6 to it before rerunning the checker: the new clause needs a scenario, or a data-variant row, whose Initial state exercises it. The checker counts scenario references per rule and cannot see that a new clause has none.
+Then rerun steps 3.3 and 3.5 once, and copy the spec folder to <scratch>/round1/. There is no second round: what is left goes into the report as open.
 
-Then rerun 4.1. If this round, round <N>, changed the spec, save a copy of the spec as it stands as <scratch>/round<N>/agent-spec.md, so the next round's findings can be told apart by whether they quote a line this round changed; append this round's answered findings, one line each with id and a one-line summary of the fix or the reason it stands, to <scratch>/answered.md; then start round <N+1> at 4.3. Stop after round 3, even with findings left: three rounds without converging means the inputs or the approach need the user, so the remaining findings go into the report as open.
-
-Done when a round changes nothing and the script prints "0 errors", or round 3 has ended.
+Done when every kept finding is fixed, answered with its reason, or open, and step 3.3 reads "0 errors".
 
 ## 5. Report
 
-Reply with evidence, so the user can judge the spec without rereading it:
+Reply with evidence, so the owner can judge the spec without rereading it:
 
-- the file written, and each capability with its scenario count;
-- the merges of step 3.9, and each dropped row with what it exercised;
-- the input ledger's final state, naming any default the user accepted;
-- the proposed tools, which are provisional, and that Appendix A is the part of the spec that architecture notes may change;
-- the checker's count line and coverage table;
-- the findings, opening with a count line by severity, each marked fixed, answered with its reason, open, or Pre-existing, and the number of rounds run; for every round after the first, how many kept findings quote a line the previous round changed (a fix that introduced a defect) and how many quote a line it did not (a defect earlier finders missed), because the two call for different remedies (compare the saved round copies with diff to attribute); and the verifier drop rate: findings dropped over findings verified, given for Important and Nit separately, with each dropped finding's refutation quoted;
+- the folder written, the link to its `index.md`, and the scenario count, model path and conversational;
+- the checker's final output: states, breaks, scenarios, chart arrows;
+- each break listed on `policy.md`, as an open decision for the owner;
+- the claims put to the owner under the decision filter, with their count, and each claim left `missing`;
+- the input ledger's final state, naming any default the owner accepted, and that proposed tools are provisional and architecture notes may change them;
+- the findings, opening with a count line by severity, each marked fixed, answered with its reason, or open, and the drop rate (findings dropped over findings verified) for Important and Nit separately, with each dropped finding's refutation quoted;
 - the open questions, each as a "what if" the inputs could not answer;
-- what verification cannot catch: whether the rules are the business's real rules and whether the stakeholder list is complete, which only the user can confirm;
-- any kept finding whose pattern no checklist covers, proposed as a line for that checklist so the next spec avoids it;
-- which interview skill ran, or that the interview was direct.
+- what verification cannot catch: whether the rules are the business's real rules and whether the claims about undocumented systems are true, which only the owner can confirm.
