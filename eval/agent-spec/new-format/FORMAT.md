@@ -1,0 +1,143 @@
+# New-format agent spec: the files the harness grades
+
+Pinned 2026-11-14 by step 1 of `HARNESS-PLAN.md`. No skill template for the new format exists
+yet. Everything below is an assumption the harness is built on; the format switch adopts it or
+changes it together with the frozen grader in `grader/`.
+
+A spec is one folder. The owner reads `index.md`, `claims.md`, `rules.md` and `policy.md`. The
+other files are for programs and later stages.
+
+| File | Written by | Read by |
+|---|---|---|
+| `index.md` | skill | owner |
+| `claims.md` | skill | owner, lint |
+| `rules.md` | skill | owner, lint |
+| `model.py` | skill | checker |
+| `policy.md`, `chart.mmd` | the skill's checker | owner, checker (to compare) |
+| `scenarios.md` | skill, from the model | lint, checker (replay) |
+
+A trial also writes `interview-log.json` beside the spec folder. It is a trial output, not part
+of the spec.
+
+## Common rules
+
+- Ids: claims `C-<n>`, rules `R-<n>`, decisions `D-<n>`, scenarios `SC-<n>` (a letter suffix
+  such as `SC-06b` is allowed). Each id is unique within its file.
+- A cell that is empty, `-` or `—` counts as blank.
+- Every relative Markdown link in the owner's four files and in `scenarios.md` must resolve to
+  a file in the spec folder.
+
+## index.md
+
+One page. It must link to `claims.md`, `rules.md` and `policy.md`.
+
+## claims.md
+
+Two tables, under the headings `## Systems` and `## Claims`, with exactly these headers.
+
+```
+| system | owner | docs | tools |
+| id | claim | kind | system | source | quote | what ends it | if it differs from what the customer confirmed |
+```
+
+Systems: one row per outside system the agent's tools reach, directly or behind another
+system. `docs` says where the system's docs are, or `none`.
+
+Claims, column by column:
+
+- **kind**: `system` (how an outside system behaves), `policy` (a business rule), `limit` (a
+  bound on something), `money` (an amount the agent states or passes on), `missing` (a question
+  nobody has answered).
+- **system**: required for kind `system`, and must name a row of the Systems table. Blank
+  otherwise.
+- **source**: `owner's words`, `proposed, accepted`, `spec only` or `nobody`.
+- **quote**: required when the source is `owner's words` or `proposed, accepted`. The text is
+  copied from the interview record: the owner's reply for `owner's words`, the accepted
+  question for `proposed, accepted`.
+- **what ends it**: for kind `limit`, what stops the thing being limited. For a numeric bound
+  this is the bound ("the second call"). For a limit set to none, it is what ends it anyway,
+  or the bound the skill proposed. Blank for other kinds.
+- **if it differs from what the customer confirmed**: for kind `money`, what the agent does
+  when the value a tool returns differs from the value the customer confirmed. Blank for other
+  kinds.
+
+Changed from the plan: the plan's "rules that depend on it" column is dropped. `rules.md`
+already names the claims each rule rests on, and two copies of one link would drift.
+
+## rules.md
+
+Three parts.
+
+1. Rules. Each starts with a heading `## R-<n> <title>`, then the rule in the owner's words,
+   then one line `Rests on: <ids>` naming claims (`C-`) and decisions (`D-`) that exist.
+2. `## What the agent does`: a table `| situation | the agent | rules |`. This is the policy the
+   model encodes. Each row's `rules` cell names existing rules.
+3. `## Decisions`: a table `| id | decision | decided by | reason |`.
+
+## model.py
+
+Standard-library Python. The checker imports it from the spec folder and uses only these names.
+
+```python
+INITIAL                      # a hashable state
+def successors(state)        # -> list of (step, next_state): every step the setup, the customer,
+                             #    the outside systems and the agent can take from this state
+def is_end(state) -> bool    # the conversation is over
+def chart(state) -> str      # the chart-state name of this state, for the policy page
+RULES = [{"id": "R-01", "step": f or None, "end": g or None}, ...]
+SELFTEST = {"id": "selftest", "step": f or None, "end": g or None}
+```
+
+- A step has `.actor` (`setup`, `customer`, `system` or `agent`) and `.label` (plain words).
+- `step(state, step, next_state)` is called on every reachable step; `end(state)` on every
+  reachable end state. Each returns `None` when the rule holds, or a short reason when it breaks.
+- Every `RULES` id names a rule in `rules.md`. A rule the model cannot express has no entry.
+- `SELFTEST` is a deliberately broken rule. The checker must find a break for it.
+- Two steps may share a label when they differ only in what the agent cannot see. A label may
+  end in a parenthetical, such as `refund call times out (nothing created)`, that names the
+  hidden part.
+
+The checker adds one rule of its own, `no-step`: a reachable state that is not an end state and
+has no step out. It is listed like any other break.
+
+## policy.md and chart.mmd
+
+Generated by the checker from the model. `chart.mmd` is a Mermaid `stateDiagram-v2`; each line
+with `-->` is one arrow. `policy.md` links to `chart.mmd`, then has a section `## Breaks` with
+one entry per break:
+
+```
+### <rule id>: <reason, exactly as the model's check returns it>
+1. <first step label of the shortest path>
+2. ...
+```
+
+When nothing breaks, the section holds the single line `None.`
+
+## scenarios.md
+
+One section per scenario, `## SC-<n> <title>`, with these lines:
+
+```
+Kind: model path            (or: conversational)
+Rules: R-01, R-04
+World:                      (model path only)
+1. <label of a setup, customer or system step>
+2. ...
+Why not a path: <reason>    (conversational only)
+```
+
+A model-path scenario fixes everything the outside world does, in order: the setup, every
+customer step and every system step. The agent is left free. A world line matches a model step
+whose label equals it, or whose label is the line followed by a parenthetical. The checker
+counts the complete paths that fit: one path, no path, or several (ambiguous).
+
+## interview-log.json
+
+```json
+{"questions": [{"n": 1, "question": "...", "recommended": "...", "reply": "...",
+                "answered_by": "record"}]}
+```
+
+`answered_by` is `record` when the owner stand-in found the answer in the fixture, and
+`stand-in default` when it accepted the recommendation because the record is silent.
