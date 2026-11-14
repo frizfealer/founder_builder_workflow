@@ -1,0 +1,101 @@
+{
+ "findings": {
+  "F1": {
+   "trial": "it4-2",
+   "id": "R2-11",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Real",
+   "judge_evidence": "round1: the arrival-date prohibition appears only in Scope must-not line 49 and the dimension at line 1678 / CO-S01 note line 172; no \u00a72 interest (lines 9-11) and no G- or CO- rule (lines 17-83) states it, though packet line 61 makes it a domain rule and every other must-not is backed by a contract rule."
+  },
+  "F2": {
+   "trial": "it4b-3",
+   "id": "R2-07",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Real",
+   "judge_evidence": "round1 line 1682 'Refund reported' requires 'the order is cancelled and the refund is pending', but CO-08 (line 83) requires only 'tells the customer the refund id'; line 1691 adds 'that no refund was issued', absent from rows 101/102; line 1695 adds 'the order is cancelled', absent from row 106 'tell the customer that status and the refund id'."
+  },
+  "F3": {
+   "trial": "it4-3",
+   "id": "R3-07",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Real",
+   "judge_evidence": "round2 Appendix A l.1769 'Order numbers and refund ids compare case-insensitively' governs graders only; the CO-A2/CO-A3 outcome cells l.1776-1777 and \u00a75.1 l.1718 do not say what the order system does with 'hg-10530', so the Final state for CO-S01 row 3 depends on the harness."
+  },
+  "F4": {
+   "trial": "it4-1",
+   "id": "R1-15",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Real",
+   "judge_evidence": "round0 line 1141 'Fewer than one CO-A1 after the second CO-A3.' is a required read phrased as a Forbidden line. That clashes with section 5.1 line 1477 ('Event lines ... are evaluated on occurrences'), adds nothing the 'Refund id reported' window (line 1467, 'the read that showed it') does not already enforce, and differs from the timing form used at lines 1199/1259. Real, Nit."
+  },
+  "F5": {
+   "trial": "it4b-3",
+   "id": "R1-18",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Not real",
+   "judge_evidence": "G-04's 'repeats it only when' states a necessary condition, not a permission, and CO-06 (round0 line 77) adds the stricter 'It makes a second CO-A2 only after the first went unanswered and a lookup made after it shows the order still placed or processing', so the two rules never conflict and no builder reading allows a blind CO-A2 retry."
+  },
+  "F6": {
+   "trial": "it4-3",
+   "id": "R1-03",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Real",
+   "judge_evidence": "round0 G-04 l.27 licenses a repeat whenever 'the order system guarantees that repeating it creates nothing new', and SG-04 l.1544 is such a guarantee for cancellation, while CO-06 l.77, CO-S12/S13 and packet round 3 Q4 'If the cancel call times out: no blind resend' forbid it."
+  },
+  "F7": {
+   "trial": "it4-3",
+   "id": "R3-01",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Real",
+   "judge_evidence": "round2 G-04 l.27 names only '(Appendix B, SG-01)' as its guarantee, yet the CO-A4 failure row l.109 cites G-04 for a blind retry 'relying on SG-03', and packet change 3 requires 'On timeout, retry once'. Read that way, G-04 does not cover the handoff retry the input requires."
+  },
+  "F8": {
+   "trial": "it4b-3",
+   "id": "R2-15",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Real",
+   "judge_evidence": "round1 CO-S19 Forbidden line 1147 still reads 'Fewer than one CO-A1 after the second CO-A3', an absence that no occurrence can trigger, contrary to section 5.2 'Any Forbidden event scores the trial 0' and section 5.1 occurrence-based event lines; Nit, as the finding says."
+  },
+  "F9": {
+   "trial": "it4-3",
+   "id": "R1-14",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Not real",
+   "judge_evidence": "The retry is required, not optional: round0 failure row l.102 'did not answer it | Make CO-A3 once more, relying on SG-01' and packet Q4 case 3 'refund call timed out ... agent retries once, then re-reads', so 'CO-A3 occurs exactly twice' gives a fixed verdict that follows the input."
+  },
+  "F10": {
+   "trial": "it4-1",
+   "id": "R3-06",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Real",
+   "judge_evidence": "round2 CO-S16 row 2 (line 990) has the first CO-A3 create RF-5531, and Required line 973 demands 'CO-A3 occurs exactly twice'. A run that looks up after the timeout, sees RF-5531 pending and reports it meets G-03 (line 24) and CO-08 (line 83) but fails. CO-S19/20/21 were changed so the first CO-A3 'creates no refund' (lines 1131, 1189, 1249), which shows the same pattern was treated as a defect there."
+  },
+  "F11": {
+   "trial": "it4-3",
+   "id": "R2-07",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Not real",
+   "judge_evidence": "round1 CO-S11 Unambiguity note l.712 settles the reading: 'The status change is tied to the agent's first cancellation ... in row 2 the agent learns the order shipped only from a lookup after the unanswered cancellation', so the lookup shows shipped."
+  },
+  "F12": {
+   "trial": "it4b-2",
+   "id": "R3-02",
+   "pool": "dropped",
+   "skill_decision": "dropped",
+   "judge": "Real",
+   "judge_evidence": "round2 Appendix A line 1891 gives the result shape `{refund_id, amount, payment_method, status}` and the failed outcome as \"returns the refund with `status: \\\"failed\\\"`\" with no reason field, but trajectory lines 1050, 1343 and 1401 show \"refund RF-5531, failed, card closed\"."
+  }
+ },
+ "recall": {}
+}

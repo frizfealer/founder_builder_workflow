@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """Calibrate the judges against a human.
 
-  calibrate.py sample <eval-dir> --trials a,b [--n 20] [--seed 1]
+  calibrate.py sample <eval-dir> --trials a,b [--n 20] [--seed 1] [--pool dropped|kept|all]
+                                 [--exclude <calibration-dir>,...] [--no-recall]
       Writes <eval-dir>/calibration/<date>/worksheet.md (findings with the spec text they quote,
       judge verdicts hidden), answers.md (a form to fill), and sealed.json (the judge verdicts).
   calibrate.py score <eval-dir>/calibration/<date>
       Reads answers.md, compares with sealed.json, prints agreement and where it breaks.
 
-Sample mix: ~40 % kept Important, ~30 % kept Nit, ~30 % dropped, split across the trials given,
-plus 5 recall matches to confirm. Findings are drawn deterministically from the seed so the
+Sample mix (--pool all, the default): ~40 % kept Important, ~30 % kept Nit, ~30 % dropped, split
+across the trials given, plus 5 recall matches to confirm. --pool dropped (or kept) draws only from
+that pool; --exclude skips findings already sealed in earlier calibration folders; --no-recall
+omits the recall matches. Findings are drawn deterministically from the seed so the
 worksheet can be regenerated.
 """
 import json
@@ -23,30 +26,8 @@ def load(p):
     return json.loads(Path(p).read_text())
 
 
-def finding_text(folder, fid, rnd):
-    """The finding's full block from round<rnd>-findings.md, or '' if not found."""
-    f = folder / f"round{rnd}-findings.md"
-    if not f.exists():
-        return ""
-    lines = f.read_text().splitlines()
-    hdr = re.compile(r"^(?:##\s*)?" + re.escape(fid) + r"\b")
-    start = next((i for i, l in enumerate(lines) if hdr.match(l)), None)
-    if start is None:
-        return ""
-    head = re.sub(r"\s+[—-]+\s+(kept|dropped|Pre-existing)\b.*$", "", lines[start], flags=re.I)  # hide the skill's decision
-    out = [head]
-    for l in lines[start + 1:]:
-        if re.match(r"^(?:##\s*)?[A-Z]\d-L?\d+\s*(\||\()", l) or l.startswith("## "):
-            break
-        out.append(l)
-    # cut the verifier/decision lines so the human rules blind
-    cut = []
-    for l in out:
-        if re.match(r"^\**\s*(Verifier|Verifiers?|Decision|Decision reason|Status|Routing|Standard verifier|Adversarial verifier|Outcome|Kept|Dropped|Disposition)\b", l.strip(), re.I):
-            break
-        cut.append(l)
-    return "\n".join(cut).strip()
-
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from grade import blind_finding_text as finding_text  # same cut the judge gets: finding only, no refutation
 
 def spec_excerpt(folder, quote, rnd, width=10):
     """±width lines around the first line of the quote in the spec snapshot the finding read."""
@@ -62,14 +43,20 @@ def spec_excerpt(folder, quote, rnd, width=10):
     return None, snap.name
 
 
-def sample(eval_dir, trials, n, seed):
+def sample(eval_dir, trials, n, seed, which="all", exclude=(), with_recall=True):
     rnd = random.Random(seed)
+    seen = set()
+    for ex in exclude:
+        for v in load(Path(ex) / "sealed.json").get("findings", {}).values():
+            seen.add((v["trial"], v["id"]))
     pool = {"kept_important": [], "kept_nit": [], "dropped": []}
     recall = []
     for lab in trials:
         folder = eval_dir / "results" / lab
         t = load(folder / "trial.json")
         for f in t["findings"]:
+            if (lab, f["id"]) in seen:
+                continue
             if f.get("kept") is True and f.get("severity") == "Important":
                 pool["kept_important"].append((lab, f))
             elif f.get("kept") is True:
@@ -81,8 +68,14 @@ def sample(eval_dir, trials, n, seed):
             for key_id, match in load(rk).get("matches", {}).items():
                 if match:
                     recall.append((lab, key_id, match))
-    quota = {"kept_important": round(n * 0.4), "kept_nit": round(n * 0.3)}
-    quota["dropped"] = n - quota["kept_important"] - quota["kept_nit"]
+    if which == "dropped":
+        quota = {"kept_important": 0, "kept_nit": 0, "dropped": n}
+    elif which == "kept":
+        quota = {"kept_important": round(n * 0.6), "kept_nit": 0, "dropped": 0}
+        quota["kept_nit"] = n - quota["kept_important"]
+    else:
+        quota = {"kept_important": round(n * 0.4), "kept_nit": round(n * 0.3)}
+        quota["dropped"] = n - quota["kept_important"] - quota["kept_nit"]
     picked = []
     for k, q in quota.items():
         items = pool[k][:]
@@ -90,7 +83,7 @@ def sample(eval_dir, trials, n, seed):
         picked += [(k, lab, f) for lab, f in items[:q]]
     rnd.shuffle(picked)
     rnd.shuffle(recall)
-    recall = recall[:5]
+    recall = recall[:5] if with_recall else []
 
     sealed = {"findings": {}, "recall": {}}
     ws = ["# Calibration worksheet", "",
@@ -208,6 +201,8 @@ if __name__ == "__main__":
         trials = a[a.index("--trials") + 1].split(",")
         n = int(a[a.index("--n") + 1]) if "--n" in a else 20
         seed = int(a[a.index("--seed") + 1]) if "--seed" in a else 1
-        sample(eval_dir, trials, n, seed)
+        which = a[a.index("--pool") + 1] if "--pool" in a else "all"
+        exclude = a[a.index("--exclude") + 1].split(",") if "--exclude" in a else []
+        sample(eval_dir, trials, n, seed, which, exclude, "--no-recall" not in a)
     else:
         score(a[1])
