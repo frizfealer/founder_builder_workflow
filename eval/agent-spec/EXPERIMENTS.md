@@ -303,3 +303,16 @@ is rebuilt and two-part items are split.
   lines; the grades disagree with two of the four.
 - Key defects with two parts (N10, M8) were counted as found on one part. Split them into two
   key entries when the key is rebuilt from three baseline trials.
+
+## 2026-11-14 — dropped_real re-judged blind; demoted to reported
+
+The dropped_real judge now sees only the finding, the spec snapshots, the packet and the
+inputs (never a refutation, report.md or run.log). All 26 trials re-judged. Full-kind
+baseline worst moved 1 → 5 (it4-1..3: 4, 3, 4; it4b-1..3: 1, 2, 5): the verifier drops
+about 3 real findings per run. Against the owner's 6 blind rulings on dropped findings
+the new judge agrees on 4–5 (old judge: 3), n too small to call it calibrated.
+Decision (owner, measurement): dropped_real is reported, not gated. A change that moves
+only dropped_real is inconclusive → revert. Per-iteration means of real drops, for the
+record: e4-base 7.3, it1 (E5) 4.7, it2 (E6) 4.0, it3 (E7, reverted) 5.7, it4+it4b (E8) 3.2.
+A 12-item dropped-only worksheet exists at calibration/2026-11-14/ — unused unless a
+decision hinges on it.

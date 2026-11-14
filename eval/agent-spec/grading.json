@@ -105,9 +105,9 @@
     {
       "name": "dropped_real",
       "kind": "judge",
-      "gate": true,
+      "gate": false,
       "direction": "lower",
-      "about": "dropped findings the judge rules Real: defects the verifier threw away; gated against the baseline (recall_key sees only the 7 key items)"
+      "about": "dropped findings a blind judge (finding + spec + inputs only, no refutation) rules Real: defects the verifier threw away. Reported, not gated (2026-11-14): judge calibrated at n=6 only; a change that moves only this metric is inconclusive and defaults to revert"
     },
     {
       "name": "wall_clock_s",

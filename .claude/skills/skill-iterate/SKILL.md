@@ -19,7 +19,8 @@ baseline trials.
 3. A reference citation (a book chapter, an article) is a reason to try a change, never evidence
    that it worked.
 4. A change is kept only when no gated metric fails in any trial of its set. A change that
-   cannot be graded is not made.
+   cannot be graded is not made. A change that moves only reported (non-gated) metrics is
+   inconclusive, and inconclusive defaults to revert; it never goes to the human as a question.
 5. The measurement and the thing measured never change in the same iteration. Skill text and
    its scripts in one iteration; `grading.json`, the key, thresholds, frozen inputs or baseline
    folders in another, with the human.
