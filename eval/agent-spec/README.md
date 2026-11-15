@@ -12,6 +12,7 @@ change to the verification process can be compared before and after.
 | `product-idea.md` | The one source document the packet lists. |
 | `baseline/round{1,2,3}-findings.md` | The merged findings the original run produced in each round (M1–M13, N1–N13, P1–P9). Used to grade recall. |
 | `baseline/subagent-stats.md` | Token, tool-use and duration figures per subagent from the original run. |
+| `PROMPT-build.md`, `build-key.md` | Run prompt and input-coverage checklist of the `build` kind (below). |
 | `grading.json` | Metrics, gates, key defects and judge context for `skill-iterate/scripts/grade.py`. Changing it is a human decision. |
 | `EXPERIMENTS.md` | One entry per skill change: hypothesis, trials, grade, outcome. |
 | `run-<label>/` | Scratch for one trial (gitignored). Parallel trials never share one. |
@@ -20,6 +21,17 @@ change to the verification process can be compared before and after.
 
 If the repo is not at `/Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow`,
 replace that prefix in `review-packet.md` first.
+
+## Build kind
+
+`PROMPT-build.md` runs the whole skill, steps 1 to 5, from `product-idea.md` alone. The interview
+and the tool confirmation turn are replayed verbatim from `review-packet.md`: the runner puts the
+recorded questions and takes the recorded answers, so this kind does not test which questions
+the skill would ask (the runner logs its own in `interview-replay.md`). Graded on
+`input_coverage` against `build-key.md` (one item per interview answer, known failure case and
+confirmed tool outcome; a PROPOSAL until the human approves it), `unsupported_statements`,
+`golden_distance` to `examples/order_support_agent/agent-spec.md` (report only), and cost.
+Run with `/trial agent-spec <set>` using `PROMPT-build.md` in place of `PROMPT.md`.
 
 ## Running one trial
 

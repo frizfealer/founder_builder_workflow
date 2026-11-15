@@ -1,0 +1,32 @@
+Run a build trial of the agent-spec skill: steps 1 to 5, from the product idea to the report. Label: <label>
+
+The user's side of every conversation in this run is frozen in eval/agent-spec/review-packet.md. You replay it; you never ask the user anything. Kind: build.
+
+Setup:
+1. Read .claude/skills/agent-spec/SKILL.md and every file it links to as you reach the step that links it.
+2. Your scratch directory is eval/agent-spec/run-<label>/. Delete it if it exists. Create it, and inside it the product directory eval/agent-spec/run-<label>/product/. Copy eval/agent-spec/product-idea.md to run-<label>/product/product-idea.md. That copy is the only product document; the skill writes run-<label>/product/agent-spec.md. Use run-<label>/ (outside product/) as the skill's <scratch> for the step-4.2 packet, round copies, briefs, findings files and any helper script you write; never the shared session scratchpad, which parallel runners collide in.
+3. Do not read, and do not give any subagent: eval/agent-spec/round0-agent-spec.md, anything under examples/order_support_agent/, eval/agent-spec/results/, eval/agent-spec/baseline/, eval/agent-spec/calibration/, eval/agent-spec/run/ (the packet's "Spec under review" path; ignore that line), any other eval/agent-spec/run-*/ directory, build-key.md, grading.json, EXPERIMENTS.md or judge-verifier-brief.md. They hold earlier specs of this product or the grading of this run. Do not touch anything under examples/. The café example the skill links to is allowed.
+4. Read eval/agent-spec/review-packet.md now. Use only these parts of it as the user's words: "Interview, verbatim" (rounds 1 to 3, the shared-understanding summary) and "Tool confirmation turn". Its other parts (the ledger, the tool table) summarise those words; do not copy them into your ledger in place of doing step 1.
+
+Replay rules (they replace every point where the skill waits for the user):
+5. Step 1: read the product document, fill the ledger as the skill says, and "show" it by writing it to results/<label>/ledger-step1.md. No reply is expected; go on.
+6. Step 2: the interview is replayed, not composed. Do not invoke grilling, grill-with-docs or any other interview skill: they question the human. Instead, for each recorded round in order, put the recorded questions (Q1..Q4, as written) to the user and take the recorded answer, verbatim, as the reply. Then present the shared-understanding summary items and take its recorded "yes". Fill the ledger from those replies as step 2 says. Log in results/<label>/interview-replay.md each round: the questions you would have asked yourself at that point (one line each, before reading the recorded ones), the recorded questions you put instead, and the reply used.
+7. Step 3.8: derive and write your own tool proposal into Appendix A and run the checker, as the skill says. Then take the recorded tool confirmation turn as the user's reply: it confirms the proposed set it quotes, with the four changes. Bind Appendix A to that confirmed set (the recorded proposal plus the four changes) and record row 2 of the ledger as the skill says. Log in interview-replay.md where your own proposal differed from the recorded one.
+8. Anything else the skill would ask the user (a rule change in step 4.5, a finding only the user can decide, a gap no recorded answer fills) becomes an open question in the report, as the skill says. Never invent a user answer. If the skill cannot continue past a point without a reply the recording does not hold (a required ledger row still missing at the end of step 2, for example), stop there, write what exists to results/<label>/, set trial.json warnings to say where and why, and hand back.
+
+Run:
+9. Steps 1 to 5 in order, exactly as the skill states them, through step 4's stop condition (a round that changes nothing, or the round cap) and the step-5 report. Step 4.2 is not skipped: write your own packet. Dispatch finders and verifiers as the skill says.
+10. Do not ask me anything.
+
+Record, at the end, in eval/agent-spec/results/<label>/:
+11. ledger-step1.md (from rule 5), interview-replay.md (rules 6 and 7), review-packet.md (a copy of the packet you wrote in step 4.2).
+12. round1-findings.md, round2-findings.md, round3-findings.md (those that ran) — the merged findings of each round, verbatim, each marked kept or dropped with its verifier verdicts, and fixed / answered / open / Pre-existing.
+13. subagent-stats.md — one line per subagent dispatched: round, role, model (the alias you dispatched it with, also written to trial.json subagents[].model), and input, output and cache-read tokens separately when the harness reports them (trial.json tokens_in / tokens_out / tokens_cache_read, with tokens as the total), and the tool_uses, duration_ms and subagent_tokens from its task notification. Mark any subagent whose notification did not arrive.
+14. run.log — the start and end UTC timestamp (`date -u +%FT%TZ`) of each of steps 1, 2, 3 (and 3.8, 3.9), 4 (each round) and 5; the checker output of every run; the command line of every script you ran; any error.
+15. agent-spec-final.md — run-<label>/product/agent-spec.md as it stands when the run ends.
+16. rounds/round<N>-agent-spec.md — a copy of each round<N>/agent-spec.md snapshot, round0 included.
+17. report.md — the step-5 report as the skill specifies it. If the harness refuses the write, return the report text in your hand-back under the heading REPORT.MD and the main session writes it; do not write it by another route.
+18. runner-notes.md — your own reasons for keep/drop decisions, dispatch timing and anything else you record for yourself, written here in results/, never in the scratch dir: reviewers grep the scratch dir and must not see your conclusions.
+19. trial.json — per .claude/skills/skill-iterate/references/trial-schema.md, with "kind": "build", skill_commit, effort (the session's /effort level) and session_model set. wall_clock_s is step 1 start to step 5 end. rounds are the step-4 verification rounds. integrity.asked_user is true if any message went to the user, script_errors counts failures of the skill's own scripts (check_spec.py), checker_zero_errors_seen is the step-4 stop condition. Numbers from task notifications, timestamps and the checker, never from memory.
+
+Then reply with: the checker's final count line, each capability with its scenario count, the count line of each verification round, and the total wall clock.

@@ -304,6 +304,33 @@ is rebuilt and two-part items are split.
 - Key defects with two parts (N10, M8) were counted as found on one part. Split them into two
   key entries when the key is rebuilt from three baseline trials.
 
+## B0 — build kind baseline (2026-11-11/12, skill 019811e)
+
+**What.** New `build` kind: steps 1-5 from `product-idea.md`, interview and tool confirmation
+replayed verbatim from `review-packet.md` (`PROMPT-build.md`). Metrics: integrity,
+input_coverage against `build-key.md` (43 items, PROPOSAL), unsupported_statements,
+golden_distance to `examples/order_support_agent/agent-spec.md` (report), wall clock, tokens,
+cost. grade.py gained per-metric `kinds`. Not a skill change; this is the baseline.
+
+| trial | integrity | input_coverage | unsupported | golden_distance | wall_clock_s | tokens_k | cost_usd |
+|---|---|---|---|---|---|---|---|
+| build-base-1 | pass | 0.98 | 0 | 0.752 | 2103 | 1201 | 9.42 |
+| build-base-2 | pass | 0.98 | 0 | 0.846 | 2354 | 1221 | 9.57 |
+| build-base-3 | pass | 0.98 | 0 | 0.871 | 2224 | 1179 | 9.24 |
+
+All three: one capability (CO), 16-17 scenarios, 3 verification rounds ending at the round cap
+with the spec still changing; checker 0 errors; no question to the user. C05 (order statuses
+listed as a set) missed in all three.
+
+**Caveats.** (1) PROMPT-build.md has the runner read the packet before step 1, so the
+"own questions" in interview-replay.md are not blind (all runners flagged it). (2) The
+`skill-eval-judge` agent type was not loaded in the session (started outside the repo); judges
+ran as general-purpose, model opus, session effort high, with judge.md as instructions; tool
+restriction by prompt only. (3) Judges flagged lenient readings on C08, C09, C18, C21 and let pass
+items the trials' own verification kept as findings (refund id in CO-09/CO-08; handoff covered
+by the one confirmation in build-base-2 CO-03). unsupported_statements = 0 everywhere with a
+gate tolerance of 0 above it. (4) report.md of build-base-2 and -3 written by the main session
+from the hand-back (trial.md 3b).
 ## 2026-11-14 — dropped_real re-judged blind; demoted to reported
 
 The dropped_real judge now sees only the finding, the spec snapshots, the packet and the

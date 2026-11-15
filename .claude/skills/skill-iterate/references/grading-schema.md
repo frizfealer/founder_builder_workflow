@@ -38,6 +38,8 @@ One per managed skill at `eval/<skill>/grading.json`. Changing it is a human dec
 - **gate** — a gated metric fails a trial when it misses `min`/`max` or is worse than the worst
   baseline value by more than `tolerance`. Pending judge metrics count as failing, so a set
   cannot pass ungraded.
+- **kinds** (on a metric) — the kinds it applies to; absent means every kind. A metric that does
+  not apply to a trial's kind is not computed, judged, gated or shown for it.
 - **direction** — `lower` or `higher` is better; `pass` is boolean; `report` is shown, never
   gated.
 - **the judge's model and effort** (`agents/judge.md` frontmatter) are part of the measurement
@@ -49,8 +51,12 @@ One per managed skill at `eval/<skill>/grading.json`. Changing it is a human dec
 
 Code metrics `grade.py` knows: integrity, wall_clock_s, finder_tool_calls_max,
 finder_duration_max_s, tokens_total_k, rounds_run, kept_total, important_kept,
-verifier_drop_rate, codex_subagents. Judge metrics: recall_key, recall_found, false_positives (with derived fp_important / fp_nit), dropped_real, key_recall (share of the kind's
-key items the final spec avoids or puts to the owner as a decision). Adding a metric
+verifier_drop_rate, codex_subagents, golden_distance (needs `"golden"`: a path relative to the eval
+dir, compared with the trial's `agent-spec-final.md`). Judge metrics: recall_key, recall_found,
+false_positives (with derived fp_important / fp_nit), dropped_real, input_coverage (share of the
+kind's key items the final spec covers), unsupported_statements (count of product facts the
+inputs do not support), key_recall (share of the kind's key items the final spec avoids or puts to
+the owner as a decision). Adding a metric
 means adding it to `grade.py` and to this list in the same commit.
 
 **spec_grader** (optional) — `{"script": "<path>", "kinds": ["..."], "args": {"<name>": "<path>[,<path>]"}}`.

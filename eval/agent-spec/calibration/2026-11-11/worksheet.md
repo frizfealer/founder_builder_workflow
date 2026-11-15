@@ -104,11 +104,16 @@ Spec the finder read: `results/it4b-3/rounds/round1-agent-spec.md` (round1-agent
 
 ## F4 — it2-2 R1-10 (round 1, Nit)
 
-```
-## R1-10
+▎ R1-10 | Lies | Nit | Appendix A, CO-A3 row
+▎ Quote: "refund failed: returns the refund with status: "failed" and failure_reason (payment_method_closed, payment_method_expired or declined)"
+▎ Evidence: the confirmed refund fields are refund id, order number, amount, payment method and status. No input defines a failure_reason field or its three values. No verdict depends on it, since no line reads the field.
 
-```
-```
+What it claims. In Appendix A, the spec says a failed refund comes back with a field called failure_reason, which has three possible values. The finder says the user never confirmed that field, so the spec made it up. "Lies" is the skill's class for a spec that states something the inputs don't support.
+
+What the inputs say (eval/agent-spec/review-packet.md):
+- Line 38. The refund fields are refund id, order number, amount, payment method and status. There is no reason field.
+- Line 77. The tool contract says only "terminal refund error returns a refund with status failed." It names no reason field.
+- Line 63. The user did confirm three causes of a terminal failure: "card closed or expired" or "the provider declines." These match the three values exactly.
 
 Spec the finder read: `results/it2-2/rounds/round0-agent-spec.md` (round0-agent-spec.md lines 1515-1535)
 
@@ -181,9 +186,9 @@ Spec the finder read: `results/it4b-3/rounds/round1-agent-spec.md` (round1-agent
 ## F6 — it2-2 R1-15 (round 1, Nit)
 
 ```
-## R1-15
-
-```
+▎ R1-15 | Untestable | Nit | §5.1 End of trial (CO-S10, CO-S14, CO-S15, CO-S21)
+▎ Quote: "A trial ends at the first agent message that asks the user nothing when no User turn is due, or at the agent's 12th message (the message cap), whichever comes first."
+▎ Evidence: Appendix A lets the agent repeat CO-A1 (look up orders) without limit. CO-S10, CO-S14, CO-S15 and CO-S21 make every CO-A1 after some point go unanswered. An agent that keeps retrying never sends a message, so the trial never ends and has no verdict.
 ```
 
 Spec the finder read: `results/it2-2/rounds/round0-agent-spec.md` (round0-agent-spec.md lines 1455-1475)
