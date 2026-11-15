@@ -1,0 +1,60 @@
+---
+title: "Harbor Goods: cancel an order (seeded policy, defects kept)"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: start
+    lg1: before cancel
+    lg2: after yes
+    lg3: nothing cancelled
+    lg4: Breaks R07
+    lg5: Breaks NoDeadlock or R03 in some cases
+    lg6: Path to the NoDeadlock or R03 or R07 bug
+  }
+  class lg0 tan
+  class lg1 blue
+  class lg2 orange
+  class lg3 pink
+  class lg4 breaks
+  class lg5 mayBreak
+  class lg6 bugPath
+  s0: Start
+  state "Before the cancel call" as s1 {
+    s2: Looking up orders
+    s3: Proposal waiting for yes
+  }
+  state "Conversation over" as s4 {
+    s5: Nothing cancelled, customer told
+  }
+  state "After the customer says yes" as s6 {
+    s7: Cancelling
+    s8: Cancel unanswered, checking
+  }
+  [*] --> s0
+  s0 --> s0: The order is already cancelled, its refund failed or The order is placed or processing
+  s0 --> s2: customer asks to cancel the order by its number
+  s2 --> s2: agent looks up the customer's orders or lookup shows the order cancelled, refund failed or lookup shows the order placed or processing
+  s2 --> s5: agent tells the customer: the order is already cancelled
+  s2 --> s3: agent proposes: cancel the whole order, refund the total to its payment method
+  s3 --> s7: customer says yes
+  s3 --> s3: customer asks for the refund to go to another payment method instead or agent proposes the changed proposal: refund to the other payment method
+  s7 --> s7: agent sends the cancel
+  s7 --> s8: cancel call times out (it did cancel)
+  s8 --> s8: agent looks up the customer's orders or lookup answers without the order
+  classDef breaks fill:#ffecee,stroke:#e72e3b,stroke-width:2.5px,color:#cd2834
+  classDef mayBreak fill:#fff3e6,stroke:#e8730c,stroke-width:2.5px,color:#b85a06
+  class s0 tan
+  class s0 bugPath
+  class s2 blue
+  class s2 bugPath
+  class s3 blue
+  class s3 mayBreak
+  class s3 bugPath
+  class s5 pink
+  class s5 breaks
+  class s5 bugPath
+  class s7 orange
+  class s7 bugPath
+  class s8 orange
+  class s8 mayBreak
+  class s8 bugPath

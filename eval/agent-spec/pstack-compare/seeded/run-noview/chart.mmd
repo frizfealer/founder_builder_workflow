@@ -1,0 +1,65 @@
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: Breaks NoDeadlock or R03 or R07
+    lg1: Path to the NoDeadlock or R03 or R07 bug
+  }
+  class lg0 breaks
+  class lg1 bugPath
+  s0: s=[loc |-> "setup", pending |-> "", order |-> "", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "", named |-> FALSE, asked_whole |-> FALSE, change |-> "", seen |-> "", seen_refund |-> "", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s1: s=[loc |-> "turn1", pending |-> "", order |-> "cancelled", refund |-> "failed", task |-> FALSE, other_open |-> FALSE, request |-> "", named |-> FALSE, asked_whole |-> FALSE, change |-> "", seen |-> "", seen_refund |-> "", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s2: s=[loc |-> "turn1", pending |-> "", order |-> "open", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "", named |-> FALSE, asked_whole |-> FALSE, change |-> "", seen |-> "", seen_refund |-> "", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s3: s=[loc |-> "agent", pending |-> "", order |-> "cancelled", refund |-> "failed", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "", seen_refund |-> "", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s4: s=[loc |-> "agent", pending |-> "", order |-> "open", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "", seen_refund |-> "", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s5: s=[loc |-> "agent", pending |-> "lookup", order |-> "cancelled", refund |-> "failed", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "", seen_refund |-> "", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s6: s=[loc |-> "agent", pending |-> "lookup", order |-> "open", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "", seen_refund |-> "", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s7: s=[loc |-> "agent", pending |-> "", order |-> "cancelled", refund |-> "failed", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "cancelled", seen_refund |-> "failed", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s8: s=[loc |-> "agent", pending |-> "", order |-> "open", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "open", seen_refund |-> "none", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s9: s=[loc |-> "end", pending |-> "", order |-> "cancelled", refund |-> "failed", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "cancelled", seen_refund |-> "failed", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {"already_cancelled"}] brk={}
+  s10: s=[loc |-> "proposed", pending |-> "", order |-> "open", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "open", seen_refund |-> "none", method |-> "original", ever_proposed |-> TRUE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s11: s=[loc |-> "agent", pending |-> "", order |-> "open", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "open", seen_refund |-> "none", method |-> "original", ever_proposed |-> TRUE, confirmed |-> TRUE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s12: s=[loc |-> "agent", pending |-> "", order |-> "open", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "method", seen |-> "open", seen_refund |-> "none", method |-> "original", ever_proposed |-> TRUE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s13: s=[loc |-> "agent", pending |-> "cancel", order |-> "open", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "open", seen_refund |-> "none", method |-> "original", ever_proposed |-> TRUE, confirmed |-> TRUE, cancel_n |-> 1, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s14: s=[loc |-> "proposed", pending |-> "", order |-> "open", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "open", seen_refund |-> "none", method |-> "other", ever_proposed |-> TRUE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={<<"R-03", "proposed a refund to another payment method">>}
+  s15: s=[loc |-> "agent", pending |-> "", order |-> "cancelled", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "open", seen_refund |-> "none", method |-> "original", ever_proposed |-> TRUE, confirmed |-> TRUE, cancel_n |-> 1, cancel_last |-> "timeout", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s16: s=[loc |-> "agent", pending |-> "lookup", order |-> "cancelled", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "open", seen_refund |-> "none", method |-> "original", ever_proposed |-> TRUE, confirmed |-> TRUE, cancel_n |-> 1, cancel_last |-> "timeout", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  s17: s=[loc |-> "agent", pending |-> "", order |-> "cancelled", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "open", seen_refund |-> "none", method |-> "original", ever_proposed |-> TRUE, confirmed |-> TRUE, cancel_n |-> 1, cancel_last |-> "timeout", after_cancel |-> "missing", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}] brk={}
+  [*] --> s0
+  s0 --> s1: Setup
+  s0 --> s2: Setup
+  s1 --> s3: CustomerAsks
+  s2 --> s4: CustomerAsks
+  s3 --> s5: AgentActs
+  s4 --> s6: AgentActs
+  s5 --> s7: LookupShows
+  s6 --> s8: LookupShows
+  s7 --> s9: AgentActs
+  s8 --> s10: AgentActs
+  s10 --> s11: CustomerSaysYes
+  s10 --> s12: CustomerAsksOtherMethod
+  s11 --> s13: AgentActs
+  s12 --> s14: AgentActs
+  s13 --> s15: CancelAnswers
+  s15 --> s16: AgentActs
+  s16 --> s17: LookupAnswersWithoutOrder
+  classDef breaks fill:#ffecee,stroke:#e72e3b,stroke-width:2.5px,color:#cd2834
+  class s0 bugPath
+  class s1 bugPath
+  class s2 bugPath
+  class s3 bugPath
+  class s4 bugPath
+  class s5 bugPath
+  class s6 bugPath
+  class s7 bugPath
+  class s8 bugPath
+  class s9 breaks
+  class s9 bugPath
+  class s10 bugPath
+  class s11 bugPath
+  class s12 bugPath
+  class s13 bugPath
+  class s14 breaks
+  class s14 bugPath
+  class s15 bugPath
+  class s16 bugPath
+  class s17 breaks
+  class s17 bugPath

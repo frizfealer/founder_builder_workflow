@@ -1,0 +1,60 @@
+stateDiagram-v2
+    state "Looking up orders" as s0
+    state "Asked which order, or whole order?" as s1
+    state "Proposal stated, waiting for yes" as s2
+    state "Cancel sent" as s3
+    state "Cancel sent, no answer" as s4
+    state "Cancelled, refund not yet issued" as s5
+    state "Handing to store staff" as s6
+    state "Nothing changed, customer told why" as s7
+    state "Not cancelled, customer told" as s8
+    state "Cancelled and refunded" as s9
+    state "Handed to store staff" as s10
+    state "Customer sent to support" as s11
+    state "Part-order or other-refund request unanswered" as s12
+    state "Already cancelled, no refund, not handed off" as s13
+    state "Already cancelled, no refund, request unanswered, not handed off" as s14
+    state "Handed off as 'unknown' though lookup answered" as s15
+    state "Told 'unknown' though lookup showed shipped" as s16
+    state "Told 'not cancelled', but it was" as s17
+    [*] --> s0 : customer asks to cancel
+    s0 --> s1 : lookup: open, some items asked<br/>lookup: two open orders
+    s0 --> s2 : lookup: open
+    s0 --> s7 : lookup: no answer<br/>lookup: number not on account<br/>lookup: shipped<br/>lookup: already cancelled
+    s0 --> s12 : lookup: shipped<br/>lookup: already cancelled
+    s0 --> s13 : lookup: already cancelled, no refund
+    s0 --> s14 : lookup: already cancelled, no refund
+    s1 --> s2 : customer asks to cancel the whole order<br/>customer names the order
+    s1 --> s7 : customer keeps the order<br/>customer stops answering
+    s2 --> s3 : customer says yes
+    s2 --> s7 : customer withdraws<br/>customer stops answering
+    s3 --> s4 : cancel: no answer
+    s3 --> s5 : cancel: cancelled
+    s3 --> s8 : cancel: not found<br/>cancel: rejected, shipped
+    s3 --> s17 : cancel: not found (late cancel landed)
+    s4 --> s3 : lookup: open
+    s4 --> s5 : lookup: cancelled
+    s4 --> s6 : lookup: no answer<br/>2nd cancel, no lookup<br/>2nd cancel, lookup: no answer
+    s4 --> s8 : lookup: shipped
+    s4 --> s15 : 2nd cancel, lookup: open<br/>2nd cancel, lookup: cancelled<br/>2nd cancel, lookup: shipped
+    s5 --> s6 : refund: failed<br/>refund: order not cancelled<br/>refund: provider down twice<br/>lookup: no answer<br/>lookup: refund failed<br/>lookup: refund none
+    s5 --> s9 : refund: pending/issued<br/>lookup: refund pending/issued
+    s6 --> s10 : task created
+    s6 --> s11 : hand-off: no answer twice
+    s8 --> s17 : late cancel lands
+    s15 --> s10 : task created
+    s15 --> s11 : hand-off: no answer twice
+    s15 --> s16 : task created<br/>hand-off: no answer twice
+    classDef breaks fill:#fbe9e7,stroke:#b3261e,stroke-width:2px,color:#000
+    class s12 breaks
+    note right of s12 : breaks CO-03
+    class s13 breaks
+    note right of s13 : breaks CO-07
+    class s14 breaks
+    note right of s14 : breaks CO-03, CO-07
+    class s15 breaks
+    note right of s15 : breaks CO-07
+    class s16 breaks
+    note right of s16 : breaks CO-05
+    class s17 breaks
+    note right of s17 : breaks S-1, S-2

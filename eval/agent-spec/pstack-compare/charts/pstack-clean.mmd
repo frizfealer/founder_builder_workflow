@@ -1,0 +1,73 @@
+---
+title: "Harbor Goods: cancel an order (clean policy)"
+---
+stateDiagram-v2
+  state "Legend" as legend {
+    lg0: start
+    lg1: before cancel
+    lg2: after yes
+    lg3: refunded
+    lg4: handed off
+    lg5: nothing cancelled
+  }
+  class lg0 tan
+  class lg1 blue
+  class lg2 orange
+  class lg3 teal
+  class lg4 yellow
+  class lg5 pink
+  s0: Start
+  state "Before the cancel call" as s1 {
+    s2: Looking up orders
+    s3: Asked which order
+    s4: Proposal waiting for yes
+    s5: Told only the whole order can be cancelled
+  }
+  state "Conversation over" as s6 {
+    s7: Nothing cancelled, customer told
+    s8: Cancelled and refunded
+    s9: Handed to store staff
+    s10: Customer sent to support
+  }
+  state "After the customer says yes" as s11 {
+    s12: Cancelling
+    s13: Cancel unanswered, checking
+    s14: Refunding
+    s15: Handing to store staff
+  }
+  [*] --> s0
+  s0 --> s2: customer asks to cancel the order by its number or customer asks for a different refund amount or customer asks for the refund to go to another payment method or customer asks to cancel only some items or customer gives an order number not on the account or customer asks to cancel 'my order' without saying which
+  s2 --> s7: agent tells the customer: the order is already cancelled or agent tells the customer: your orders cannot be checked right now or agent tells the customer: the order is already cancelled#59; the refund is the total paid, to the order's payment method or agent tells the customer: the order is already cancelled#59; only the whole order can be cancelled or agent tells the customer: no order with that number is on your account or agent tells the customer: the order has shipped and cannot be cancelled#59; returns are a separate process or agent tells the customer: the refund is the total paid, to the order's payment method#59; the order has shipped and cannot be cancelled#59; returns are a separate process or agent tells the customer: the order has shipped and cannot be cancelled#59; returns are a separate process#59; only the whole order can be cancelled
+  s2 --> s4: agent proposes: cancel the whole order, refund the total to its payment method or agent states the refund terms and proposes the whole order, refund to its payment method or agent proposes the only open order
+  s2 --> s5: agent says only the whole order can be cancelled
+  s2 --> s3: agent asks which order
+  s3 --> s2: customer names the order
+  s3 --> s7: customer stops answering
+  s4 --> s12: customer says yes
+  s4 --> s7: customer stops answering or customer withdraws
+  s5 --> s2: customer asks to cancel the whole order
+  s5 --> s7: customer keeps the order
+  s12 --> s13: cancel call times out (it did cancel) or cancel call times out (nothing changed)
+  s12 --> s14: agent sends the refund
+  s12 --> s7: agent tells the customer: the order was not cancelled#59; the order has shipped and cannot be cancelled#59; returns are a separate process
+  s14 --> s15: agent asks store staff to follow up (refund not issued) or agent asks store staff to follow up (refund status unknown)
+  s13 --> s14: agent sends the refund
+  s13 --> s15: agent asks store staff to follow up (cancellation unknown)
+  s14 --> s8: agent tells the customer: the order is cancelled#59; the refund is pending or issued, with its id
+  s13 --> s7: agent tells the customer: the order was not cancelled#59; the order has shipped and cannot be cancelled#59; returns are a separate process
+  s13 --> s12: cancel call returns cancelled or cancel call rejected: the order has shipped
+  s15 --> s9: agent tells the customer: the order is cancelled#59; the refund has not been issued#59; store staff will follow up or agent tells the customer: it is not known whether the order was cancelled#59; store staff will follow up or agent tells the customer: the order is cancelled#59; the refund's status is unknown#59; store staff will follow up
+  s15 --> s10: agent tells the customer: the order is cancelled#59; the refund has not been issued#59; it could not confirm store staff were told#59; contact Harbor Goods support or agent tells the customer: it is not known whether the order was cancelled#59; it could not confirm store staff were told#59; contact Harbor Goods support or agent tells the customer: the order is cancelled#59; the refund's status is unknown#59; it could not confirm store staff were told#59; contact Harbor Goods support
+  class s0 tan
+  class s2 blue
+  class s3 blue
+  class s4 blue
+  class s5 blue
+  class s7 pink
+  class s8 teal
+  class s9 yellow
+  class s10 yellow
+  class s12 orange
+  class s13 orange
+  class s14 orange
+  class s15 orange

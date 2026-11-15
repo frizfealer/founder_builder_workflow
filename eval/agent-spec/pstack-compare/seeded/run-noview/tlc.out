@@ -1,0 +1,46 @@
+TLC2 Version 2.19 of 08 August 2024 (rev: 5a47802)
+Warning: Please run the Java VM which executes TLC with a throughput optimized garbage collector by passing the "-XX:+UseParallelGC" property.
+(Use the -nowarning option to disable this warning.)
+Running breadth-first search Model-Checking with fp 0 and seed -5098202932651556511 with 1 worker on 8 cores with 6144MB heap and 64MB offheap memory [pid: 22657] (Mac OS X 26.6.2 aarch64, Eclipse Adoptium 25.0.5 x86_64, MSBDiskFPSet, DiskStateQueue).
+Parsing file /Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow/eval/agent-spec/pstack-compare/seeded/SeededPolicy.tla
+Parsing file /private/var/folders/hb/79cr56vn3538zpsrk8nznlr40000gn/T/statechart-q2UIQg/statechart-2F1ADz/tmp-verdict-1/Integers.tla
+Parsing file /private/var/folders/hb/79cr56vn3538zpsrk8nznlr40000gn/T/statechart-q2UIQg/statechart-2F1ADz/tmp-verdict-1/Sequences.tla
+Parsing file /private/var/folders/hb/79cr56vn3538zpsrk8nznlr40000gn/T/statechart-q2UIQg/statechart-2F1ADz/tmp-verdict-1/Naturals.tla
+Semantic processing of module Naturals
+Semantic processing of module Integers
+Semantic processing of module Sequences
+Semantic processing of module SeededPolicy
+Starting... (2026-11-14 15:36:42)
+Computing initial states...
+Finished computing initial states: 1 distinct state generated at 2026-11-14 15:36:42.
+Error: Invariant R07 is violated.
+Error: The behavior up to this point is:
+State 1: <Initial predicate>
+/\ s = [loc |-> "setup", pending |-> "", order |-> "", refund |-> "none", task |-> FALSE, other_open |-> FALSE, request |-> "", named |-> FALSE, asked_whole |-> FALSE, change |-> "", seen |-> "", seen_refund |-> "", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}]
+/\ brk = {}
+
+State 2: <Setup line 95, col 10 to line 96, col 101 of module SeededPolicy>
+/\ s = [loc |-> "turn1", pending |-> "", order |-> "cancelled", refund |-> "failed", task |-> FALSE, other_open |-> FALSE, request |-> "", named |-> FALSE, asked_whole |-> FALSE, change |-> "", seen |-> "", seen_refund |-> "", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}]
+/\ brk = {}
+
+State 3: <CustomerAsks line 153, col 17 to line 155, col 95 of module SeededPolicy>
+/\ s = [loc |-> "agent", pending |-> "", order |-> "cancelled", refund |-> "failed", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "", seen_refund |-> "", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}]
+/\ brk = {}
+
+State 4: <AgentActs line 238, col 14 to line 238, col 56 of module SeededPolicy>
+/\ s = [loc |-> "agent", pending |-> "lookup", order |-> "cancelled", refund |-> "failed", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "", seen_refund |-> "", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}]
+/\ brk = {}
+
+State 5: <LookupShows line 111, col 16 to line 111, col 83 of module SeededPolicy>
+/\ s = [loc |-> "agent", pending |-> "", order |-> "cancelled", refund |-> "failed", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "cancelled", seen_refund |-> "failed", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {}]
+/\ brk = {}
+
+State 6: <AgentActs line 238, col 14 to line 238, col 56 of module SeededPolicy>
+/\ s = [loc |-> "end", pending |-> "", order |-> "cancelled", refund |-> "failed", task |-> FALSE, other_open |-> FALSE, request |-> "number", named |-> TRUE, asked_whole |-> FALSE, change |-> "", seen |-> "cancelled", seen_refund |-> "failed", method |-> "", ever_proposed |-> FALSE, confirmed |-> FALSE, cancel_n |-> 0, cancel_last |-> "", after_cancel |-> "", cancel_seen |-> FALSE, refund_n |-> 0, refund_last |-> "", after_refund |-> "", fu_n |-> 0, fu_last |-> "", fu_reason |-> "", told |-> {"already_cancelled"}]
+/\ brk = {}
+
+169 states generated, 159 distinct states found, 53 states left on queue.
+The depth of the complete state graph search is 6.
+The average outdegree of the complete state graph is 2 (minimum is 1, the maximum 6 and the 95th percentile is 5).
+Finished in 00s at (2026-11-14 15:36:42)
+
