@@ -1,0 +1,19 @@
+{
+  "id": 11,
+  "title": "agent-spec section 5 Suite field",
+  "item": "agent-spec template §5: define the Suite field (capability = being hill-climbed, not a gate; regression = must keep passing); pass rule per suite (regression gates on pass^5 = 1 and any Forbidden event, capability reports pass rate and partial credit); drop undefined pass@1; confirm commit 0e1f523 (pytest-bdd mapping paragraph removal) is pushed.",
+  "motivation": "The pytest-bdd conversion reads §5, so it must be settled first; today §5's all-trials-pass rule contradicts the lane-2 CI-lower-bound check.",
+  "status": "Dropped",
+  "added": "2026-11-07",
+  "finished": "2026-11-15",
+  "notes": "Keep the 0.80 threshold and no-drop check out of the spec — they are runner/CI policy. Under an hour; do before item 1. Folded into task 19 on 2026-11-15 (owner agreed).",
+  "depends_on": [],
+  "source_chat": "BDD tests vs agent eval (Nov 6); Backlog / feature-map chat (Nov 7)",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "",
+  "priority": "",
+  "tokens": null,
+  "draft_note": ""
+}

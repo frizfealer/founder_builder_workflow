@@ -1,0 +1,27 @@
+{
+  "id": 25,
+  "title": "Restated policy read as acceptance",
+  "item": "agent-spec: a reply that restates the owner's policy is treated as acceptance of a proposed rule change",
+  "motivation": "Seen in a switch trial; the skill text does not say how to read such a reply",
+  "status": "Backlog",
+  "added": "2026-11-15",
+  "finished": "",
+  "notes": "Small skill-text change; one iteration.",
+  "depends_on": [
+    {
+      "id": 28,
+      "soft": false
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14–15)",
+  "done_means": "The skill text says a reply that only restates the policy is not acceptance. A seeded trial with such a reply leaves the rule unchanged.",
+  "verified_by": [
+    "metrics",
+    "script"
+  ],
+  "may_edit": [],
+  "runs_as": "iterate",
+  "priority": "medium",
+  "tokens": null,
+  "draft_note": ""
+}

@@ -1,0 +1,21 @@
+{
+  "id": 31,
+  "title": "Move the task list into the repo",
+  "item": "Move the task list from the Google Sheet into the repo: one file per task, a lint, a table view and a next-task picker",
+  "motivation": "The sheet was six rows behind the repo on 2026-11-15; a status changed in the same commit as the work cannot fall behind",
+  "status": "In progress",
+  "added": "2026-11-15",
+  "finished": "",
+  "notes": "Built by manager-build/PROMPT.md.",
+  "depends_on": [],
+  "source_chat": "Manager design chat (Nov 15)",
+  "done_means": "One file per task for all 33 seed tasks; every seed field reads back equal; the lint passes; the table view and the next-task picker work.",
+  "verified_by": [
+    "script"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "high",
+  "tokens": null,
+  "draft_note": ""
+}

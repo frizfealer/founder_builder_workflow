@@ -1,0 +1,24 @@
+{
+  "id": 4,
+  "title": "/iterate workflow",
+  "item": "/iterate — skill-agnostic workflow for developing every skill in the repo",
+  "motivation": "Claude Code runs the change and its verification with subagents and escalates only decisions that need a human; existing examples run through the artifact verifier serve as unit tests",
+  "status": "Done",
+  "added": "2026-11-07",
+  "finished": "2026-11-09",
+  "notes": "Built as the skill-iterate skill (/setup-eval, /trial, /grade, /iterate). First /iterate result (E5) merged 2026-11-09; E6–E8 followed. Follow-ups are items 20, 22 and 28.",
+  "depends_on": [
+    {
+      "id": 5,
+      "soft": true
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 6)",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "",
+  "priority": "",
+  "tokens": null,
+  "draft_note": ""
+}

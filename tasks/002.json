@@ -1,0 +1,31 @@
+{
+  "id": 2,
+  "title": "Feedback loop from test findings to the spec",
+  "item": "Master-agent feedback loop: spec → pytest-bdd → findings → agent-spec update mode, plus findings-generation instructions",
+  "motivation": "Closes the loop so test findings improve the spec instead of being read once and lost",
+  "status": "Backlog",
+  "added": "2026-11-07",
+  "finished": "",
+  "notes": "",
+  "depends_on": [
+    {
+      "id": 1,
+      "soft": false
+    },
+    {
+      "id": 3,
+      "soft": false
+    }
+  ],
+  "source_chat": "Pytest-bdd verification for agent-spec (Nov 1)",
+  "done_means": "One full pass on one example: test findings written in the findings format, update mode changes the spec, the re-run passes.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "medium",
+  "tokens": null,
+  "draft_note": ""
+}

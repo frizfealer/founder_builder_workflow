@@ -1,0 +1,30 @@
+{
+  "id": 7,
+  "title": "Rule ID tags, generated index and lint",
+  "item": "Rule/scenario IDs as tags in tests, prompt sections, tool and harness code; script that generates the rule → scenarios → tests → source index; lint (every spec rule ID in ≥1 test and ≥1 source location; every ID in code exists in the spec)",
+  "motivation": "Tags survive file moves, hand-written maps don't (Specification by Example ch. 11); a generated index can't rot, a hand-written feature map does",
+  "status": "Backlog",
+  "added": "2026-11-07",
+  "finished": "",
+  "notes": "No hand-written feature map. Depends on item 6 showing the owners.",
+  "depends_on": [
+    {
+      "id": 1,
+      "soft": false
+    },
+    {
+      "id": 6,
+      "soft": false
+    }
+  ],
+  "source_chat": "Backlog / feature-map chat (Nov 7)",
+  "done_means": "Rule IDs are tagged in the tests and source of one example. The index is generated. The lint fails on a seeded missing tag and passes otherwise.",
+  "verified_by": [
+    "script"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "low",
+  "tokens": null,
+  "draft_note": ""
+}

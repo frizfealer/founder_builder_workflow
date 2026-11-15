@@ -1,0 +1,26 @@
+{
+  "id": 5,
+  "title": "Cheaper checking step in agent-spec",
+  "item": "Make the agent-spec Verify step (3 rounds of finders → verifiers → fix) faster and cheaper in tokens",
+  "motivation": "The three rounds are slow and token-heavy (observed 2026-11-06)",
+  "status": "Backlog",
+  "added": "2026-11-07",
+  "finished": "",
+  "notes": "",
+  "depends_on": [
+    {
+      "id": 28,
+      "soft": false
+    }
+  ],
+  "source_chat": "Verification rounds token cost (Nov 6–8)",
+  "done_means": "The checking step runs on a lower-end model at medium effort, and no gated metric is worse than the baseline.",
+  "verified_by": [
+    "metrics"
+  ],
+  "may_edit": [],
+  "runs_as": "iterate",
+  "priority": "low",
+  "tokens": null,
+  "draft_note": "Finish rule and low priority set by the owner 2026-11-15. E7 put the verifier on Sonnet in the old format and was reverted because it dropped real defects."
+}

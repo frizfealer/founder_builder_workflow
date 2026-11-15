@@ -1,0 +1,27 @@
+{
+  "id": 22,
+  "title": "/setup-eval on a second skill",
+  "item": "/setup-eval on a second skill",
+  "motivation": "Shows skill-iterate is generic, not specific to agent-spec",
+  "status": "Backlog",
+  "added": "2026-11-14",
+  "finished": "",
+  "notes": "",
+  "depends_on": [
+    {
+      "id": 1,
+      "soft": false
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14)",
+  "done_means": "/setup-eval creates the BDD skill's eval folder. The owner approves its grading.json. Three baseline trials run and grade. Nothing in skill-iterate had to be edited to name the new skill.",
+  "verified_by": [
+    "you",
+    "script"
+  ],
+  "may_edit": [],
+  "runs_as": "measurement",
+  "priority": "medium",
+  "tokens": null,
+  "draft_note": "Owner decided 2026-11-15: the second skill is the BDD skill. May edit must name the protected-paths file, to add the new eval folder."
+}

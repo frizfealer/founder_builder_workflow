@@ -1,0 +1,26 @@
+{
+  "id": 33,
+  "title": "Mechanical checks for the manager",
+  "item": "Three checks: protected paths (lint before merge), no push during a manager run (hook), tasks merged since the last review (limit)",
+  "motivation": "A gate holds only where a script enforces it",
+  "status": "In progress",
+  "added": "2026-11-15",
+  "finished": "",
+  "notes": "Built by manager-build/PROMPT.md. Other rules stay prose until one is broken.",
+  "depends_on": [
+    {
+      "id": 31,
+      "soft": false
+    }
+  ],
+  "source_chat": "Manager design chat (Nov 15)",
+  "done_means": "Each check has passing tests for its allow and refuse cases, run in temporary git repos.",
+  "verified_by": [
+    "script"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "high",
+  "tokens": null,
+  "draft_note": ""
+}

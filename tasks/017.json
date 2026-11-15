@@ -1,0 +1,21 @@
+{
+  "id": 17,
+  "title": "Fresh example with the owner unprepared",
+  "item": "Fresh example built from scratch in the new format, with the owner answering the interview unprepared",
+  "motivation": "Only fair test of the interview guard and of readability; the owner already knows Harbor Goods",
+  "status": "Backlog",
+  "added": "2026-11-14",
+  "finished": "",
+  "notes": "After reading the policy page: five questions about the policy, noting whether the chart was used. The chart stays only if it was used.",
+  "depends_on": [],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14)",
+  "done_means": "A new example is built in the new format from the owner's live interview. His five answers about the policy, and whether he used the chart, are recorded. The chart is kept or dropped.",
+  "verified_by": [
+    "you"
+  ],
+  "may_edit": [],
+  "runs_as": "you",
+  "priority": "high",
+  "tokens": null,
+  "draft_note": ""
+}

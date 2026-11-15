@@ -1,0 +1,19 @@
+{
+  "id": 8,
+  "title": "Cafe: key the reservation rule on phone",
+  "item": "Café example: key \"one reservation per name per date\" on phone instead of name",
+  "motivation": "Name is a weak identity; the agent always has the phone",
+  "status": "Dropped",
+  "added": "2026-11-07",
+  "finished": "2026-11-07",
+  "notes": "Café is a closed regression fixture; changing the rule means re-cutting it and the hand-converted tests for no skill-level gain. Phone already used for recovery matching (G-04, CR-S19 row 3).",
+  "depends_on": [],
+  "source_chat": "Pytest-bdd verification for agent-spec (Nov 1); dropped in Backlog / feature-map chat (Nov 7)",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "",
+  "priority": "",
+  "tokens": null,
+  "draft_note": ""
+}

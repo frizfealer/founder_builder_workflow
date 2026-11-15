@@ -1,0 +1,19 @@
+{
+  "id": 21,
+  "title": "Commit or discard the 2026-11-14 work",
+  "item": "Commit or discard the 2026-11-14 uncommitted work: statechart-test, assumption-flag-test, pstack-compare, new-format, the vendored .claude/skills/statechart, and the background agents' files",
+  "motivation": "Only DECISIONS.md was committed; the working tree holds many uncommitted folders",
+  "status": "Done",
+  "added": "2026-11-14",
+  "finished": "2026-11-15",
+  "notes": "Evidence folders and switch plan committed (be3c6f0); old build kind kept as history (027e0e2); switch trials kept as history (2fbdb77). Deleted: vendored pstack skill, tmp, eval/.patch10.py. Older owner files left untouched.",
+  "depends_on": [],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14)",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "",
+  "priority": "",
+  "tokens": null,
+  "draft_note": ""
+}

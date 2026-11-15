@@ -1,0 +1,31 @@
+{
+  "id": 32,
+  "title": "Manager skill",
+  "item": "Manager skill: Claude Code takes Ready tasks and runs them without asking what is next, parks what needs the owner, and reports once",
+  "motivation": "The owner has about 10 hours a week; asking him what is next, or about every decision, spends them",
+  "status": "In progress",
+  "added": "2026-11-15",
+  "finished": "",
+  "notes": "Built by manager-build/PROMPT.md.",
+  "depends_on": [
+    {
+      "id": 31,
+      "soft": false
+    },
+    {
+      "id": 33,
+      "soft": false
+    }
+  ],
+  "source_chat": "Manager design chat (Nov 15)",
+  "done_means": "A /manage command and its skill exist; a dry run on the seed picks task 20 and changes nothing; agent definitions set model and effort.",
+  "verified_by": [
+    "script",
+    "you"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "high",
+  "tokens": null,
+  "draft_note": ""
+}

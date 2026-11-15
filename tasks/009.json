@@ -1,0 +1,30 @@
+{
+  "id": 9,
+  "title": "Eval runner (lane 2)",
+  "item": "Eval runner (lane 2): pytest option (--eval --trials N) over the same step definitions — record per-line outcomes instead of raising, N trials per data variant with an LLM simulated user, aggregate per agent-spec §5 (any Forbidden event → 0, else share of Required events; pass rate, pass^5, question recall/precision, turn and call counts, cost, latency). Gate: Forbidden = 0 across all trials; Required-event pass rate 95% CI lower bound ≥ 0.80 (recalibrate after first full run); no significant drop vs last green run. Everything else reported.",
+  "motivation": "Lane 1 (BDD gate) proves the test rig, not the model; the real agent is non-deterministic so one pass/fail run says nothing. One set of step definitions for both lanes avoids two definitions of \"CR-A1 occurred\" (Anthropic Demystifying evals: pass^k, partial credit, grade the transcript).",
+  "status": "Backlog",
+  "added": "2026-11-07",
+  "finished": "",
+  "notes": "Depends on item 1. Gate policy: inner loop k=1, any failure fails; slice gate k=5, all must pass. SimulatedUser is already swappable for an LLM one.",
+  "depends_on": [
+    {
+      "id": 1,
+      "soft": false
+    },
+    {
+      "id": 19,
+      "soft": false
+    }
+  ],
+  "source_chat": "BDD tests vs agent eval (Nov 6); Agent workflow with Claude subagents (Nov 6)",
+  "done_means": "pytest --eval --trials N reuses the step definitions and reports the scoring plan's numbers. The reference agent scores a pass and each broken variant scores its known failure.",
+  "verified_by": [
+    "script"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "low",
+  "tokens": null,
+  "draft_note": "Waits for a built agent; there is no task for that yet."
+}

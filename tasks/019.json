@@ -1,0 +1,23 @@
+{
+  "id": 19,
+  "title": "Agent-evaluation skill",
+  "item": "Agent-evaluation skill: owns how behavior is tested — scoring plan (today spec §5), rubric dimensions, test mechanics",
+  "motivation": "DECISIONS.md: agent-spec owns what the agent must do, agent eval owns how it is tested",
+  "status": "Backlog",
+  "added": "2026-11-14",
+  "finished": "",
+  "notes": "27 of the 50 clusters in the parked key-proposal.md move here. Relates to item 9 (eval runner).",
+  "depends_on": [],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14)",
+  "done_means": "The owner approves a plan. Then the skill writes the scoring plan (suites, a pass rule per suite, no pass@1), the rubric and the test mechanics from a new-format spec. It includes the eval-runner paragraph. Material in agent-eval-pending/ is used or removed.",
+  "verified_by": [
+    "you",
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "low",
+  "tokens": null,
+  "draft_note": "Includes former tasks 10 and 11 (folded 2026-11-15). Plan first. Waits for a built agent; there is no task for that yet."
+}

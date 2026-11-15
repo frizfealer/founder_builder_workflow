@@ -1,0 +1,21 @@
+{
+  "id": 6,
+  "title": "Rule to owner table in architecture notes",
+  "item": "Rule → owner table in architecture notes: one row per rule ID (G-xx, CR-xx) naming its owning location, product side (prompt section, tool wrapper, harness code, harness check) and test side (fake system, simulated user, grader, pytest-bdd steps)",
+  "motivation": "So an agent or a new engineer can find the code to change when a rule changes; more than one product-side owner is a leakage finding (Ousterhout ch. 5; Fundamentals of Software Architecture ch. 8)",
+  "status": "Backlog",
+  "added": "2026-11-07",
+  "finished": "",
+  "notes": "Do first: ~13 rows for the café agent, hand-written. Then run the CR-04 (3 → 4 times) change and compare files touched against the table.",
+  "depends_on": [],
+  "source_chat": "Backlog / feature-map chat (Nov 7)",
+  "done_means": "Architecture notes hold one row per rule ID, with one product-side and one test-side owner. One rule change is made on a scratch branch and the files touched are compared with the table.",
+  "verified_by": [
+    "reviewer"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "low",
+  "tokens": null,
+  "draft_note": ""
+}

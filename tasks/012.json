@@ -1,0 +1,27 @@
+{
+  "id": 12,
+  "title": "Pause verification on rule-text changes",
+  "item": "agent-spec Verify step: pause on rule-text changes. Fixes to scenarios and wording are the skill's to make; a fix that changes a rule (G-xx, CR-xx) is the founder's decision. When a round produces one, stop, collect all such proposals into one batch (R1…Rn), get the founder's decisions, then resume verification on the stable text instead of running the next round on text about to change.",
+  "motivation": "Observed on the order-cancel run: round 3 would have reviewed G-05, CO-01, CO-09 text that was about to be replaced, so its findings would have been wasted; Claude Code stopped on its own judgment and batched six proposals (R1–R6). The skill as written says \"run three rounds\" — the judgment call should be the rule.",
+  "status": "Backlog",
+  "added": "2026-11-07",
+  "finished": "",
+  "notes": "Edit SKILL.md §4 Verify: add the pause-and-batch rule; three-round cap counts only rounds run on stable text. Small edit; also cuts wasted tokens (relates to item 5).",
+  "depends_on": [
+    {
+      "id": 28,
+      "soft": false
+    }
+  ],
+  "source_chat": "Verification rounds token cost (Nov 6–8); added in Backlog / feature-map chat (Nov 7)",
+  "done_means": "A fix that changes rule text stops the round and goes to the owner as one batch. A seeded trial ends with that batch and runs no further round on that text.",
+  "verified_by": [
+    "metrics",
+    "script"
+  ],
+  "may_edit": [],
+  "runs_as": "iterate",
+  "priority": "medium",
+  "tokens": null,
+  "draft_note": "DECISIONS.md already says a rule-text fix becomes a proposal for the human, and d93de6e touches the same step. Check what is left before running."
+}

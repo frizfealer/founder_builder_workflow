@@ -1,0 +1,24 @@
+{
+  "id": 15,
+  "title": "Interview guard in agent-spec",
+  "item": "Interview guard in agent-spec: first ask which systems the agent calls, who owns each and where the docs are; check system claims against docs; for every limit set to none say what ends it; for every money value from a tool say what happens on a mismatch; show what a policy choice leads to",
+  "motivation": "The interview accepted unreasonable decisions (unlimited lookup retries) and wrong external-system assumptions (a repeated refund call never duplicates) without warning",
+  "status": "Done",
+  "added": "2026-11-14",
+  "finished": "2026-11-15",
+  "notes": "In the skill since e8ed321. The four guard gates read 1.0 in 3 of 3 baseline trials; 1–9 claims put to the owner per trial, limit 10. These check form only; whether the questions are good is untested until item 17.",
+  "depends_on": [
+    {
+      "id": 14,
+      "soft": false
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14)",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "",
+  "priority": "",
+  "tokens": null,
+  "draft_note": ""
+}

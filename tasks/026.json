@@ -1,0 +1,27 @@
+{
+  "id": 26,
+  "title": "Accepted rule change creates a new conflict",
+  "item": "agent-spec: an accepted rule change can create a new rule conflict with no owner turn left to settle it",
+  "motivation": "Seen in switch-base-5; the conflict is listed on the policy page as an open decision, so the gates pass",
+  "status": "Backlog",
+  "added": "2026-11-15",
+  "finished": "",
+  "notes": "Decide whether the answer step gets one more owner turn.",
+  "depends_on": [
+    {
+      "id": 28,
+      "soft": false
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14–15)",
+  "done_means": "The owner decides whether the answer step gets one more owner turn. Then a seeded trial with such a conflict ends with it settled or put to the owner, not only listed.",
+  "verified_by": [
+    "you",
+    "metrics"
+  ],
+  "may_edit": [],
+  "runs_as": "you",
+  "priority": "medium",
+  "tokens": null,
+  "draft_note": "Becomes an iterate task once the owner has decided."
+}
