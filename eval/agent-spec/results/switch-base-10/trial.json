@@ -1,0 +1,227 @@
+{
+ "schema": 1,
+ "label": "switch-base-10",
+ "kind": "build2",
+ "legacy": false,
+ "skill_commit": "807d36e",
+ "effort": "high",
+ "session_model": "opus",
+ "wall_clock_s": 1787,
+ "rounds": [
+  {
+   "n": 1,
+   "start": "2026-11-15T14:53:38Z",
+   "end": "2026-11-15T15:02:15Z",
+   "seconds": 517,
+   "merged": 7,
+   "kept": 5,
+   "dropped": 2,
+   "preexisting": 0,
+   "unknown_kept": 0,
+   "important_kept": 2,
+   "header_count": {
+    "merged": 7,
+    "important": 4,
+    "nit": 3
+   }
+  }
+ ],
+ "integrity": {
+  "script_errors": 0,
+  "checker_zero_errors_seen": true,
+  "asked_user": false
+ },
+ "subagents": [
+  {
+   "round": 0,
+   "step": "2",
+   "role": "stand-in turn 1",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 61100,
+   "tokens": 51202,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "step": "2",
+   "role": "stand-in turn 2",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 48609,
+   "tokens": 50439,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "step": "3.4",
+   "role": "stand-in turn 3",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 103732,
+   "tokens": 60076,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "step": "3.4",
+   "role": "stand-in turn 4",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 7,
+   "duration_ms": 69621,
+   "tokens": 52966,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "step": "4",
+   "role": "finder: faithfulness",
+   "kind": "finder",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 9,
+   "duration_ms": 171258,
+   "tokens": 83863,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "step": "4",
+   "role": "verifier: adversarial",
+   "kind": "verifier",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 13,
+   "duration_ms": 136795,
+   "tokens": 92104,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "step": "4.5",
+   "role": "stand-in turn 5",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 62647,
+   "tokens": 52009,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  }
+ ],
+ "findings": [
+  {
+   "id": "R1-01",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-01, R-08, R-10; claims.md C-04, C-45",
+   "quote": "When the order list call times out, it sends it again; the owner set no limit on this.",
+   "kept": true,
+   "verified": true,
+   "status": "open"
+  },
+  {
+   "id": "R1-02",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Important",
+   "location": "rules.md R-07",
+   "quote": "The agent sends the refund call only after the cancel call answered cancelled.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-03",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "policy.md chart; rules.md D-02, R-04; claims.md C-42",
+   "quote": "Each order is handled on its own, with its own proposal and its own yes; nothing else bounds how many orders one conversation cancels.",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-04",
+   "round": 1,
+   "class": "Unclear",
+   "severity": "Important",
+   "location": "rules.md What the agent does, row 'a refund call went unanswered, and the second refund call has answered'",
+   "quote": "a refund call went unanswered, and the second refund call has answered | reads the refund again",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-05",
+   "round": 1,
+   "class": "Unclear",
+   "severity": "Nit",
+   "location": "claims.md C-30, C-32; rules.md R-09, R-10",
+   "quote": "On a lasting error the refund call returns a refund with status failed; on a passing error it creates no refund.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-06",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "claims.md C-26, C-04",
+   "quote": "A refund can fail after it is issued, when the customer's bank or card issuer cannot process it.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-07",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md What the agent does rows citing R-12, R-10 and R-04",
+   "quote": "the cancel call answered order not found | says the order was not found, and changes nothing | R-12",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  }
+ ],
+ "final_spec": "results/switch-base-10/spec-final",
+ "stand_in": {
+  "questions": 20,
+  "answered_by_record": 11,
+  "answered_by_stand_in_default": 9
+ },
+ "checker_final": "0 errors; States: 6623 steps: 7800 self-test: pass; Breaks: 0; Scenarios: 45 (39 model path); Chart: 14 states, 21 arrows; Steps no scenario takes: 0",
+ "warnings": [
+  "The harness refused writing results/switch-base-10/report.md (subagent write of a report file); the report text is returned in the hand-back under REPORT.MD for the main session to write.",
+  "Task notifications reported only subagent_tokens (total); tokens_in, tokens_out and tokens_cache_read are null.",
+  "This skill version runs one verification round (step 4.5: 'There is no second round'); round2/round3 did not run. checker_zero_errors_seen is the step-4.5 rerun reading 0 errors.",
+  "This skill version has no steps 3.8 or 3.9; their timestamps are absent from run.log.",
+  "Round 1 finding R1-01 is partly fixed (list-call failure rule added) and partly open (no end to resending a read that times out; the owner declined a bound)."
+ ]
+}

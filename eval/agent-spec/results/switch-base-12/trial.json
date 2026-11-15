@@ -1,0 +1,256 @@
+{
+ "schema": 1,
+ "label": "switch-base-12",
+ "kind": "build2",
+ "legacy": false,
+ "skill_commit": "807d36e",
+ "effort": "high",
+ "session_model": "opus",
+ "wall_clock_s": 1784,
+ "final_spec": "results/switch-base-12/spec-final",
+ "rounds": [
+  {
+   "n": 1,
+   "start": "2026-11-15T14:53:51Z",
+   "end": "2026-11-15T15:02:35Z",
+   "seconds": 524,
+   "merged": 9,
+   "kept": 6,
+   "dropped": 3,
+   "preexisting": 0,
+   "unknown_kept": 0,
+   "important_kept": 3,
+   "header_count": {
+    "merged": 8,
+    "important": 5,
+    "nit": 3
+   }
+  }
+ ],
+ "integrity": {
+  "script_errors": 0,
+  "checker_zero_errors_seen": true,
+  "asked_user": false
+ },
+ "subagents": [
+  {
+   "round": 0,
+   "role": "owner stand-in: step 2 turn 1",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 6,
+   "duration_ms": 27792,
+   "tokens": 47067,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "role": "owner stand-in: step 2 turn 2",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 90918,
+   "tokens": 56866,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "role": "owner stand-in: step 2 turn 3",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 66452,
+   "tokens": 54190,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "role": "owner stand-in: step 3.4 turn 1 (tool confirmation)",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 10,
+   "duration_ms": 112548,
+   "tokens": 63569,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "role": "owner stand-in: step 3.4 turn 2",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 7,
+   "duration_ms": 100410,
+   "tokens": 63132,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "finder: faithfulness",
+   "kind": "finder",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 9,
+   "duration_ms": 173029,
+   "tokens": 84343,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "verifier: adversarial",
+   "kind": "verifier",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 11,
+   "duration_ms": 195594,
+   "tokens": 101052,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "owner stand-in: step 4.5 rule-change proposal",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 29429,
+   "tokens": 47238,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  }
+ ],
+ "findings": [
+  {
+   "id": "R1-01",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Important",
+   "location": "claims.md C-06, C-07; rules.md R-01, R-07, R-09",
+   "quote": "C-06 | A call to list the customer's orders answers with the orders, gets no answer, or fails with an error.",
+   "kept": true,
+   "verified": true,
+   "status": "open"
+  },
+  {
+   "id": "R1-02",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "claims.md C-50; rules.md R-01, R-07, R-09",
+   "quote": "C-50 | ... | none: the owner set no limit |",
+   "kept": true,
+   "verified": true,
+   "status": "open"
+  },
+  {
+   "id": "R1-03",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Important",
+   "location": "claims.md C-47; rules.md R-04",
+   "quote": "the agent then says the refund is the order's total paid to its payment method and asks for a yes to the proposal again.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-04",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md R-13; What the agent does",
+   "quote": "absent",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-05",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Important",
+   "location": "policy.md A3; rules.md R-10, R-09",
+   "quote": "agent tells the customer: the order is cancelled and the order system returned a refund amount that differs from the one you agreed; store staff will follow up on the order",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-06",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md R-12",
+   "quote": "if that gets no answer too, it tells the customer what is known so far and to contact Harbor Goods support.",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-07",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md row 'the customer asked to cancel only some items'",
+   "quote": "says only the whole order can be cancelled, and asks whether to cancel the whole order | R-03",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-08",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md rows for a cancel answered shipped / re-read shows shipped; R-06, R-07",
+   "quote": "the cancel call answered that the order cannot be cancelled because it shipped",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-09",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md R-10, R-11; refund issued or pending row",
+   "quote": "says the order is cancelled and the refund of that amount to that payment method is issued or pending, with its refund id",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  }
+ ],
+ "interview": {
+  "questions": 18,
+  "answered_by_record": 12,
+  "answered_by_stand_in_default": 6,
+  "claims_put_to_owner": 9
+ },
+ "checker_final": "0 errors; States: 9351 steps: 11163 self-test: pass; Breaks: 0; Scenarios: 47 (42 model path); Chart: 13 states, 20 arrows; Steps no scenario takes: 0",
+ "warnings": [
+  "Task notifications report only total subagent_tokens, tool_uses and duration_ms; tokens_in, tokens_out and tokens_cache_read are null.",
+  "The round-1 finder's count line says '8 findings: 5 Important, 3 Nit' but it lists 9 (F1-F9, 5 Important, 4 Nit); merged uses 9, header_count keeps the stated line.",
+  "The skill at 807d36e has no steps 3.8 or 3.9; the tool confirmation was put to the stand-in in the step-3.4 decision turn (log question 10).",
+  "The harness refused writing results/switch-base-12/report.md ('Subagents should return findings as text'); the report text is returned in the hand-back under REPORT.MD for the main session to write.",
+  "Stand-in turns 0 in subagents[].round mean steps 2 and 3.4, before the verification rounds."
+ ]
+}

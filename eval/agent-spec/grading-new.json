@@ -5,7 +5,7 @@
  "kinds": {
   "build2": {
    "description": "steps 1-5 from product-idea.md with the owner stand-in (PROMPT-build2.md, step 7); output is a new-format spec folder named by trial.json final_spec, plus interview-log.json in the results folder. Baseline: three trials of the switched skill (step 8).",
-   "baseline_labels": []
+   "baseline_labels": ["switch-base-10", "switch-base-11", "switch-base-12"]
   }
  },
  "key": {

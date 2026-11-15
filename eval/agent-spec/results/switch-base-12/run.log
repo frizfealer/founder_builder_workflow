@@ -1,0 +1,70 @@
+setup 2026-11-15T14:34:32Z
+step1 start 2026-11-15T14:34:32Z
+step1 end 2026-11-15T14:34:50Z
+step2 start 2026-11-15T14:34:50Z
+step2 end 2026-11-15T14:42:36Z
+step3 start 2026-11-15T14:42:36Z
+step3.3 first check: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-12/product/agent-spec --write
+0 errors
+States: 3278  steps: 3637  self-test: pass
+Breaks: 1
+  no-step: the agent has no step here  (12 steps)
+Listed on policy.md: 1; not listed: 0
+Scenarios: 0 (0 model path); one-path share None
+Chart: 13 states, 20 arrows
+Steps no scenario takes: 67
+step3.4 start 2026-11-15T14:45:34Z
+step3.4 end 2026-11-15T14:52:44Z
+step3.3 after decision turn: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-12/product/agent-spec --write
+0 errors
+States: 9351  steps: 11163  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 0 (0 model path); one-path share None
+Chart: 13 states, 20 arrows
+step3.5 start 2026-11-15T14:52:44Z
+uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-12/product/agent-spec --derive
+step3.5 check after appending: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-12/product/agent-spec
+0 errors
+States: 9351  steps: 11163  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 45 (40 model path); one-path share 1.0
+Chart: 13 states, 20 arrows
+Steps no scenario takes: 0
+step3.5 end 2026-11-15T14:53:20Z
+step3 end 2026-11-15T14:53:20Z
+note: this skill version has no steps 3.8/3.9; the tool confirmation happened in the step-3.4 decision turn (log question 10)
+step4 start 2026-11-15T14:53:20Z
+step4.1: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-12/product/agent-spec
+0 errors
+States: 9351  steps: 11163  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 45 (40 model path); one-path share 1.0
+Chart: 13 states, 20 arrows
+Steps no scenario takes: 0
+step4.2 packet written 2026-11-15T14:53:35Z
+round1 start 2026-11-15T14:53:51Z
+round1 finder returned 2026-11-15T14:57:25Z
+round1 verifier returned 2026-11-15T15:01:14Z
+step4.5 rerun 3.3/3.5: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-12/product/agent-spec --write --derive (appended SC-46, SC-47)
+0 errors
+States: 9351  steps: 11163  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 47 (42 model path); one-path share 1.0
+Chart: 13 states, 20 arrows
+Steps no scenario takes: 0
+round1 end 2026-11-15T15:02:35Z
+step4 end 2026-11-15T15:02:35Z
+step5 start 2026-11-15T15:02:35Z
+0 errors
+States: 9351  steps: 11163  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 47 (42 model path); one-path share 1.0
+Chart: 13 states, 20 arrows
+Steps no scenario takes: 0
+step5 report.md write refused by the harness (Write tool: 'Subagents should return findings as text'); report returned in the hand-back under REPORT.MD
+step5 end 2026-11-15T15:04:16Z

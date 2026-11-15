@@ -1,0 +1,212 @@
+{
+ "schema": 1,
+ "label": "switch-base-11",
+ "kind": "build2",
+ "legacy": false,
+ "skill_commit": "807d36e",
+ "effort": "high",
+ "session_model": "opus",
+ "wall_clock_s": 1386,
+ "final_spec": "results/switch-base-11/spec-final",
+ "rounds": [
+  {
+   "n": 1,
+   "start": "2026-11-15T14:50:04Z",
+   "end": "2026-11-15T14:56:50Z",
+   "seconds": 406,
+   "merged": 6,
+   "kept": 3,
+   "dropped": 3,
+   "preexisting": 0,
+   "unknown_kept": 0,
+   "important_kept": 2,
+   "header_count": {
+    "merged": 6,
+    "important": 3,
+    "nit": 3
+   }
+  }
+ ],
+ "integrity": {
+  "script_errors": 0,
+  "checker_zero_errors_seen": true,
+  "asked_user": false
+ },
+ "subagents": [
+  {
+   "round": null,
+   "role": "stand-in: step 2 turn 1",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 26225,
+   "tokens": 46864,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": null,
+   "role": "stand-in: step 2 turn 2",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 6,
+   "duration_ms": 97779,
+   "tokens": 59939,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": null,
+   "role": "stand-in: step 2 turn 3",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 63040,
+   "tokens": 55470,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": null,
+   "role": "stand-in: step 2 turn 4",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 66917,
+   "tokens": 54228,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": null,
+   "role": "stand-in: step 3.4 decision turn",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 52349,
+   "tokens": 51269,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "finder: faithfulness",
+   "kind": "finder",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 9,
+   "duration_ms": 179648,
+   "tokens": 83285,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "verifier: adversarial",
+   "kind": "verifier",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 14,
+   "duration_ms": 115764,
+   "tokens": 85359,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  }
+ ],
+ "findings": [
+  {
+   "id": "R1-01",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Important",
+   "location": "rules.md 'What the agent does' row for order not cancelled; policy.md A15 not-found message",
+   "quote": "| the refund call returned a failed refund, answered order not cancelled, or answered a second transient error | hands the case to staff (refund not issued), then says the order is cancelled but the refund was not issued | R-07, R-11, R-09 |",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-02",
+   "round": 1,
+   "class": "Unclear",
+   "severity": "Important",
+   "location": "rules.md R-04",
+   "quote": "When the customer's words fit more than one open order, the agent asks which one, and the yes must name the order number.",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-03",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md 'What the agent does' (R-04, R-12)",
+   "quote": "absent",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-04",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md R-02, row 'the read of the orders failed'",
+   "quote": "When it cannot read the customer's orders, it says so and changes nothing.",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-05",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "claims.md C-47, C-49, C-51",
+   "quote": "Refunds to expired or cancelled cards usually reach the customer's replacement card, and fail only in rare cases.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-06",
+   "round": 1,
+   "class": "Unclear",
+   "severity": "Nit",
+   "location": "rules.md R-02 title",
+   "quote": "## R-02 Shipped, delivered, cancelled or unknown orders change nothing",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  }
+ ],
+ "counts": {
+  "questions_to_stand_in": 17,
+  "answered_from_record": 9,
+  "stand_in_default": 8,
+  "claims_put_to_owner": 1,
+  "scenarios": 53,
+  "model_path_scenarios": 46,
+  "conversational_scenarios": 7
+ },
+ "warnings": [
+  "The harness split of tokens (in / out / cache read) was not reported in task notifications; tokens is subagent_tokens.",
+  "The skill under test has no step 3.8/3.9; the tool confirmation ran in step 3.4 (Q16), and run.log has 3.4/3.5 timestamps instead.",
+  "report.md write was refused by the harness for subagents; the report text is returned in the hand-back under REPORT.MD.",
+  "Stand-in rows have round null (step 2 and step 3.4, before the verification rounds).",
+  "R1-05 is partly answered (C-47 left spec only) and partly fixed (C-49, C-51); status recorded as fixed."
+ ]
+}
