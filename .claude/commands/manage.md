@@ -1,0 +1,1 @@
+../skills/manage/commands/manage.md
