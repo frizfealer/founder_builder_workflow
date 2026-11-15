@@ -1,0 +1,119 @@
+{
+ "inputs": [
+  "product-idea.md"
+ ],
+ "questions": [
+  {
+   "n": 1,
+   "question": "Which systems will the agent's tools reach, directly or behind another system, who owns each, and where are their docs?",
+   "recommended": "Two. Harbor Goods' order system, owned by Harbor Goods, with no docs: it looks up an order and cancels it. And the payment provider that took the customer's payment, which the refund goes through, with its public docs. If \"yes\", please name the payment provider and where its docs are.",
+   "reply": "> | Order system | Lists the customer's orders, cancels an order, and issues the refund for an order. | Harbor Goods | None. |\n> | Payment provider | Moves the refunded money back to the customer's payment method. The order system calls it; the agent does not. | An outside service like Stripe. | Public docs: Stripe's, at docs.stripe.com. |\n> | Staff task queue | Takes the follow-up tasks the agent creates for store staff. | Harbor Goods | None. |",
+   "answered_by": "record"
+  },
+  {
+   "n": 2,
+   "question": "Which orders may the agent cancel?",
+   "recommended": "An order that has not shipped yet. For an order that has shipped or been delivered, the agent cancels nothing and tells the customer it cannot be cancelled in this conversation.",
+   "reply": "> Q1 Which orders can the agent cancel? Recommended: only orders that have not shipped yet; for a shipped or delivered order the agent says it cannot cancel and changes nothing; returns are a separate future capability.\n> Q1: Yes. Statuses: placed, processing, shipped, delivered, cancelled. Cancellable while placed or processing, no time limit. Once shipped, the agent refuses without issuing a cancel call and tells the customer returns are a separate process (out of scope for v1).\n> An already cancelled order: the agent reports that and changes nothing.",
+   "answered_by": "record"
+  },
+  {
+   "n": 3,
+   "question": "How does the agent know which orders belong to the customer, and what does an order record show?",
+   "recommended": "The customer is signed in, and the order system lists only that customer's orders, each with its order id, its status (not shipped, shipped, delivered, cancelled), its items and the amount paid. The agent acts only on an order from that list.",
+   "reply": "> Q3 How does the agent know the order belongs to the person asking? Recommended: the customer is already signed in, and the agent sees only that customer's orders (a precondition).\n> Q3 Proposed fields. Order: order number (e.g. HG-10482), placed date, status, line items (product name, quantity, unit price), shipping cost, tax, total paid, payment method (e.g. \"Visa ending 4242\"). Refund: refund id (e.g. RF-5531), order number, amount, payment method, status (pending, issued). No final-sale flag.\n> - Refund status: pending, issued, failed.\n> - No final-sale or non-cancellable flag.\n> Statuses: placed, processing, shipped, delivered, cancelled.\n> An order number matching none of the customer's orders: the agent says so and changes nothing.\n> Proposed set shown to the user: list_orders() (returns each order with its refund or null), cancel_order(order_number), issue_refund(order_number) (supplied), request_staff_followup(order_number, reason) with reasons refund_not_issued, refund_status_unknown, cancellation_unknown; terminal refund error returns a refund with status failed, transient error creates none; handoff timeout not retried; SG-02 (store staff work every follow-up task) added.\n> 4. list_orders includes cancelled orders.\n> Lists the customer's orders, cancels an order, and issues the refund for an order.",
+   "answered_by": "record"
+  },
+  {
+   "n": 4,
+   "question": "What refund does the customer get when an order is cancelled?",
+   "recommended": "The full amount paid, back to the payment method the customer used, issued through the order system right after the cancel.",
+   "reply": "> - Rules, not fields: full-order cancellation only (no partial); refund amount = order total paid; refund payment method = order's payment method; at most one refund per order.\n> Q1 Does one confirmation cover both cancellation and refund? Proposed: the agent states one proposal (e.g. \"cancel order HG-10482 and refund $86.40 to Visa ending 4242\"); the customer's one \"yes\" authorizes both calls. No cancellation fee, no store-credit option. The agent promises nothing about when the money arrives.\n> 2. issue_refund adds outcome OrderNotCancelled.\n> Lists the customer's orders, cancels an order, and issues the refund for an order.\n> Moves the refunded money back to the customer's payment method. The order system calls it; the agent does not.",
+   "answered_by": "record"
+  },
+  {
+   "n": 5,
+   "question": "When may the agent cancel an order?",
+   "recommended": "Only after the customer says yes to the full proposal: which order is cancelled and the refund amount. Any change to the proposal after the yes voids that yes, and the agent asks again. A question about cancelling, or saying they are thinking of cancelling, is not a yes.",
+   "reply": "Yes, I accept your recommendation.\n> Q4 What counts as permission to cancel? Proposed default: the agent cancels an order only after the customer explicitly confirms the full proposal (which order, the refund amount and where it goes); any change after confirmation voids it.\n> Q1 Does one confirmation cover both cancellation and refund? Proposed: the agent states one proposal (e.g. \"cancel order HG-10482 and refund $86.40 to Visa ending 4242\"); the customer's one \"yes\" authorizes both calls.\n> 1. Wrong order cancelled — customer has two open orders and says \"cancel my order\"; agent must disambiguate and get a confirmation naming the order number before the cancel call.",
+   "answered_by": "stand-in default"
+  },
+  {
+   "n": 6,
+   "question": "Are there known failure cases or past conversations the agent must handle?",
+   "recommended": "None beyond what you have told me so far.",
+   "reply": "> Q4: No transcripts or known incidents. Known failure cases to cover:\n> 1. Wrong order cancelled — customer has two open orders and says \"cancel my order\"; agent must disambiguate and get a confirmation naming the order number before the cancel call.\n> 2. Cancel succeeded, refund call returned an error — refund not issued, state known; agent reports it, does not claim success, hands off to the store's manual refund process. One retry allowed on a transient error, none on a terminal one.\n> 3. Cancel succeeded, refund call timed out — state unknown; agent retries once, then re-reads the order and refund records and reports what it finds. Final message must match the final refund status.\n> Derive any further cases yourself.",
+   "answered_by": "record"
+  },
+  {
+   "n": 7,
+   "question": "When does the agent create a follow-up task for store staff, and what does it tell the customer then?",
+   "recommended": "Only when it cannot finish the cancel and refund itself and cannot tell the customer the outcome for certain: the cancel call gets no answer, the refund is not issued, or the refund's state is unknown. It creates one task naming the order and the reason, and tells the customer that staff will follow up.",
+   "reply": "Yes, I accept your recommendation.\n> 2. Cancel succeeded, refund call returned an error — refund not issued, state known; agent reports it, does not claim success, hands off to the store's manual refund process.\n> Recommended (a): a state-changing handoff call, e.g. request_manual_refund(order_number, reason), creating a task for store staff.\n> Q3 Proposed: transient = payment provider temporarily unavailable, retry once; terminal = payment method can no longer receive money (card closed or expired) or the provider declines, no retry, hand off.\n> For case 3, after the retry the agent re-reads the refund record: pending or issued, report that status; failed or no refund, hand off and say the refund is not confirmed yet; re-read fails, say status unknown and hand off.\n> Re-read fails, say outcome unknown, issue no refund, hand off.\n> - One handoff call covers both the failed-refund case and the unknown-cancellation case, with a reason argument.\n> Proposed set shown to the user: list_orders() (returns each order with its refund or null), cancel_order(order_number), issue_refund(order_number) (supplied), request_staff_followup(order_number, reason) with reasons refund_not_issued, refund_status_unknown, cancellation_unknown; terminal refund error returns a refund with status failed, transient error creates none; handoff timeout not retried; SG-02 (store staff work every follow-up task) added.\n> On timeout, retry once; if it times out again, tell the customer to contact Harbor Goods support.",
+   "answered_by": "stand-in default"
+  },
+  {
+   "n": 8,
+   "question": "Nothing yet bounds how many orders one conversation may cancel. What ends it?",
+   "recommended": "The agent works on one order at a time, each with its own proposal and its own yes. After one order is done, the customer may ask to cancel another of their orders; the conversation ends when they have no other order to cancel or stop asking.",
+   "reply": "Yes, I accept your recommendation.",
+   "answered_by": "stand-in default"
+  },
+  {
+   "n": 9,
+   "question": "Question 9: Here is the smallest tool set I propose, with what each call can answer. Please confirm it.\n- list the customer's orders: answers with each of the signed-in customer's orders, cancelled ones included, each with its refund or none; or gets no answer.\n- cancel an order (order number): answers \"cancelled\"; answers that the order has shipped since it was read; or gets no answer.\n- issue the refund for an order (order number): answers with the refund, pending or issued; with a refund whose status is failed (a final error); with a temporary error and no refund; with \"order not cancelled\"; or times out.\n- ask staff to follow up (order number, reason): answers that the task is created, or gets no answer.\nClaims put to the owner: C-06, C-09, C-11.",
+   "recommended": "Yes, that is the tool set, and those are the answers each call can give.",
+   "reply": "> Proposed set shown to the user: list_orders() (returns each order with its refund or null), cancel_order(order_number), issue_refund(order_number) (supplied), request_staff_followup(order_number, reason) with reasons refund_not_issued, refund_status_unknown, cancellation_unknown; terminal refund error returns a refund with status failed, transient error creates none; handoff timeout not retried; SG-02 (store staff work every follow-up task) added.\n> Confirmed, with four changes:\n> 1. cancel_order is idempotent (cancelling a cancelled order returns cancelled). Outcomes: cancelled; OrderNotCancellable{status} (replaces OrderShipped, covers shipped and delivered); OrderNotFound; timeout.\n> 2. issue_refund adds outcome OrderNotCancelled.\n> 3. request_staff_followup is idempotent on (order_number, reason) — add as SG-03. On timeout, retry once; if it times out again, tell the customer to contact Harbor Goods support.\n> 4. list_orders includes cancelled orders. Reads may be retried on timeout without limit; only commit calls are bounded.",
+   "answered_by": "record"
+  },
+  {
+   "n": 10,
+   "question": "Question 10: Your order system has no docs, so I compared it with common order systems. In those, sending the same refund call twice can make two refunds unless the system checks for one that already exists. (Your payment provider's docs say a repeated request is safe only when it carries the same idempotency key.) Here is where it matters, in plain steps: the customer has one open order and asks to cancel it; the agent proposes, the customer says yes; the cancel works; the refund call times out, though the refund was made; the agent sends the refund call once more, as you said; it answers with a refund; the order now has two refunds, against your rule of at most one refund per order. If a second refund call for an order that already has a refund just returns that refund, the agent can resend as you said. If it makes a second refund, the agent should re-read first. Does a second refund call for an order that already has a refund make a second refund? Claims put to the owner: C-16.",
+   "recommended": "Treat it as possible. After a refund call that times out, the agent re-reads the order's refund before sending the call again, and sends it again only when the re-read shows no refund.",
+   "reply": "> Tool contract: issue_refund(order_number) is idempotent, keyed on order number — repeated calls return the same refund id and never create a second refund. The store enforces this (supporting-actor guarantee, Appendix B). The agent may retry it.",
+   "answered_by": "record"
+  },
+  {
+   "n": 11,
+   "question": "Question 11: When the cancel call gets no answer, the order may or may not have been cancelled. What should the agent do? Claims put to the owner: C-10.",
+   "recommended": "The agent re-reads the order. If it shows the order cancelled, the agent issues the refund. If it shows the order not cancelled, the agent tells the customer the order was not cancelled and nothing was changed. If the re-read gets no answer, the agent says the outcome is unknown, issues no refund, and asks staff to follow up (cancellation unknown).",
+   "reply": "> If the cancel call times out: no blind resend; re-read the order. Cancelled, continue to refund. Still placed or processing, send the cancel once more under the same confirmation. Shipped, report it and issue no refund. Re-read fails, say outcome unknown, issue no refund, hand off.",
+   "answered_by": "record"
+  },
+  {
+   "n": 12,
+   "question": "Question 12: The refund call returns the amount it refunded. What does the agent do when that amount differs from the total paid the customer said yes to? Claims put to the owner: C-29.",
+   "recommended": "The agent makes no further change with the new amount, tells the customer the amount the refund call returned, and asks staff to follow up with a new reason, \"refund amount differs\".",
+   "reply": "Yes, I accept your recommendation.",
+   "answered_by": "stand-in default"
+  },
+  {
+   "n": 13,
+   "question": "Question 13: When the call that asks staff to follow up gets no answer, what does the agent do? Two of your earlier answers read differently: one says \"handoff timeout not retried\", the other says \"On timeout, retry once; if it times out again, tell the customer to contact Harbor Goods support.\" Under the first, the agent sends one follow-up call and, when it gets no answer, tells the customer what happened and asks them to contact Harbor Goods support. Under the second, it sends the follow-up call once more first, and could then create two tasks for one order if the first call did create its task. Claims put to the owner: C-21.",
+   "recommended": "The follow-up call is not resent. When it gets no answer, the agent tells the customer what happened and asks them to contact Harbor Goods support.",
+   "reply": "> 3. request_staff_followup is idempotent on (order_number, reason) — add as SG-03. On timeout, retry once; if it times out again, tell the customer to contact Harbor Goods support.",
+   "answered_by": "record"
+  },
+  {
+   "n": 14,
+   "question": "Question 14: You said that after a refund call times out, the agent \"retries once, then re-reads the order and refund records and reports what it finds\". The rule now re-reads only when the second call also gets no answer. I propose changing it. Before: \"When the second refund call also got no answer, the agent re-reads the refund before it reports the refund's state.\" After: \"After a refund call that timed out, the agent sends it once more and then re-reads the order and its refund, whatever the second call answered, and reports what the re-read shows.\"",
+   "recommended": "Yes, change the rule to the \"After\" text.",
+   "reply": "> 3. Cancel succeeded, refund call timed out — state unknown; agent retries once, then re-reads the order and refund records and reports what it finds. Final message must match the final refund status.\n> For case 3, after the retry the agent re-reads the refund record: pending or issued, report that status; failed or no refund, hand off and say the refund is not confirmed yet; re-read fails, say status unknown and hand off.",
+   "answered_by": "record"
+  },
+  {
+   "n": 15,
+   "question": "Question 15: You said reads (the order list, a re-read of the order or its refund) \"may be retried on timeout without limit\". Nothing then ends a read that keeps getting no answer, and the agent could keep the customer waiting for ever. I propose a new rule. Before: (no rule) After: \"When a read of the customer's orders, or a re-read of an order or its refund, gets no answer, the agent tries it again up to two more times. After the third try with no answer, it acts as the rules say for a read with no answer.\"",
+   "recommended": "Yes, add the rule with a bound of three tries in all.",
+   "reply": "> Reads may be retried on timeout without limit; only commit calls are bounded.",
+   "answered_by": "record"
+  },
+  {
+   "n": 16,
+   "question": "Question 16: The rule for a changed proposal covers only a change after the customer said yes. A customer can also switch to their other open order before saying yes. I propose widening it. Before: \"When the customer changes the proposal after saying yes, such as asking to cancel a different order, the earlier yes no longer counts. The agent proposes again and waits for a new yes.\" After: \"When the customer changes the proposal, before or after saying yes, such as asking to cancel a different order, any earlier yes no longer counts. The agent proposes again and waits for a new yes.\"",
+   "recommended": "Yes, change the rule to the \"After\" text.",
+   "reply": "Yes, I accept your recommendation.\n> Proposed default: the agent cancels an order only after the customer explicitly confirms the full proposal (which order, the refund amount and where it goes); any change after confirmation voids it.\n> 1. Wrong order cancelled — customer has two open orders and says \"cancel my order\"; agent must disambiguate and get a confirmation naming the order number before the cancel call.",
+   "answered_by": "stand-in default"
+  }
+ ]
+}

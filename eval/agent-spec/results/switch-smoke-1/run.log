@@ -1,0 +1,278 @@
+step1 start 2026-11-14T23:20:44Z
+step1 end 2026-11-14T23:20:58Z
+step2 start 2026-11-14T23:20:58Z
+stand-in turn1 done 2026-11-14T23:21:33Z; script: uv run python run-switch-smoke-1/addlog.py results/switch-smoke-1/stand-in/turn1.json
+stand-in turn2 done 2026-11-14T23:22:34Z; script: uv run python run-switch-smoke-1/addlog.py results/switch-smoke-1/stand-in/turn2.json
+stand-in turn3 done 2026-11-14T23:23:33Z
+step2 end 2026-11-14T23:23:33Z
+step3 start 2026-11-14T23:23:33Z
+3.3 run1: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-smoke-1/product/agent-spec --write
+(eval):1: no such file or directory: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-smoke-1/product/agent-spec --write
+3.3 run1: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-smoke-1/product/agent-spec --write
+0 errors
+States: 1685  steps: 1730  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 0 (0 model path); one-path share None
+Chart: 12 states, 18 arrows
+Steps no scenario takes: 65
+  [Asked which order] customer names one order by its number
+  [Asked which order] customer stops answering
+  [Cancelling] agent asks for the refund of the total paid
+  [Cancelling] agent cancels the order once more
+  [Cancelling] agent creates a follow-up task for staff
+  [Cancelling] agent re-reads the order
+  [Cancelling] agent tells the customer: the order shipped before it could be cancelled; it was not cancelled and no refund was issued
+  [Cancelling] cancel call answers cancelled
+  [Cancelling] cancel call gets no answer (cancelled)
+  [Cancelling] cancel call gets no answer (not cancelled)
+  [Cancelling] cancel call gets no answer (the order has just shipped)
+  [Cancelling] cancel call is rejected: the order has just shipped
+  [Cancelling] re-reading the order gets no answer
+  [Cancelling] re-reading the order shows it cancelled
+  [Cancelling] re-reading the order shows it shipped
+  [Cancelling] re-reading the order shows it still open
+  [Customer asked] customer asks to cancel "my order" without a number
+  [Customer asked] customer asks to cancel an order number that is not theirs
+  [Customer asked] customer asks to cancel an order, naming its number
+  [Handing to staff] agent creates the follow-up task again
+  [Handing to staff] agent tells the customer: it is not known whether the order was cancelled, and no refund was issued; staff will follow up
+  [Handing to staff] agent tells the customer: it is not known whether the order was cancelled, and no refund was issued; staff will follow up; please contact Harbor Goods support
+  [Handing to staff] agent tells the customer: the order is cancelled and the refund system returned a different amount, which it states; staff will follow up
+  [Handing to staff] agent tells the customer: the order is cancelled and the refund system returned a different amount, which it states; staff will follow up; please contact Harbor Goods support
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund is not confirmed yet; staff will follow up
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund is not confirmed yet; staff will follow up; please contact Harbor Goods support
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund was not issued; staff will follow up
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund was not issued; staff will follow up; please contact Harbor Goods support
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund's status is unknown; staff will follow up
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund's status is unknown; staff will follow up; please contact Harbor Goods support
+  [Handing to staff] follow-up call answers created
+  [Handing to staff] follow-up call gets no answer
+  [Looking up orders] agent asks which order, by its number
+  [Looking up orders] agent cancels the order
+  [Looking up orders] agent lists the customer's orders
+  [Looking up orders] agent proposes: cancel this order and refund its total to its payment method; asks for a yes
+  [Looking up orders] agent tells the customer: it cannot look up the orders right now, and nothing was changed
+  [Looking up orders] agent tells the customer: nothing was changed
+  [Looking up orders] agent tells the customer: that order number matches none of the customer's orders, and nothing was changed
+  [Looking up orders] agent tells the customer: the order has shipped and cannot be cancelled; returns are a separate process
+  [Looking up orders] agent tells the customer: the order is already cancelled, and nothing was changed
+  [Looking up orders] list call answers with the customer's orders
+  [Looking up orders] list call gets no answer
+  [Proposal waiting for yes] customer says no
+  [Proposal waiting for yes] customer says yes
+  [Proposal waiting for yes] customer says yes, then asks to cancel their other order instead
+  [Proposal waiting for yes] customer stops answering
+  [Refunding] agent asks for the refund once more
+  [Refunding] agent creates a follow-up task for staff
+  [Refunding] agent re-reads the refund
+  [Refunding] agent tells the customer: the order is cancelled and the refund of the total paid is issued to the order's payment method
+  [Refunding] re-reading the refund gets no answer
+  [Refunding] re-reading the refund shows no refund
+  [Refunding] re-reading the refund shows the refund failed
+  [Refunding] re-reading the refund shows the refund pending or issued
+  [Refunding] refund call answers issued, for a different amount
+  [Refunding] refund call answers issued, for the total confirmed
+  [Refunding] refund call gets no answer (no refund)
+  [Refunding] refund call gets no answer (refund created)
+  [Refunding] refund call returns a refund with status failed
+  [Refunding] refund call returns a temporary error (no refund)
+  [Start] The customer has one open order
+  [Start] The customer has two open orders
+  [Start] The customer's order has shipped
+  [Start] The customer's order is already cancelled
+3.3 end / 3.4 start 2026-11-14T23:27:14Z
+stand-in 3.4 turn1 done 2026-11-14T23:28:09Z
+stand-in 3.4 turn2 done 2026-11-14T23:29:06Z
+3.3 run2: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-smoke-1/product/agent-spec --write
+0 errors
+States: 2069  steps: 2168  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 0 (0 model path); one-path share None
+Chart: 12 states, 18 arrows
+Steps no scenario takes: 75
+  [Asked which order] customer names one order by its number
+  [Asked which order] customer stops answering
+  [Cancelling] agent asks for the refund of the total paid
+  [Cancelling] agent cancels the order once more
+  [Cancelling] agent creates a follow-up task for staff
+  [Cancelling] agent re-reads the order
+  [Cancelling] agent re-reads the order again
+  [Cancelling] agent tells the customer: the order shipped before it could be cancelled; it was not cancelled and no refund was issued
+  [Cancelling] cancel call answers cancelled
+  [Cancelling] cancel call answers not cancellable: the order has just shipped
+  [Cancelling] cancel call answers order not found
+  [Cancelling] cancel call gets no answer (cancelled)
+  [Cancelling] cancel call gets no answer (not cancelled)
+  [Cancelling] cancel call gets no answer (the order has just shipped)
+  [Cancelling] re-reading the order fails with an error
+  [Cancelling] re-reading the order gets no answer
+  [Cancelling] re-reading the order shows it cancelled
+  [Cancelling] re-reading the order shows it shipped
+  [Cancelling] re-reading the order shows it still open
+  [Customer asked] customer asks to cancel "my order" without a number
+  [Customer asked] customer asks to cancel an order number that is not theirs
+  [Customer asked] customer asks to cancel an order, naming its number
+  [Handing to staff] agent creates the follow-up task again
+  [Handing to staff] agent tells the customer: it is not known whether the order was cancelled, and no refund was issued; staff will follow up
+  [Handing to staff] agent tells the customer: it is not known whether the order was cancelled, and no refund was issued; staff will follow up; please contact Harbor Goods support
+  [Handing to staff] agent tells the customer: the order could not be cancelled, and no refund was issued; staff will follow up
+  [Handing to staff] agent tells the customer: the order could not be cancelled, and no refund was issued; staff will follow up; please contact Harbor Goods support
+  [Handing to staff] agent tells the customer: the order is cancelled and the refund system returned a different amount, which it states; staff will follow up
+  [Handing to staff] agent tells the customer: the order is cancelled and the refund system returned a different amount, which it states; staff will follow up; please contact Harbor Goods support
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund is not confirmed yet; staff will follow up
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund is not confirmed yet; staff will follow up; please contact Harbor Goods support
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund was not issued; staff will follow up
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund was not issued; staff will follow up; please contact Harbor Goods support
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund's status is unknown; staff will follow up
+  [Handing to staff] agent tells the customer: the order is cancelled but the refund's status is unknown; staff will follow up; please contact Harbor Goods support
+  [Handing to staff] follow-up call answers created
+  [Handing to staff] follow-up call gets no answer
+  [Looking up orders] agent asks which order, by its number
+  [Looking up orders] agent cancels the order
+  [Looking up orders] agent lists the customer's orders
+  [Looking up orders] agent lists the customer's orders again
+  [Looking up orders] agent proposes: cancel this order and refund its total to its payment method; asks for a yes
+  [Looking up orders] agent tells the customer: it cannot look up the orders right now, and nothing was changed
+  [Looking up orders] agent tells the customer: nothing was changed
+  [Looking up orders] agent tells the customer: that order number matches none of the customer's orders, and nothing was changed
+  [Looking up orders] agent tells the customer: the order has shipped and cannot be cancelled; returns are a separate process
+  [Looking up orders] agent tells the customer: the order is already cancelled, and nothing was changed
+  [Looking up orders] list call answers with the customer's orders
+  [Looking up orders] list call fails with an error
+  [Looking up orders] list call gets no answer
+  [Proposal waiting for yes] customer says no
+  [Proposal waiting for yes] customer says yes
+  [Proposal waiting for yes] customer says yes, then asks to cancel their other order instead
+  [Proposal waiting for yes] customer stops answering
+  [Refunding] agent asks for the refund once more
+  [Refunding] agent creates a follow-up task for staff
+  [Refunding] agent re-reads the refund
+  [Refunding] agent re-reads the refund again
+  [Refunding] agent tells the customer: the order is cancelled and the refund of the total paid is issued to the order's payment method
+  [Refunding] re-reading the refund fails with an error
+  [Refunding] re-reading the refund gets no answer
+  [Refunding] re-reading the refund shows no refund
+  [Refunding] re-reading the refund shows the refund failed
+  [Refunding] re-reading the refund shows the refund pending or issued
+  [Refunding] refund call answers issued, for a different amount
+  [Refunding] refund call answers issued, for the total confirmed
+  [Refunding] refund call answers order not cancelled
+  [Refunding] refund call gets no answer (no refund)
+  [Refunding] refund call gets no answer (refund created)
+  [Refunding] refund call returns a refund with status failed
+  [Refunding] refund call returns a temporary error (no refund)
+  [Start] The customer has one open order
+  [Start] The customer has two open orders
+  [Start] The customer's order has shipped
+  [Start] The customer's order is already cancelled
+3.4 end / 3.5 start 2026-11-14T23:30:03Z
+3.5: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-smoke-1/product/agent-spec --derive
+script: python3 run-switch-smoke-1/fill_scenarios.py derive1.txt product/agent-spec/scenarios.md titles1.txt
+0 errors
+States: 2069  steps: 2168  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 41 (38 model path); one-path share 1.0
+Chart: 12 states, 18 arrows
+Steps no scenario takes: 0
+3.5 end 2026-11-14T23:30:39Z
+step3 end 2026-11-14T23:30:39Z
+step4 start / 4.1 2026-11-14T23:30:39Z
+4.1: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-smoke-1/product/agent-spec
+0 errors
+States: 2069  steps: 2168  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 41 (38 model path); one-path share 1.0
+Chart: 12 states, 18 arrows
+Steps no scenario takes: 0
+4.2 packet written 2026-11-14T23:30:50Z
+round1 start (4.3 finder dispatched) 2026-11-14T23:31:04Z
+4.3 finder returned 2026-11-14T23:33:05Z; 4.4 verifier dispatched
+4.4 verifier returned 2026-11-14T23:34:45Z; 4.5 start
+stand-in 4.5 turn done 2026-11-14T23:35:36Z
+4.5 rerun 3.3: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-smoke-1/product/agent-spec --write
+13 errors
+  scenarios.md: SC-02 replays to no path of the model
+  scenarios.md: SC-03 replays to no path of the model
+  scenarios.md: SC-06 replays to no path of the model
+  scenarios.md: SC-09 replays to no path of the model
+  scenarios.md: SC-10 replays to no path of the model
+  scenarios.md: SC-12 replays to no path of the model
+  scenarios.md: SC-13 replays to no path of the model
+  scenarios.md: SC-17 replays to no path of the model
+  scenarios.md: SC-18 replays to no path of the model
+  scenarios.md: SC-19 replays to no path of the model
+  scenarios.md: SC-28 replays to no path of the model
+  scenarios.md: SC-30 replays to no path of the model
+  scenarios.md: SC-34 replays to no path of the model
+States: 2231  steps: 2339  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 41 (38 model path); one-path share 0.66
+  SC-02: no path (0 paths)
+  SC-03: no path (0 paths)
+  SC-06: no path (0 paths)
+  SC-09: no path (0 paths)
+  SC-10: no path (0 paths)
+  SC-12: no path (0 paths)
+  SC-13: no path (0 paths)
+  SC-17: no path (0 paths)
+  SC-18: no path (0 paths)
+  SC-19: no path (0 paths)
+  SC-28: no path (0 paths)
+  SC-30: no path (0 paths)
+  SC-34: no path (0 paths)
+Chart: 12 states, 18 arrows
+Steps no scenario takes: 25
+  [Asked which order] customer names one order by its number
+  [Asked which order] customer stops answering
+  [Cancelling] agent cancels the order once more
+  [Cancelling] agent tells the customer: the order has shipped or been delivered; it was not cancelled and no refund was issued
+  [Cancelling] cancel call answers not cancellable: the order has just shipped or been delivered
+  [Cancelling] cancel call gets no answer (not cancelled)
+  [Cancelling] cancel call gets no answer (the order has just shipped or been delivered)
+  [Cancelling] re-reading the order shows it shipped or delivered
+  [Cancelling] re-reading the order shows it still open
+  [Customer asked] customer asks to cancel "my order" without a number
+  [Handing to staff] agent tells the customer: the order is cancelled and the refund system returned a different amount, which it states; please contact Harbor Goods support
+  [Handing to staff] agent tells the customer: the order is cancelled and the refund system returned a different amount, which it states; staff will follow up
+  [Looking up orders] agent asks which order, by its number
+  [Looking up orders] agent tells the customer: the order has shipped or been delivered and cannot be cancelled; returns are a separate process
+  [Proposal waiting for yes] customer says yes, then asks to cancel their other order instead
+  [Refunding] agent re-reads the refund again
+  [Refunding] agent tells the customer: the order is cancelled and the refund of the total paid to the order's payment method is pending
+  [Refunding] re-reading the refund gets no answer
+  [Refunding] re-reading the refund shows a different amount
+  [Refunding] re-reading the refund shows it issued, for the total confirmed
+  [Refunding] re-reading the refund shows it pending, for the total confirmed
+  [Refunding] refund call answers pending or issued, for a different amount
+  [Refunding] refund call answers pending, for the total confirmed
+  [Start] The customer has two or more open orders
+  [Start] The customer's order has shipped or been delivered
+0 errors
+States: 2231  steps: 2339  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 41 (38 model path); one-path share 1.0
+Chart: 12 states, 18 arrows
+Steps no scenario takes: 4
+  [Refunding] agent tells the customer: the order is cancelled and the refund of the total paid to the order's payment method is pending
+  [Refunding] re-reading the refund shows a different amount
+  [Refunding] re-reading the refund shows it pending, for the total confirmed
+  [Refunding] refund call answers pending, for the total confirmed
+4.5 rerun 3.5: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-smoke-1/product/agent-spec --derive
+script: python3 run-switch-smoke-1/fill_scenarios.py derive2.txt product/agent-spec/scenarios.md titles2.txt
+0 errors
+States: 2231  steps: 2339  self-test: pass
+Breaks: 0
+Listed on policy.md: 0; not listed: 0
+Scenarios: 44 (41 model path); one-path share 1.0
+Chart: 12 states, 18 arrows
+Steps no scenario takes: 0
+round1 end (4.5 done, round1 snapshot) 2026-11-14T23:36:53Z
+step4 end 2026-11-14T23:36:53Z
+step5 start 2026-11-14T23:36:53Z
+step5 end 2026-11-14T23:37:24Z

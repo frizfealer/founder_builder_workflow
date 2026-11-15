@@ -1,0 +1,28 @@
+{
+ "answers": [
+  {
+   "question": "A reviewer found that the rule on which order only covers a customer with exactly two open orders. A customer with three open orders, or with one open and one shipped order, who says \"cancel my order\" is not covered, nor a customer with no orders. Do you accept this change?",
+   "recommended": "Yes, accept the change.",
+   "reply": "Yes, I accept your recommendation.\n> 1. Wrong order cancelled — customer has two open orders and says \"cancel my order\"; agent must disambiguate and get a confirmation naming the order number before the cancel call.",
+   "answered_by": "stand-in default"
+  },
+  {
+   "question": "A reviewer found that after a refund call with no answer, the re-read reports any refund it shows as pending or issued, without checking that its amount and payment method are the ones the customer agreed to. Do you accept this change to the rule on retrying the refund?",
+   "recommended": "Yes, accept the change.",
+   "reply": "Yes, I accept your recommendation.\n> 3. Cancel succeeded, refund call timed out — state unknown; agent retries once, then re-reads the order and refund records and reports what it finds. Final message must match the final refund status.\n> For case 3, after the retry the agent re-reads the refund record: pending or issued, report that status; failed or no refund, hand off and say the refund is not confirmed yet; re-read fails, say status unknown and hand off.\n> - Rules, not fields: full-order cancellation only (no partial); refund amount = order total paid; refund payment method = order's payment method; at most one refund per order.",
+   "answered_by": "stand-in default"
+  },
+  {
+   "question": "A reviewer found that the rule on telling the customer calls a pending refund \"refunded\", while you said to report the status, pending or issued. Do you accept this change?",
+   "recommended": "Yes, accept the change.",
+   "reply": "Yes, I accept your recommendation.\n> 3. Cancel succeeded, refund call timed out — state unknown; agent retries once, then re-reads the order and refund records and reports what it finds. Final message must match the final refund status.\n> For case 3, after the retry the agent re-reads the refund record: pending or issued, report that status; failed or no refund, hand off and say the refund is not confirmed yet; re-read fails, say status unknown and hand off.",
+   "answered_by": "stand-in default"
+  },
+  {
+   "question": "A reviewer found that the rule on one order at a time leaves out what ends a run of orders, and says nothing of a customer who asks to cancel two orders in one message. Do you accept this change?",
+   "recommended": "Yes, accept the change.",
+   "reply": "Yes, I accept your recommendation.",
+   "answered_by": "stand-in default"
+  }
+ ]
+}

@@ -1,0 +1,46 @@
+stateDiagram-v2
+    classDef p0 fill:#dbeafe
+    classDef p1 fill:#fde68a
+    classDef p2 fill:#bbf7d0
+    state "Start" as s0
+    state "Finding the order" as g0 {
+        s1: Conversation started
+        s2: Finding the order
+        s5: Waiting for the customer's answer
+        s3: Proposal waiting for yes
+    }
+    class s1,s2,s5,s3 p0
+    state "After the yes" as g1 {
+        s6: Cancelling
+        s8: Refunding
+        s9: Handing to staff
+    }
+    class s6,s8,s9 p1
+    state "Conversation over" as g2 {
+        s10: Refunded, customer told
+        s11: Refund pending, customer told
+        s13: Cancelled, refund not confirmed, customer told
+        s12: Cancel outcome unknown, customer told
+        s4: Nothing changed, customer told
+        s7: Customer left
+    }
+    class s10,s11,s13,s12,s4,s7 p2
+    [*] --> s0
+    s0 --> s1: A1 - starting situation
+    s1 --> s2: A2 - customer asks to cancel an order
+    s2 --> s3: A3 - agent proposes the order
+    s2 --> s4: A4 - agent tells the customer what happened
+    s2 --> s5: A5 - agent asks which order
+    s3 --> s4: A6 - agent tells the customer what happened
+    s3 --> s6: A7 - customer says yes
+    s3 --> s7: A8 - customer leaves
+    s5 --> s2: A9 - customer names the order
+    s5 --> s7: A10 - customer leaves
+    s6 --> s4: A11 - agent tells the customer what happened
+    s6 --> s8: A12 - agent issues the refund
+    s6 --> s9: A13 - agent hands the case to staff
+    s8 --> s10: A14 - agent tells the customer what happened
+    s8 --> s11: A15 - agent tells the customer what happened
+    s8 --> s9: A16 - agent hands the case to staff
+    s9 --> s12: A17 - agent tells the customer what happened
+    s9 --> s13: A18 - agent tells the customer what happened

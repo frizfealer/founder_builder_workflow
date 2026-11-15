@@ -1,0 +1,250 @@
+{
+ "schema": 1,
+ "label": "switch-base-5",
+ "kind": "build2",
+ "legacy": false,
+ "skill_commit": "d93de6e",
+ "effort": "high",
+ "session_model": "opus",
+ "wall_clock_s": 1830,
+ "final_spec": "results/switch-base-5/spec-final",
+ "questions_asked": 19,
+ "stand_in_answered_from_record": 9,
+ "rounds": [
+  {
+   "n": 1,
+   "start": "2026-11-15T03:16:01Z",
+   "end": "2026-11-15T03:25:13Z",
+   "seconds": 552,
+   "merged": 10,
+   "kept": 7,
+   "dropped": 3,
+   "preexisting": 0,
+   "unknown_kept": 0,
+   "important_kept": 3,
+   "header_count": {
+    "merged": 10,
+    "important": 6,
+    "nit": 4
+   }
+  }
+ ],
+ "integrity": {
+  "script_errors": 0,
+  "checker_zero_errors_seen": true,
+  "asked_user": false
+ },
+ "subagents": [
+  {
+   "round": "step 2, turn 1",
+   "role": "stand-in",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 38676,
+   "tokens": 50567,
+   "tokens_in": 10,
+   "tokens_out": 8169,
+   "tokens_cache_read": 177952
+  },
+  {
+   "round": "step 2, turn 2",
+   "role": "stand-in",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 7,
+   "duration_ms": 55540,
+   "tokens": 52590,
+   "tokens_in": 22,
+   "tokens_out": 10595,
+   "tokens_cache_read": 460167
+  },
+  {
+   "round": "step 3.4, turn 1",
+   "role": "stand-in",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 6,
+   "duration_ms": 81962,
+   "tokens": 57993,
+   "tokens_in": 16,
+   "tokens_out": 16134,
+   "tokens_cache_read": 314409
+  },
+  {
+   "round": "step 3.4, turn 2",
+   "role": "stand-in",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 31790,
+   "tokens": 48259,
+   "tokens_in": 10,
+   "tokens_out": 4972,
+   "tokens_cache_read": 185957
+  },
+  {
+   "round": 1,
+   "role": "finder: faithfulness",
+   "kind": "finder",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 7,
+   "duration_ms": 175748,
+   "tokens": 82736,
+   "tokens_in": 20,
+   "tokens_out": 35195,
+   "tokens_cache_read": 535478
+  },
+  {
+   "round": 1,
+   "role": "verifier: adversarial",
+   "kind": "verifier",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 9,
+   "duration_ms": 152537,
+   "tokens": 85065,
+   "tokens_in": 24,
+   "tokens_out": 29109,
+   "tokens_cache_read": 588469
+  },
+  {
+   "round": 1,
+   "role": "stand-in (step 4.5 rule proposals)",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 39810,
+   "tokens": 49872,
+   "tokens_in": 10,
+   "tokens_out": 7782,
+   "tokens_cache_read": 186789
+  }
+ ],
+ "findings": [
+  {
+   "id": "R1-01",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Important",
+   "location": "rules.md R-08",
+   "quote": "When that read fails but the retry answered pending or issued, the agent tells the customer what the retry answered.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-02",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md R-12 and What the agent does",
+   "quote": "absent",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-03",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-03",
+   "quote": "When the customer has two open orders and does not say which one to cancel, the agent asks which one and proposes nothing until the customer names it.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-04",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md R-02, R-07, row 'the order read again shows it shipped'",
+   "quote": "Shipped, it says the order can no longer be cancelled and issues no refund.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-05",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-08, row 'the refund call answered failed or order not cancelled'; policy.md A3",
+   "quote": "agent tells the customer: the order is cancelled but the refund was not issued; staff will follow up",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-06",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-04, R-06, R-08",
+   "quote": "absent",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-07",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md R-07, row 'the order read again shows it shipped'",
+   "quote": "Shipped, it says the order can no longer be cancelled and issues no refund.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-08",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md R-09, R-11",
+   "quote": "either way it gives the amount and the payment method and creates no staff task.",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-09",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "claims.md C-56; rules.md R-01",
+   "quote": "A read can answer with an error, which the owner calls a read that fails, as well as time out.",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-10",
+   "round": 1,
+   "class": "Unclear",
+   "severity": "Nit",
+   "location": "claims.md C-30",
+   "quote": "The agent proposes the total paid the order list shows; when the refund comes back with another amount, C-39 applies.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  }
+ ],
+ "warnings": [
+  "tokens is the task notification's subagent_tokens; tokens_in/out/cache_read are summed from each subagent transcript's usage records (cache_read cumulative across turns), so they do not add to tokens.",
+  "Stand-in subagents (steps 2, 3.4, 4.5) have kind 'other' and a step name in 'round' where they ran outside a verification round.",
+  "Kept severities for F2 and F4 are the verifier's (Nit); the finder rated them Important. header_count is the finder's count line.",
+  "The skill has one verification round (step 4.5: 'There is no second round'), so only round1-findings.md exists.",
+  "Final checker run shows 1 break (R-11), listed on policy.md as an open decision; it follows from the owner-accepted F1 fix (D-15).",
+  "report.md could not be written: the harness refused the Write ('Subagents should return findings as text'); the report text is in the hand-back under REPORT.MD."
+ ]
+}

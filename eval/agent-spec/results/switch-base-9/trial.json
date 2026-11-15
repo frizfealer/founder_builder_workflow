@@ -1,0 +1,243 @@
+{
+ "schema": 1,
+ "label": "switch-base-9",
+ "kind": "build2",
+ "legacy": false,
+ "skill_commit": "807d36e",
+ "effort": "high",
+ "session_model": "opus",
+ "wall_clock_s": 1637,
+ "rounds": [
+  {
+   "n": 1,
+   "start": "2026-11-15T13:18:13Z",
+   "end": "2026-11-15T13:28:16Z",
+   "seconds": 603,
+   "merged": 10,
+   "kept": 10,
+   "dropped": 0,
+   "preexisting": 0,
+   "unknown_kept": 0,
+   "important_kept": 3,
+   "header_count": {
+    "merged": 10,
+    "important": 6,
+    "nit": 4
+   }
+  }
+ ],
+ "integrity": {
+  "script_errors": 0,
+  "checker_zero_errors_seen": true,
+  "asked_user": false
+ },
+ "subagents": [
+  {
+   "round": null,
+   "step": "2",
+   "role": "stand-in turn 1",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 18430,
+   "tokens": 45705
+  },
+  {
+   "round": null,
+   "step": "2",
+   "role": "stand-in turn 2",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 79200,
+   "tokens": 52154
+  },
+  {
+   "round": null,
+   "step": "2",
+   "role": "stand-in turn 3",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 7,
+   "duration_ms": 64640,
+   "tokens": 51970
+  },
+  {
+   "round": null,
+   "step": "3.4",
+   "role": "stand-in turn 4 (decision turn A)",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 46646,
+   "tokens": 49671
+  },
+  {
+   "round": null,
+   "step": "3.4",
+   "role": "stand-in turn 5 (decision turn B)",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 28455,
+   "tokens": 47842
+  },
+  {
+   "round": 1,
+   "role": "finder: faithfulness",
+   "kind": "finder",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 15,
+   "duration_ms": 195115,
+   "tokens": 86858
+  },
+  {
+   "round": 1,
+   "role": "verifier: adversarial",
+   "kind": "verifier",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 12,
+   "duration_ms": 158642,
+   "tokens": 90211
+  },
+  {
+   "round": 1,
+   "step": "4.5",
+   "role": "stand-in turn 6 (rule-change proposals)",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 32373,
+   "tokens": 50100
+  }
+ ],
+ "findings": [
+  {
+   "id": "R1-01",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md row 're-read shows a refund, pending or issued'; policy.md A18",
+   "quote": "| the re-read shows a refund, pending or issued | says the order is cancelled and the refund is pending or issued | R-07 |",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-02",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Important",
+   "location": "rules.md row 'refund call answered that the order is not cancelled'; policy.md A3; R-07",
+   "quote": "| the refund call answered that the order is not cancelled | asks staff to follow up (refund not issued) | R-06, R-10 |",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-03",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Important",
+   "location": "policy.md A3; rules.md row 're-read shows the refund failed, or no refund'",
+   "quote": "agent tells the customer: the order is cancelled, but the refund is not issued or not confirmed; store staff will follow up",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-04",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "claims.md C-47; rules.md read rows",
+   "quote": "nothing set: an open question for the owner; the model treats a read with no answer as one still unanswered after the agent stops retrying",
+   "kept": true,
+   "verified": true,
+   "status": "open"
+  },
+  {
+   "id": "R1-05",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md R-12, D-03, What the agent does",
+   "quote": "absent",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-06",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "scenarios.md SC-38",
+   "quote": "the customer asks when the refund will reach them, and the agent promises no date.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-07",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md What the agent does",
+   "quote": "absent",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-08",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md rows at lines 84, 108, 115",
+   "quote": "| the order list got no answer | says it cannot see their orders right now and changes nothing | R-07 |",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-09",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md R-09 last sentence, R-08; claims.md C-37",
+   "quote": "When the second refund call also got no answer, the agent re-reads the refund before it reports the refund's state.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-10",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "claims.md C-10",
+   "quote": "A cancel call that times out may or may not have cancelled the order, so the agent does not resend it blindly and re-reads the order first.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  }
+ ],
+ "final_spec": "results/switch-base-9/spec-final",
+ "questions_asked": 16,
+ "warnings": [
+  "report.md: the harness refused the write ('Subagents should return findings as text, not write report files'); the report is in the hand-back under REPORT.MD for the main session to write",
+  "tokens_in / tokens_out / tokens_cache_read: not reported by the harness; tokens is the notification's subagent_tokens",
+  "rounds: SKILL.md runs one verification round ('There is no second round'); the step-4 stop condition is that round plus a final check at 0 errors",
+  "SKILL.md has no step 3.8 or 3.9; the tool confirmation is step 3.4, and run.log times it under that name",
+  "important_kept uses the verifier's severities (3 Important); the finder's header said 6 Important, 4 Nit"
+ ]
+}

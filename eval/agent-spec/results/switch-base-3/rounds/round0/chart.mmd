@@ -1,0 +1,55 @@
+stateDiagram-v2
+    classDef p0 fill:#dbeafe
+    classDef p1 fill:#fde68a
+    classDef p2 fill:#bbf7d0
+    state "Start" as s0
+    state "Before the yes" as g0 {
+        s1: Customer asked
+        s2: Looking up orders
+        s6: Asked which order
+        s5: Asked about the whole order
+        s3: Proposal waiting for yes
+    }
+    class s1,s2,s6,s5,s3 p0
+    state "After the yes" as g1 {
+        s7: Cancelling
+        s10: Checking the order
+        s9: Refunding
+        s14: Checking the refund
+        s12: Handing to staff
+    }
+    class s7,s10,s9,s14,s12 p1
+    state "Conversation over" as g2 {
+        s11: Cancelled and refunded, customer told
+        s4: Nothing changed, customer told
+        s13: Handed to staff, customer told
+        s8: Customer left
+    }
+    class s11,s4,s13,s8 p2
+    [*] --> s0
+    s0 --> s1: A1 - starting situation
+    s1 --> s2: A2 - customer asks to cancel
+    s10 --> s12: A3 - agent hands the case to staff as "cancellation unknown"
+    s10 --> s4: A4 - agent tells the customer what happened
+    s10 --> s7: A5 - agent cancels the order once more
+    s10 --> s9: A6 - order lookup shows the order cancelled
+    s12 --> s13: A7 - agent tells the customer what happened
+    s14 --> s11: A8 - agent tells the customer what happened
+    s14 --> s12: A9 - agent hands the case to staff as "refund status unknown" (+1 more)
+    s2 --> s3: A10 - agent proposes the cancel and refund
+    s2 --> s4: A11 - agent tells the customer what happened
+    s2 --> s5: A12 - agent tells the customer - only the whole order can be cancelled, and asks whether to cancel the whole order
+    s2 --> s6: A13 - agent asks which order to cancel
+    s3 --> s4: A14 - agent tells the customer what happened
+    s3 --> s7: A15 - customer says yes
+    s3 --> s8: A16 - customer leaves
+    s5 --> s2: A17 - customer asks to cancel the whole order
+    s5 --> s8: A18 - customer leaves
+    s6 --> s2: A19 - customer names one of the open orders
+    s6 --> s8: A20 - customer leaves
+    s7 --> s10: A21 - agent looks up the order
+    s7 --> s4: A22 - agent tells the customer what happened
+    s7 --> s9: A23 - cancel call answers cancelled
+    s9 --> s11: A24 - agent tells the customer what happened
+    s9 --> s12: A25 - agent hands the case to staff as "refund amount differs" (+1 more)
+    s9 --> s14: A26 - agent looks up the order and its refund again

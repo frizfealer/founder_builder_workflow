@@ -1,0 +1,28 @@
+{
+ "answers": [
+  {
+   "question": "Which orders may the agent cancel, and what does it do with an order it may not cancel?",
+   "recommended": "Only an order that has not shipped yet. For an order that has shipped, been delivered, or is already cancelled, the agent cancels nothing, tells the customer why it cannot cancel it, and creates a task for store staff to follow up.",
+   "reply": "> Q1 Which orders can the agent cancel? Recommended: only orders that have not shipped yet; for a shipped or delivered order the agent says it cannot cancel and changes nothing; returns are a separate future capability.\n> Statuses: placed, processing, shipped, delivered, cancelled.\n> Cancellable while placed or processing, no time limit.\n> Once shipped, the agent refuses without issuing a cancel call and tells the customer returns are a separate process (out of scope for v1).\n> Note the race: status can flip processing → shipped between the agent's read and its cancel call; the store rejects the cancel and the agent must report that truthfully and issue no refund call.\n> - An already cancelled order: the agent reports that and changes nothing.",
+   "answered_by": "record"
+  },
+  {
+   "question": "How much money does the customer get back, and where does it go?",
+   "recommended": "The full amount paid for the order, back to the payment method the customer paid with. The order system issues the refund when the order is cancelled.",
+   "reply": "> - Rules, not fields: full-order cancellation only (no partial); refund amount = order total paid; refund payment method = order's payment method; at most one refund per order.\n> Q1 Does one confirmation cover both cancellation and refund? Proposed: the agent states one proposal (e.g. \"cancel order HG-10482 and refund $86.40 to Visa ending 4242\"); the customer's one \"yes\" authorizes both calls. No cancellation fee, no store-credit option. The agent promises nothing about when the money arrives.",
+   "answered_by": "record"
+  },
+  {
+   "question": "What does an order record show that the agent needs before it acts?",
+   "recommended": "The order number, the customer it belongs to, its status (placed, shipped, delivered or cancelled), the items, the amount paid and the payment method. The agent reads these from the order system's list of the customer's orders.",
+   "reply": "> Q3 Proposed fields. Order: order number (e.g. HG-10482), placed date, status, line items (product name, quantity, unit price), shipping cost, tax, total paid, payment method (e.g. \"Visa ending 4242\"). Refund: refund id (e.g. RF-5531), order number, amount, payment method, status (pending, issued). No final-sale flag.\n> - Refund status: pending, issued, failed.\n> - No final-sale or non-cancellable flag.\n> Statuses: placed, processing, shipped, delivered, cancelled.\n> Proposed set shown to the user: list_orders() (returns each order with its refund or null), cancel_order(order_number), issue_refund(order_number) (supplied), request_staff_followup(order_number, reason) with reasons refund_not_issued, refund_status_unknown, cancellation_unknown; terminal refund error returns a refund with status failed, transient error creates none; handoff timeout not retried; SG-02 (store staff work every follow-up task) added.\n> 4. list_orders includes cancelled orders.\n> Q3 How does the agent know the order belongs to the person asking? Recommended: the customer is already signed in, and the agent sees only that customer's orders (a precondition).",
+   "answered_by": "record"
+  },
+  {
+   "question": "What counts as the customer's permission to cancel, and what voids it?",
+   "recommended": "The agent acts only on the signed-in customer's own orders, as the order system lists them. It cancels only after the customer says yes to the full proposal: which order, and the refund amount and where it goes. Any change to the proposal voids that yes, and the agent asks again.",
+   "reply": "> Q3 How does the agent know the order belongs to the person asking? Recommended: the customer is already signed in, and the agent sees only that customer's orders (a precondition).\n> Q4 What counts as permission to cancel? Proposed default: the agent cancels an order only after the customer explicitly confirms the full proposal (which order, the refund amount and where it goes); any change after confirmation voids it.\n> Q1 Does one confirmation cover both cancellation and refund? Proposed: the agent states one proposal (e.g. \"cancel order HG-10482 and refund $86.40 to Visa ending 4242\"); the customer's one \"yes\" authorizes both calls.\n> 1. Wrong order cancelled — customer has two open orders and says \"cancel my order\"; agent must disambiguate and get a confirmation naming the order number before the cancel call.",
+   "answered_by": "record"
+  }
+ ]
+}

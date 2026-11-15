@@ -1,0 +1,286 @@
+{
+ "schema": 1,
+ "label": "switch-base-3",
+ "kind": "build2",
+ "legacy": false,
+ "skill_commit": "e8ed321",
+ "effort": "high",
+ "session_model": "opus",
+ "wall_clock_s": 1475,
+ "final_spec": "results/switch-base-3/spec-final",
+ "rounds": [
+  {
+   "n": 1,
+   "start": "2026-11-15T00:02:56Z",
+   "end": "2026-11-15T00:13:04Z",
+   "seconds": 608,
+   "merged": 12,
+   "kept": 10,
+   "dropped": 2,
+   "preexisting": 0,
+   "unknown_kept": 0,
+   "important_kept": 4,
+   "header_count": {
+    "merged": 12,
+    "important": 6,
+    "nit": 6
+   }
+  }
+ ],
+ "integrity": {
+  "script_errors": 0,
+  "checker_zero_errors_seen": true,
+  "asked_user": false
+ },
+ "subagents": [
+  {
+   "round": 0,
+   "role": "stand-in: step 2 turn 1",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 15846,
+   "tokens": 46428,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "role": "stand-in: step 2 turn 2",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 47815,
+   "tokens": 50646,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "role": "stand-in: step 3.4 turn 3",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 43850,
+   "tokens": 50241,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "role": "stand-in: step 3.4 turn 4",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 31177,
+   "tokens": 48489,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "finder: faithfulness",
+   "kind": "finder",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 6,
+   "duration_ms": 186688,
+   "tokens": 80445,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "verifier: adversarial",
+   "kind": "verifier",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 10,
+   "duration_ms": 166934,
+   "tokens": 91519,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "stand-in: step 4.5 turn 5",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 33379,
+   "tokens": 49962,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  }
+ ],
+ "findings": [
+  {
+   "id": "R1-01",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md R-05",
+   "quote": "When the customer changes any part of the proposal after the yes, the yes no longer counts and the agent proposes again.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-02",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-05, R-07; What the agent does; claims.md C-26",
+   "quote": "absent",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-03",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-09, R-13, row 'the new lookup shows the refund pending or issued'; policy.md A8",
+   "quote": "the new lookup shows the refund pending or issued | says the order is cancelled and the refund is pending or issued, with no promise of when it arrives",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-04",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-15, row 'the lookup got no answer'; claims.md C-07, C-42",
+   "quote": "When the first lookup of the customer's orders gets no answer, the agent tries it again; the owner set no limit on lookups.",
+   "kept": true,
+   "verified": true,
+   "status": "open"
+  },
+  {
+   "id": "R1-05",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-14, What the agent does; policy.md chart steps",
+   "quote": "A request to cancel another order gets its own proposal and its own yes.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-06",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md What the agent does, rows for an order the customer has not named",
+   "quote": "the customer has two open orders and did not say which | asks which order",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-07",
+   "round": 1,
+   "class": "Unclear",
+   "severity": "Important",
+   "location": "rules.md R-10 and its row",
+   "quote": "The lookup fails, or the order is still not cancelled after the second cancel call: it says the outcome is unknown, issues no refund, and hands the case to staff as \"cancellation unknown\".",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-08",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md R-03 row; policy.md A12; rules.md R-12 and row",
+   "quote": "says only the whole order can be cancelled, and asks whether to cancel the whole order",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-09",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "claims.md C-11, C-16, C-17",
+   "quote": "A refund can still fail after it is issued",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-10",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "claims.md C-38",
+   "quote": "The customer has no transcripts or known incidents",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-11",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md R-08",
+   "quote": "After a refund with status failed, a second error, or an answer that the order is not cancelled, it makes no further refund call, tells the customer the refund was not issued, and hands the case to staff as \"refund not issued\".",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-12",
+   "round": 1,
+   "class": "Unclear",
+   "severity": "Nit",
+   "location": "rules.md R-12",
+   "quote": "Each case R-08, R-09, R-10 and R-13 hand to staff gets a follow-up with its reason.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  }
+ ],
+ "interview": {
+  "questions": 17,
+  "answered_by_record": 12,
+  "stand_in_default": 5,
+  "turns": 5
+ },
+ "checker_final": {
+  "errors": 0,
+  "states": 8993,
+  "steps": 9348,
+  "breaks": 0,
+  "scenarios": 46,
+  "model_path": 41,
+  "chart_states": 16,
+  "chart_arrows": 30,
+  "uncovered_steps": 0
+ },
+ "warnings": [
+  "Harness reported only total subagent_tokens per notification; tokens_in/out/cache_read are null.",
+  "Stand-in subagents before step 4 are recorded with round 0.",
+  "report.md write was refused by the harness for a subagent; the report text is in the hand-back under REPORT.MD for the main session to write.",
+  "Stand-in turns 3 and 4 (step 3.4) were dispatched in parallel; the skill's 'at most two turns' was kept.",
+  "Finding F7 was kept although the verifier said Not real, and F10 kept although Style only; reasons in runner-notes.md."
+ ]
+}

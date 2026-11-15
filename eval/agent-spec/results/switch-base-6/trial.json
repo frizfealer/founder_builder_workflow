@@ -1,0 +1,241 @@
+{
+ "schema": 1,
+ "label": "switch-base-6",
+ "kind": "build2",
+ "legacy": false,
+ "skill_commit": "d93de6e",
+ "effort": "high",
+ "session_model": "opus",
+ "wall_clock_s": 1579,
+ "final_spec": "results/switch-base-6/spec-final",
+ "rounds": [
+  {
+   "n": 1,
+   "start": "2026-11-15T03:12:18Z",
+   "end": "2026-11-15T03:21:26Z",
+   "seconds": 548,
+   "merged": 8,
+   "kept": 5,
+   "dropped": 3,
+   "preexisting": 0,
+   "unknown_kept": 0,
+   "important_kept": 2,
+   "header_count": {
+    "merged": 8,
+    "important": 6,
+    "nit": 2
+   }
+  }
+ ],
+ "integrity": {
+  "script_errors": 0,
+  "checker_zero_errors_seen": true,
+  "asked_user": false
+ },
+ "subagents": [
+  {
+   "round": "step 2",
+   "role": "stand-in, turn 1",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 15459,
+   "tokens": 46873,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": "step 2",
+   "role": "stand-in, turn 2",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 44221,
+   "tokens": 50467,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": "step 2",
+   "role": "stand-in, turn 3",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 3,
+   "duration_ms": 23179,
+   "tokens": 47976,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": "step 3.4",
+   "role": "stand-in, turn 4 (tool confirmation)",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 41663,
+   "tokens": 51045,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": "step 3.4",
+   "role": "stand-in, turn 5",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 30710,
+   "tokens": 49301,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "finder: faithfulness",
+   "kind": "finder",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 9,
+   "duration_ms": 183315,
+   "tokens": 84199,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "verifier: adversarial",
+   "kind": "verifier",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 13,
+   "duration_ms": 166379,
+   "tokens": 93912,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": "step 4.5",
+   "role": "stand-in, turn 6 (rule-change proposals)",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 3,
+   "duration_ms": 27977,
+   "tokens": 49482,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  }
+ ],
+ "findings": [
+  {
+   "id": "R1-01",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-01, R-07, R-08, D-08; claims.md C-37",
+   "quote": "When the lookup of the customer's orders gets no answer, the agent tries it again, with no limit.",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-02",
+   "round": 1,
+   "class": "Unclear",
+   "severity": "Important",
+   "location": "rules.md R-01, R-07, R-08; claims.md C-34, C-44, C-45",
+   "quote": "When the lookup fails, the agent says it could not look up their orders just now and changes nothing.",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-03",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-08, R-10; row 'the re-read shows the refund, pending or issued'",
+   "quote": "a refund pending or issued, it reports that status",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-04",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md R-12, D-03; What the agent does (absent)",
+   "quote": "When one order is done, the customer may name another of their orders, and the agent starts over with a new proposal and a new yes.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-05",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-03; row 'the customer has two open orders and named neither'",
+   "quote": "When the customer has two open orders and says \"cancel my order\", the agent asks which order they mean before it proposes anything.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-06",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Important",
+   "location": "rules.md R-05",
+   "quote": "When the customer changes any part of the proposal after saying yes, such as asking for their other order instead, the earlier yes no longer counts.",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-07",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md R-09",
+   "quote": "It says the order is cancelled and refunded only when the order system shows a refund, pending or issued, for the amount and payment method the customer agreed to",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-08",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "claims.md C-13, C-30",
+   "quote": "The refund the order system returns carries an amount and a payment method, which the agent passes on to the customer.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  }
+ ],
+ "questions_asked": 20,
+ "answered_from_record": 11,
+ "answered_by_stand_in_default": 9,
+ "warnings": [
+  "report.md could not be written: the harness refused the write from the subagent; the report text is in the hand-back under REPORT.MD.",
+  "The harness reported only total subagent_tokens; tokens_in, tokens_out and tokens_cache_read are null.",
+  "The skill at d93de6e runs one verification round (step 4.5: 'There is no second round'), so only round 1 exists.",
+  "The decision filter put 12 claims to the owner, above the skill's cap of 10.",
+  "Finding R1-04 was reported Important by the finder and kept at the verifier's Nit."
+ ]
+}

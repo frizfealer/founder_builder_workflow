@@ -1,0 +1,28 @@
+{
+ "answers": [
+  {
+   "question": "You said reads may be retried on timeout without limit. Nothing then ends a lookup or a re-read that keeps getting no answer, and the customer waits for ever. What ends it? Claims put to the owner: C-34, C-37.",
+   "recommended": "The agent tries a read at most three times. After a third read with no answer it treats the read as failed: for the first lookup of the customer's orders it tells the customer it could not look up their orders just now and changes nothing; for a re-read it does what you set for a re-read that fails.",
+   "reply": "> 4. list_orders includes cancelled orders. Reads may be retried on timeout without limit; only commit calls are bounded.",
+   "answered_by": "record"
+  },
+  {
+   "question": "After a cancel call with no answer, the agent re-reads the order and, if it is still placed or processing, sends the cancel once more under the same yes. When that second cancel call also gets no answer, nothing says what happens next. What should the agent do? Claims put to the owner: C-38.",
+   "recommended": "It re-reads the order once more. If it shows cancelled, it goes on to the refund; if it shows shipped or delivered, it reports that and makes no refund; if it is still placed or processing, or the re-read fails, it sends no third cancel call, tells the customer it is not known whether the order was cancelled, makes no refund call, and creates a staff follow-up task (cancellation unknown).",
+   "reply": "Yes, I accept your recommendation.\n> If the cancel call times out: no blind resend; re-read the order. Cancelled, continue to refund. Still placed or processing, send the cancel once more under the same confirmation. Shipped, report it and issue no refund. Re-read fails, say outcome unknown, issue no refund, hand off.",
+   "answered_by": "stand-in default"
+  },
+  {
+   "question": "The cancel call can answer OrderNotFound, and the refund call can answer OrderNotCancelled. The agent only cancels an order the lookup showed, and only refunds after the cancel answered cancelled, so both are unexpected. What should the agent do on each? Claims put to the owner: C-39, C-40.",
+   "recommended": "On OrderNotFound, the agent makes no refund call, tells the customer it could not find the order to cancel it and nothing was changed, and creates a staff follow-up task (cancellation unknown). On OrderNotCancelled, the agent makes no further refund call, tells the customer the cancellation could not be confirmed and no refund was made, and creates a staff follow-up task (cancellation unknown).",
+   "reply": "Yes, I accept your recommendation.",
+   "answered_by": "stand-in default"
+  },
+  {
+   "question": "The follow-up task has three reasons: refund not issued, refund status unknown, cancellation unknown. When the refund the order system returns has an amount or payment method different from what the customer agreed, the agent hands the case to staff, but none of the three reasons says so. Under the recommendation staff see a fourth reason, refund differs; under the other answer the task goes in as refund status unknown. Which should it be? Claims put to the owner: C-28.",
+   "recommended": "Add a fourth reason, refund differs from what the customer agreed.",
+   "reply": "Yes, I accept your recommendation.",
+   "answered_by": "stand-in default"
+  }
+ ]
+}

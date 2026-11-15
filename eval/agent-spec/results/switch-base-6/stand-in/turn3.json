@@ -1,0 +1,22 @@
+{
+ "answers": [
+  {
+   "question": "Are there known failure cases or past conversations the agent must handle, beyond a customer with two open orders who says \"cancel my order\"?",
+   "recommended": "No others.",
+   "reply": "> No transcripts or known incidents. Known failure cases to cover:\n> 2. Cancel succeeded, refund call returned an error — refund not issued, state known; agent reports it, does not claim success, hands off to the store's manual refund process. One retry allowed on a transient error, none on a terminal one.\n> 3. Cancel succeeded, refund call timed out — state unknown; agent retries once, then re-reads the order and refund records and reports what it finds. Final message must match the final refund status.\n> Derive any further cases yourself.",
+   "answered_by": "record"
+  },
+  {
+   "question": "When the refund the order system reports has an amount or a payment method different from the one the customer said yes to, what does the agent do?",
+   "recommended": "The agent makes no further change with the new value, tells the customer the amount and payment method the order system returned, and hands the case to staff with a follow-up task.",
+   "reply": "Yes, I accept your recommendation.\n> Proposed default: the agent cancels an order only after the customer explicitly confirms the full proposal (which order, the refund amount and where it goes); any change after confirmation voids it.",
+   "answered_by": "stand-in default"
+  },
+  {
+   "question": "How many orders may the agent cancel in one conversation, and what ends it?",
+   "recommended": "One order per proposal. After one order is done, the customer may name another of their orders, and the agent starts over with a new proposal and a new yes. It ends when the customer names no other order to cancel.",
+   "reply": "Yes, I accept your recommendation.",
+   "answered_by": "stand-in default"
+  }
+ ]
+}

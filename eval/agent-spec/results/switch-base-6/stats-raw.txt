@@ -1,0 +1,8 @@
+step 2 | stand-in turn 1 | opus | tokens split not reported | tool_uses 4 | duration_ms 15459 | subagent_tokens 46873
+step 2 | stand-in turn 2 | opus | tokens split not reported | tool_uses 4 | duration_ms 44221 | subagent_tokens 50467
+step 2 | stand-in turn 3 | opus | tokens split not reported | tool_uses 3 | duration_ms 23179 | subagent_tokens 47976
+step 3.4 | stand-in turn 4 | opus | tokens split not reported | tool_uses 5 | duration_ms 41663 | subagent_tokens 51045
+step 3.4 | stand-in turn 5 | opus | tokens split not reported | tool_uses 5 | duration_ms 30710 | subagent_tokens 49301
+round 1 | finder: faithfulness | opus | tokens split not reported | tool_uses 9 | duration_ms 183315 | subagent_tokens 84199
+round 1 | verifier: adversarial | opus | tokens split not reported | tool_uses 13 | duration_ms 166379 | subagent_tokens 93912
+step 4.5 | stand-in turn 6 | opus | tokens split not reported | tool_uses 3 | duration_ms 27977 | subagent_tokens 49482

@@ -1,0 +1,46 @@
+stateDiagram-v2
+    classDef p0 fill:#dbeafe
+    classDef p1 fill:#fde68a
+    classDef p2 fill:#bbf7d0
+    classDef p3 fill:#fbcfe8
+    state "Start" as s0
+    state "Finding the order" as g0 {
+        s1: Customer asked
+        s2: Looking up orders
+        s5: Asked which order
+    }
+    class s1,s2,s5 p0
+    state "Proposal" as g1 {
+        s3: Proposal waiting for yes
+    }
+    class s3 p1
+    state "After the yes" as g2 {
+        s6: Cancelling
+        s8: Refunding
+        s9: Handing to staff
+    }
+    class s6,s8,s9 p2
+    state "Conversation over" as g3 {
+        s10: Cancelled and refunded, customer told
+        s11: Handed to staff, customer told
+        s4: Nothing changed, customer told
+        s7: Customer left
+    }
+    class s10,s11,s4,s7 p3
+    [*] --> s0
+    s0 --> s1: A1 - starting situation
+    s1 --> s2: A2 - customer asks to cancel
+    s2 --> s3: A3 - agent proposes the cancellation
+    s2 --> s4: A4 - agent tells the customer what happened
+    s2 --> s5: A5 - agent asks which order the customer means
+    s3 --> s4: A6 - agent tells the customer what happened
+    s3 --> s6: A7 - customer says yes
+    s3 --> s7: A8 - customer leaves
+    s5 --> s2: A9 - customer names an order not yet shipped (+1 more)
+    s5 --> s7: A10 - customer leaves
+    s6 --> s4: A11 - agent tells the customer what happened
+    s6 --> s8: A12 - agent asks the order system to refund the order
+    s6 --> s9: A13 - agent creates a staff follow-up task - cancellation unknown
+    s8 --> s10: A14 - agent tells the customer what happened
+    s8 --> s9: A15 - agent creates a staff follow-up task - refund differs (+3 more)
+    s9 --> s11: A16 - agent tells the customer what happened

@@ -1,0 +1,241 @@
+{
+ "schema": 1,
+ "label": "switch-base-8",
+ "kind": "build2",
+ "legacy": false,
+ "skill_commit": "807d36e",
+ "effort": "high",
+ "session_model": "opus",
+ "wall_clock_s": 1783,
+ "final_spec": "results/switch-base-8/spec-final",
+ "rounds": [
+  {
+   "n": 1,
+   "start": "2026-11-15T13:19:30Z",
+   "end": "2026-11-15T13:30:15Z",
+   "seconds": 645,
+   "merged": 8,
+   "kept": 5,
+   "dropped": 3,
+   "preexisting": 0,
+   "unknown_kept": 0,
+   "important_kept": 3,
+   "header_count": {
+    "merged": 8,
+    "important": 4,
+    "nit": 4
+   }
+  }
+ ],
+ "integrity": {
+  "script_errors": 0,
+  "checker_zero_errors_seen": true,
+  "asked_user": false
+ },
+ "subagents": [
+  {
+   "round": 0,
+   "role": "stand-in: step 2 turn 1",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 21680,
+   "tokens": 46059,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "role": "stand-in: step 2 turn 2",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 62150,
+   "tokens": 53756,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "role": "stand-in: step 2 turn 3",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 25058,
+   "tokens": 48383,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "role": "stand-in: step 3.4 turn 1",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 5,
+   "duration_ms": 52953,
+   "tokens": 51517,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 0,
+   "role": "stand-in: step 3.4 turn 2",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 30000,
+   "tokens": 48011,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "finder: faithfulness",
+   "kind": "finder",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 12,
+   "duration_ms": 231235,
+   "tokens": 94648,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "adversarial verifier",
+   "kind": "verifier",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 14,
+   "duration_ms": 176990,
+   "tokens": 97065,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  },
+  {
+   "round": 1,
+   "role": "stand-in: step 4.5",
+   "kind": "other",
+   "codex": false,
+   "model": "opus",
+   "tool_uses": 4,
+   "duration_ms": 32370,
+   "tokens": 48786,
+   "tokens_in": null,
+   "tokens_out": null,
+   "tokens_cache_read": null
+  }
+ ],
+ "findings": [
+  {
+   "id": "R1-01",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Important",
+   "location": "rules.md R-10; What the agent does row for a failed refund or not-cancelled answer; policy.md A17",
+   "quote": "After an error the order system will not recover from, or an answer that the order is not cancelled, the agent sends no second refund call.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-02",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Important",
+   "location": "claims.md C-52, C-17; rules.md D-09; R-13",
+   "quote": "A staff task can also give the reason refund amount differs.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-03",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "claims.md C-39",
+   "quote": "The refund call returns a refund with an amount. What does the agent do when that amount differs from the amount the customer said yes to?",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-04",
+   "round": 1,
+   "class": "Lies",
+   "severity": "Nit",
+   "location": "rules.md R-15; claims.md C-08, C-43",
+   "quote": "When the read of the customer's orders fails with an error at the start of the conversation, the agent changes nothing and tells the customer it cannot see their orders right now.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-05",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md R-15; claims.md C-44; rules.md D-11",
+   "quote": "A read that times out may be retried without limit; only calls that change something are bounded.",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-06",
+   "round": 1,
+   "class": "Unclear",
+   "severity": "Nit",
+   "location": "rules.md R-12",
+   "quote": "it says a refund was made only when the order system showed a refund with status pending or issued for the amount the customer said yes to, and gives that status.",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  },
+  {
+   "id": "R1-07",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Important",
+   "location": "rules.md R-05, R-16, What the agent does",
+   "quote": "absent",
+   "kept": true,
+   "verified": true,
+   "status": "fixed"
+  },
+  {
+   "id": "R1-08",
+   "round": 1,
+   "class": "Gap",
+   "severity": "Nit",
+   "location": "rules.md R-12, R-13",
+   "quote": "absent",
+   "kept": false,
+   "verified": true,
+   "status": "dropped"
+  }
+ ],
+ "questions_asked": 21,
+ "answered_from_record": 12,
+ "warnings": [
+  "The harness refused the write of report.md ('Subagents should return findings as text'); the report text is in the hand-back under REPORT.MD for the main session to write.",
+  "Task notifications gave only subagent_tokens, tool_uses and duration_ms; tokens_in, tokens_out and tokens_cache_read are null.",
+  "F5's severity is the verifier's Nit (the finder said Important); important_kept counts the verifier's severities.",
+  "A helper append of mine truncated scenarios.md once in step 4.5; I rebuilt it from derive.txt and the check passed again (run.log). This was not one of the skill's scripts.",
+  "One check run's discarded stdout went to /tmp/x instead of the run dir.",
+  "SKILL.md at 807d36e has no steps 3.8 or 3.9 and only one verification round; the tool confirmation happened in step 3.4."
+ ]
+}

@@ -1,0 +1,87 @@
+step1 start 2026-11-14T23:49:40Z
+setup: rm -rf run-switch-base-1; mkdir -p run-switch-base-1/product; cp product-idea.md run-switch-base-1/product/product-idea.md
+step1 end 2026-11-14T23:50:02Z
+step2 start 2026-11-14T23:50:02Z
+step2 turn1 (stand-in) dispatched 2026-11-14T23:50:02Z
+step2 turn1 returned 2026-11-14T23:50:36Z (reply arrived as a hand-back message; no task notification with usage)
+step2 docs read: docs.stripe.com/refunds, docs.stripe.com/api/idempotent_requests 2026-11-14T23:51:05Z
+step2 turn2 (stand-in) dispatched 2026-11-14T23:51:05Z
+step2 turn2 returned 2026-11-14T23:52:28Z; script: uv run python run-switch-base-1/append_turn.py results/switch-base-1/stand-in/turn2.json results/switch-base-1/interview-log.json
+step2 turn3 (stand-in) dispatched 2026-11-14T23:52:45Z
+step2 turn3 returned 2026-11-14T23:53:38Z; script: uv run python run-switch-base-1/append_turn.py results/switch-base-1/stand-in/turn3.json results/switch-base-1/interview-log.json
+step2 end 2026-11-14T23:56:15Z
+step3 start 2026-11-14T23:56:15Z
+step3.3 check run 1: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-1/product/agent-spec --write
+  0 errors; States: 10381 steps: 10620 self-test: pass; Breaks: 2 (R-02 model check too broad, R-09 model check too strict: both model fixes); Chart: 14 states, 18 arrows; Steps no scenario takes: 75
+step3.3 check run 2 (same command) after model fixes:
+  0 errors
+  States: 10381  steps: 10620  self-test: pass
+  Breaks: 0
+  Listed on policy.md: 0; not listed: 0
+  Scenarios: 0 (0 model path); one-path share None
+  Chart: 14 states, 18 arrows
+step3.4 start 2026-11-15T00:00:14Z
+step3.4 turn1 (stand-in) dispatched 2026-11-15T00:00:14Z
+step3.4 turn1 returned 2026-11-15T00:01:47Z; script: uv run python run-switch-base-1/append_turn.py results/switch-base-1/stand-in/turn4.json results/switch-base-1/interview-log.json
+note: this skill version holds the tool confirmation in step 3.4 (decision turn); it has no steps 3.8 or 3.9
+step3.4 turn2 (stand-in) dispatched 2026-11-15T00:02:00Z
+step3.4 turn2 returned 2026-11-15T00:03:16Z; script: uv run python run-switch-base-1/append_turn.py results/switch-base-1/stand-in/turn5.json results/switch-base-1/interview-log.json
+step3.4 apply: uv run python eval/agent-spec/run-switch-base-1/patch_model_34.py (run in the spec folder); claims and rules updated by inline uv run python scripts
+step3.3 check run 3: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-1/product/agent-spec --write
+  0 errors
+  States: 16081  steps: 16906  self-test: pass
+  Breaks: 1
+    R-11: the refund amount differs and the customer was not told, or staff were not given the case  (17 steps)
+  Listed on policy.md: 1; not listed: 0
+  Scenarios: 0 (0 model path); one-path share None
+  Chart: 14 states, 18 arrows
+step3.4 end 2026-11-15T00:05:25Z (R-11 break left open: the two 3.4 turns are spent)
+step3.5 start 2026-11-15T00:05:25Z
+step3.5 derive: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-1/product/agent-spec --derive
+step3.5 script: uv run python eval/agent-spec/run-switch-base-1/fill_scenarios.py derive1.txt product/agent-spec/scenarios.md (run in run-switch-base-1/)
+step3.5 check: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-1/product/agent-spec
+  0 errors
+  States: 16081  steps: 16906  self-test: pass
+  Breaks: 1
+    R-11: the refund amount differs and the customer was not told, or staff were not given the case  (17 steps)
+  Listed on policy.md: 1; not listed: 0
+  Scenarios: 52 (48 model path); one-path share 1.0
+  Chart: 14 states, 18 arrows
+  Steps no scenario takes: 0
+step3.5 end 2026-11-15T00:05:59Z
+step3 end 2026-11-15T00:05:59Z
+step4 start 2026-11-15T00:05:59Z
+step4.1 check (no --write): uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-1/product/agent-spec
+  0 errors
+  States: 16081  steps: 16906  self-test: pass
+  Breaks: 1
+    R-11: the refund amount differs and the customer was not told, or staff were not given the case  (17 steps)
+  Listed on policy.md: 1; not listed: 0
+  Scenarios: 52 (48 model path); one-path share 1.0
+  Chart: 14 states, 18 arrows
+  Steps no scenario takes: 0
+step4.2 script: uv run python run-switch-base-1/write_packet.py results/switch-base-1/interview-log.json run-switch-base-1/docs-read.md run-switch-base-1/review-packet.md; round0 copied 2026-11-15T00:06:12Z
+step4 round1 start 2026-11-15T00:06:28Z
+step4.3 finder dispatched 2026-11-15T00:06:28Z
+step4.3 finder returned 2026-11-15T00:09:51Z: 11 findings: 6 Important, 5 Nit.
+step4.4 verifier dispatched 2026-11-15T00:09:51Z
+step4.4 verifier returned 2026-11-15T00:13:40Z: Real 3 (F3, F4, F5); Not real 5 (F1, F2, F6, F7, F11); Style only 3 (F8, F9, F10)
+step4.5 start 2026-11-15T00:13:40Z; step4.5 owner turn (stand-in) dispatched 2026-11-15T00:13:40Z
+step4.5 script: uv run python eval/agent-spec/run-switch-base-1/apply_round1.py (run in run-switch-base-1/)
+step4.5 owner turn returned 2026-11-15T00:14:11Z: Q17 accepted (stand-in default); R-04 text left unchanged per the skill's rule-change rule, reported as a proposal
+step4.5 rerun 3.3: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-1/product/agent-spec --write --derive (one step uncovered; SC-53 appended by inline script)
+step4.5 rerun 3.3/3.5 check: uv run python .claude/skills/agent-spec/scripts/check.py eval/agent-spec/run-switch-base-1/product/agent-spec --write
+  0 errors
+  States: 16081  steps: 16911  self-test: pass
+  Breaks: 1
+    R-11: the refund amount differs and the customer was not told, or staff were not given the case  (17 steps)
+  Listed on policy.md: 1; not listed: 0
+  Scenarios: 53 (49 model path); one-path share 1.0
+  Chart: 14 states, 18 arrows
+  Steps no scenario takes: 0
+step4.5 end / round1 end 2026-11-15T00:14:20Z; round1 copied
+step4 end 2026-11-15T00:14:20Z
+step5 start 2026-11-15T00:14:20Z
+step5 report write refused by the harness (subagent report-file guard); report returned in the hand-back under REPORT.MD
+step5 end 2026-11-15T00:15:54Z
+correction: the turn-1 stand-in task notification did arrive later (tool_uses 6, duration_ms 20138, subagent_tokens 46534)
