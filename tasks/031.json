@@ -3,9 +3,9 @@
   "title": "Move the task list into the repo",
   "item": "Move the task list from the Google Sheet into the repo: one file per task, a lint, a table view and a next-task picker",
   "motivation": "The sheet was six rows behind the repo on 2026-11-15; a status changed in the same commit as the work cannot fall behind",
-  "status": "In progress",
+  "status": "Done",
   "added": "2026-11-15",
-  "finished": "",
+  "finished": "2026-11-15",
   "notes": "Built by manager-build/PROMPT.md.",
   "depends_on": [],
   "source_chat": "Manager design chat (Nov 15)",
@@ -16,6 +16,41 @@
   "may_edit": [],
   "runs_as": "build",
   "priority": "high",
-  "tokens": null,
-  "draft_note": ""
+  "tokens": {
+    "agents": 0,
+    "main_session": "not recorded"
+  },
+  "draft_note": "",
+  "decided_for_you": [
+    {
+      "chosen": "one JSON file per task, tasks/<id>.json with the id zero-padded to 3",
+      "rejected": "Markdown with YAML front matter: the repo's scripts are stdlib-only and Python's standard library has no YAML parser",
+      "would_change": "the owner wanting to read and edit tasks as Markdown rather than through tasks.py list"
+    },
+    {
+      "chosen": "tasks/ at the repo root",
+      "rejected": "a folder inside the manager skill",
+      "would_change": "the task list becoming specific to one skill"
+    },
+    {
+      "chosen": "tasks.py next counts direct dependents, hard and soft, among tasks not Done or Dropped",
+      "rejected": "counting hard dependents only, or dependents of dependents",
+      "would_change": "the owner reading 'depend on' as hard only"
+    },
+    {
+      "chosen": "lint also requires finished to be set exactly when a task is Done or Dropped, the file name to equal the id, and a parked question on every Needs you task",
+      "rejected": "checking only the rules the prompt lists",
+      "would_change": "a seed or owner task that legitimately breaks one of them"
+    },
+    {
+      "chosen": "the parked question (needs_you) and the decided-for-you records live as optional fields in the task file",
+      "rejected": "separate files per task",
+      "would_change": "the records growing too long to read in one JSON file"
+    },
+    {
+      "chosen": "tokens is null or {agents, main_session}, with main_session \"not recorded\"",
+      "rejected": "a bare integer",
+      "would_change": "task 30 making main-session use available"
+    }
+  ]
 }

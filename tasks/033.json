@@ -3,9 +3,9 @@
   "title": "Mechanical checks for the manager",
   "item": "Three checks: protected paths (lint before merge), no push during a manager run (hook), tasks merged since the last review (limit)",
   "motivation": "A gate holds only where a script enforces it",
-  "status": "In progress",
+  "status": "Done",
   "added": "2026-11-15",
-  "finished": "",
+  "finished": "2026-11-15",
   "notes": "Built by manager-build/PROMPT.md. Other rules stay prose until one is broken.",
   "depends_on": [
     {
@@ -21,6 +21,51 @@
   "may_edit": [],
   "runs_as": "build",
   "priority": "high",
-  "tokens": null,
-  "draft_note": ""
+  "tokens": {
+    "agents": 83000,
+    "main_session": "not recorded"
+  },
+  "draft_note": "",
+  "decided_for_you": [
+    {
+      "chosen": "a run is marked active by the file manage-run-active in the git common dir (.git/)",
+      "rejected": "a tracked marker file, which needs a .gitignore change outside the allowed paths; an environment variable, which a running session cannot set for its hooks",
+      "would_change": "two manager runs needing to run at once in separate clones"
+    },
+    {
+      "chosen": "the push hook fails open: no onFailure block in .claude/settings.json",
+      "rejected": "onFailure: block, which needs Claude Code v2.1.295 or later and blocks every Bash call in every session if the script breaks",
+      "would_change": "a push getting through because the hook script failed to start"
+    },
+    {
+      "chosen": "the hook refuses git [global options] push in any shell segment; git stash push passes; gh is not covered",
+      "rejected": "matching the word push anywhere",
+      "would_change": "a manager run pushing by another route"
+    },
+    {
+      "chosen": "append-only lets an existing file grow at its end (old content is a prefix of the new); any other change, rename or removal fails",
+      "rejected": "failing every change to an existing file, which fails every iterate task because /iterate step 7 appends to EXPERIMENTS.md",
+      "would_change": "the owner wanting EXPERIMENTS.md strictly frozen"
+    },
+    {
+      "chosen": "the protected-path list and the task's may_edit are read from the working branch, not the task branch",
+      "rejected": "reading them from the task branch, where a task could grant itself an edit",
+      "would_change": "nothing foreseen"
+    },
+    {
+      "chosen": "review tag review/<date>, found as the nearest review/* tag on the working branch",
+      "rejected": "a single moving tag",
+      "would_change": "the owner preferring one tag he moves"
+    },
+    {
+      "chosen": "a task merge is a first-parent merge commit whose subject starts 'Merge task <id>:'",
+      "rejected": "counting every merge commit",
+      "would_change": "the owner merging other branches through the same subject"
+    },
+    {
+      "chosen": "the protected-path list and limits.json sit in .claude/skills/manage/",
+      "rejected": "the repo root",
+      "would_change": "another skill needing to read them"
+    }
+  ]
 }
