@@ -1,0 +1,10 @@
+{
+ "inputs": ["product-idea.md"],
+ "questions": [
+  {"n": 1,
+   "question": "Can a cancelled booking be restored? Claims put to the owner: C-01.",
+   "recommended": "No: a cancel is final, and the agent says so before it cancels.",
+   "reply": "> A cancelled booking cannot be restored.\n> Refunds take five days.",
+   "answered_by": "record"}
+ ]
+}

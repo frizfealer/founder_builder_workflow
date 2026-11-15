@@ -82,7 +82,7 @@ End a question that puts claims to the owner under the decision filter with the 
 
 In this step, ask the systems question, then the gaps of rows 1 and 3 to 6, most blocking first. Row 2's tools wait for step 3.4 when they are proposed. For an optional row, ask once; if the owner has nothing, record *none*. For row 4 when it is none, recommend: a write happens only after the customer says yes to the full proposal it carries out, and any change to the proposal voids that yes.
 
-Keep every question, its recommendation and the reply verbatim; step 4.2 copies them, and every quote in `claims.md` is copied from them.
+Keep every question, its recommendation and the reply verbatim in `interview-log.json`, beside the `agent-spec/` folder, in the format of [the café example's log](examples/cafe/interview-log.json), with `"inputs"` listing the path of every document and code path you read in step 1, relative to the log. Step 4.2 copies them, every quote in `claims.md` is copied from them, and the lint checks each quote, and the count of claims named on "Claims put to the owner" lines, against this file.
 
 Done when the Systems table has a row for every system, rows 1 and 3 are found, and every optional row is found or recorded as none.
 
@@ -148,7 +148,7 @@ You are the worst reviewer of this spec, because the assumptions that shaped a r
 
 ### 4.1 Check again
 
-Run step 3.3's command without `--write`. Keep its output for the report.
+Run step 3.3's command without `--write`. Fix every lint error it lists before you report, then rerun it. Keep its output for the report.
 
 Done when it reads "0 errors".
 

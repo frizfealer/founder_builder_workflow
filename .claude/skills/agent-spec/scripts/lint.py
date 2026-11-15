@@ -5,7 +5,11 @@ Usage:
   lint.py <spec-dir> [--units answer-units.json] [--json out.json]
 
 Errors are what the templates require: files present, table headers and fields, ids unique and
-resolving, every rule resting on something, every scenario citing a rule, links resolving.
+resolving, every rule resting on something, every scenario citing a rule, links resolving, every
+money claim saying what happens when the amount differs. It also reads interview-log.json beside
+the spec folder (the café example's format, plus "inputs": paths of the documents the skill read,
+relative to the log): every quote of an owner's-words or proposed-accepted claim must be one
+unbroken passage of the log or of an input, and at most LIMIT claims may be put to the owner.
 With --units it also lists the recorded answers no claims row quotes (a report, not an error).
 Exit 1 when there is any error.
 """
@@ -24,6 +28,10 @@ DECISIONS_HEAD = ["id", "decision", "decided by", "reason"]
 KINDS = {"system", "policy", "limit", "money", "missing"}
 SOURCES = {"owner's words", "proposed, accepted", "docs", "spec only", "nobody"}
 QUOTED = {"owner's words", "proposed, accepted", "docs"}
+FROM_RECORD = {"owner's words", "proposed, accepted"}
+MISMATCH = "if it differs from what the customer confirmed"
+LOG = "interview-log.json"
+LIMIT = 10
 
 
 def blank(cell):
@@ -35,6 +43,48 @@ def norm(text):
     text = re.sub(r"^\s*>\s?", "", text, flags=re.M)
     text = text.replace("`", "").replace("“", '"').replace("”", '"').replace("’", "'")
     return re.sub(r"\s+", " ", text).strip().lower()
+
+
+def put_to_owner(question):
+    """Claim ids a question names in its closing mark "Claims put to the owner: C-07, C-10."."""
+    m = re.search(r"Claims put to the owner:\s*(C-\d+(?:\s*,\s*C-\d+)*)", question)
+    return re.findall(r"C-\d+", m.group(1)) if m else []
+
+
+def reply_passages(reply):
+    """A reply's passages: each blockquote line alone, each run of other lines together."""
+    out, run = [], []
+    for line in reply.splitlines():
+        if line.lstrip().startswith(">"):
+            out.append(line)
+            run and out.append("\n".join(run))
+            run = []
+        else:
+            run.append(line)
+    run and out.append("\n".join(run))
+    return out
+
+
+def read_log(spec_dir):
+    """(questions, passages, errors) from the interview log beside the spec folder.
+
+    passages are the normalized texts a quote must lie inside: each question, each
+    recommendation, each reply passage, and each input document whole.
+    """
+    path = Path(spec_dir).parent / LOG
+    if not path.exists():
+        return [], [], [f"{LOG}: missing beside the spec folder"]
+    log = json.loads(path.read_text(encoding="utf-8"))
+    qs = log.get("questions", [])
+    texts = [t for q in qs for t in [q.get("question", ""), q.get("recommended", "")] + reply_passages(q.get("reply", ""))]
+    errors = []
+    for name in log.get("inputs", []):
+        p = path.parent / name
+        files = sorted(f for f in p.rglob("*") if f.is_file()) if p.is_dir() else [p] if p.is_file() else []
+        if not files:
+            errors.append(f"{LOG}: input {name} not found")
+        texts += [f.read_text(encoding="utf-8", errors="ignore") for f in files]
+    return qs, [norm(t) for t in texts if t.strip()], errors
 
 
 def section(text, heading):
@@ -72,6 +122,7 @@ def parse(spec_dir):
     d = Path(spec_dir)
     read = lambda n: (d / n).read_text(encoding="utf-8") if (d / n).exists() else None
     spec = {"dir": d, "text": {n: read(n) for n in FILES}}
+    spec["questions"], spec["passages"], spec["log_errors"] = read_log(d)
     claims = spec["text"]["claims.md"] or ""
     spec["systems_head"], spec["systems"] = table(section(claims, "Systems"))
     spec["claims_head"], spec["claims"] = table(section(claims, "Claims"))
@@ -151,11 +202,20 @@ def lint(spec):
             e.append(f"claims.md: {cid} source '{r.get('source')}' is not one of {sorted(SOURCES)}")
         if r.get("source") in QUOTED and blank(r.get("quote", "")):
             e.append(f"claims.md: {cid} is sourced '{r.get('source')}' but has no quote")
+        if r.get("kind") == "money" and blank(r.get(MISMATCH, "")):
+            e.append(f"claims.md: {cid} is a money claim with no 'if it differs' answer")
+        quote = norm(r.get("quote", ""))
+        if r.get("source") in FROM_RECORD and quote and not any(quote in p for p in spec["passages"]):
+            e.append(f"claims.md: {cid} quote is not one unbroken passage of the interview log or the inputs")
         if r.get("kind") == "system":
             if blank(r.get("system", "")):
                 e.append(f"claims.md: {cid} is a system claim with no system")
             elif r["system"] not in systems:
                 e.append(f"claims.md: {cid} names system '{r['system']}', which has no Systems row")
+    e += spec["log_errors"]
+    put = {c for q in spec["questions"] for c in put_to_owner(q.get("question", ""))}
+    if len(put) > LIMIT:
+        e.append(f"{LOG}: {len(put)} claims put to the owner; the limit is {LIMIT}")
     claim_ids = [r.get("id", "") for r in spec["claims"]]
     for i in dupes(claim_ids):
         e.append(f"claims.md: duplicate id {i}")
