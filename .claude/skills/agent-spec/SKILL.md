@@ -17,7 +17,7 @@ One folder holds one capability, because `model.py` is one model. A second capab
 
 **Updates.** When the folder exists and the user names a change to its capability, change only the claims, rules, model lines and scenarios the change touches, keep every id stable, and run steps 3.3 to 5. When the user passes a findings file instead, apply each finding whose fix is to the spec; report every other finding back unapplied with its reason (it quotes no spec line, or its fix belongs in the test code or the agent under test); then run steps 3.3 to 5.
 
-**A fix that changes a rule's text stops at that rule.** In every run, show the owner the rule before and after the proposed change, apply only the other lines the fix touches, and report the rule change as a proposal for the owner to decide. This holds for every rule, including one this run added.
+**A fix that changes a rule's text stops at that rule.** In every run, show the owner the rule before and after the proposed change, apply only the other lines the fix touches, and put the rule change to the owner as a proposal. This holds for every rule, including one this run added. When the owner accepts the change, apply it to the rule, rerun step 3.3 until it reads "0 errors", and log it as a row of the Decisions table, decided by "the owner, accepting the recommendation". A change the owner rejects or leaves unanswered stays a proposal in the report.
 
 ## 1. Collect the inputs
 
@@ -92,7 +92,7 @@ Done when the Systems table has a row for every system, rows 1 and 3 are found, 
 
 Fill `claims.md`, `rules.md` and `index.md` from the templates in [assets/](assets/). Work the tool outcomes with the brainstorm in [the use-case checklist](references/cockburn-checklist.md) first, so each outcome the agent can detect becomes a system claim and a row of "What the agent does".
 
-- Every claim names its source. *owner's words* and *proposed, accepted* carry the reply or the accepted question as their quote, copied verbatim; *docs* carries the page and the sentence. A claim you could not source is *spec only*; a question nobody has answered is kind `missing`, source `nobody`.
+- Every claim names its source. *owner's words* and *proposed, accepted* carry the reply or the accepted question as their quote, copied verbatim; *docs* carries the page and the sentence. A quote cell holds one unbroken passage, copied as it stands; a claim that needs two passages is split into two claims, each with its own passage. A claim you could not source is *spec only*; a question nobody has answered is kind `missing`, source `nobody`.
 - Every rule rests on the claims and decisions it comes from. Every choice the owner made, or accepted from a recommendation, is a decision row.
 - "What the agent does" has one row per situation the agent can be in, in the order a conversation meets them. It is the policy the model encodes.
 
