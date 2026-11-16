@@ -35,7 +35,7 @@ interview guard, not whether its questions are the right ones for a real owner.
 | `new-format/FORMAT.md` | The files a new-format spec folder must have, as the frozen grader reads them. |
 | `new-format/grader/` | The frozen grader: `lint.py`, `check.py` (the model checker), `grade_spec.py` (all code metrics of one trial; `grade.py` runs it as `spec_grader`), `answer-units.json` (the recorded answer units), `check_standin.py` (checks the stand-in quoted the record verbatim), `calibrate_key.py`, and `tests/`. Copies, not the skill's own scripts, so a skill change cannot move them. |
 | `new-format/key-build2.md`, `new-format/judge-brief-key.md` | The 9 known defects the `key_recall` judge looks for in a trial's final spec, and the brief it applies. |
-| `new-format/seeded/`, `seeded-clean/`, `seeded-defects.md` | Hand-made new-format specs with and without known defects; they test the grader only, no trial runs on them. `results/seeded-demo/` is a hand-written trial on `seeded/` for the grader tests, not a real trial. |
+| `new-format/seeded/`, `seeded-clean/`, `seeded-defects.md` | Hand-made new-format specs with and without known defects; they test the grader only, no trial runs on them. `new-format/grader/tests/fixtures/seeded-demo/` is a hand-written trial on `seeded/` for the grader tests, not a real trial; the tests copy it into a temporary eval folder. |
 | `new-format/HARNESS-PLAN.md`, `new-format/SWITCH-PLAN.md` | How this harness and the skill's format switch were planned, with the owner's rulings. |
 | `calibration/` | The owner's rulings used to calibrate the judges (`2026-11-14-key-judge/` for `key_recall`). |
 | `EXPERIMENTS.md` | One entry per skill change: hypothesis, trials, grade, outcome. |
@@ -76,8 +76,8 @@ no gated metric fails in any trial of its set (`.claude/skills/skill-iterate/SKI
 
 `switch-base-10`, `-11` and `-12`: three trials of the switched skill, graded 2026-11-15. Their
 worst values: `one_path_share` 1.0, `answer_reach` 0.84, `owner_lines` 221, `wall_clock_s`
-1787, `key_recall` 0.44, `cost_usd` 4.06. `switch-smoke-1` and `switch-base-1` to `-9` are the
-switch's earlier trials, kept as history.
+1787, `key_recall` 0.44, `cost_usd` 4.06. `switch-base-1` to `-9` are the switch's earlier
+trials, kept as history.
 
 ## Retired kinds (history)
 
