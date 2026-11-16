@@ -1,0 +1,22 @@
+{
+  "id": 42,
+  "title": "Record the rest of HARNESS-PLAN section 5 retirements",
+  "item": "Carry out or record the retirements in new-format/HARNESS-PLAN.md section 5 (metrics, keys, files, queued EXPERIMENTS.md items) beyond the trial kinds",
+  "motivation": "Found by the task 28 reviewer: section 5 (owner ruling 5) retires more than the kinds task 28 covered; the queued experiments still read as open and nothing records them closed.",
+  "notes": "",
+  "done_means": "Every item in HARNESS-PLAN.md section 5 is either done or listed as open in a named place; EXPERIMENTS.md shows the queued items closed.",
+  "draft_note": "Drafted by the manager on 2026-11-15 from the task 28 reviews. Priority left for the owner.",
+  "depends_on": [],
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [],
+  "status": "Proposed",
+  "added": "2026-11-15",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tokens": null
+}

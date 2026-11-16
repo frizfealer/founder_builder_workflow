@@ -3,7 +3,7 @@
   "title": "Make build2 the default trial kind",
   "item": "Make the new way of testing the agent-spec skill the default one that /trial, /grade and /iterate use, and mark the two old ways as retired",
   "motivation": "Today a plain /iterate would test the new skill the old way, which fails or gives meaningless numbers. The owner ruled the old ways retire once the new baseline is graded, which happened 2026-11-15",
-  "status": "Ready",
+  "status": "Needs you",
   "added": "2026-11-15",
   "finished": "",
   "notes": "The commands read grading.json, which still describes only the old trial kinds (full: review step on the old 1,544-line spec; build: old skill with the recorded interview replayed). The new kind (build2: whole new skill, stand-in owner, baseline trials 10–12) sits in grading-new.json. Small file work, no trials, its own commit. Do before the next change to the skill (items 24–26). Old trial folders stay as history. Same commit or the next: rewrite eval/agent-spec/README.md, which still describes the old test setup; delete the merged branch agent-spec/switch and the older stale branches.",
@@ -20,6 +20,41 @@
   ],
   "runs_as": "measurement",
   "priority": "high",
-  "tokens": null,
-  "draft_note": "Owner chose this as the manager's second task; mark Ready after the first run passes. Its note also asks to delete merged and stale branches: that is a delete, so list them and park it for the owner."
+  "tokens": {
+    "agents": 380535,
+    "main_session": "not recorded"
+  },
+  "draft_note": "Owner chose this as the manager's second task; mark Ready after the first run passes. Its note also asks to delete merged and stale branches: that is a delete, so list them and park it for the owner.",
+  "needs_you": {
+    "question": "Branch task/028 meets every clause of done_means (default_kind build2, baseline switch-base-10..12, full and build marked RETIRED, /trial and /iterate read default_kind, baseline table and warnings identical, old trial folders untouched, README rewritten). Both reviews failed it on one thing: test_grade_build2.py::test_grade_skips_unknown_kind asserts grading.json has no build2 kind, so it fails once this task lands. That test is under the protected eval/agent-spec/new-format/grader/ and not in may_edit. Separately, the notes ask to delete branches; merged into the working branch: agent-spec/switch, manager/build, iterate/agent-spec/it1, iterate/agent-spec/it2, claude/verifier-ruling-stability-4811l2, add-develop-architecture-notes. Not merged: add-agent-spec-to-pytest-bdd (2026-10-18), add-review-artifact (2026-10-24). The manager never deletes branches.",
+    "recommendation": "Add eval/agent-spec/new-format/grader/tests/test_grade_build2.py to may_edit and fold task 038 into this task, so the next run retries task/028 with the test pointed at grading.json; the three minor review points (README 'unless told otherwise', owner-brief.md now a judge input for retired kinds, task 040's FAIL cause) get fixed in the same retry. Delete the six merged branches yourself; keep the two unmerged ones until you look at them.",
+    "if_vetoed": "If you would rather merge with the one test failing until 038 lands, say so and the next run merges task/028 as it stands, with 038 Ready next. If you reject the grading.json merge approach, the branch is discarded and the task needs a new done_means."
+  },
+  "decided_for_you": [
+    {
+      "chosen": "Merge build2 into grading.json and keep the retired kinds there",
+      "rejected": "Replace grading.json with grading-new.json",
+      "would_change": "If old kinds should be graded only through a separate file (a new grading-old.json would need may_edit)"
+    },
+    {
+      "chosen": "Keep grading-new.json, marked superseded",
+      "rejected": "Delete it or make it a pointer",
+      "would_change": "Task 038 lands and no test names it"
+    },
+    {
+      "chosen": "New fields default_kind and kinds.<kind>.prompt, read by trial.md and iterate.md",
+      "rejected": "A PROMPT-<kind>.md naming rule",
+      "would_change": "You prefer the naming rule; task 039 documents the fields in grading-schema.md"
+    },
+    {
+      "chosen": "Park instead of merging with one failing protected test",
+      "rejected": "Merge and leave the test failing until 038",
+      "would_change": "You accept a temporarily failing test"
+    },
+    {
+      "chosen": "Branch deletion listed in needs_you, not done",
+      "rejected": "Deleting merged branches",
+      "would_change": "Never; the manager may not delete branches"
+    }
+  ]
 }

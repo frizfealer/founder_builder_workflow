@@ -1,0 +1,24 @@
+{
+  "id": 43,
+  "title": "grade.py lists only the metrics of the graded kinds",
+  "item": "The metric list grade.py prints under the table shows only metrics that apply to the kinds in the table",
+  "motivation": "Found by the task 28 reviewers: grade.py prints every metric in the grading file, so a build2-only grade lists recall_key, finder_* and other retired-kind metrics. Task 28 makes this longer.",
+  "notes": "",
+  "done_means": "Grading only build2 trials prints no metric description whose kinds exclude build2; a test covers it.",
+  "draft_note": "Drafted by the manager on 2026-11-15 from the task 28 reviews. Priority left for the owner.",
+  "depends_on": [],
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/skill-iterate/scripts/grade.py"
+  ],
+  "status": "Proposed",
+  "added": "2026-11-15",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tokens": null
+}

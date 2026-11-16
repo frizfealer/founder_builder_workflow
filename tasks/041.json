@@ -1,0 +1,22 @@
+{
+  "id": 41,
+  "title": "/trial steps 4-5 match the build2 folder layout",
+  "item": "Steps 4 and 5 of skill-iterate commands/trial.md describe snapshots and validation for the old one-file spec",
+  "motivation": "Found by the task 28 reviewer: trial.md lines 32-37 say snapshots go to rounds/round<N>-<artifact> and check kept + dropped + preexisting + unknown_kept == merged, while PROMPT-build2.md line 27 writes rounds/round<N>/ for a spec folder.",
+  "notes": "",
+  "done_means": "trial.md steps 4 and 5 describe what a build2 trial writes and checks, matching PROMPT-build2.md.",
+  "draft_note": "Drafted by the manager on 2026-11-15 from the task 28 reviews. Priority left for the owner.",
+  "depends_on": [],
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [],
+  "status": "Proposed",
+  "added": "2026-11-15",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tokens": null
+}
