@@ -1,5 +1,26 @@
 # Manager runs
 
+## Run 2026-11-15 22:05
+
+Stopped because: merge limit (3 task merges since review/2026-11-15; no other task is Ready either).
+
+### Done
+- task 028: Make build2 the default trial kind; merge 91b38d1; tokens 529833 (main session: not recorded)
+- task 036: /grade commit step skips unchanged verdict files; merge d74610e; tokens 184471 (main session: not recorded)
+
+### Decided for you
+- task 028: chose keeping `owner-brief.md` in `judge_context.inputs` for every kind, recorded as an accepted trade-off in grading.json's notes, over dropping it; would change if grade.py gains per-kind judge inputs.
+- task 028: chose to have the README state what each command does over adding a kind argument to /trial; would change if you want /trial to take a kind.
+- task 028: chose to leave HARNESS-PLAN.md, SWITCH-PLAN.md and PROMPT-switch-plan.md mentioning grading-new.json over editing dated plan records; would change if you treat those plans as live.
+- task 036: chose a plain-porcelain parsing rule that also covers `old -> new` rename lines and git's quoted paths (tab included) over naming only the characters in your ruling; would change if you want the shorter rule.
+- task 036: chose to update the no-verdict-found test's command assertion to the new status command over leaving a stray `-z` there; would change if you read "change nothing else" strictly.
+
+### Needs you
+- Review and set a review tag: the merge limit is reached, so the next run merges nothing until `git tag review/2026-11-15-2 re-create-from-scratch`.
+- Branches to delete (task 028's notes ask for it; the manager may not delete): merged `agent-spec/switch`, `manager/build`, `iterate/agent-spec/it1`, `iterate/agent-spec/it2`, `claude/verifier-ruling-stability-4811l2`, `add-develop-architecture-notes`, and now `task/028`, `task/028-2`, `task/036`, `task/036-2`.
+- task 040 (Backlog): with build2 live, a grade.py run with no `--labels`/`--set` (/iterate step 1, a bare /grade) now grades `results/seeded-demo` and writes a judge task there. The task 028 reviewer confirmed this; task 040 already covers it, so it may deserve a higher priority.
+- task 046 (Proposed): small eval doc fixes left by task 028. The README omits `judge-verifier-brief.md`, /trial step 0 refers forward to step 1, and grading.json's long note prints under every grade table. Its note change needs `eval/agent-spec/grading.json` in may_edit.
+
 ## Run 2026-11-15 21:27
 
 Stopped because: no task to take.
