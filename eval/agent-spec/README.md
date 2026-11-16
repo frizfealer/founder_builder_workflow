@@ -4,8 +4,9 @@ Tests the whole skill, `.claude/skills/agent-spec/SKILL.md` steps 1 to 5, on a f
 so that a change to the skill can be compared before and after. The trial kind is `build2`: the
 skill starts from `product-idea.md`, puts every question it would ask the user to an owner
 stand-in, and writes a new-format spec folder (`new-format/FORMAT.md`). `build2` is the
-`default_kind` in `grading.json`, so `/trial`, `/grade` and `/iterate` use it unless told
-otherwise. Older kinds are retired and kept only as history (last section).
+`default_kind` in `grading.json`: `/trial` runs it and `/iterate` compares against its
+baseline; `/grade` grades each trial under its own kind. Older kinds are retired and kept only
+as history (last section).
 
 ## The fixture
 
@@ -31,7 +32,6 @@ interview guard, not whether its questions are the right ones for a real owner.
 | `PROMPT-build2.md` | The run prompt for one build2 trial: setup, the stand-in rules, what to record in `results/<label>/`. Frozen. |
 | `stand-in-brief.md`, `owner-brief.md`, `product-idea.md`, `review-packet.md` | The fixture (above). Frozen. |
 | `grading.json` | Kinds, baselines, metrics and gates, the key and the judge context, read by `.claude/skills/skill-iterate/scripts/grade.py`. Changing it is a human decision. |
-| `grading-new.json` | The build2 draft that `grading.json` absorbed on 2026-11-15. Superseded; kept only because `new-format/grader/tests/test_grade_build2.py` names it. |
 | `new-format/FORMAT.md` | The files a new-format spec folder must have, as the frozen grader reads them. |
 | `new-format/grader/` | The frozen grader: `lint.py`, `check.py` (the model checker), `grade_spec.py` (all code metrics of one trial; `grade.py` runs it as `spec_grader`), `answer-units.json` (the recorded answer units), `check_standin.py` (checks the stand-in quoted the record verbatim), `calibrate_key.py`, and `tests/`. Copies, not the skill's own scripts, so a skill change cannot move them. |
 | `new-format/key-build2.md`, `new-format/judge-brief-key.md` | The 9 known defects the `key_recall` judge looks for in a trial's final spec, and the brief it applies. |
