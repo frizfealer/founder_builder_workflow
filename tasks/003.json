@@ -1,0 +1,21 @@
+{
+  "id": 3,
+  "title": "FINDINGS.md for the order-cancel example",
+  "item": "FINDINGS.md for the order-cancel example and the before/after trial count",
+  "motivation": "Record what the cull and finder rounds changed so the example is usable as a measurement run",
+  "status": "Backlog",
+  "added": "2026-11-07",
+  "finished": "",
+  "notes": "examples/order_support_agent/",
+  "depends_on": [],
+  "source_chat": "Order-support agent login design (Nov 5–6)",
+  "done_means": "examples/order_support_agent/FINDINGS.md is committed. It says what the cull and the finder rounds changed, with counts before and after, and each claim names its commit.",
+  "verified_by": [
+    "reviewer"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "low",
+  "tokens": null,
+  "draft_note": "An untracked FINDINGS.md sits at the repo root; if that is this file, the task is a move and a commit."
+}

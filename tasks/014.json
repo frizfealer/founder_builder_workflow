@@ -1,0 +1,24 @@
+{
+  "id": 14,
+  "title": "Format switch in agent-spec",
+  "item": "Format switch in the agent-spec skill: claims table, rules in the owner's words, policy model and policy page, scenarios derived from the model, §5 scoring moved out to agent eval",
+  "motivation": "Owner's problems with the current spec: too dense, 2,000 lines of scenarios to read, tool contract hidden in an appendix, what and how mixed",
+  "status": "Done",
+  "added": "2026-11-14",
+  "finished": "2026-11-15",
+  "notes": "On agent-spec/switch, merged into re-create-from-scratch (e8ed321; fix rounds d93de6e, 807d36e). Worst of baseline trials 10–12 against the old skill: owner-read lines 221 vs 1,544; time 1,787 s vs 2,103–2,540 s; subagent cost $3.42–4.06 vs about $9.40.",
+  "depends_on": [
+    {
+      "id": 13,
+      "soft": false
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14)",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "",
+  "priority": "",
+  "tokens": null,
+  "draft_note": ""
+}

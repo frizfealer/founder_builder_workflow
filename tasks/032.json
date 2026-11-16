@@ -1,0 +1,76 @@
+{
+  "id": 32,
+  "title": "Manager skill",
+  "item": "Manager skill: Claude Code takes Ready tasks and runs them without asking what is next, parks what needs the owner, and reports once",
+  "motivation": "The owner has about 10 hours a week; asking him what is next, or about every decision, spends them",
+  "status": "Done",
+  "added": "2026-11-15",
+  "finished": "2026-11-15",
+  "notes": "Built by manager-build/PROMPT.md.",
+  "depends_on": [
+    {
+      "id": 31,
+      "soft": false
+    },
+    {
+      "id": 33,
+      "soft": false
+    }
+  ],
+  "source_chat": "Manager design chat (Nov 15)",
+  "done_means": "A /manage command and its skill exist; a dry run on the seed picks task 20 and changes nothing; agent definitions set model and effort.",
+  "verified_by": [
+    "script",
+    "you"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "high",
+  "tokens": {
+    "agents": 116946,
+    "main_session": "not recorded"
+  },
+  "draft_note": "",
+  "decided_for_you": [
+    {
+      "chosen": "skill manage, command /manage, agents manager-builder and manager-reviewer; user-invoked (disable-model-invocation: true) like the repo's other skills",
+      "rejected": "a model-invoked skill",
+      "would_change": "another skill needing to start a run"
+    },
+    {
+      "chosen": "run reports go in tasks/RUNS.md, newest first, committed on the working branch as 'manage: run report <date>'",
+      "rejected": "one file per run",
+      "would_change": "the file growing past one screen per review"
+    },
+    {
+      "chosen": "parking commits only that task's file on the working branch; the task branch stays",
+      "rejected": "leaving the Needs you status on the task branch only, where tasks.py next would not see it",
+      "would_change": "the owner wanting parked work merged as far as it got"
+    },
+    {
+      "chosen": "inside an iterate task, the merge / revert question that /iterate always lists under Needs you is answered by the keep rule; any other item parks",
+      "rejected": "parking on every item, which parks every iterate task",
+      "would_change": "the owner wanting to decide every iterate merge himself"
+    },
+    {
+      "chosen": "the reviewer has Read, Grep and Glob only; for 'script' it names the commands and the manager runs them",
+      "rejected": "giving the reviewer Bash, which is not read-only",
+      "would_change": "a check the manager cannot run from the reviewer's list"
+    },
+    {
+      "chosen": "one fresh retry means a new builder with the reviewer's findings, then a new reviewer",
+      "rejected": "rerunning the same review",
+      "would_change": "retries passing only on reruns"
+    },
+    {
+      "chosen": "the merge limit is also checked before taking a task, so no task is built that cannot be merged",
+      "rejected": "checking only at the start and before each merge",
+      "would_change": "nothing foreseen"
+    },
+    {
+      "chosen": "tokens for this task count the headless 'claude -p /manage --dry-run' session used to check done means 3 (116,946 input + output tokens)",
+      "rejected": "recording 0 because it was not a subagent",
+      "would_change": "the owner counting only Agent-tool runs"
+    }
+  ]
+}

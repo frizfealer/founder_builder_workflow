@@ -1,0 +1,29 @@
+{
+  "id": 30,
+  "title": "Record main-session tokens and effort per trial",
+  "item": "Record the main session's token use and effort level in every trial",
+  "motivation": "Trial cost counts only subagent tokens, so $3.42–4.06 per trial is an undercount by an unknown amount; some trials recorded effort as unknown",
+  "status": "Backlog",
+  "added": "2026-11-15",
+  "finished": "",
+  "notes": "A change to the measuring setup; its own commit. Check what the Claude Code harness exposes before promising exact numbers.",
+  "depends_on": [
+    {
+      "id": 28,
+      "soft": false
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14–15)",
+  "done_means": "Every trial.json holds the main session's token use and effort level, or the README states what Claude Code does not expose.",
+  "verified_by": [
+    "script"
+  ],
+  "may_edit": [
+    ".claude/skills/skill-iterate/scripts/grade.py",
+    ".claude/skills/skill-iterate/references/grading-schema.md"
+  ],
+  "runs_as": "measurement",
+  "priority": "medium",
+  "tokens": null,
+  "draft_note": ""
+}

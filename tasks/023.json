@@ -1,0 +1,36 @@
+{
+  "id": 23,
+  "title": "Stand-in owner opens with No",
+  "item": "Stand-in owner opens with \"No. The record says:\" even when the record agrees with the recommendation",
+  "motivation": "Could make the skill drop a correct recommendation; seen on 22 questions across baseline trials 10–12, with no result changed",
+  "status": "Backlog",
+  "added": "2026-11-15",
+  "finished": "",
+  "notes": "A change to the measuring setup: fix it with the next such change, then rebaseline once (about $11 in subagent tokens).",
+  "depends_on": [
+    {
+      "id": 28,
+      "soft": false
+    },
+    {
+      "id": 29,
+      "soft": true
+    },
+    {
+      "id": 30,
+      "soft": true
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14–15)",
+  "done_means": "The stand-in owner agrees plainly when the record agrees with the recommendation. Replaying the 22 questions gives 0 such openers.",
+  "verified_by": [
+    "script"
+  ],
+  "may_edit": [
+    "eval/agent-spec/stand-in-brief.md"
+  ],
+  "runs_as": "measurement",
+  "priority": "medium",
+  "tokens": null,
+  "draft_note": "Tasks 23, 29 and 30 each change the test input or setup: do them together and rebaseline once."
+}

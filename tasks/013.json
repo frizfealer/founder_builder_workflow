@@ -1,0 +1,19 @@
+{
+  "id": 13,
+  "title": "Eval harness for the new agent-spec format",
+  "item": "Eval harness for the new agent-spec format (build2 kind): pinned format, seeded test case, frozen lint and checker, grading metrics, judge calibration on the 20 owner rulings, stand-in owner",
+  "motivation": "The old harness grades the old spec format; DECISIONS.md (688e9e7) puts the harness first, before the format switch",
+  "status": "Done",
+  "added": "2026-11-14",
+  "finished": "2026-11-14",
+  "notes": "Plan: eval/agent-spec/new-format/HARNESS-PLAN.md, with owner rulings. Steps 1–7 built; committed as 423ce3d and 6bea342. Key-judge calibration 16 of 20 (bar 18), so key_recall is reported, not gated; recalibrate at item 17. Step 8 (baseline) is item 16.",
+  "depends_on": [],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14)",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "",
+  "priority": "",
+  "tokens": null,
+  "draft_note": ""
+}

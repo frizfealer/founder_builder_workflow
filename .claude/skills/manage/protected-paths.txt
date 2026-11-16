@@ -1,0 +1,51 @@
+# Protected paths, read by scripts/checks.py protected.
+# One rule and one pattern per line.
+#   named        the task may change the path only if its "may edit" names it
+#   append-only  new files pass; changing, renaming or removing an existing file fails
+# A pattern is matched one path segment at a time; * matches within a segment.
+# A pattern ending in / covers everything under that folder.
+
+# Direction
+named        DECISIONS.md
+
+# Measurement, all skills
+named        .claude/skills/skill-iterate/scripts/grade.py
+named        .claude/skills/skill-iterate/scripts/calibrate.py
+named        .claude/skills/skill-iterate/agents/judge.md
+named        .claude/skills/skill-iterate/references/escalation.md
+named        .claude/skills/skill-iterate/references/grading-schema.md
+
+# Measurement, per skill
+named        eval/*/grading*.json
+named        eval/agent-spec/judge-verifier-brief.md
+named        eval/agent-spec/new-format/key-build2.md
+named        eval/agent-spec/new-format/judge-brief-key.md
+named        eval/agent-spec/new-format/FORMAT.md
+named        eval/agent-spec/new-format/grader/
+named        eval/agent-spec/new-format/seeded/
+named        eval/agent-spec/new-format/seeded-clean/
+named        eval/agent-spec/new-format/seeded-defects.md
+
+# Frozen trial inputs
+named        eval/agent-spec/PROMPT*.md
+named        eval/agent-spec/stand-in-brief.md
+named        eval/agent-spec/owner-brief.md
+named        eval/agent-spec/product-idea.md
+named        eval/agent-spec/review-packet.md
+
+# Owner's rulings
+named        eval/*/calibration/
+
+# History
+append-only  eval/*/baseline/
+append-only  eval/*/results/
+append-only  eval/*/EXPERIMENTS.md
+
+# The manager's own checks: the whole manager skill (the list, the scripts and tests, the limits
+# config, the skill text and agents) and its links in .claude/
+named        .claude/skills/manage/
+named        .claude/agents/manager-builder.md
+named        .claude/agents/manager-reviewer.md
+named        .claude/commands/manage.md
+named        .claude/settings*.json
+named        .git/hooks/

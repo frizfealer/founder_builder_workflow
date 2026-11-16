@@ -1,0 +1,25 @@
+{
+  "id": 28,
+  "title": "Make build2 the default trial kind",
+  "item": "Make the new way of testing the agent-spec skill the default one that /trial, /grade and /iterate use, and mark the two old ways as retired",
+  "motivation": "Today a plain /iterate would test the new skill the old way, which fails or gives meaningless numbers. The owner ruled the old ways retire once the new baseline is graded, which happened 2026-11-15",
+  "status": "Backlog",
+  "added": "2026-11-15",
+  "finished": "",
+  "notes": "The commands read grading.json, which still describes only the old trial kinds (full: review step on the old 1,544-line spec; build: old skill with the recorded interview replayed). The new kind (build2: whole new skill, stand-in owner, baseline trials 10–12) sits in grading-new.json. Small file work, no trials, its own commit. Do before the next change to the skill (items 24–26). Old trial folders stay as history. Same commit or the next: rewrite eval/agent-spec/README.md, which still describes the old test setup; delete the merged branch agent-spec/switch and the older stale branches.",
+  "depends_on": [],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14–15)",
+  "done_means": "grading.json describes the build2 kind with baseline trials 10 to 12 and marks the two old kinds retired. /trial, /grade and /iterate use build2 by default. Grading the baseline gives the same numbers as before. Old trial folders are unchanged. The eval README describes the new setup.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    "eval/agent-spec/grading.json",
+    "eval/agent-spec/grading-new.json"
+  ],
+  "runs_as": "measurement",
+  "priority": "high",
+  "tokens": null,
+  "draft_note": "Owner chose this as the manager's second task; mark Ready after the first run passes. Its note also asks to delete merged and stale branches: that is a delete, so list them and park it for the owner."
+}

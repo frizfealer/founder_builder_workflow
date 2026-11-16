@@ -1,0 +1,38 @@
+{
+  "id": 24,
+  "title": "Three key items missed in every switch trial",
+  "item": "agent-spec iterations on the three key items missed in every switch trial: an order number typed in a different case (P25), a yes withdrawn in the same message (P26), whether an unanswered cancel can land late (F2)",
+  "motivation": "Present in all 12 switch trials",
+  "status": "Backlog",
+  "added": "2026-11-15",
+  "finished": "",
+  "notes": "One change per iteration against the build2 baseline. The key_recall judge is uncalibrated, so read the items, not the score.",
+  "depends_on": [
+    {
+      "id": 28,
+      "soft": false
+    },
+    {
+      "id": 23,
+      "soft": true
+    },
+    {
+      "id": 29,
+      "soft": true
+    },
+    {
+      "id": 30,
+      "soft": true
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14–15)",
+  "done_means": "One change per iteration. Each of P25, P26 and F2 is caught in all 3 trials of its iteration, against 0 of 12 switch trials today, and no gated metric is worse.",
+  "verified_by": [
+    "metrics"
+  ],
+  "may_edit": [],
+  "runs_as": "iterate",
+  "priority": "medium",
+  "tokens": null,
+  "draft_note": "'All 3 trials' is a suggested bar, not derived. Read the items, not the key_recall score."
+}

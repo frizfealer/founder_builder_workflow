@@ -1,0 +1,24 @@
+{
+  "id": 10,
+  "title": "Eval-runner paragraph in the pytest-bdd notes",
+  "item": "Write the eval-runner paragraph in pytest-bdd-skill-notes.md, naming the two axes separately: instrument (gate vs scored run, same step definitions) and lifecycle (@planned → @active capability → regression), citing Adzic ch. 11 and the Anthropic evals article.",
+  "motivation": "Deck and notes should use the same words (gate / benchmark); the lifecycle markers are what the pytest-bdd skill will implement.",
+  "status": "Dropped",
+  "added": "2026-11-07",
+  "finished": "2026-11-15",
+  "notes": "Was the next action of the Nov 6 chat; ~30 min. Folded into task 19 on 2026-11-15 (owner agreed).",
+  "depends_on": [
+    {
+      "id": 11,
+      "soft": false
+    }
+  ],
+  "source_chat": "BDD tests vs agent eval (Nov 6)",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "",
+  "priority": "",
+  "tokens": null,
+  "draft_note": ""
+}

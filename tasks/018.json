@@ -1,0 +1,24 @@
+{
+  "id": 18,
+  "title": "Policy chart phases and colors",
+  "item": "Policy chart: add phase groups and colors to our own chart generator, as pstack's statechart does",
+  "motivation": "Owner found pstack's chart clearer than ours for the same 13 states and 22 arrows",
+  "status": "Done",
+  "added": "2026-11-14",
+  "finished": "2026-11-15",
+  "notes": "Phase groups, numbered arrows and a table of each arrow's steps are in the skill's checker (e8ed321). Baseline charts have 20–21 arrows. pstack not adopted. Keep or drop the chart at item 17.",
+  "depends_on": [
+    {
+      "id": 14,
+      "soft": false
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14)",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "",
+  "priority": "",
+  "tokens": null,
+  "draft_note": ""
+}

@@ -1,0 +1,21 @@
+{
+  "id": 29,
+  "title": "Answer the open Harbor Goods product questions",
+  "item": "Answer the open Harbor Goods product questions",
+  "motivation": "Every trial leaves them open because the stand-in owner cannot decide them, so the example spec carries known open questions",
+  "status": "Backlog",
+  "added": "2026-11-15",
+  "finished": "",
+  "notes": "Main one: what ends lookup retries (the recorded answer is \"without limit\"; the owner now thinks that is wrong). Also: what the agent does when the order list returns an error; a refund that fails after it was issued; and five decisions from the first checker run (shipped order plus a part-order request; an order cancelled with no refund; acting on the lookup after a second unanswered cancel; an order shipping mid-call; a timed-out cancel landing late). Recommended answers are in the handoff. Changing recorded answers changes the test input, so rebaseline after.",
+  "depends_on": [],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14–15)",
+  "done_means": "The owner's answer is recorded for each open question, starting with what ends lookup retries. The frozen trial inputs that hold his answers are updated.",
+  "verified_by": [
+    "you"
+  ],
+  "may_edit": [],
+  "runs_as": "you",
+  "priority": "high",
+  "tokens": null,
+  "draft_note": "May edit must name the frozen trial inputs that record his answers; set when he answers."
+}

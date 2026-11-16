@@ -1,0 +1,30 @@
+{
+  "id": 27,
+  "title": "Recalibrate the key_recall judge",
+  "item": "Recalibrate the key_recall judge",
+  "motivation": "Agreed with the owner on 16 of 20 rulings against a bar of 18; the calibration set tests whether a finding is real, not whether a defect is still present",
+  "status": "Backlog",
+  "added": "2026-11-15",
+  "finished": "",
+  "notes": "Do at item 17, where the owner rules on findings anyway. Until then key_recall stays reported, not gated.",
+  "depends_on": [
+    {
+      "id": 17,
+      "soft": false
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14–15)",
+  "done_means": "The judge agrees with the owner's rulings on at least 18 of 20, on a set that tests whether a defect is still present.",
+  "verified_by": [
+    "you",
+    "script"
+  ],
+  "may_edit": [
+    "eval/agent-spec/calibration/",
+    "eval/agent-spec/new-format/judge-brief-key.md"
+  ],
+  "runs_as": "measurement",
+  "priority": "low",
+  "tokens": null,
+  "draft_note": ""
+}

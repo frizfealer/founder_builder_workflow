@@ -1,0 +1,21 @@
+{
+  "id": 20,
+  "title": "/grade commits its verdicts",
+  "item": "/grade commits the verdicts it writes",
+  "motivation": "Promised in commands/grade.md, not done",
+  "status": "Ready",
+  "added": "2026-11-14",
+  "finished": "",
+  "notes": "Small.",
+  "depends_on": [],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14)",
+  "done_means": "After /grade <skill>, the verdict files it wrote are in one commit and none is left uncommitted. commands/grade.md says so.",
+  "verified_by": [
+    "script"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "medium",
+  "tokens": null,
+  "draft_note": "Verify on a scratch branch. Owner chose this as the manager's first task."
+}

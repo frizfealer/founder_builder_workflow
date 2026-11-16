@@ -1,0 +1,32 @@
+{
+  "id": 16,
+  "title": "New build2 baseline",
+  "item": "New baseline: three build2 trials of the switched skill on Harbor Goods, graded",
+  "motivation": "Every later skill change is compared against it",
+  "status": "Done",
+  "added": "2026-11-14",
+  "finished": "2026-11-15",
+  "notes": "Baseline = switch-base-10..12 (0c27a00), effort high. Took two fix rounds and a stand-in fix (8b61191). key_recall 0.44–0.67, reported only. The five product questions were not put to the owner; they wait for a real rebuild of Harbor Goods.",
+  "depends_on": [
+    {
+      "id": 13,
+      "soft": false
+    },
+    {
+      "id": 14,
+      "soft": false
+    },
+    {
+      "id": 15,
+      "soft": false
+    }
+  ],
+  "source_chat": "Agent workflow with Claude subagents (Nov 14)",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "",
+  "priority": "",
+  "tokens": null,
+  "draft_note": ""
+}

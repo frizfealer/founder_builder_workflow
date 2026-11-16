@@ -1,0 +1,30 @@
+{
+  "id": 35,
+  "title": "Run the manager in its own worktree",
+  "item": "/manage runs in a separate git worktree so the owner can keep working in the main checkout during a run",
+  "motivation": "The manager switches branches and merges in the checkout where it starts, so today the owner must not work in that checkout during a run",
+  "notes": "A branch can be checked out in only one worktree at a time, so the working branch cannot be checked out in both. The run marker is already in the git common dir, so the push hook sees it from every worktree.",
+  "depends_on": [
+    {
+      "id": 34,
+      "soft": true
+    }
+  ],
+  "done_means": "/manage creates or reuses a worktree for the run, does all branch switching and merging there, and leaves the owner's checkout untouched; commands/manage.md and SKILL.md say where the worktree is and how the owner reaches the merged work. A test in a temporary repo shows a run's merge lands on the working branch while the main checkout's branch and files are unchanged.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/",
+    ".claude/commands/manage.md"
+  ],
+  "draft_note": "Drafted by the manager build on 2026-11-15 at the owner's request. Priority left for the owner. Open choice: where the working branch lives while the owner works (he would stay on another branch, or the run merges with git update-ref instead of a checkout).",
+  "status": "Proposed",
+  "added": "2026-11-15",
+  "finished": "",
+  "source_chat": "Manager build review (Nov 15)",
+  "runs_as": "build",
+  "priority": "",
+  "tokens": null
+}

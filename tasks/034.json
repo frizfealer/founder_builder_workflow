@@ -1,0 +1,24 @@
+{
+  "id": 34,
+  "title": "Recover from an interrupted manager run",
+  "item": "/manage detects and recovers from a run that stopped partway: a stale run marker, the checkout left on a task branch, a task left In progress",
+  "motivation": "A crashed or cancelled run leaves .git/manage-run-active behind, which blocks the owner's pushes and makes the next run-start fail, and can leave the checkout on task/<id>",
+  "notes": "Today the owner deletes the marker by hand (SKILL.md, What the scripts enforce).",
+  "depends_on": [],
+  "done_means": "Given a leftover marker with no run going, a checkout on a task branch, or a task branch whose task the working branch still shows Ready, the next /manage start restores a state it can run from (or parks the task) without deleting a branch or losing a commit, and logs what it did in the run report. Tests in temporary git repos cover each case.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "draft_note": "Drafted by the manager build on 2026-11-15 at the owner's request. Priority left for the owner. How to tell a stale marker from a live run (e.g. the session id or pid in the marker) is the main design choice.",
+  "status": "Proposed",
+  "added": "2026-11-15",
+  "finished": "",
+  "source_chat": "Manager build review (Nov 15)",
+  "runs_as": "build",
+  "priority": "",
+  "tokens": null
+}
