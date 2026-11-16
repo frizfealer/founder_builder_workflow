@@ -1,0 +1,24 @@
+{
+  "id": 37,
+  "title": "Advisor consulted before a task is parked",
+  "item": "Before the manager parks a task, it consults a read-only advisor agent on Fable at high effort, which may say the task can go on without the owner and how",
+  "motivation": "Some parks may be avoidable: the manager parks on a doubt another strong model could settle from the repo. The owner's review should hold only what truly needs him.",
+  "notes": "The advisor may not unpark: a fact only the owner knows, a failed protected-path check, a task verified by the owner (verified_by includes you, or runs_as is you), or anything on the never list. Those park whatever it says.",
+  "depends_on": [],
+  "done_means": "A manager-advisor agent exists with model Fable, effort high and read-only tools, linked in .claude/agents/ like the other two. commands/manage.md consults it before every park and parks anyway in the four cases above. SKILL.md says so. A test covers that the four cases always park.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "draft_note": "Drafted by Claude on 2026-11-15 at the owner's request. Priority left for the owner. Open choice: whether the four always-park cases are checked by a script or stay prose in manage.md; the test in done_means assumes a script.",
+  "status": "Proposed",
+  "added": "2026-11-15",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tokens": null
+}

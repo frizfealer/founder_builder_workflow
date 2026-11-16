@@ -279,3 +279,50 @@ def test_merge_limit_ignores_other_merges(repo):
     repo.git("switch", "-q", BASE)
     repo.git("merge", "-q", "--no-ff", "-m", "Merge branch 'side'", "side")
     assert checks.task_merges_since_review(repo.path, base=BASE) == (0, None)
+
+
+# --- review file -----------------------------------------------------------------------------
+
+def test_review_file_missing(repo):
+    """Should refuse the merge when the task has no saved review reply."""
+    ok, msg = checks.check_review(repo.path, 1)
+    assert not ok
+    assert "tasks/reviews/001-1.md" in msg
+
+
+def test_review_first_line_not_pass(repo):
+    """Should refuse the merge when the review reply's first line is not VERDICT: PASS."""
+    repo.write("tasks/reviews/001-1.md", "VERDICT: FAIL\n- **Problems:** ...\n")
+    ok, msg = checks.check_review(repo.path, 1)
+    assert not ok
+    assert "VERDICT: PASS" in msg
+
+
+def test_review_pass(repo):
+    """Should allow the merge when the only review reply starts with VERDICT: PASS."""
+    repo.write("tasks/reviews/001-1.md", "VERDICT: PASS\n- **Parts:** ...\n")
+    assert checks.check_review(repo.path, 1)[0]
+
+
+def test_review_latest_reply_counts(repo):
+    """Should judge by the highest-numbered reply: a pass after a failed first review is a pass, and the reverse is a refusal."""
+    repo.write("tasks/reviews/001-1.md", "VERDICT: FAIL\n")
+    repo.write("tasks/reviews/001-2.md", "VERDICT: PASS\n")
+    assert checks.check_review(repo.path, 1)[0]
+    for n in range(3, 11):
+        repo.write(f"tasks/reviews/001-{n}.md", "VERDICT: PASS\n" if n < 10 else "VERDICT: FAIL\n")
+    assert not checks.check_review(repo.path, 1)[0]
+
+
+def test_review_other_task_file_ignored(repo):
+    """Should refuse the merge when only another task has a review reply."""
+    repo.write("tasks/reviews/002-1.md", "VERDICT: PASS\n")
+    assert not checks.check_review(repo.path, 1)[0]
+
+
+def test_review_not_needed_for_metrics_task(repo):
+    """Should allow the merge with no review reply when the task is verified by metrics only, since no reviewer runs."""
+    t = task(1)
+    t["verified_by"] = ["metrics"]
+    repo.write_task(t)
+    assert checks.check_review(repo.path, 1)[0]

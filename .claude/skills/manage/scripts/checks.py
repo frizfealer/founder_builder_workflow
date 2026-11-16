@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""The manager's three mechanical checks. Run from inside the repo.
+"""The manager's mechanical checks. Run from inside the repo.
 
   checks.py protected <task-id> <branch>   files <branch> changes against the working branch,
                                            checked against protected-paths.txt; exit 1 on a failure
   checks.py merge-limit                    task merges on the working branch since the latest
                                            review tag, against limits.json; exit 1 at the limit
+  checks.py review <task-id>               the task's latest saved review reply in the working
+                                           tree; exit 1 when none exists or its first line is
+                                           not "VERDICT: PASS" (only for a task verified by
+                                           reviewer or script)
   checks.py run-start | run-end            mark a manager run active / no longer active
   checks.py push-hook                      Claude Code PreToolUse hook: refuse git push while a run
                                            is active (reads the hook's JSON on stdin)
@@ -35,6 +39,8 @@ TASKS_DIR = "tasks"
 MANAGER_FIELDS = {"status", "finished", "tokens", "needs_you", "decided_for_you"}
 REVIEW_TAG_GLOB = "review/*"
 TASK_MERGE = re.compile(r"^Merge task \d+:")
+REVIEWS_DIR = f"{TASKS_DIR}/reviews"  # <id>-<n>.md, one per reviewer reply, n from 1
+REVIEW_PASS = "VERDICT: PASS"
 MARKER = "manage-run-active"  # in the git common dir, so every worktree of the clone sees it
 
 
@@ -155,6 +161,31 @@ def check_merge_limit(repo, base=WORKING_BRANCH):
     return True, f"{count} task merge(s) on {base} {since}; the limit is {limit}."
 
 
+# --- review file -----------------------------------------------------------------------------
+
+def check_review(repo, task_id):
+    """(ok, message). ok only when the task's highest-numbered review reply starts VERDICT: PASS.
+    A task verified by neither reviewer nor script has no reviewer, so it needs no reply."""
+    verified_by = json.loads((Path(repo) / TASKS_DIR / f"{task_id:03d}.json").read_text())["verified_by"]
+    if not {"reviewer", "script"} & set(verified_by):
+        return True, f"task {task_id} is verified by {verified_by}; no reviewer runs, no review reply needed"
+    folder = Path(repo) / REVIEWS_DIR
+    replies = {}
+    for p in folder.glob(f"{task_id:03d}-*.md"):
+        n = p.stem.split("-", 1)[1]
+        if n.isdigit():
+            replies[int(n)] = p
+    if not replies:
+        return False, f"no review reply saved for task {task_id} (expected {REVIEWS_DIR}/{task_id:03d}-1.md)"
+    latest = replies[max(replies)]
+    lines = latest.read_text().splitlines()
+    first = lines[0].strip() if lines else ""
+    rel = f"{REVIEWS_DIR}/{latest.name}"
+    if first != REVIEW_PASS:
+        return False, f"{rel}: first line is {first!r}, not {REVIEW_PASS!r}. Merge nothing."
+    return True, f"{rel}: {REVIEW_PASS}"
+
+
 # --- active run and the push hook ------------------------------------------------------------
 
 def marker_path(cwd):
@@ -229,6 +260,8 @@ def main(argv):
         return 1 if fails else 0
     if cmd == "merge-limit":
         ok, msg = check_merge_limit(".", base)
+    elif cmd == "review" and len(argv) == 2:
+        ok, msg = check_review(".", int(argv[1]))
     elif cmd == "run-start":
         ok, msg = run_start(".")
     elif cmd == "run-end":

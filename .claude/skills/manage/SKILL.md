@@ -30,7 +30,10 @@ to another task. He reads one report at his review.
 2. The manager and its agents may add tasks with status Proposed. When a rule in this skill is
    broken and no script checks it, propose a task to build that check.
 3. The builder never verifies its own work. The reviewer gets a fresh context, read-only tools,
-   and a brief written from the task file and the diff, not from the builder's report.
+   and a brief written from the task file and the diff, not from the builder's report. It
+   labels each problem in the task's change or outside it. A problem in the task's change
+   fails the review and gets the one fresh retry. Only a problem outside it becomes a Proposed
+   task. Every reviewer reply is saved verbatim in `tasks/reviews/` and merged with the task.
 4. One merge commit per task. The task file shows Done, `finished` and `tokens` in that merge.
 5. Inside an iterate task, skill-iterate's `references/escalation.md` applies as well. Outside
    it, this skill's stop list is the only one. `DECISIONS.md` is the direction every brief
@@ -66,6 +69,10 @@ All from the repo root, all with `python3`:
   its three links in `.claude/` are protected.
 - `scripts/checks.py merge-limit`: task merges since the latest review tag, against
   `limits.json`. At the limit the manager merges nothing more and ends the run.
+- `scripts/checks.py review <id>`: the task's highest-numbered reply in
+  `tasks/reviews/<id>-<n>.md`, in the working tree during the merge. It refuses the merge when
+  no reply is saved or the latest's first line is not `VERDICT: PASS`. A task verified by
+  neither `reviewer` nor `script` has no reviewer and passes.
 - `scripts/checks.py run-start | run-end`: mark a run active with `.git/manage-run-active`.
   While it exists, the `PreToolUse` hook in `.claude/settings.json` refuses any Bash command
   whose text runs `git push`, for the main session and every subagent. It reads command text,
@@ -95,4 +102,5 @@ ln -s ../skills/manage/agents/reviewer.md   .claude/agents/manager-reviewer.md
 
 - Each task's file: `decided_for_you` (one entry per decision made without the owner: chosen,
   rejected, what would change it), `needs_you` when parked, `tokens`.
+- `tasks/reviews/<id>-<n>.md`: each reviewer reply verbatim, in the task's merge commit.
 - `tasks/RUNS.md`: one report per run, newest first, in skill-iterate's three sections.

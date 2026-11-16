@@ -3,7 +3,7 @@
   "title": "Make build2 the default trial kind",
   "item": "Make the new way of testing the agent-spec skill the default one that /trial, /grade and /iterate use, and mark the two old ways as retired",
   "motivation": "Today a plain /iterate would test the new skill the old way, which fails or gives meaningless numbers. The owner ruled the old ways retire once the new baseline is graded, which happened 2026-11-15",
-  "status": "Backlog",
+  "status": "Ready",
   "added": "2026-11-15",
   "finished": "",
   "notes": "The commands read grading.json, which still describes only the old trial kinds (full: review step on the old 1,544-line spec; build: old skill with the recorded interview replayed). The new kind (build2: whole new skill, stand-in owner, baseline trials 10–12) sits in grading-new.json. Small file work, no trials, its own commit. Do before the next change to the skill (items 24–26). Old trial folders stay as history. Same commit or the next: rewrite eval/agent-spec/README.md, which still describes the old test setup; delete the merged branch agent-spec/switch and the older stale branches.",

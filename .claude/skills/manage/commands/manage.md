@@ -45,7 +45,9 @@ branch, set the task to In progress and commit `task <id>: in progress`.
 ## 5. Verify, by `verified_by`
 
 Never by the builder. An empty or failed review is a fail, and so is a reply whose first line
-is not `VERDICT: PASS`.
+is not `VERDICT: PASS`, and so is a reply with any problem labelled in the task's change. Keep
+every reviewer reply verbatim, in order; step 7 saves them. For each problem labelled outside
+it, add a Proposed task; step 7 or 8 commits it.
 
 - **reviewer**, **script:** dispatch `manager-reviewer` with the task file's path and the
   output of `git diff <working branch>...task/<id>`. Not the builder's report. Tell it to look
@@ -55,8 +57,8 @@ is not `VERDICT: PASS`.
   --gate` exits 0.
 - **you:** park.
 
-On a fail: one fresh retry. Dispatch a new `manager-builder` with the reviewer's findings, then
-a new `manager-reviewer`. If it still fails, park.
+On a fail: one fresh retry. Dispatch a new `manager-builder` with the reviewer's problems in
+the task's change, then a new `manager-reviewer`. If it still fails, park.
 
 ## 6. Protected paths
 
@@ -65,14 +67,17 @@ a new `manager-reviewer`. If it still fails, park.
 ## 7. Merge
 
 `checks.py merge-limit`; at the limit park the task with "merge limit reached; review and set
-a review tag". Otherwise, on the working branch: `git merge --no-ff --no-commit <branch>`, set
-the task file's `status` to Done, `finished` to today, `tokens`, and `decided_for_you`, then
-commit with the subject `Merge task <id>: <title>`. Go to step 2.
+a review tag". Otherwise, on the working branch: `git merge --no-ff --no-commit <branch>`. Write
+each reviewer reply from step 5 verbatim to `tasks/reviews/<id>-<n>.md` (id zero-padded to 3;
+`n` counts on from the task's highest existing number, from 1). Run `checks.py review <id>`; if
+it fails, `git merge --abort` and park the task with its output. Then set the task file's
+`status` to Done, `finished` to today, `tokens`, and `decided_for_you`, add the Proposed tasks
+from step 5, and commit all of it with the subject `Merge task <id>: <title>`. Go to step 2.
 
 ## 8. Park
 
 On the working branch, edit only this task's file: `status` Needs you, `needs_you`,
-`decided_for_you`, `tokens`. Commit `task <id>: parked`. The task's branch stays. Go to step 2.
+`decided_for_you`, `tokens`; and add the Proposed tasks from step 5. Commit `task <id>: parked`. The task's branch stays. Go to step 2.
 
 ## 9. End
 
