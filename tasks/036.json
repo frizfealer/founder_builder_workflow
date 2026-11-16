@@ -1,0 +1,21 @@
+{
+  "id": 36,
+  "title": "/grade commit step skips unchanged verdict files",
+  "item": "Step 4 of commands/grade.md commits only verdict files that are new or changed, so an unusable verdict that grade.py re-lists does not make git commit fail",
+  "motivation": "grade.py re-lists a judge task whose verdict file exists but is unusable (error field, empty or all-null items). Step 4 takes every listed task's existing verdict file, so if the only one is already committed and unchanged, git commit exits 1 with nothing to commit. Found by the task 20 reviewer.",
+  "notes": "The test builds <paths> with its own code, not from the pattern in grade.md; the fix could close that gap too.",
+  "depends_on": [],
+  "done_means": "When every listed verdict file is already committed and unchanged, /grade step 4 makes no commit and does not fail. A test in a temporary git repo covers that case.",
+  "verified_by": [
+    "script"
+  ],
+  "may_edit": [],
+  "draft_note": "Drafted by the manager on 2026-11-15 from the task 20 review. Priority left for the owner.",
+  "status": "Proposed",
+  "added": "2026-11-15",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tokens": null
+}
