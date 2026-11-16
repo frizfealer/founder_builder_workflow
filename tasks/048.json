@@ -20,6 +20,9 @@
   ],
   "runs_as": "build",
   "priority": "low",
+  "tags": [
+    "repo"
+  ],
   "tokens": null,
   "draft_note": "Drafted by Claude in chat on 2026-11-16 at the owner's request. The DECISIONS.md wording is the owner's to approve: which is why verified_by includes you. The script's home is left to the builder; if it goes under .claude/skills/manage/, that path must be added to may_edit by the owner first. Priority is a draft."
 }

@@ -16,6 +16,9 @@
   "may_edit": [],
   "runs_as": "build",
   "priority": "low",
+  "tags": [
+    "examples"
+  ],
   "tokens": null,
   "draft_note": "An untracked FINDINGS.md sits at the repo root; if that is this file, the task is a move and a commit."
 }

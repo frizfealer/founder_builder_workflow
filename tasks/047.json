@@ -19,6 +19,9 @@
   ],
   "runs_as": "you",
   "priority": "low",
+  "tags": [
+    "manager"
+  ],
   "tokens": null,
   "draft_note": "Drafted by Claude in chat on 2026-11-16 at the owner's request. Priority, runs_as and verified_by are drafts for the owner."
 }

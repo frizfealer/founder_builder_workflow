@@ -131,6 +131,14 @@ def test_protected_own_task_owner_fields_rewritten(repo):
         assert any(field in f for f in fails), field
 
 
+def test_protected_own_task_tags_changed(repo):
+    """Should fail when the branch changes the tags of its own task."""
+    b = on_branch(repo)
+    repo.write_task(task(1) | {"tags": ["repo"]})
+    repo.commit("retag own task")
+    assert any("tags" in f for f in protected(repo, b))
+
+
 @pytest.mark.parametrize("path", [".claude/skills/manage/SKILL.md",
                                   ".claude/skills/manage/agents/reviewer.md",
                                   ".claude/commands/manage.md"])

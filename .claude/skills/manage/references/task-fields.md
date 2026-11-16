@@ -15,6 +15,7 @@ One JSON object per file, `tasks/<id>.json`, id zero-padded to 3 (`tasks/020.jso
 | `may_edit` | protected paths this task may change; a trailing `/` names a folder. Empty for most | Owner; manager may draft |
 | `runs_as` | `build`, `iterate`, `measurement`, `you` | Owner; manager may draft |
 | `priority` | `high`, `medium`, `low` | Owner |
+| `tags` | list of 1 to 3 tags, each a line of `tasks/tags.txt` | Owner; the manager or builder for a Proposed task |
 | `depends_on` | list of `{"id": <int>, "soft": <bool>}`; hard unless `soft` is true | Owner; manager may draft |
 | `tokens` | `null`, or `{"agents": <int>, "main_session": "not recorded"}` | Manager |
 | `draft_note` | text, optional | Whoever drafted the fields |

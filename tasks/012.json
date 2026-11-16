@@ -30,6 +30,9 @@
   "may_edit": [],
   "runs_as": "iterate",
   "priority": "medium",
+  "tags": [
+    "agent-spec"
+  ],
   "tokens": null,
   "draft_note": "DECISIONS.md already says a rule-text fix becomes a proposal for the human, and d93de6e touches the same step. Check what is left before running."
 }

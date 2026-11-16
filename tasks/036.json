@@ -17,6 +17,9 @@
   "source_chat": "",
   "runs_as": "build",
   "priority": "medium",
+  "tags": [
+    "skill-iterate"
+  ],
   "tokens": {
     "agents": 184471,
     "main_session": "not recorded"

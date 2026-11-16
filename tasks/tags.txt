@@ -1,0 +1,7 @@
+agent-spec
+bdd
+agent-eval
+skill-iterate
+manager
+examples
+repo

@@ -10,6 +10,7 @@ SKILL = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SKILL / "scripts"))
 
 BASE = "work"
+TAGS = ["manager", "repo"]
 
 
 def task(task_id, status="Ready", may_edit=(), depends_on=(), priority="medium"):
@@ -17,7 +18,8 @@ def task(task_id, status="Ready", may_edit=(), depends_on=(), priority="medium")
         "id": task_id, "title": f"Task {task_id}", "item": "", "motivation": "", "status": status,
         "added": "2026-11-15", "finished": "", "notes": "", "depends_on": list(depends_on),
         "source_chat": "", "done_means": "Something is observable.", "verified_by": ["script"],
-        "may_edit": list(may_edit), "runs_as": "build", "priority": priority, "tokens": None,
+        "may_edit": list(may_edit), "runs_as": "build", "priority": priority, "tags": ["manager"],
+        "tokens": None,
     }
 
 

@@ -25,6 +25,10 @@
   "may_edit": [],
   "runs_as": "build",
   "priority": "low",
+  "tags": [
+    "agent-spec",
+    "bdd"
+  ],
   "tokens": null,
   "draft_note": ""
 }

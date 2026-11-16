@@ -16,6 +16,10 @@
   "may_edit": [],
   "runs_as": "build",
   "priority": "low",
+  "tags": [
+    "examples",
+    "bdd"
+  ],
   "tokens": null,
   "draft_note": ""
 }

@@ -18,6 +18,9 @@
   "may_edit": [],
   "runs_as": "build",
   "priority": "low",
+  "tags": [
+    "agent-eval"
+  ],
   "tokens": null,
   "draft_note": "Includes former tasks 10 and 11 (folded 2026-11-15). Plan first. Waits for a built agent; there is no task for that yet."
 }

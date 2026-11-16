@@ -26,7 +26,7 @@ to another task. He reads one report at his review.
 ## Rules
 
 1. Only the owner sets Ready. Once a task is Ready its `done_means`, `verified_by`, `may_edit`,
-   `runs_as`, `priority` and `depends_on` are his; the manager drafts them only before then.
+   `runs_as`, `priority`, `depends_on` and `tags` are his; the manager drafts them only before then.
 2. The manager adds at most one Proposed task per task run, bundling the review findings worth
    doing. The builder proposes a task only when `done_means` needs a protected path its
    `may_edit` does not name. When a rule in this skill is broken and no script checks it, the

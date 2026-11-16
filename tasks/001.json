@@ -16,6 +16,9 @@
   "may_edit": [],
   "runs_as": "build",
   "priority": "high",
+  "tags": [
+    "bdd"
+  ],
   "tokens": null,
   "draft_note": "Owner decided 2026-11-15: build on the cafe new-format spec first. No longer depends on 11 or 19: BDD tests gate with a scripted reference agent. S01, S12, S20, S26, S41 were old-format scenario IDs. Branch add-agent-spec-to-pytest-bdd holds earlier work, not reviewed."
 }

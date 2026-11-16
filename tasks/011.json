@@ -14,6 +14,10 @@
   "may_edit": [],
   "runs_as": "",
   "priority": "",
+  "tags": [
+    "agent-spec",
+    "agent-eval"
+  ],
   "tokens": null,
   "draft_note": ""
 }

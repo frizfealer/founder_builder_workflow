@@ -19,6 +19,10 @@
   "may_edit": [],
   "runs_as": "",
   "priority": "",
+  "tags": [
+    "bdd",
+    "agent-eval"
+  ],
   "tokens": null,
   "draft_note": ""
 }

@@ -20,5 +20,8 @@
   "source_chat": "",
   "runs_as": "build",
   "priority": "low",
+  "tags": [
+    "skill-iterate"
+  ],
   "tokens": null
 }

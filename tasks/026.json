@@ -30,6 +30,9 @@
   "may_edit": [],
   "runs_as": "you",
   "priority": "medium",
+  "tags": [
+    "agent-spec"
+  ],
   "tokens": null,
   "draft_note": "Becomes an iterate task once the owner has decided."
 }

@@ -41,6 +41,9 @@
   "may_edit": [],
   "runs_as": "iterate",
   "priority": "medium",
+  "tags": [
+    "agent-spec"
+  ],
   "tokens": null,
   "draft_note": "'All 3 trials' is a suggested bar, not derived. Read the items, not the key_recall score."
 }

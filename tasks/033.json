@@ -21,6 +21,9 @@
   "may_edit": [],
   "runs_as": "build",
   "priority": "high",
+  "tags": [
+    "manager"
+  ],
   "tokens": {
     "agents": 125103,
     "main_session": "not recorded"

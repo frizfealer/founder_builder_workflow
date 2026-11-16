@@ -30,6 +30,9 @@
   "may_edit": [],
   "runs_as": "iterate",
   "priority": "medium",
+  "tags": [
+    "agent-spec"
+  ],
   "tokens": null,
   "draft_note": ""
 }

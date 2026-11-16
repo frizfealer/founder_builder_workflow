@@ -16,6 +16,10 @@
   "may_edit": [],
   "runs_as": "you",
   "priority": "high",
+  "tags": [
+    "examples",
+    "agent-spec"
+  ],
   "tokens": null,
   "draft_note": "May edit must name the frozen trial inputs that record his answers; set when he answers."
 }

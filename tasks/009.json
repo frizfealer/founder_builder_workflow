@@ -25,6 +25,10 @@
   "may_edit": [],
   "runs_as": "build",
   "priority": "low",
+  "tags": [
+    "agent-eval",
+    "bdd"
+  ],
   "tokens": null,
   "draft_note": "Waits for a built agent; there is no task for that yet."
 }

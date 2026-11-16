@@ -14,6 +14,8 @@ import sys
 from pathlib import Path
 
 TASKS_DIR = "tasks"
+TAGS_FILE = "tags.txt"  # in TASKS_DIR, one allowed tag per line
+MAX_TAGS = 3
 STATUSES = ["Proposed", "Backlog", "Ready", "In progress", "Needs you", "Done", "Dropped"]
 CLOSED = {"Done", "Dropped"}
 VERIFIERS = {"script", "metrics", "reviewer", "you"}
@@ -22,10 +24,10 @@ PRIORITIES = ["high", "medium", "low"]
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 # The owner's fields: set by the owner; the manager may draft them only before Ready.
-OWNER_FIELDS = ["done_means", "verified_by", "may_edit", "runs_as", "priority", "depends_on"]
+OWNER_FIELDS = ["done_means", "verified_by", "may_edit", "runs_as", "priority", "depends_on", "tags"]
 REQUIRED = ["id", "title", "item", "motivation", "status", "added", "finished", "notes",
             "depends_on", "source_chat", "done_means", "verified_by", "may_edit", "runs_as",
-            "priority", "tokens"]
+            "priority", "tags", "tokens"]
 # needs_you: the parked question. decided_for_you: one entry per decision made without the owner.
 OPTIONAL = ["draft_note", "needs_you", "decided_for_you"]
 NEEDS_YOU_KEYS = ["question", "recommendation", "if_vetoed"]
@@ -48,6 +50,14 @@ def load_all(root):
     return tasks
 
 
+def load_tags(root):
+    """The allowed tags from <root>/tasks/tags.txt. Raises ValueError when the file is missing."""
+    p = Path(root) / TASKS_DIR / TAGS_FILE
+    if not p.exists():
+        raise ValueError(f"{TASKS_DIR}/{TAGS_FILE} does not exist")
+    return [line.strip() for line in p.read_text().splitlines() if line.strip()]
+
+
 def write(root, task):
     task_path(root, task["id"]).write_text(json.dumps(task, indent=2, ensure_ascii=False) + "\n")
 
@@ -56,7 +66,7 @@ def _is_str_list(v):
     return isinstance(v, list) and all(isinstance(x, str) for x in v)
 
 
-def lint_task(name, t):
+def lint_task(name, t, allowed_tags):
     """Problems in one task, ignoring cross-task references."""
     errs = []
     if not isinstance(t, dict):
@@ -99,6 +109,13 @@ def lint_task(name, t):
         e(f"{name}: runs_as {t['runs_as']!r} is not one of {sorted(RUNS_AS)}")
     if t["priority"] not in PRIORITIES + [""]:
         e(f"{name}: priority {t['priority']!r} is not one of {PRIORITIES}")
+    tags = t["tags"]
+    if not _is_str_list(tags) or not 1 <= len(tags) <= MAX_TAGS:
+        e(f"{name}: tags must be a list of 1 to {MAX_TAGS} tags from {TASKS_DIR}/{TAGS_FILE}")
+    else:
+        unknown_tags = [x for x in tags if x not in allowed_tags]
+        if unknown_tags:
+            e(f"{name}: tags {unknown_tags} are not in {TASKS_DIR}/{TAGS_FILE}")
     deps = t["depends_on"]
     if not isinstance(deps, list) or not all(
         isinstance(d, dict) and set(d) == {"id", "soft"} and isinstance(d["id"], int)
@@ -131,10 +148,10 @@ def lint_task(name, t):
     return errs
 
 
-def lint(tasks):
+def lint(tasks, allowed_tags):
     errs = []
     for name, t in tasks.items():
-        errs += lint_task(name, t)
+        errs += lint_task(name, t, allowed_tags)
     if errs:
         return errs
     ids = {t["id"] for t in tasks.values()}
@@ -200,10 +217,11 @@ def main(argv):
         return 2
     try:
         tasks = load_all(root)
+        allowed_tags = load_tags(root)
     except ValueError as e:
         print(f"FAIL {e}")
         return 1
-    errs = lint(tasks)
+    errs = lint(tasks, allowed_tags)
     if argv[0] == "lint":
         for err in errs:
             print(f"FAIL {err}")

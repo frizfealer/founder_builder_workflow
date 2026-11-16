@@ -24,6 +24,9 @@
   ],
   "runs_as": "measurement",
   "priority": "medium",
+  "tags": [
+    "skill-iterate"
+  ],
   "tokens": null,
   "draft_note": ""
 }

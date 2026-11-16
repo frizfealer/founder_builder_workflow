@@ -23,6 +23,9 @@
   ],
   "runs_as": "build",
   "priority": "",
+  "tags": [
+    "skill-iterate"
+  ],
   "tokens": null,
   "draft_note": "Drafted by the task-028 builder. Owner fields are a proposal; priority left for the owner."
 }

@@ -14,6 +14,10 @@
   "may_edit": [],
   "runs_as": "",
   "priority": "",
+  "tags": [
+    "skill-iterate",
+    "agent-spec"
+  ],
   "tokens": null,
   "draft_note": ""
 }

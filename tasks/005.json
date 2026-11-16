@@ -29,6 +29,9 @@
   "may_edit": [],
   "runs_as": "iterate",
   "priority": "low",
+  "tags": [
+    "agent-spec"
+  ],
   "tokens": null,
   "draft_note": "Finish rule and low priority set by the owner 2026-11-15. E7 put the verifier on Sonnet in the old format and was reverted because it dropped real defects."
 }

@@ -22,6 +22,9 @@
   "may_edit": [],
   "runs_as": "measurement",
   "priority": "medium",
+  "tags": [
+    "skill-iterate"
+  ],
   "tokens": null,
   "draft_note": "Owner decided 2026-11-15: the second skill is the BDD skill. May edit must name the protected-paths file, to add the new eval folder."
 }

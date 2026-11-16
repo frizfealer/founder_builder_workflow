@@ -19,6 +19,9 @@
   "may_edit": [],
   "runs_as": "",
   "priority": "",
+  "tags": [
+    "skill-iterate"
+  ],
   "tokens": null,
   "draft_note": ""
 }

@@ -51,7 +51,9 @@ Never by the builder. An empty or failed review is a fail, and so is a reply who
 is not `VERDICT: PASS`, and so is a reply with any problem labelled blocking. Minor and
 outside problems never fail it. Keep every reviewer reply verbatim, in order; step 7 or 8 saves
 them. From the minor and outside problems and what the builder noticed, add at most one Proposed
-task for this task run, bundling the ones worth doing, or none; step 7 or 8 commits it.
+task for this task run, bundling the ones worth doing, or none; step 7 or 8 commits it. Give it
+`tags`: 1 to 3 lines of `tasks/tags.txt` that fit its title, notes and `may_edit` (`repo` when
+none fits).
 
 - **reviewer**, **script:** dispatch `manager-reviewer` with the task file's path and the
   output of `git diff <working branch>...task/<id>`. Not the builder's report. Tell it to look

@@ -22,6 +22,9 @@
   ],
   "runs_as": "measurement",
   "priority": "high",
+  "tags": [
+    "skill-iterate"
+  ],
   "tokens": {
     "agents": 529833,
     "main_session": "not recorded"

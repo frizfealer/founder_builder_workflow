@@ -25,6 +25,10 @@
   ],
   "runs_as": "measurement",
   "priority": "low",
+  "tags": [
+    "skill-iterate",
+    "agent-spec"
+  ],
   "tokens": null,
   "draft_note": ""
 }

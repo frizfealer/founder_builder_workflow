@@ -20,5 +20,8 @@
   "source_chat": "Manager build review (Nov 15)",
   "runs_as": "build",
   "priority": "",
+  "tags": [
+    "manager"
+  ],
   "tokens": null
 }

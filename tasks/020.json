@@ -16,6 +16,9 @@
   "may_edit": [],
   "runs_as": "build",
   "priority": "medium",
+  "tags": [
+    "skill-iterate"
+  ],
   "tokens": {
     "agents": 111854,
     "main_session": "not recorded"
