@@ -1,7 +1,10 @@
 """Task 20: /grade commits the verdict files its judges wrote, in one commit, and nothing else.
 
 Runs in a throwaway git repo: the real grade.py writes judge tasks, stand-in judges write verdict
-files, and the git commands of commands/grade.md step 4 are read from that file and run as written.
+files, and the verdict path pattern and git commands of commands/grade.md step 4 are read from that
+file and run as written. Task 36: a listed verdict that is committed and unchanged is left out, and
+when none is new or changed step 4 makes no commit; when no listed verdict file exists it runs no git
+command at all.
 """
 import json
 import re
@@ -24,17 +27,32 @@ def step4_commands():
     return re.findall(r"`(git [^`]+)`", step)
 
 
-def run_step4(repo, paths, skill, set_name):
-    """Run step 4's commands, with <paths>, <skill> and <set> filled in. Returns the last output."""
-    out = ""
-    for cmd in step4_commands():
+def run_step4(repo, found, skill, set_name):
+    """Run step 4's commands with <found>, <skill> and <set> filled in; <paths> is what the first
+    command prints, read as step 4 says (NUL-ended entries, path after the first three characters).
+    Returns None when <found> or <paths> is empty (no git command or no commit), else the last
+    command's output."""
+    if not found:
+        return None
+    lists = {"<found>": found}
+
+    def run(cmd):
         argv = []
         for tok in shlex.split(cmd):
-            if tok == "<paths>":
-                argv += paths
+            if tok in lists:
+                assert lists[tok], f"{tok} is empty: git would get no path filter"
+                argv += lists[tok]
             else:
                 argv.append(tok.replace("<skill>", skill).replace("<set>", set_name))
-        out = repo.git(*argv[1:])
+        return repo.git(*argv[1:])
+
+    first, *rest = step4_commands()
+    lists["<paths>"] = [entry[3:] for entry in run(first).split("\0") if entry]
+    if not lists["<paths>"]:
+        return None
+    out = ""
+    for cmd in rest:
+        out = run(cmd)
     return out
 
 
@@ -98,9 +116,14 @@ def grade(repo):
     return re.findall(r"^\s+(results/\S+\.task\.md)$", out, re.M)
 
 
-def verdict_paths(repo, tasks):
-    """Step 4's <paths>: the verdict file of each listed task, where it exists."""
-    paths = [f"eval/demo/{t[:-len('.task.md')]}.verdict.json" for t in tasks]
+def found_paths(repo, tasks, skill="demo"):
+    """Step 4's <found>: step 4's verdict path pattern filled in for each listed task, where the file exists."""
+    step = re.search(r"^4\. (.*?)^5\. ", GRADE_MD.read_text(), re.S | re.M).group(1)
+    pattern = re.search(r"`([^`]+\.verdict\.json)`", step).group(1)
+    paths = []
+    for t in tasks:
+        label, metric = re.fullmatch(r"results/([^/]+)/judge/([^/]+)\.task\.md", t).groups()
+        paths.append(pattern.replace("<skill>", skill).replace("<label>", label).replace("<metric>", metric))
     return [p for p in paths if (repo.path / p).exists()]
 
 
@@ -116,7 +139,7 @@ def test_commit_verdicts_one_commit_none_left(repo):
     repo.git("add", "other.md")
     before = repo.git("rev-parse", "HEAD").strip()
 
-    paths = verdict_paths(repo, tasks)
+    paths = found_paths(repo, tasks)
     status = run_step4(repo, paths, "demo", "s")
 
     assert repo.git("rev-list", "--count", f"{before}..HEAD").strip() == "1"
@@ -129,11 +152,93 @@ def test_commit_verdicts_one_commit_none_left(repo):
     assert " M notes.md" in left and "M  other.md" in left
 
 
+def unusable():
+    return json.dumps({"metric": "key_recall", "error": "judge failed"})
+
+
+def commit_unusable(repo, labels):
+    for lab in labels:
+        repo.write(f"eval/demo/results/{lab}/judge/key_recall.verdict.json", unusable())
+    repo.git("add", "-A")
+    repo.git("commit", "-q", "-m", "unusable verdicts")
+
+
+def test_commit_verdicts_all_unchanged_makes_no_commit(repo):
+    """Should make no commit and not fail when every listed verdict file is already committed and unchanged."""
+    commit_unusable(repo, ["s-1", "s-2"])
+    tasks = grade(repo)  # grade.py re-lists both: their verdicts are unusable
+    assert sorted(tasks) == ["results/s-1/judge/key_recall.task.md", "results/s-2/judge/key_recall.task.md"]
+    repo.write("other.md", "dirty and staged\n")
+    repo.git("add", "other.md")
+    before = repo.git("rev-parse", "HEAD").strip()
+
+    found = found_paths(repo, tasks)  # no judge is re-dispatched: both verdict files exist
+    assert len(found) == 2
+    assert run_step4(repo, found, "demo", "s") is None
+
+    assert repo.git("rev-parse", "HEAD").strip() == before
+    assert "M  other.md" in repo.git("status", "--porcelain", "--", "other.md")
+
+
+def test_commit_verdicts_leaves_out_unchanged_one(repo):
+    """Should commit only the new verdict file when another listed verdict is committed and unchanged."""
+    commit_unusable(repo, ["s-1"])
+    tasks = grade(repo)
+    assert sorted(tasks) == ["results/s-1/judge/key_recall.task.md", "results/s-2/judge/key_recall.task.md"]
+    repo.write("eval/demo/results/s-2/judge/key_recall.verdict.json", verdict())  # stand-in judge for s-2
+    before = repo.git("rev-parse", "HEAD").strip()
+
+    status = run_step4(repo, found_paths(repo, tasks), "demo", "s")
+
+    assert repo.git("rev-list", "--count", f"{before}..HEAD").strip() == "1"
+    assert repo.git("show", "--name-only", "--format=", "HEAD").split() == ["eval/demo/results/s-2/judge/key_recall.verdict.json"]
+    assert status == ""
+
+
+def test_commit_verdicts_none_found_makes_no_commit(repo):
+    """Should run no git command and make no commit when no listed task has a verdict file, even with other dirty, staged and untracked files."""
+    tasks = grade(repo)
+    assert sorted(tasks) == ["results/s-1/judge/key_recall.task.md", "results/s-2/judge/key_recall.task.md"]
+    repo.write("notes.md", "dirty, not staged\n")
+    repo.write("other.md", "dirty and staged\n")
+    repo.git("add", "other.md")
+    repo.write("untracked.md", "new\n")
+    before = repo.git("rev-parse", "HEAD").strip()
+    assert "other.md" in repo.git("status", "--porcelain", "-z", "--")  # no paths after --: no filter
+
+    found = found_paths(repo, tasks)  # every judge failed to write its verdict
+    assert found == []
+    assert run_step4(repo, found, "demo", "s") is None
+
+    assert repo.git("rev-parse", "HEAD").strip() == before
+    left = repo.git("status", "--porcelain", "--", "notes.md", "other.md", "untracked.md")
+    assert " M notes.md" in left and "M  other.md" in left and "?? untracked.md" in left
+
+
+def test_commit_verdicts_path_with_space_and_non_ascii(repo):
+    """Should commit a verdict file whose path git would quote in plain porcelain output."""
+    paths = ["eval/demo/results/s 4/judge/key_recall.verdict.json",
+             "eval/demo/results/s-\u00e9/judge/key_recall.verdict.json"]
+    for p in paths:
+        repo.write(p, verdict())
+    before = repo.git("rev-parse", "HEAD").strip()
+
+    status = run_step4(repo, paths, "demo", "s")
+
+    assert repo.git("rev-list", "--count", f"{before}..HEAD").strip() == "1"
+    committed = repo.git("show", "--name-only", "-z", "--format=", "HEAD").strip("\n\0").split("\0")
+    assert sorted(committed) == sorted(paths)
+    assert status == ""
+
+
 def test_grade_md_states_the_commit_step():
     """Should say in commands/grade.md that the verdicts go in one commit and none is left uncommitted."""
     text = GRADE_MD.read_text()
-    assert [c.split()[1] for c in step4_commands()] == ["add", "commit", "status"]
+    assert [c.split()[1] for c in step4_commands()] == ["status", "add", "commit", "status"]
     flat = " ".join(text.split())
     assert "in one commit" in flat
     assert "must print nothing" in flat
-    assert "If no verdict file was written, make no commit." in flat
+    assert "make no commit" in flat
+    step = " ".join(re.search(r"^4\. (.*?)^5\. ", text, re.S | re.M).group(1).split())
+    assert step.index("If `<found>` is empty, run no git command") < step.index("`git ")
+    assert step4_commands()[0] == "git status --porcelain -z -- <found>"

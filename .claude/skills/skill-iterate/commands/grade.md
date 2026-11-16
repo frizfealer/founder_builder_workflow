@@ -13,14 +13,21 @@ Grade the trials of skill `$ARGUMENTS`.
 3. Rerun `grade.py` with the same flags. Every judge cell should now hold a number. If one is
    still pending, read that judge's output, say why it failed, and leave the cell pending; do
    not fill it in by hand.
-4. Commit the verdict files this run's judges wrote, in one commit, and nothing else. They are
+4. Commit the verdict files this run's judges wrote, in one commit, and nothing else. Take
    `eval/<skill>/results/<label>/judge/<metric>.verdict.json` for each task step 1 listed, where
-   that file now exists; call them `<paths>`. Run `git add -- <paths>`, then
+   that file now exists; call them `<found>`. If `<found>` is empty, run no git command, make no
+   commit and skip the rest of this step, since git status with nothing after `--` lists every
+   dirty file in the repo. Otherwise run `git status --porcelain -z -- <found>` and keep only the
+   files it prints, which are new or changed; call them `<paths>`. Its output is one entry per
+   file, each ending in a NUL byte: two status letters, a space, then the path, unquoted; the path
+   is everything after the first three characters. grade.py re-lists a task whose verdict file
+   exists but is unusable, so a listed verdict can be committed and unchanged; it is left out.
+   If `<paths>` is empty, no verdict file was written: make no commit and skip the rest of this
+   step. Run `git add -- <paths>`, then
    `git commit -m "eval/<skill>: judge verdicts for <set>" -- <paths>` with the attribution lines
    this session requires (`<set>` is the `--set` value, else the labels graded). The paths after
    `--` keep every other staged or dirty file out of the commit. Then
-   `git status --porcelain -- <paths>` must print nothing. Report the commit hash. If no verdict
-   file was written, make no commit.
+   `git status --porcelain -- <paths>` must print nothing. Report the commit hash.
 5. Print the table and the set summary verbatim. Add nothing to the numbers.
 6. If `--gate` was asked for, report the exit code.
 
