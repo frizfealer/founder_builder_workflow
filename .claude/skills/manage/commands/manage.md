@@ -78,7 +78,12 @@ each reviewer reply from step 5 verbatim to `tasks/reviews/<id>-<n>.md` (id zero
 `n` counts on from the task's highest existing number, from 1). Run `checks.py review <id>`; if
 it fails, `git merge --abort` and park the task with its output. Then set the task file's
 `status` to Done, `finished` to today, `tokens`, and `decided_for_you`, add the Proposed task
-from step 5, and commit all of it with the subject `Merge task <id>: <title>`. Go to step 2.
+from step 5, and commit all of it with the subject `Merge task <id>: <title>`.
+
+Right after that commit, run `git branch -d <name>`, one branch per command, for every branch
+of this task named `task/<id>` or `task/<id>-<n>` (`git branch --list 'task/<id>' 'task/<id>-*'`).
+Use `-d` only, never `-D`, and delete no other branch. If git refuses a branch, leave it and
+list it under Needs you in the run report. Go to step 2.
 
 ## 8. Park
 
@@ -106,6 +111,7 @@ Stopped because: <no task to take | merge limit | start check failed: ...>.
 ### Needs you
 - task <id> (parked): <question>. Recommended: <answer>. If you veto: <what changes>.
 - task <id> (Proposed): <title>. <why>.
+- branch <name> (not deleted): <git's refusal, one line>.
 ```
 
 Tokens: add up `subagent_tokens` from every agent result on the task, including judges and

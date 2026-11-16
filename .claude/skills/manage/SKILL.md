@@ -58,7 +58,8 @@ what changes if he vetoes.
 
 ## Never
 
-Push. Delete a branch, or anything outside the task's own branch. Change a protected path the
+Push. Delete a branch, except the merged task's own branches with `git branch -d` (step 7 of
+`commands/manage.md`). Delete anything outside the task's own branch. Change a protected path the
 task's `may_edit` does not name. Set a task to Ready, or change the owner's fields on a Ready
 task. Start a task whose hard dependency is not Done. Let the builder verify its own work.
 
