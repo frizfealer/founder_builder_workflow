@@ -1,0 +1,21 @@
+{
+  "id": 46,
+  "title": "Small eval doc fixes left by task 028",
+  "item": "List judge-verifier-brief.md in the eval/agent-spec/README.md Files table, make commands/trial.md step 0 stop pointing forward to 'the kind of step 1', and shorten or move the long grading.json note that now prints under every grade table",
+  "motivation": "Minor points from the task 028 review: the README omits a file the retired full kind still uses, trial.md step 0 reads backwards, and grade.py prints the whole notes field under every table.",
+  "notes": "The seeded-demo point from the same review is task 040.",
+  "done_means": "The README Files table lists judge-verifier-brief.md; trial.md step 0 names the kind without referring to a later step; a plain grade's output no longer carries the long grading.json note.",
+  "draft_note": "Drafted by the manager on 2026-11-15 from the task 028 review. Priority left for the owner. The note change touches eval/agent-spec/grading.json, which is protected, so may_edit needs it.",
+  "depends_on": [],
+  "verified_by": [
+    "reviewer"
+  ],
+  "may_edit": [],
+  "status": "Proposed",
+  "added": "2026-11-15",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tokens": null
+}

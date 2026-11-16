@@ -3,9 +3,9 @@
   "title": "Make build2 the default trial kind",
   "item": "Make the new way of testing the agent-spec skill the default one that /trial, /grade and /iterate use, and mark the two old ways as retired",
   "motivation": "Today a plain /iterate would test the new skill the old way, which fails or gives meaningless numbers. The owner ruled the old ways retire once the new baseline is graded, which happened 2026-11-15",
-  "status": "Ready",
+  "status": "Done",
   "added": "2026-11-15",
-  "finished": "",
+  "finished": "2026-11-15",
   "notes": "The commands read grading.json, which still describes only the old trial kinds (full: review step on the old 1,544-line spec; build: old skill with the recorded interview replayed). The new kind (build2: whole new skill, stand-in owner, baseline trials 10–12) sits in grading-new.json. Small file work, no trials, its own commit. Do before the next change to the skill (items 24–26). Old trial folders stay as history. Same commit or the next: rewrite eval/agent-spec/README.md, which still describes the old test setup; delete the merged branch agent-spec/switch and the older stale branches. 2026-11-15, owner: tasks 38 and 39 folded in; the retry continues from task/028. That branch also adds tasks/038-040; at merge keep the working branch's copies.",
   "depends_on": [],
   "source_chat": "Agent workflow with Claude subagents (Nov 14–15)",
@@ -23,7 +23,7 @@
   "runs_as": "measurement",
   "priority": "high",
   "tokens": {
-    "agents": 380535,
+    "agents": 529833,
     "main_session": "not recorded"
   },
   "draft_note": "Owner chose this as the manager's second task; mark Ready after the first run passes. Its note also asks to delete merged and stale branches: that is a delete, so list them and park it for the owner.",
@@ -52,6 +52,21 @@
       "chosen": "Branch deletion listed in needs_you, not done",
       "rejected": "Deleting merged branches",
       "would_change": "Never; the manager may not delete branches"
+    },
+    {
+      "chosen": "Keep owner-brief.md in judge_context.inputs for every kind, recorded as an accepted trade-off in grading.json notes",
+      "rejected": "Drop it, so new build2 key_recall tasks would differ from the baseline's",
+      "would_change": "grade.py gains per-kind judge inputs"
+    },
+    {
+      "chosen": "README states what each command does instead of promising a kind override",
+      "rejected": "Add a kind argument to /trial",
+      "would_change": "You want /trial to accept a kind argument"
+    },
+    {
+      "chosen": "Leave HARNESS-PLAN.md, SWITCH-PLAN.md and PROMPT-switch-plan.md mentioning grading-new.json",
+      "rejected": "Edit dated plan records",
+      "would_change": "You treat those plans as live documents"
     }
   ]
 }

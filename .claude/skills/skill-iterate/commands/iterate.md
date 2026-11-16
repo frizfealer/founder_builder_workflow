@@ -10,7 +10,8 @@ for escalation cases 3 and 4.
 
 Preconditions, checked before anything else; any failure ends the run with a one-line reason:
 - `eval/<skill>/grading.json` names at least three baseline labels for the kind this
-  iteration will run, each with a `trial.json` and complete judge verdicts.
+  iteration will run (its `default_kind`, the kind `/trial` runs), each with a `trial.json`
+  and complete judge verdicts.
 - The skill's working tree is clean and `eval/<skill>/EXPERIMENTS.md` has no entry whose
   trials are ungraded (rule 1: one change at a time).
 - The problem statement names a metric in `grading.json` that should move.

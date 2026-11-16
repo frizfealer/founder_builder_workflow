@@ -33,7 +33,7 @@ def row(stdout, label="seeded-demo"):
 
 def test_grade_prints_build2_table():
     """Should print a build2 row for the hand-written seeded-demo trial with the spec grader's values."""
-    r = run("--grading", "grading-new.json", "--labels", "seeded-demo")
+    r = run("--labels", "seeded-demo")
     assert r.returncode == 0, r.stderr
     got = row(r.stdout)
     assert got["kind"] == "build2"
@@ -48,7 +48,7 @@ def test_grade_prints_build2_table():
 
 def test_grade_writes_key_recall_task():
     """Should write a key_recall judge task naming the brief, the spec folder and all nine key items."""
-    run("--grading", "grading-new.json", "--labels", "seeded-demo")
+    run("--labels", "seeded-demo")
     task = (JUDGE / "key_recall.task.md").read_text()
     assert "new-format/judge-brief-key.md" in task
     assert "new-format/seeded" in task
@@ -62,12 +62,12 @@ def test_grade_scores_key_recall_verdict():
     items = {"M1": "present", "M3": "avoided", "P7": "decision", "P10": "present", "P21": "present",
              "P25": "decision", "P26": "present", "F2": "avoided", "F8": "present"}
     (JUDGE / "key_recall.verdict.json").write_text(json.dumps({"metric": "key_recall", "items": items}))
-    got = row(run("--grading", "grading-new.json", "--labels", "seeded-demo").stdout)
+    got = row(run("--labels", "seeded-demo").stdout)
     assert got["key_recall"] == "0.44"  # 4 of 9
 
 
 def test_grade_skips_unknown_kind():
-    """Should skip the build2 demo trial when grading against grading.json, which has no build2 kind."""
-    r = run("--labels", "seeded-demo")
+    """Should skip the standin-1 trial, whose kind standin-check grading.json does not define."""
+    r = run("--labels", "standin-1")
     assert r.returncode == 0, r.stderr
-    assert "skip seeded-demo: kind build2 is not in the grading file" in r.stderr
+    assert "skip standin-1: kind standin-check is not in the grading file" in r.stderr

@@ -7,8 +7,10 @@ One per managed skill at `eval/<skill>/grading.json`. Changing it is a human dec
 {
   "skill": "<name>",
   "fixture": "<one sentence: what frozen input the skill runs on>",
+  "default_kind": "<kind>",
   "kinds": {
-    "<kind>": {"description": "...", "baseline_labels": ["<label>", "..."]}
+    "<kind>": {"description": "...", "prompt": "<run prompt, relative to eval dir>",
+               "baseline_labels": ["<label>", "..."]}
   },
   "key": {
     "<kind>": {"file": "<path relative to eval dir>", "ids": ["..."]}
@@ -30,6 +32,13 @@ One per managed skill at `eval/<skill>/grading.json`. Changing it is a human dec
 
 - **kinds** — trial shapes that are comparable with each other. A trial is graded only against
   baselines of its own kind.
+- **default_kind** — the kind `/trial` runs and whose baseline `/iterate` checks. Optional when
+  the file has one kind, which is then the default.
+- **prompt** (on a kind) — the run prompt `/trial` gives each trial of that kind, a path relative
+  to the eval dir; `PROMPT.md` when absent.
+- **RETIRED** — a kind whose `description` starts `RETIRED` is never run by `/trial`; its result
+  folders still grade. Follow the prefix with the date and the reason, e.g.
+  `RETIRED 2026-11-15: replaced by build2, because ...`.
 - **baseline_labels** — results folders of the skill *before* the change under test. Three is
   the minimum for a regression to be told from run-to-run variance; fewer is allowed but the
   table says so.
