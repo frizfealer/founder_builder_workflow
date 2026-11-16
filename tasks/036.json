@@ -11,14 +11,14 @@
   ],
   "may_edit": [],
   "draft_note": "Drafted by the manager on 2026-11-15 from the task 20 review. Priority left for the owner.",
-  "status": "Ready",
+  "status": "Done",
   "added": "2026-11-15",
-  "finished": "",
+  "finished": "2026-11-15",
   "source_chat": "",
   "runs_as": "build",
   "priority": "medium",
   "tokens": {
-    "agents": 116967,
+    "agents": 184471,
     "main_session": "not recorded"
   },
   "decided_for_you": [
@@ -36,6 +36,16 @@
       "chosen": "Extra tests for a partly changed set, no verdict found, and unusual path characters",
       "rejected": "Only the done_means case",
       "would_change": "You want only the done_means test"
+    },
+    {
+      "chosen": "Plain porcelain parsing rule that also covers R/C 'old -> new' lines and git's quoted paths, including tab",
+      "rejected": "Only the characters the brief named",
+      "would_change": "You want the shorter rule"
+    },
+    {
+      "chosen": "Updated the no-verdict-found test's command assertion to the new status command",
+      "rejected": "Leave the stray -z in that assertion",
+      "would_change": "You read 'change nothing else' strictly"
     }
   ]
 }
