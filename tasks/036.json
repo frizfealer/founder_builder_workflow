@@ -3,7 +3,7 @@
   "title": "/grade commit step skips unchanged verdict files",
   "item": "Step 4 of commands/grade.md commits only verdict files that are new or changed, so an unusable verdict that grade.py re-lists does not make git commit fail",
   "motivation": "grade.py re-lists a judge task whose verdict file exists but is unusable (error field, empty or all-null items). Step 4 takes every listed task's existing verdict file, so if the only one is already committed and unchanged, git commit exits 1 with nothing to commit. Found by the task 20 reviewer.",
-  "notes": "The test builds <paths> with its own code, not from the pattern in grade.md; the fix could close that gap too.",
+  "notes": "The test builds <paths> with its own code, not from the pattern in grade.md; the fix could close that gap too. 2026-11-15, owner accepted the park recommendation: drop -z, use git status --porcelain --untracked-files=all -- <found>, and add a test that the empty-<paths> stop comes before git add. The retry continues from task/036.",
   "depends_on": [],
   "done_means": "When every listed verdict file is already committed and unchanged, /grade step 4 makes no commit and does not fail. A test in a temporary git repo covers that case.",
   "verified_by": [
@@ -11,7 +11,7 @@
   ],
   "may_edit": [],
   "draft_note": "Drafted by the manager on 2026-11-15 from the task 20 review. Priority left for the owner.",
-  "status": "Needs you",
+  "status": "Ready",
   "added": "2026-11-15",
   "finished": "",
   "source_chat": "",
@@ -20,11 +20,6 @@
   "tokens": {
     "agents": 116967,
     "main_session": "not recorded"
-  },
-  "needs_you": {
-    "question": "Verification still fails after the one retry. Branch task/036 (commits 7416407, 3ca9709) meets done_means: committed, unchanged verdicts give no commit, an empty <found> runs no git command, and 6 tests pass. The second review failed it on: (1) the test never checks grade.md's 'If <paths> is empty ... make no commit' sentence, so deleting it keeps every test green; (2) `git status --porcelain -z` misses untracked verdicts under status.showUntrackedFiles=no and may print a folder on git < 2.27; add --untracked-files=all; (3) an agent reading -z output in a tool result may not see the NUL separators; (4) the parse rule ignores staged renames. Should the next run retry with these four fixes?",
-    "recommendation": "Yes: drop -z and use `git status --porcelain --untracked-files=all -- <found>` (verdict paths are <label>/judge/<metric>.verdict.json, plain characters), add an ordering test for the empty-<paths> sentence, and set the task back to Ready for one more build on task/036.",
-    "if_vetoed": "If you accept the branch as it is, the next run merges task/036 unchanged and the four points become one Proposed task. If you prefer keeping -z, the retry pipes it through tr '\\0' '\\n' instead."
   },
   "decided_for_you": [
     {

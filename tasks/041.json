@@ -12,11 +12,11 @@
     "reviewer"
   ],
   "may_edit": [],
-  "status": "Proposed",
+  "status": "Backlog",
   "added": "2026-11-15",
   "finished": "",
   "source_chat": "",
   "runs_as": "build",
-  "priority": "",
+  "priority": "low",
   "tokens": null
 }

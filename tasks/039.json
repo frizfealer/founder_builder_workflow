@@ -3,10 +3,10 @@
   "title": "Document default_kind and kinds.<kind>.prompt in the grading schema",
   "item": "Add the two grading.json fields task 028 introduced, default_kind (the kind /trial runs) and kinds.<kind>.prompt (its run prompt, PROMPT.md when absent), and the RETIRED description prefix, to skill-iterate/references/grading-schema.md",
   "motivation": "/trial and /iterate now read these fields, but the schema reference, which /setup-eval follows, does not describe them; it is protected, so task 028 could not",
-  "status": "Proposed",
+  "status": "Dropped",
   "added": "2026-11-15",
-  "finished": "",
-  "notes": "Found while building task 028.",
+  "finished": "2026-11-15",
+  "notes": "Found while building task 028. 2026-11-15, owner: folded into task 28's done_means.",
   "depends_on": [
     {
       "id": 28,

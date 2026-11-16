@@ -2,8 +2,8 @@
   "id": 40,
   "title": "Keep the seeded-demo test fixture out of a plain /grade agent-spec",
   "item": "Stop grade.py's all-labels run from grading results/seeded-demo, the hand-written build2 fixture of the grader tests, as if it were a trial",
-  "motivation": "With build2 live in grading.json, every run of grade.py eval/agent-spec without --set or --labels grades every results/ folder, seeded-demo included. Two callers do this: a bare /grade agent-spec, which writes results/seeded-demo/judge/key_recall.task.md and would dispatch a paid judge on invented numbers, and /iterate step 1, which runs plain grade.py eval/<skill> for the advisor's table, so it writes the same file and hands the advisor a seeded-demo row that FAILs with key_recall pending. Both runs also rewrite results/switch-smoke-1/judge/key_recall.task.md (same content today). Only /trial and /iterate step 5 pass --set and are not affected",
-  "status": "Proposed",
+  "motivation": "With build2 live in grading.json, every run of grade.py eval/agent-spec without --set or --labels grades every results/ folder, seeded-demo included. Two callers do this: a bare /grade agent-spec, which writes results/seeded-demo/judge/key_recall.task.md and would dispatch a paid judge on invented numbers, and /iterate step 1, which runs plain grade.py eval/<skill> for the advisor's table, so it writes the same file and hands the advisor a seeded-demo row that FAILs on lint_errors (1 > 0), one_path_share (0.83 against the baseline worst of 1.0) and guard_recommend (0.75 < 1.0); key_recall is ungated and shows pending. Both runs also rewrite results/switch-smoke-1/judge/key_recall.task.md (same content today). Only /trial and /iterate step 5 pass --set and are not affected",
+  "status": "Backlog",
   "added": "2026-11-15",
   "finished": "",
   "notes": "Found while building task 028. switch-smoke-1 is a real smoke trial, not a fixture; whether a plain run should also leave it alone is a separate call for the owner, and done_means covers seeded-demo only. results/ is append-only, so the fixture cannot simply be moved or relabelled there; options are an exclusion list read by grade.py or moving the fixture with its tests.",
@@ -21,7 +21,7 @@
   ],
   "may_edit": [],
   "runs_as": "measurement",
-  "priority": "",
+  "priority": "high",
   "tokens": null,
   "draft_note": "Drafted by the task-028 builder. may_edit left empty: the fix needs a choice between grade.py and the grader tests, which is the owner's. Priority left for the owner."
 }

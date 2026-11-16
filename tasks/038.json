@@ -3,10 +3,10 @@
   "title": "Point the build2 grader tests at grading.json and remove grading-new.json",
   "item": "Make new-format/grader/tests/test_grade_build2.py grade with the default grading.json instead of grading-new.json, replace test_grade_skips_unknown_kind (it asserts grading.json has no build2 kind) with a skip test on a kind grading.json still lacks (standin-check, results/standin-1), then delete the superseded grading-new.json",
   "motivation": "Task 028 made build2 live in grading.json, so test_grade_skips_unknown_kind now fails (1 of 34 grader tests), and grading-new.json is a second copy of the build2 measurement kept only because these tests name it",
-  "status": "Proposed",
+  "status": "Dropped",
   "added": "2026-11-15",
-  "finished": "",
-  "notes": "Found while building task 028. The test file is protected (new-format/grader/), so task 028 could not change it.",
+  "finished": "2026-11-15",
+  "notes": "Found while building task 028. The test file is protected (new-format/grader/), so task 028 could not change it. 2026-11-15, owner: folded into task 28's done_means.",
   "depends_on": [
     {
       "id": 28,

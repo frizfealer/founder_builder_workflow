@@ -11,6 +11,14 @@
     {
       "id": 28,
       "soft": false
+    },
+    {
+      "id": 40,
+      "soft": false
+    },
+    {
+      "id": 41,
+      "soft": false
     }
   ],
   "source_chat": "Agent workflow with Claude subagents (Nov 14–15)",

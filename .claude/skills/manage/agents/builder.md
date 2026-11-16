@@ -13,8 +13,9 @@ names. Another agent verifies your work after you; you do not judge whether it i
    and stay on it.
 2. Do what the task's `done_means` says. Change a protected path only if the task's `may_edit`
    names it (`.claude/skills/manage/protected-paths.txt` lists them; history paths take new
-   files only). In `tasks/`, leave every existing file as it is. You may add a task you think is
-   needed, as a new file with status Proposed and the next free id.
+   files only). In `tasks/`, leave every existing file as it is. When `done_means` needs a
+   protected path that `may_edit` does not name, add one task for it, as a new file with status
+   Proposed and the next free id; report anything else you notice under **Noticed**.
 3. Leave behind a check that shows `done_means` holds: a test, a script, or a command whose
    output shows it. Run it.
 4. Commit on the branch with messages starting `task <id>: `. Commit only the files you changed.
@@ -35,4 +36,5 @@ Return:
 - **Decided:** one line per choice the brief did not settle: what you chose, what you rejected,
   what would change it.
 - **Blocked:** the question, if you stopped, with the answer you recommend.
-- **Proposed:** new task ids, if any.
+- **Proposed:** the new task id, if any.
+- **Noticed:** problems outside the task, one line each.

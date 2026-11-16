@@ -27,14 +27,17 @@ to another task. He reads one report at his review.
 
 1. Only the owner sets Ready. Once a task is Ready its `done_means`, `verified_by`, `may_edit`,
    `runs_as`, `priority` and `depends_on` are his; the manager drafts them only before then.
-2. The manager and its agents may add tasks with status Proposed. When a rule in this skill is
-   broken and no script checks it, propose a task to build that check.
+2. The manager adds at most one Proposed task per task run, bundling the review findings worth
+   doing. The builder proposes a task only when `done_means` needs a protected path its
+   `may_edit` does not name. When a rule in this skill is broken and no script checks it, the
+   manager proposes a task to build that check.
 3. The builder never verifies its own work. The reviewer gets a fresh context, read-only tools,
    and a brief written from the task file and the diff, not from the builder's report. It
-   labels each problem in the task's change or outside it. A problem in the task's change
-   fails the review and gets the one fresh retry. Only a problem outside it becomes a Proposed
-   task. Every reviewer reply is saved verbatim in `tasks/reviews/`, in the task's merge commit or,
-   when the task is parked, its park commit.
+   labels each problem blocking, minor or outside the change; `agents/reviewer.md` defines the
+   labels. Only a blocking problem fails the review. A fail
+   gets one fresh retry, whose builder fixes the blocking problems and changes nothing else.
+   Minor and outside problems stay in the review file. Every reviewer reply is saved verbatim
+   in `tasks/reviews/`, in the task's merge commit or, when the task is parked, its park commit.
 4. One merge commit per task. The task file shows Done, `finished` and `tokens` in that merge.
 5. Inside an iterate task, skill-iterate's `references/escalation.md` applies as well. Outside
    it, this skill's stop list is the only one. `DECISIONS.md` is the direction every brief
@@ -45,6 +48,8 @@ to another task. He reads one report at his review.
 Park the task when:
 - it needs a fact about the owner's product or an outside system that only he knows;
 - the protected-path check fails, or verification still fails after one fresh retry;
+- a blocking problem can be fixed only in a protected path the task's `may_edit` does not name.
+  Park at once, with no retry, and name that path in the recommendation;
 - `verified_by` includes `you`, or `runs_as` is `you`;
 - finishing would need something from the never list.
 
