@@ -31,7 +31,9 @@ branch, set the task to In progress and commit `task <id>: in progress`.
 
 - **build**, **measurement:** dispatch `manager-builder` with a complete brief: the task file's
   path and its `done_means` and `may_edit` quoted; the branch; the paths involved; the earlier
-  branch of this task if one exists; `DECISIONS.md` as the direction. It commits on the branch
+  branch of this task if one exists, whose work the builder brings over without any file under
+  `tasks/`, so the new branch's task files stay as the working branch has them; `DECISIONS.md`
+  as the direction. It commits on the branch
   and returns what it changed, the check it wrote or ran for `done_means`, its decisions, a
   Proposed task only when `done_means` needs a protected path outside `may_edit`, and what it
   noticed outside the task.
