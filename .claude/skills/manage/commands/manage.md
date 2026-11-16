@@ -46,7 +46,7 @@ branch, set the task to In progress and commit `task <id>: in progress`.
 
 Never by the builder. An empty or failed review is a fail, and so is a reply whose first line
 is not `VERDICT: PASS`, and so is a reply with any problem labelled in the task's change. Keep
-every reviewer reply verbatim, in order; step 7 saves them. For each problem labelled outside
+every reviewer reply verbatim, in order; step 7 or 8 saves them. For each problem labelled outside
 it, add a Proposed task; step 7 or 8 commits it.
 
 - **reviewer**, **script:** dispatch `manager-reviewer` with the task file's path and the
@@ -77,7 +77,9 @@ from step 5, and commit all of it with the subject `Merge task <id>: <title>`. G
 ## 8. Park
 
 On the working branch, edit only this task's file: `status` Needs you, `needs_you`,
-`decided_for_you`, `tokens`; and add the Proposed tasks from step 5. Commit `task <id>: parked`. The task's branch stays. Go to step 2.
+`decided_for_you`, `tokens`. Write each reviewer reply from step 5 verbatim to
+`tasks/reviews/<id>-<n>.md`, numbered as in step 7, and add the Proposed tasks from step 5.
+Commit all of it as `task <id>: parked`. The task's branch stays. Go to step 2.
 
 ## 9. End
 

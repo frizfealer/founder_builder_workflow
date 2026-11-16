@@ -33,7 +33,8 @@ to another task. He reads one report at his review.
    and a brief written from the task file and the diff, not from the builder's report. It
    labels each problem in the task's change or outside it. A problem in the task's change
    fails the review and gets the one fresh retry. Only a problem outside it becomes a Proposed
-   task. Every reviewer reply is saved verbatim in `tasks/reviews/` and merged with the task.
+   task. Every reviewer reply is saved verbatim in `tasks/reviews/`, in the task's merge commit or,
+   when the task is parked, its park commit.
 4. One merge commit per task. The task file shows Done, `finished` and `tokens` in that merge.
 5. Inside an iterate task, skill-iterate's `references/escalation.md` applies as well. Outside
    it, this skill's stop list is the only one. `DECISIONS.md` is the direction every brief
@@ -102,5 +103,5 @@ ln -s ../skills/manage/agents/reviewer.md   .claude/agents/manager-reviewer.md
 
 - Each task's file: `decided_for_you` (one entry per decision made without the owner: chosen,
   rejected, what would change it), `needs_you` when parked, `tokens`.
-- `tasks/reviews/<id>-<n>.md`: each reviewer reply verbatim, in the task's merge commit.
+- `tasks/reviews/<id>-<n>.md`: each reviewer reply verbatim, in the task's merge or park commit.
 - `tasks/RUNS.md`: one report per run, newest first, in skill-iterate's three sections.
