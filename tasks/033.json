@@ -22,7 +22,7 @@
   "runs_as": "build",
   "priority": "high",
   "tokens": {
-    "agents": 83000,
+    "agents": 125103,
     "main_session": "not recorded"
   },
   "draft_note": "",
