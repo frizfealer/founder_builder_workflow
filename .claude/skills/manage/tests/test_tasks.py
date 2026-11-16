@@ -1,6 +1,8 @@
 import json
 import re
 import shutil
+import threading
+import urllib.request
 from collections import Counter
 from pathlib import Path
 
@@ -141,3 +143,27 @@ def test_board_escapes_script_end_in_data(tmp_path, capsys):
     tasks.main(["--root", str(tmp_path), "board"])
     html = (tmp_path / "build" / "task-board.html").read_text()
     assert "</script><b>" not in html
+
+
+def test_board_server_reads_task_files_per_request(tmp_path):
+    """Should serve a changed task title on the next request, and an error once the tasks stop linting."""
+    (tmp_path / "tasks").mkdir()
+    (tmp_path / "tasks" / "tags.txt").write_text("\n".join(TAGS) + "\n")
+    tasks.write(tmp_path, task(1))
+    server = tasks.board_server(tmp_path, 0)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    url = f"http://127.0.0.1:{server.server_address[1]}"
+
+    def get(path):
+        with urllib.request.urlopen(url + path) as r:
+            return r.read().decode()
+    try:
+        assert json.loads(get("/tasks.json"))["tasks"][0]["title"] == "Task 1"
+        tasks.write(tmp_path, task(1) | {"title": "Renamed"})
+        assert json.loads(get("/tasks.json"))["tasks"][0]["title"] == "Renamed"
+        assert "Renamed" in get("/")
+        tasks.write(tmp_path, task(1) | {"tags": ["ui"]})
+        assert "do not lint" in json.loads(get("/tasks.json"))["error"]
+    finally:
+        server.shutdown()
+        server.server_close()

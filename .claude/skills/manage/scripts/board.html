@@ -1,5 +1,6 @@
 <!doctype html>
-<!-- Template for tasks.py board, which replaces the data placeholder below with the task list. -->
+<!-- Template for tasks.py board, which replaces the data placeholder below with the task list.
+     Served by tasks.py board --serve, the page also re-reads tasks.json every few seconds. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -42,6 +43,8 @@
   dt { font-weight: 600; margin-top: 6px; }
   dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
   .empty { color: var(--muted); font-size: 12px; }
+  #error { flex-basis: 100%; background: var(--warn); padding: 4px 8px; border-radius: 3px; }
+  #error:empty { display: none; }
 </style>
 </head>
 <body>
@@ -49,12 +52,13 @@
   <input type="search" id="q" placeholder="Search id, title, notes, tags" aria-label="Search">
   <fieldset id="pri"><legend>Priority</legend></fieldset>
   <fieldset id="tags"><legend>Tags</legend></fieldset>
+  <div id="error" role="alert"></div>
 </header>
 <main id="board"></main>
 <script type="application/json" id="data">__BOARD_DATA__</script>
 <script>
-const DATA = JSON.parse(document.getElementById("data").textContent);
-const byId = Object.fromEntries(DATA.tasks.map(t => [t.id, t]));
+let DATA = JSON.parse(document.getElementById("data").textContent);
+let byId = Object.fromEntries(DATA.tasks.map(t => [t.id, t]));
 const collapsed = { Done: true };
 const open = new Set();
 
@@ -67,9 +71,11 @@ function el(tag, attrs, ...kids) {
 
 function boxes(id, values) {
   const fs = document.getElementById(id);
+  const was = Object.fromEntries([...fs.querySelectorAll("input")].map(c => [c.value, c.checked]));
+  fs.querySelectorAll("label").forEach(l => l.remove());
   for (const v of values) {
     const cb = el("input", { type: "checkbox", value: v });
-    cb.checked = true;
+    cb.checked = was[v] !== false;
     cb.addEventListener("change", render);
     fs.append(el("label", {}, cb, " " + v));
   }
@@ -138,6 +144,39 @@ function render() {
     board.append(sec);
   }
 }
+function showError() {
+  document.getElementById("error").textContent = DATA.error || "";
+}
+
+// Served by tasks.py board --serve: re-read the task files every few seconds.
+// A task list that does not lint keeps the last good one on screen, with the error above it.
+let last = "";
+async function poll() {
+  try {
+    const r = await fetch("tasks.json", { cache: "no-store" });
+    const text = await r.text();
+    showError();
+    if (text === last) return;
+    last = text;
+    const fresh = JSON.parse(text);
+    if (fresh.error) {
+      DATA.error = fresh.error + ". The board shows the last good task list.";
+      showError();
+      return;
+    }
+    const tagsChanged = fresh.tags.join("\n") !== DATA.tags.join("\n");
+    DATA = fresh;
+    byId = Object.fromEntries(DATA.tasks.map(t => [t.id, t]));
+    if (tagsChanged) boxes("tags", DATA.tags);
+    showError();
+    render();
+  } catch (e) {
+    document.getElementById("error").textContent = "Cannot reach tasks.py board --serve; is it still running?";
+  }
+}
+if (location.protocol.startsWith("http")) setInterval(poll, 3000);
+
+showError();
 render();
 </script>
 </body>

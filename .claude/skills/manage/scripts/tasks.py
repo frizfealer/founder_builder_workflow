@@ -7,6 +7,8 @@ Usage, from the repo root:
   tasks.py next    the task the manager should take, or why there is none; exit 1 when there is none
   tasks.py board [--open]   write build/task-board.html and print the number of tasks per status;
                             --open opens it in the browser
+  tasks.py board --serve [--open]   serve the board at http://127.0.0.1:8765/ until Ctrl-C; it
+                            reads tasks/ on every request and the page re-checks every few seconds
 
 Run with --root <dir> to read <dir>/tasks/ instead of ./tasks/.
 """
@@ -14,6 +16,7 @@ import json
 import re
 import sys
 import webbrowser
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 TASKS_DIR = "tasks"
@@ -26,6 +29,7 @@ RUNS_AS = {"build", "iterate", "measurement", "you"}
 PRIORITIES = ["high", "medium", "low"]
 BOARD_TEMPLATE = Path(__file__).with_name("board.html")
 BOARD_OUT = "build/task-board.html"
+BOARD_PORT = 8765
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 # The owner's fields: set by the owner; the manager may draft them only before Ready.
@@ -211,15 +215,61 @@ def table(tasks):
     return "\n".join(out)
 
 
-def board(root, tasks, allowed_tags):
-    """Write the board page under <root> and return (its path, {status: count})."""
-    data = {"statuses": STATUSES, "priorities": PRIORITIES, "tags": allowed_tags,
-            "tasks": sorted(tasks.values(), key=lambda t: t["id"])}
+def board_data(tasks, allowed_tags, error=None):
+    """What the board page shows. error is set when the tasks cannot be read or do not lint."""
+    return {"statuses": STATUSES, "priorities": PRIORITIES, "tags": allowed_tags,
+            "tasks": sorted(tasks.values(), key=lambda t: t["id"]), "error": error}
+
+
+def board_page(data):
     # A "<" inside the JSON could end the <script> element early; \u003c parses back to "<".
     blob = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")
+    return BOARD_TEMPLATE.read_text().replace("__BOARD_DATA__", blob)
+
+
+def live_board_data(root):
+    """board_data for the task files as they are now on disk."""
+    try:
+        tasks, allowed_tags = load_all(root), load_tags(root)
+    except ValueError as e:
+        return board_data({}, [], str(e))
+    errs = lint(tasks, allowed_tags)
+    if errs:
+        return board_data({}, allowed_tags, f"the tasks do not lint ({len(errs)} problem(s)): {errs[0]}")
+    return board_data(tasks, allowed_tags)
+
+
+def board_server(root, port):
+    """A local server: / is the board page, /tasks.json the task data, both read fresh per request."""
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            path = self.path.split("?")[0]
+            if path == "/":
+                body, kind = board_page(live_board_data(root)), "text/html"
+            elif path == "/tasks.json":
+                body, kind = json.dumps(live_board_data(root), ensure_ascii=False), "application/json"
+            else:
+                self.send_error(404)
+                return
+            raw = body.encode()
+            self.send_response(200)
+            self.send_header("Content-Type", f"{kind}; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
+
+        def log_message(self, *args):
+            pass
+
+    return ThreadingHTTPServer(("127.0.0.1", port), Handler)
+
+
+def board(root, tasks, allowed_tags):
+    """Write the board page under <root> and return (its path, {status: count})."""
     out = Path(root) / BOARD_OUT
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(BOARD_TEMPLATE.read_text().replace("__BOARD_DATA__", blob))
+    out.write_text(board_page(board_data(tasks, allowed_tags)))
     counts = {s: sum(1 for t in tasks.values() if t["status"] == s) for s in STATUSES}
     return out, counts
 
@@ -230,12 +280,30 @@ def main(argv):
         i = argv.index("--root")
         root = argv[i + 1]
         argv = argv[:i] + argv[i + 2:]
-    open_board = argv[1:] == ["--open"] and argv[0] == "board"
-    if open_board:
+    flags = set(argv[1:])
+    if argv[:1] == ["board"] and len(flags) == len(argv) - 1 and flags <= {"--open", "--serve"}:
         argv = argv[:1]
+    else:
+        flags = set()
     if len(argv) != 1 or argv[0] not in {"lint", "list", "next", "board"}:
         print(__doc__)
         return 2
+    if "--serve" in flags:
+        try:
+            server = board_server(root, BOARD_PORT)
+        except OSError as e:
+            print(f"FAIL cannot serve on 127.0.0.1:{BOARD_PORT} ({e})")
+            return 1
+        url = f"http://127.0.0.1:{BOARD_PORT}/"
+        print(f"serving the task board at {url}; Ctrl-C stops it")
+        if "--open" in flags:
+            webbrowser.open(url)
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            pass
+        server.server_close()
+        return 0
     try:
         tasks = load_all(root)
         allowed_tags = load_tags(root)
@@ -259,7 +327,7 @@ def main(argv):
         for s, n in counts.items():
             print(f"{s}: {n}")
         print(f"{len(tasks)} task(s); wrote {out}")
-        if open_board:
+        if "--open" in flags:
             webbrowser.open(out.resolve().as_uri())
         return 0
     t, why = pick_next(tasks)
