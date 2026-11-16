@@ -5,12 +5,15 @@ Usage, from the repo root:
   tasks.py lint    every field valid, every dependency exists, Ready tasks complete; exit 1 on a problem
   tasks.py list    all tasks as one table
   tasks.py next    the task the manager should take, or why there is none; exit 1 when there is none
+  tasks.py board [--open]   write build/task-board.html and print the number of tasks per status;
+                            --open opens it in the browser
 
 Run with --root <dir> to read <dir>/tasks/ instead of ./tasks/.
 """
 import json
 import re
 import sys
+import webbrowser
 from pathlib import Path
 
 TASKS_DIR = "tasks"
@@ -21,6 +24,8 @@ CLOSED = {"Done", "Dropped"}
 VERIFIERS = {"script", "metrics", "reviewer", "you"}
 RUNS_AS = {"build", "iterate", "measurement", "you"}
 PRIORITIES = ["high", "medium", "low"]
+BOARD_TEMPLATE = Path(__file__).with_name("board.html")
+BOARD_OUT = "build/task-board.html"
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 # The owner's fields: set by the owner; the manager may draft them only before Ready.
@@ -206,13 +211,29 @@ def table(tasks):
     return "\n".join(out)
 
 
+def board(root, tasks, allowed_tags):
+    """Write the board page under <root> and return (its path, {status: count})."""
+    data = {"statuses": STATUSES, "priorities": PRIORITIES, "tags": allowed_tags,
+            "tasks": sorted(tasks.values(), key=lambda t: t["id"])}
+    # A "<" inside the JSON could end the <script> element early; \u003c parses back to "<".
+    blob = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")
+    out = Path(root) / BOARD_OUT
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(BOARD_TEMPLATE.read_text().replace("__BOARD_DATA__", blob))
+    counts = {s: sum(1 for t in tasks.values() if t["status"] == s) for s in STATUSES}
+    return out, counts
+
+
 def main(argv):
     root = "."
     if "--root" in argv:
         i = argv.index("--root")
         root = argv[i + 1]
         argv = argv[:i] + argv[i + 2:]
-    if len(argv) != 1 or argv[0] not in {"lint", "list", "next"}:
+    open_board = argv[1:] == ["--open"] and argv[0] == "board"
+    if open_board:
+        argv = argv[:1]
+    if len(argv) != 1 or argv[0] not in {"lint", "list", "next", "board"}:
         print(__doc__)
         return 2
     try:
@@ -232,6 +253,14 @@ def main(argv):
         return 1
     if argv[0] == "list":
         print(table(tasks))
+        return 0
+    if argv[0] == "board":
+        out, counts = board(root, tasks, allowed_tags)
+        for s, n in counts.items():
+            print(f"{s}: {n}")
+        print(f"{len(tasks)} task(s); wrote {out}")
+        if open_board:
+            webbrowser.open(out.resolve().as_uri())
         return 0
     t, why = pick_next(tasks)
     if t is None:

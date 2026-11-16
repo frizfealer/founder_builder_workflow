@@ -1,3 +1,7 @@
+import json
+import re
+import shutil
+from collections import Counter
 from pathlib import Path
 
 import tasks
@@ -100,3 +104,40 @@ def test_next_soft_dependency_not_done():
 def test_next_none_ready():
     """Should say no task is Ready when none is."""
     assert tasks.pick_next(as_files(task(1, status="Backlog"))) == (None, "no task is Ready")
+
+
+def _board_on_repo_tasks(tmp_path, capsys):
+    """Copy the repo's tasks/ into tmp_path, run tasks.py board there, return (stdout, html, task files)."""
+    root = Path(__file__).resolve().parents[4]
+    shutil.copytree(root / "tasks", tmp_path / "tasks")
+    assert tasks.main(["--root", str(tmp_path), "board"]) == 0
+    files = sorted((tmp_path / "tasks").glob("*.json"))
+    html = (tmp_path / "build" / "task-board.html").read_text()
+    return capsys.readouterr().out, html, files
+
+
+def test_board_embeds_every_task_file(tmp_path, capsys):
+    """Should embed exactly as many tasks as there are task files in tasks/."""
+    _, html, files = _board_on_repo_tasks(tmp_path, capsys)
+    blob = re.search(r'<script type="application/json" id="data">(.*?)</script>', html, re.S).group(1)
+    embedded = json.loads(blob)["tasks"]
+    assert len(embedded) == len(files)
+    assert sorted(t["id"] for t in embedded) == sorted(int(p.stem) for p in files)
+
+
+def test_board_prints_counts_per_status(tmp_path, capsys):
+    """Should print, for every status, the number of task files with that status."""
+    out, _, files = _board_on_repo_tasks(tmp_path, capsys)
+    printed = dict(line.split(": ") for line in out.splitlines() if line.split(": ")[0] in tasks.STATUSES)
+    in_files = Counter(json.loads(p.read_text())["status"] for p in files)
+    assert {s: int(n) for s, n in printed.items()} == {s: in_files.get(s, 0) for s in tasks.STATUSES}
+
+
+def test_board_escapes_script_end_in_data(tmp_path, capsys):
+    """Should keep a "</script>" inside a task's text from ending the embedded data early."""
+    (tmp_path / "tasks").mkdir()
+    (tmp_path / "tasks" / "tags.txt").write_text("\n".join(TAGS) + "\n")
+    tasks.write(tmp_path, task(1) | {"notes": "see </script><b>"})
+    tasks.main(["--root", str(tmp_path), "board"])
+    html = (tmp_path / "build" / "task-board.html").read_text()
+    assert "</script><b>" not in html

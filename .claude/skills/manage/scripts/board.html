@@ -1,0 +1,144 @@
+<!doctype html>
+<!-- Template for tasks.py board, which replaces the data placeholder below with the task list. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Task board</title>
+<style>
+  :root { --bg: #f6f6f4; --card: #fff; --line: #ddd; --text: #222; --muted: #666;
+          --high: #c0392b; --medium: #b9770e; --low: #2e86c1; --warn: #fdebd0; --ask: #e8daef; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1c1c1e; --card: #2a2a2d; --line: #3a3a3d; --text: #eee; --muted: #aaa;
+            --warn: #5a4325; --ask: #4a3858; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.4 system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  header { padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap;
+           gap: 8px 20px; align-items: center; }
+  header input[type=search] { padding: 6px 8px; width: 260px; max-width: 100%; font: inherit;
+                              background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
+  fieldset { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px 10px; }
+  legend { font-weight: 600; float: left; margin-right: 6px; }
+  label { white-space: nowrap; cursor: pointer; }
+  main { display: flex; gap: 12px; padding: 12px 16px; overflow-x: auto; align-items: flex-start; }
+  section { flex: 0 0 260px; background: rgba(127,127,127,.08); border-radius: 6px; padding: 8px; }
+  section.collapsed { flex-basis: 140px; }
+  section h2 { font-size: 14px; margin: 0 0 8px; display: flex; justify-content: space-between; }
+  section.collapsed .card, section.collapsed .empty { display: none; }
+  button.toggle { all: unset; cursor: pointer; width: 100%; display: flex; justify-content: space-between; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 8px;
+          margin-bottom: 8px; cursor: pointer; }
+  .card .id { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .meta { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .chip { font-size: 12px; padding: 0 6px; border-radius: 9px; border: 1px solid var(--line); }
+  .pri-high { color: var(--high); border-color: var(--high); }
+  .pri-medium { color: var(--medium); border-color: var(--medium); }
+  .pri-low { color: var(--low); border-color: var(--low); }
+  .flag { font-size: 12px; margin-top: 6px; padding: 2px 6px; border-radius: 3px; }
+  .blocked { background: var(--warn); }
+  .needs { background: var(--ask); }
+  dl { margin: 8px 0 0; font-size: 13px; }
+  dt { font-weight: 600; margin-top: 6px; }
+  dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .empty { color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <input type="search" id="q" placeholder="Search id, title, notes, tags" aria-label="Search">
+  <fieldset id="pri"><legend>Priority</legend></fieldset>
+  <fieldset id="tags"><legend>Tags</legend></fieldset>
+</header>
+<main id="board"></main>
+<script type="application/json" id="data">__BOARD_DATA__</script>
+<script>
+const DATA = JSON.parse(document.getElementById("data").textContent);
+const byId = Object.fromEntries(DATA.tasks.map(t => [t.id, t]));
+const collapsed = { Done: true };
+const open = new Set();
+
+function el(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  for (const k of kids) e.append(k);
+  return e;
+}
+
+function boxes(id, values) {
+  const fs = document.getElementById(id);
+  for (const v of values) {
+    const cb = el("input", { type: "checkbox", value: v });
+    cb.checked = true;
+    cb.addEventListener("change", render);
+    fs.append(el("label", {}, cb, " " + v));
+  }
+}
+boxes("pri", DATA.priorities);
+boxes("tags", DATA.tags);
+document.getElementById("q").addEventListener("input", render);
+
+function checked(id) {
+  return [...document.querySelectorAll(`#${id} input`)].filter(c => c.checked).map(c => c.value);
+}
+
+function waitingOn(t) {
+  return t.depends_on.filter(d => byId[d.id] && byId[d.id].status !== "Done");
+}
+
+function dep(d) { return d.id + (d.soft ? " (soft)" : ""); }
+
+function card(t) {
+  const c = el("div", { class: "card", "data-id": t.id });
+  c.append(el("div", {}, el("span", { class: "id" }, "#" + t.id + " "), t.title));
+  const meta = el("div", { class: "meta" });
+  if (t.priority) meta.append(el("span", { class: "chip pri-" + t.priority }, t.priority));
+  for (const tag of t.tags) meta.append(el("span", { class: "chip" }, tag));
+  c.append(meta);
+  const w = waitingOn(t);
+  if (w.length) c.append(el("div", { class: "flag blocked" }, "blocked by " + w.map(dep).join(", ")));
+  if (t.needs_you) c.append(el("div", { class: "flag needs" }, "needs you"));
+  if (open.has(t.id)) {
+    const dl = el("dl");
+    const tokens = t.tokens ? `agents ${t.tokens.agents}, main session ${t.tokens.main_session}` : "";
+    const rows = [["done means", t.done_means], ["verification", t.verified_by.join(", ")],
+                  ["depends on", t.depends_on.map(dep).join(", ")], ["notes", t.notes],
+                  ["tokens", tokens]];
+    if (t.needs_you) rows.push(["needs you", t.needs_you.question]);
+    for (const [k, v] of rows) dl.append(el("dt", {}, k), el("dd", {}, v || "none"));
+    c.append(dl);
+  }
+  c.addEventListener("click", () => { open.has(t.id) ? open.delete(t.id) : open.add(t.id); render(); });
+  return c;
+}
+
+function render() {
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const pri = checked("pri"), tags = checked("tags");
+  const priAll = pri.length === DATA.priorities.length, tagAll = tags.length === DATA.tags.length;
+  const active = q !== "" || !priAll || !tagAll;
+  const match = t =>
+    (!q || [String(t.id), t.title, t.notes, ...t.tags].some(s => s.toLowerCase().includes(q))) &&
+    (priAll || pri.includes(t.priority)) &&
+    (tagAll || t.tags.some(x => tags.includes(x)));
+  const rank = p => { const i = DATA.priorities.indexOf(p); return i < 0 ? DATA.priorities.length : i; };
+  const board = document.getElementById("board");
+  board.replaceChildren();
+  for (const s of DATA.statuses) {
+    const all = DATA.tasks.filter(t => t.status === s);
+    const shown = all.filter(match).sort((a, b) => rank(a.priority) - rank(b.priority) || a.id - b.id);
+    const count = active ? `${shown.length} of ${all.length}` : String(all.length);
+    const sec = el("section", { "data-status": s, class: collapsed[s] ? "collapsed" : "" });
+    const btn = el("button", { class: "toggle", "aria-expanded": String(!collapsed[s]) },
+                   el("span", {}, s), el("span", { class: "count" }, count));
+    btn.addEventListener("click", () => { collapsed[s] = !collapsed[s]; render(); });
+    sec.append(el("h2", {}, btn));
+    if (!shown.length) sec.append(el("div", { class: "empty" }, "no tasks"));
+    for (const t of shown) sec.append(card(t));
+    board.append(sec);
+  }
+}
+render();
+</script>
+</body>
+</html>
