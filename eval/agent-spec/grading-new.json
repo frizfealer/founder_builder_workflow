@@ -1,6 +1,6 @@
 {
  "skill": "agent-spec",
- "status": "DRAFT 2026-11-14 (HARNESS-PLAN.md step 5). Not in use: grading.json stays the live file until the build2 baseline is graded (step 8). Run with: grade.py eval/agent-spec --grading grading-new.json --labels <labels>.",
+ "status": "SUPERSEDED 2026-11-15 (task 028): grading.json now carries the build2 kind as its default_kind and is the live file; grade build2 trials with plain grade.py eval/agent-spec. This draft (HARNESS-PLAN.md step 5) is frozen as it was graded and kept only because new-format/grader/tests/test_grade_build2.py names it; do not edit it, and delete it when that test moves to grading.json.",
  "fixture": "Harbor Goods: product-idea.md, the recorded owner answers in review-packet.md, and owner-brief.md (step 7); the skill runs steps 1-5 with an owner stand-in and writes a new-format spec folder (new-format/FORMAT.md).",
  "kinds": {
   "build2": {

@@ -10,16 +10,18 @@ Run trials of skill `$ARGUMENTS` (default n = 3).
    processes is not comparable on cost or recall, and its results would be discarded.
    Read the session's effort level (`/effort`) and model; they must equal the `effort` and
    `session_model` recorded in the baseline trials' `trial.json` (grading.json
-   `kinds.<kind>.baseline_labels`), unless the problem statement under test is that change.
-   Otherwise stop and say which to set. Also confirm the environment variable
-   `CLAUDE_CODE_EFFORT_LEVEL` is unset: it overrides every agent's `effort:` field silently.
-1. Read `eval/<skill>/PROMPT.md` and `eval/<skill>/grading.json`. Record the skill's current
-   commit (`git rev-parse --short HEAD`) and confirm the working tree of the skill's files is
-   clean; a dirty skill is not a trial of any commit, so stop and say so.
-2. For k in 1..n, dispatch one background subagent with `PROMPT.md`, label `<set>-k`, and a
-   scratch dir of its own (`eval/<skill>/run-<set>-k/`). Parallel trials never share a scratch
-   dir or a results folder. Each writes `eval/<skill>/results/<set>-k/` including `trial.json`
-   with `skill_commit` set.
+   `kinds.<kind>.baseline_labels`, the kind of step 1), unless the problem statement under
+   test is that change. Otherwise stop and say which to set. Also confirm the environment
+   variable `CLAUDE_CODE_EFFORT_LEVEL` is unset: it overrides every agent's `effort:` field silently.
+1. Read `eval/<skill>/grading.json`. The trial kind is its `default_kind` (its only kind when
+   it names none); a kind whose description starts `RETIRED` is never run. Read the kind's run
+   prompt, `eval/<skill>/<kinds.<kind>.prompt>` (`PROMPT.md` when the kind names none). Record
+   the skill's current commit (`git rev-parse --short HEAD`) and confirm the working tree of the
+   skill's files is clean; a dirty skill is not a trial of any commit, so stop and say so.
+2. For k in 1..n, dispatch one background subagent with the run prompt, label `<set>-k`, the
+   kind, and a scratch dir of its own (`eval/<skill>/run-<set>-k/`). Parallel trials never
+   share a scratch dir or a results folder. Each writes `eval/<skill>/results/<set>-k/`
+   including `trial.json` with `skill_commit` set.
 3. Wait for every trial's completion notification. A trial that dies on infrastructure (a
    stalled subagent, a harness timeout, a collision) is rerun under the same label after its
    folder is cleared, and the rerun is noted in `trial.json.warnings`; it is not counted as a

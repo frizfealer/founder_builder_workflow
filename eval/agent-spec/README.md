@@ -1,67 +1,98 @@
-# Verify-only test for the agent-spec skill
+# Eval harness for the agent-spec skill
 
-Tests step 4 (Verify) of `.claude/skills/agent-spec/SKILL.md` on frozen inputs, so that a
-change to the verification process can be compared before and after.
+Tests the whole skill, `.claude/skills/agent-spec/SKILL.md` steps 1 to 5, on a frozen product,
+so that a change to the skill can be compared before and after. The trial kind is `build2`: the
+skill starts from `product-idea.md`, puts every question it would ask the user to an owner
+stand-in, and writes a new-format spec folder (`new-format/FORMAT.md`). `build2` is the
+`default_kind` in `grading.json`, so `/trial`, `/grade` and `/iterate` use it unless told
+otherwise. Older kinds are retired and kept only as history (last section).
+
+## The fixture
+
+The product is the Harbor Goods order-support agent. Three files hold everything the owner said
+or knows:
+
+- `product-idea.md`: the owner's request, the only product document the skill gets.
+- `review-packet.md`, sections "Interview, verbatim" and "Tool confirmation turn": the owner's
+  recorded answers from the original run.
+- `owner-brief.md`: which systems the agent calls, who owns each, and where their docs are. The
+  recorded interview does not hold these facts.
+
+The stand-in (`stand-in-brief.md`) is a fresh subagent that reads only those three files. It
+answers each question from the record verbatim, or accepts the skill's recommended answer when
+the record is silent, and never invents a fact. The skill and its reviewers never see the record
+directly. A stand-in cannot be surprised, so this kind tests the visible effects of the
+interview guard, not whether its questions are the right ones for a real owner.
 
 ## Files
 
 | File | What it is |
 |---|---|
-| `round0-agent-spec.md` | The order-support spec as it was before any verification round (1,544 lines). Never edited; each run copies it. |
-| `review-packet.md` | The step-4.2 packet from the original run: input ledger, interview verbatim, confirmed tool set. Paths point at `run/agent-spec.md` and `product-idea.md` in this directory. |
-| `product-idea.md` | The one source document the packet lists. |
-| `baseline/round{1,2,3}-findings.md` | The merged findings the original run produced in each round (M1–M13, N1–N13, P1–P9). Used to grade recall. |
-| `baseline/subagent-stats.md` | Token, tool-use and duration figures per subagent from the original run. |
-| `PROMPT-build.md`, `build-key.md` | Run prompt and input-coverage checklist of the `build` kind (below). |
-| `grading.json` | Metrics, gates, key defects and judge context for `skill-iterate/scripts/grade.py`. Changing it is a human decision. |
+| `PROMPT-build2.md` | The run prompt for one build2 trial: setup, the stand-in rules, what to record in `results/<label>/`. Frozen. |
+| `stand-in-brief.md`, `owner-brief.md`, `product-idea.md`, `review-packet.md` | The fixture (above). Frozen. |
+| `grading.json` | Kinds, baselines, metrics and gates, the key and the judge context, read by `.claude/skills/skill-iterate/scripts/grade.py`. Changing it is a human decision. |
+| `grading-new.json` | The build2 draft that `grading.json` absorbed on 2026-11-15. Superseded; kept only because `new-format/grader/tests/test_grade_build2.py` names it. |
+| `new-format/FORMAT.md` | The files a new-format spec folder must have, as the frozen grader reads them. |
+| `new-format/grader/` | The frozen grader: `lint.py`, `check.py` (the model checker), `grade_spec.py` (all code metrics of one trial; `grade.py` runs it as `spec_grader`), `answer-units.json` (the recorded answer units), `check_standin.py` (checks the stand-in quoted the record verbatim), `calibrate_key.py`, and `tests/`. Copies, not the skill's own scripts, so a skill change cannot move them. |
+| `new-format/key-build2.md`, `new-format/judge-brief-key.md` | The 9 known defects the `key_recall` judge looks for in a trial's final spec, and the brief it applies. |
+| `new-format/seeded/`, `seeded-clean/`, `seeded-defects.md` | Hand-made new-format specs with and without known defects; they test the grader only, no trial runs on them. `results/seeded-demo/` is a hand-written trial on `seeded/` for the grader tests, not a real trial. |
+| `new-format/HARNESS-PLAN.md`, `new-format/SWITCH-PLAN.md` | How this harness and the skill's format switch were planned, with the owner's rulings. |
+| `calibration/` | The owner's rulings used to calibrate the judges (`2026-11-14-key-judge/` for `key_recall`). |
 | `EXPERIMENTS.md` | One entry per skill change: hypothesis, trials, grade, outcome. |
 | `run-<label>/` | Scratch for one trial (gitignored). Parallel trials never share one. |
-| `results/<label>/` | One directory per trial, written at the end of the run. Must include `trial.json` (see `skill-iterate/references/trial-schema.md`); the seven folders from before the schema were converted with `legacy_extract.py`. `baseline-1/` is the original run, reconstructed from `baseline/`. |
-| `results/<label>/judge/` | Judge task files written by `grade.py` and the verdict JSON a judge writes back. |
+| `results/<label>/` | One folder per trial, with `trial.json` (`.claude/skills/skill-iterate/references/trial-schema.md`), `interview-log.json`, `stand-in/`, the final spec in `spec-final/`, and `judge/` (task files `grade.py` writes and the verdicts judges write back). History: never edited. |
 
-If the repo is not at `/Users/yeu-chernharn/repos/agentic_course/founder-builder-workflow`,
-replace that prefix in `review-packet.md` first.
+## Running trials
 
-## Build kind
+From the repo root, in a session with native subagents at the baseline's model and effort:
 
-`PROMPT-build.md` runs the whole skill, steps 1 to 5, from `product-idea.md` alone. The interview
-and the tool confirmation turn are replayed verbatim from `review-packet.md`: the runner puts the
-recorded questions and takes the recorded answers, so this kind does not test which questions
-the skill would ask (the runner logs its own in `interview-replay.md`). Graded on
-`input_coverage` against `build-key.md` (one item per interview answer, known failure case and
-confirmed tool outcome; a PROPOSAL until the human approves it), `unsupported_statements`,
-`golden_distance` to `examples/order_support_agent/agent-spec.md` (report only), and cost.
-Run with `/trial agent-spec <set>` using `PROMPT-build.md` in place of `PROMPT.md`.
+- `/trial agent-spec <set> [--n 3]` runs n build2 trials in parallel with `PROMPT-build2.md`,
+  each writing `results/<set>-k/`, then grades them.
+- `/grade agent-spec --set <set>` runs `grade.py`, dispatches a `key_recall` judge for every
+  trial that lacks a verdict, and prints the table. For the code metrics alone:
+  `python3 .claude/skills/skill-iterate/scripts/grade.py eval/agent-spec --set <set>`.
+- `/iterate agent-spec "<problem>"` makes one change to the skill on a branch, trials and grades
+  it against the build2 baseline, and writes `results/<set>/REPORT.md`.
 
-## Running one trial
+## Metrics
 
-Paste `PROMPT.md` into Claude Code from the repo root, with `<label>` filled in
-(`baseline-2`, `new-1`, `new-2`, `new-3`, `cafe-1`).
+`grading.json` lists every metric with what it counts; `grade.py` prints that list under the
+table. In short:
 
-Order of trials:
+- Gated, absolute, in every trial: `integrity` (no failure of the skill's own scripts, its
+  checker ended at 0 errors, no question to the user), `lint_errors` = 0, `checker_selftest`
+  pass, `unlisted_breaks` = 0, `quote_valid` = 1.0, and the four interview guards
+  `guard_recommend`, `guard_none_limits`, `guard_money`, `guard_systems` = 1.0.
+- Gated against the baseline (fail when worse than the worst baseline trial by more than 10 %):
+  `one_path_share`, `answer_reach`, `owner_lines`, `wall_clock_s`.
+- Reported, never gated: `key_recall` (until the owner reviews the key), `listed_breaks`,
+  `uncovered_steps`, `unsourced_claims`, `chart_arrows`, `stand_in_defaults`,
+  `questions_asked`, `owner_flags`, `tokens_total_k`, `cost_usd`, `effort`.
 
-1. `baseline-2` — before applying the skill change. Gives a second baseline sample so run-to-run variance is known.
-2. Apply the change (script, briefs, SKILL.md edits). Commit.
-3. `new-1`, `new-2`, `new-3` — three trials of the new skill on the same inputs.
-4. `cafe-1` — the new skill on `examples/cafe_reservation_agent/agent-spec.md` (no packet exists for it; let the run write one from the example's own inputs). Checks the bundle script on a second spec.
+A trial whose effort level differs from the baseline's fails the gate. A change is kept only when
+no gated metric fails in any trial of its set (`.claude/skills/skill-iterate/SKILL.md`).
 
-## Grading a trial
+## Baseline
 
-Run `/grade agent-spec --set <set>` (or `python3 .claude/skills/skill-iterate/scripts/grade.py eval/agent-spec --set <set>` for the code metrics alone). The table below is what `grading.json` encodes; the gated metrics are:
+`switch-base-10`, `-11` and `-12`: three trials of the switched skill, graded 2026-11-15. Their
+worst values: `one_path_share` 1.0, `answer_reach` 0.84, `owner_lines` 221, `wall_clock_s`
+1787, `key_recall` 0.44, `cost_usd` 4.06. `switch-smoke-1` and `switch-base-1` to `-9` are the
+switch's earlier trials, kept as history.
 
-| Metric | Source | Pass |
-|---|---|---|
-| Finder tool calls | `subagent-stats.md`, round 2+ finders | each ≤ 6 |
-| Finder wall clock | same | each ≤ 60% of the baseline finder's duration |
-| Recall of known Important defects | compare `round2-findings.md` to `baseline/round2-findings.md`: N1, N2, N9, N10 | ≥ 3 of 4 reported (same block, same defect) |
-| False positives | new findings not in the baseline list that you judge Not real after reading | ≤ 1 |
-| Context-block misses | findings reported only as a one-line Pre-existing that are in fact in-scope defects | 0 |
-| Pipeline integrity | `run.log`: no script error, checker printed 0 errors, rounds ran without a question to the user | all three |
+## Retired kinds (history)
 
-A gated metric must pass in every trial of a set, not on average, and must not be worse than
-the worst baseline trial by more than 10 %. Recall and false positives are judged by a
-fresh-context `skill-eval-judge` subagent from the task files `grade.py` writes; calibrate it
-once by grading ~20 findings yourself and comparing, before trusting its verdicts.
+Their result folders still grade under `grading.json`, which marks each kind `RETIRED`; no new
+trial of them is run.
 
-Baselines per kind are listed in `grading.json`. As of 2026-11-08 the `full` kind has two
-(see `grading.json`); the `round2` kind is retired and kept only so the `r2-*` folders grade.
+- `full` (retired 2026-11-15): step 4 only, on the one-file spec `round0-agent-spec.md` (1,544
+  lines), run with `PROMPT.md`; recall against the known defects in `baseline/round1-findings.md`.
+  Results: `baseline-1`, `e4-base-*`, `full-new-*`, `it1*`, `it2-*`, `it3-*`, `it4*`. The
+  switched skill writes spec folders, so this kind no longer tests it.
+- `round2` (retired 2026-11-11): rounds 2 and 3 from a frozen round-1 state; its inputs were
+  removed. Results: `r2-*`.
+- `build` (retired 2026-11-15): steps 1 to 5 with the recorded interview replayed verbatim
+  (`PROMPT-build.md`), graded on `build-key.md` (a proposal, never approved). It could not test
+  which questions the skill asks. Results: `build-base-1` to `-3`.
+
+Other history: `standin-1` (a check of the stand-in, kind `standin-check`, not graded),
+`key-proposal.md`, `statechart-test/`, `pstack-compare/`, `assumption-flag-test/`.
