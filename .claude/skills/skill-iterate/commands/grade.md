@@ -17,11 +17,17 @@ Grade the trials of skill `$ARGUMENTS`.
    `eval/<skill>/results/<label>/judge/<metric>.verdict.json` for each task step 1 listed, where
    that file now exists; call them `<found>`. If `<found>` is empty, run no git command, make no
    commit and skip the rest of this step, since git status with nothing after `--` lists every
-   dirty file in the repo. Otherwise run `git status --porcelain -z -- <found>` and keep only the
-   files it prints, which are new or changed; call them `<paths>`. Its output is one entry per
-   file, each ending in a NUL byte: two status letters, a space, then the path, unquoted; the path
-   is everything after the first three characters. grade.py re-lists a task whose verdict file
-   exists but is unusable, so a listed verdict can be committed and unchanged; it is left out.
+   dirty file in the repo. Otherwise run
+   `git status --porcelain --untracked-files=all -- <found>` and keep only the files it prints,
+   which are new or changed; call them `<paths>`. Its output is one line per file: two status
+   letters, a space, then the path from the repo root, so the path is everything after the first
+   three characters. If the status letters include `R` or `C`, that part reads `old -> new`: take
+   the path after ` -> `. If the path starts with `"`, git quoted it because it holds a character
+   such as a space, a tab, a non-ASCII letter, `"` or `\`: drop the outer quotes and undo the
+   backslash escapes (`\"` is `"`, `\\` is `\`, `\t` is a tab, and octal escapes such as
+   `\303\251` are the path's UTF-8 bytes, here `é`). Each path read this way is one of `<found>`,
+   of the shape above. grade.py re-lists a task whose verdict file exists but is unusable, so a
+   listed verdict can be committed and unchanged; it is left out.
    If `<paths>` is empty, no verdict file was written: make no commit and skip the rest of this
    step. Run `git add -- <paths>`, then
    `git commit -m "eval/<skill>: judge verdicts for <set>" -- <paths>` with the attribution lines

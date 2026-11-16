@@ -6,6 +6,7 @@ file and run as written. Task 36: a listed verdict that is committed and unchang
 when none is new or changed step 4 makes no commit; when no listed verdict file exists it runs no git
 command at all.
 """
+import codecs
 import json
 import re
 import shlex
@@ -29,7 +30,7 @@ def step4_commands():
 
 def run_step4(repo, found, skill, set_name):
     """Run step 4's commands with <found>, <skill> and <set> filled in; <paths> is what the first
-    command prints, read as step 4 says (NUL-ended entries, path after the first three characters).
+    command prints, read as step 4 says (see status_paths).
     Returns None when <found> or <paths> is empty (no git command or no commit), else the last
     command's output."""
     if not found:
@@ -47,13 +48,28 @@ def run_step4(repo, found, skill, set_name):
         return repo.git(*argv[1:])
 
     first, *rest = step4_commands()
-    lists["<paths>"] = [entry[3:] for entry in run(first).split("\0") if entry]
+    lists["<paths>"] = status_paths(run(first))
     if not lists["<paths>"]:
         return None
     out = ""
     for cmd in rest:
         out = run(cmd)
     return out
+
+
+def status_paths(out):
+    """The paths in plain `git status --porcelain` output, read as step 4 says: one line per file,
+    path after the first three characters, the part after ` -> ` for an R or C entry, and a path
+    that starts with `"` unquoted (outer quotes dropped, backslash escapes undone, bytes as UTF-8)."""
+    paths = []
+    for line in out.splitlines():
+        letters, path = line[:2], line[3:]
+        if "R" in letters or "C" in letters:
+            path = path.split(" -> ")[1]
+        if path.startswith('"'):
+            path = codecs.escape_decode(path[1:-1].encode())[0].decode("utf-8")
+        paths.append(path)
+    return paths
 
 
 class Repo:
@@ -204,7 +220,7 @@ def test_commit_verdicts_none_found_makes_no_commit(repo):
     repo.git("add", "other.md")
     repo.write("untracked.md", "new\n")
     before = repo.git("rev-parse", "HEAD").strip()
-    assert "other.md" in repo.git("status", "--porcelain", "-z", "--")  # no paths after --: no filter
+    assert "other.md" in repo.git("status", "--porcelain", "--untracked-files=all", "--")  # no paths after --: no filter
 
     found = found_paths(repo, tasks)  # every judge failed to write its verdict
     assert found == []
@@ -222,6 +238,8 @@ def test_commit_verdicts_path_with_space_and_non_ascii(repo):
     for p in paths:
         repo.write(p, verdict())
     before = repo.git("rev-parse", "HEAD").strip()
+    quoted = repo.git("status", "--porcelain", "--untracked-files=all", "--", *paths)
+    assert '"eval/demo/results/s 4/' in quoted and "\\303\\251" in quoted  # git quotes both paths
 
     status = run_step4(repo, paths, "demo", "s")
 
@@ -241,4 +259,12 @@ def test_grade_md_states_the_commit_step():
     assert "make no commit" in flat
     step = " ".join(re.search(r"^4\. (.*?)^5\. ", text, re.S | re.M).group(1).split())
     assert step.index("If `<found>` is empty, run no git command") < step.index("`git ")
-    assert step4_commands()[0] == "git status --porcelain -z -- <found>"
+    assert step4_commands()[0] == "git status --porcelain --untracked-files=all -- <found>"
+
+
+def test_grade_md_stops_on_empty_paths_before_git_add():
+    """Should say in commands/grade.md step 4 to make no commit when <paths> is empty, before the git add command."""
+    step = " ".join(re.search(r"^4\. (.*?)^5\. ", GRADE_MD.read_text(), re.S | re.M).group(1).split())
+    stop = re.search(r"If `<paths>` is empty[^.]*make no commit", step)
+    assert stop, "step 4 has no stop for an empty <paths>"
+    assert stop.start() < step.index("`git add")
