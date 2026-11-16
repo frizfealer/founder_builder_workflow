@@ -1,0 +1,24 @@
+{
+  "id": 47,
+  "title": "Rename the task field may_edit to allowed_to_edit",
+  "item": "Rename the field may_edit to allowed_to_edit in every task file and in the manager skill, and write \"allowed to edit\" wherever the manager's text says \"may edit\"",
+  "motivation": "The owner read \"may edit\" as \"might edit or might not\" (chat, 2026-11-16). The field is a permission list: it names the protected paths a task is allowed to change. \"Allowed to edit\" says that.",
+  "status": "Backlog",
+  "added": "2026-11-16",
+  "finished": "",
+  "notes": "Not for a /manage run: checks.py refuses a task branch that changes any task file but its own (checks.py line 128, \"a task branch changes only its own task file\"), and this task changes all of them plus the checks themselves. Run it in a plain Claude Code session, or have Claude in chat do it, on the working branch while no task is In progress. Places that use the name today: .claude/skills/manage/ (scripts/tasks.py, scripts/checks.py, tests/conftest.py, tests/test_checks.py, SKILL.md, agents/builder.md, agents/reviewer.md, commands/manage.md, references/task-fields.md, protected-paths.txt) and every tasks/<id>.json. History is left as written: tasks/reviews/, tasks/RUNS.md, manager-build/.",
+  "depends_on": [],
+  "source_chat": "founder_and_builder project chat, 2026-11-16",
+  "done_means": "Every tasks/<id>.json has allowed_to_edit holding the value its may_edit had, and no may_edit. Outside tasks/reviews/, tasks/RUNS.md and manager-build/, no tracked file contains may_edit or the phrase \"may edit\". tasks.py lint exits 0. The manager tests pass, all of them (51 of 51 on 2026-11-15).",
+  "verified_by": [
+    "script",
+    "you"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "runs_as": "you",
+  "priority": "low",
+  "tokens": null,
+  "draft_note": "Drafted by Claude in chat on 2026-11-16 at the owner's request. Priority, runs_as and verified_by are drafts for the owner."
+}
