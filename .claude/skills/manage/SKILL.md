@@ -61,7 +61,9 @@ All from the repo root, all with `python3`:
   dependency Done; then priority, then most open dependents, then lowest id).
 - `scripts/checks.py protected <id> <branch>`: the branch's changes since it left the working
   branch, against `protected-paths.txt` and the working branch's copy of the task's `may_edit`.
-  A task branch may change only its own task file and add Proposed tasks.
+  In `tasks/`, a task branch may change only `status`, `finished`, `tokens`, `needs_you` and
+  `decided_for_you` of its own task file, and add Proposed tasks. The whole skill folder and
+  its three links in `.claude/` are protected.
 - `scripts/checks.py merge-limit`: task merges since the latest review tag, against
   `limits.json`. At the limit the manager merges nothing more and ends the run.
 - `scripts/checks.py run-start | run-end`: mark a run active with `.git/manage-run-active`.

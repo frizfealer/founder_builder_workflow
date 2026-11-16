@@ -109,11 +109,39 @@ def test_protected_other_task_file_edited(repo):
 
 
 def test_protected_own_task_file_edited(repo):
-    """Should pass when the branch edits only its own task file."""
+    """Should pass when the branch changes only the manager's fields of its own task file."""
     b = on_branch(repo)
-    repo.write_task(task(1, status="In progress"))
-    repo.commit("in progress")
+    repo.write_task(task(1, status="Needs you") | {
+        "tokens": {"agents": 10, "main_session": "not recorded"},
+        "needs_you": {"question": "q", "recommendation": "r", "if_vetoed": "v"},
+        "decided_for_you": [{"chosen": "a", "rejected": "b", "would_change": "c"}],
+    })
+    repo.commit("parked")
     assert protected(repo, b) == []
+
+
+def test_protected_own_task_owner_fields_rewritten(repo):
+    """Should fail when the branch rewrites its own task's done_means, verified_by, may_edit and priority."""
+    b = on_branch(repo)
+    repo.write_task(task(1, may_edit=["DECISIONS.md"], priority="high")
+                    | {"done_means": "Anything.", "verified_by": ["you"]})
+    repo.commit("rewrite own task")
+    fails = protected(repo, b)
+    for field in ["done_means", "verified_by", "may_edit", "priority"]:
+        assert any(field in f for f in fails), field
+
+
+@pytest.mark.parametrize("path", [".claude/skills/manage/SKILL.md",
+                                  ".claude/skills/manage/agents/reviewer.md",
+                                  ".claude/commands/manage.md"])
+def test_protected_manager_skill_edited(repo, path):
+    """Should fail when the branch edits a file of the manager skill or one of its links."""
+    repo.write(path, "original\n")
+    repo.commit("manager skill")
+    b = on_branch(repo)
+    repo.write(path, "weakened\n")
+    repo.commit("edit")
+    assert any(path in f for f in protected(repo, b))
 
 
 def test_protected_new_proposed_task(repo):
@@ -157,6 +185,8 @@ def test_protected_list_patterns_match_real_paths():
     assert rule_for("eval/agent-spec/results/switch-base-10/trial.json") == {"append-only"}
     assert rule_for(".claude/settings.local.json") == {"named"}
     assert rule_for(".claude/skills/manage/scripts/checks.py") == {"named"}
+    assert rule_for(".claude/skills/manage/SKILL.md") == {"named"}
+    assert rule_for(".claude/agents/manager-reviewer.md") == {"named"}
     assert rule_for("eval/agent-spec/new-format/SWITCH-PLAN.md") == set()
     assert rule_for(".claude/skills/skill-iterate/commands/grade.md") == set()
 

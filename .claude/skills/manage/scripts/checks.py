@@ -30,6 +30,9 @@ SKILL_DIR = ".claude/skills/manage"
 PROTECTED_LIST = f"{SKILL_DIR}/protected-paths.txt"
 LIMITS = f"{SKILL_DIR}/limits.json"
 TASKS_DIR = "tasks"
+# The only fields of its own task file a task branch may change; every other field is the
+# working branch's copy.
+MANAGER_FIELDS = {"status", "finished", "tokens", "needs_you", "decided_for_you"}
 REVIEW_TAG_GLOB = "review/*"
 TASK_MERGE = re.compile(r"^Merge task \d+:")
 MARKER = "manage-run-active"  # in the git common dir, so every worktree of the clone sees it
@@ -93,6 +96,19 @@ def check_protected(repo, task_id, branch, base=WORKING_BRANCH):
     for status, path in changes:
         if path.startswith(f"{TASKS_DIR}/") and path.endswith(".json"):
             if path == own and status == "M":
+                try:
+                    mine = json.loads(show(repo, branch, path))
+                except json.JSONDecodeError:
+                    mine = None
+                if not isinstance(mine, dict):
+                    fails.append(f"{path}: not a JSON object")
+                    continue
+                theirs = json.loads(task_text)
+                changed = sorted(k for k in set(mine) | set(theirs)
+                                 if k not in MANAGER_FIELDS and mine.get(k) != theirs.get(k))
+                if changed:
+                    fails.append(f"{path}: a task branch may change only {sorted(MANAGER_FIELDS)} "
+                                 f"of its own task; it changed {changed}")
                 continue
             if status == "A":
                 try:

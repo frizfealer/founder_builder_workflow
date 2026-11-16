@@ -41,10 +41,11 @@ append-only  eval/*/baseline/
 append-only  eval/*/results/
 append-only  eval/*/EXPERIMENTS.md
 
-# The manager's own checks
-named        .claude/skills/manage/protected-paths.txt
-named        .claude/skills/manage/limits.json
-named        .claude/skills/manage/scripts/
-named        .claude/skills/manage/tests/
+# The manager's own checks: the whole manager skill (the list, the scripts and tests, the limits
+# config, the skill text and agents) and its links in .claude/
+named        .claude/skills/manage/
+named        .claude/agents/manager-builder.md
+named        .claude/agents/manager-reviewer.md
+named        .claude/commands/manage.md
 named        .claude/settings*.json
 named        .git/hooks/
