@@ -1,0 +1,22 @@
+{
+  "id": 45,
+  "title": "/grade step 4 git commands survive ignore rules and pattern characters",
+  "item": "Step 4's git status, add and commit take verdict paths as pathspecs and skip ignored files silently",
+  "motivation": "Found by the task 36 reviewers: a verdict matched by .gitignore is left out without warning, and a label with *, ?, [ or a leading : is read as a pattern. Neither happens today.",
+  "notes": "",
+  "done_means": "An ignored verdict file makes step 4 stop with a message, and paths are taken literally (for example --literal-pathspecs); a test covers both.",
+  "draft_note": "Drafted by the manager on 2026-11-15 from the task 36 reviews. Priority left for the owner.",
+  "depends_on": [],
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [],
+  "status": "Proposed",
+  "added": "2026-11-15",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tokens": null
+}

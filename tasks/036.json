@@ -11,11 +11,36 @@
   ],
   "may_edit": [],
   "draft_note": "Drafted by the manager on 2026-11-15 from the task 20 review. Priority left for the owner.",
-  "status": "Ready",
+  "status": "Needs you",
   "added": "2026-11-15",
   "finished": "",
   "source_chat": "",
   "runs_as": "build",
   "priority": "medium",
-  "tokens": null
+  "tokens": {
+    "agents": 116967,
+    "main_session": "not recorded"
+  },
+  "needs_you": {
+    "question": "Verification still fails after the one retry. Branch task/036 (commits 7416407, 3ca9709) meets done_means: committed, unchanged verdicts give no commit, an empty <found> runs no git command, and 6 tests pass. The second review failed it on: (1) the test never checks grade.md's 'If <paths> is empty ... make no commit' sentence, so deleting it keeps every test green; (2) `git status --porcelain -z` misses untracked verdicts under status.showUntrackedFiles=no and may print a folder on git < 2.27; add --untracked-files=all; (3) an agent reading -z output in a tool result may not see the NUL separators; (4) the parse rule ignores staged renames. Should the next run retry with these four fixes?",
+    "recommendation": "Yes: drop -z and use `git status --porcelain --untracked-files=all -- <found>` (verdict paths are <label>/judge/<metric>.verdict.json, plain characters), add an ordering test for the empty-<paths> sentence, and set the task back to Ready for one more build on task/036.",
+    "if_vetoed": "If you accept the branch as it is, the next run merges task/036 unchanged and the four points become one Proposed task. If you prefer keeping -z, the retry pipes it through tr '\\0' '\\n' instead."
+  },
+  "decided_for_you": [
+    {
+      "chosen": "Filter found verdict files with git status before add/commit",
+      "rejected": "git add then git diff --cached --quiet",
+      "would_change": "You prefer the cached-diff check"
+    },
+    {
+      "chosen": "Use -z and state how to read it (retry)",
+      "rejected": "Explain unquoting of plain porcelain output",
+      "would_change": "The second review: NUL output is hard for an agent to read; recommendation above drops -z"
+    },
+    {
+      "chosen": "Extra tests for a partly changed set, no verdict found, and unusual path characters",
+      "rejected": "Only the done_means case",
+      "would_change": "You want only the done_means test"
+    }
+  ]
 }

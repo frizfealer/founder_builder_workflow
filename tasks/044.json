@@ -1,0 +1,22 @@
+{
+  "id": 44,
+  "title": "/grade step 2 and the no-re-dispatch rule agree on unusable verdicts",
+  "item": "grade.md step 2 says dispatch a judge for every listed task; its closing paragraph says never re-dispatch one whose verdict file exists. grade.py re-lists tasks with unusable verdicts, so both apply to the same task",
+  "motivation": "Found by the task 36 reviewer: the two instructions conflict exactly for unusable verdicts.",
+  "notes": "",
+  "done_means": "grade.md says what to do with a listed task whose verdict file exists but is unusable, and step 2 and the closing paragraph do not contradict each other.",
+  "draft_note": "Drafted by the manager on 2026-11-15 from the task 36 reviews. Priority left for the owner.",
+  "depends_on": [],
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [],
+  "status": "Proposed",
+  "added": "2026-11-15",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tokens": null
+}
