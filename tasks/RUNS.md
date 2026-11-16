@@ -17,7 +17,7 @@ Stopped because: merge limit (3 task merges since review/2026-11-15; no other ta
 
 ### Needs you
 - Review and set a review tag: the merge limit is reached, so the next run merges nothing until `git tag review/2026-11-15-2 re-create-from-scratch`.
-- Branches to delete (task 028's notes ask for it; the manager may not delete): merged `agent-spec/switch`, `manager/build`, `iterate/agent-spec/it1`, `iterate/agent-spec/it2`, `claude/verifier-ruling-stability-4811l2`, `add-develop-architecture-notes`, and now `task/028`, `task/028-2`, `task/036`, `task/036-2`.
+- Branches to delete (the manager may not delete): merged into the working branch are `task/020`, `task/028-2` and `task/036-2`. `task/028` and `task/036` are not merged, but their work was carried over into the `-2` branches, so they are superseded.
 - task 040 (Backlog): with build2 live, a grade.py run with no `--labels`/`--set` (/iterate step 1, a bare /grade) now grades `results/seeded-demo` and writes a judge task there. The task 028 reviewer confirmed this; task 040 already covers it, so it may deserve a higher priority.
 - task 046 (Proposed): small eval doc fixes left by task 028. The README omits `judge-verifier-brief.md`, /trial step 0 refers forward to step 1, and grading.json's long note prints under every grade table. Its note change needs `eval/agent-spec/grading.json` in may_edit.
 
