@@ -3,9 +3,9 @@
   "title": "/grade commits its verdicts",
   "item": "/grade commits the verdicts it writes",
   "motivation": "Promised in commands/grade.md, not done",
-  "status": "Ready",
+  "status": "Done",
   "added": "2026-11-14",
-  "finished": "",
+  "finished": "2026-11-15",
   "notes": "Small.",
   "depends_on": [],
   "source_chat": "Agent workflow with Claude subagents (Nov 14)",
@@ -16,6 +16,26 @@
   "may_edit": [],
   "runs_as": "build",
   "priority": "medium",
-  "tokens": null,
-  "draft_note": "Verify on a scratch branch. Owner chose this as the manager's first task."
+  "tokens": {
+    "agents": 111854,
+    "main_session": "not recorded"
+  },
+  "draft_note": "Verify on a scratch branch. Owner chose this as the manager's first task.",
+  "decided_for_you": [
+    {
+      "chosen": "commit only the verdict files",
+      "rejected": "also commit the .task.md files grade.py writes next to them",
+      "would_change": "if you want verdicts committed with their task files (one-line change to step 4 and the test)"
+    },
+    {
+      "chosen": "exact git commands in grade.md, tested by parsing them from the file",
+      "rejected": "a separate commit script",
+      "would_change": "if agents get the verdict path mapping wrong in practice"
+    },
+    {
+      "chosen": "commit message 'eval/<skill>: judge verdicts for <set>'",
+      "rejected": "a new message format",
+      "would_change": "if you have a house message format"
+    }
+  ]
 }

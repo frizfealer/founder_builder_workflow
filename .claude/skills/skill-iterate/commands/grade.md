@@ -13,8 +13,16 @@ Grade the trials of skill `$ARGUMENTS`.
 3. Rerun `grade.py` with the same flags. Every judge cell should now hold a number. If one is
    still pending, read that judge's output, say why it failed, and leave the cell pending; do
    not fill it in by hand.
-4. Print the table and the set summary verbatim. Add nothing to the numbers.
-5. If `--gate` was asked for, report the exit code.
+4. Commit the verdict files this run's judges wrote, in one commit, and nothing else. They are
+   `eval/<skill>/results/<label>/judge/<metric>.verdict.json` for each task step 1 listed, where
+   that file now exists; call them `<paths>`. Run `git add -- <paths>`, then
+   `git commit -m "eval/<skill>: judge verdicts for <set>" -- <paths>` with the attribution lines
+   this session requires (`<set>` is the `--set` value, else the labels graded). The paths after
+   `--` keep every other staged or dirty file out of the commit. Then
+   `git status --porcelain -- <paths>` must print nothing. Report the commit hash. If no verdict
+   file was written, make no commit.
+5. Print the table and the set summary verbatim. Add nothing to the numbers.
+6. If `--gate` was asked for, report the exit code.
 
 Judges never see each other's output or the grade table. Do not re-dispatch a judge whose
 verdict file exists; delete the verdict file first only when the human asked for a re-judge
