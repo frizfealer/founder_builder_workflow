@@ -6,7 +6,7 @@
   "status": "Backlog",
   "added": "2026-11-17",
   "finished": "",
-  "notes": "A branch is superseded when all three hold: its name is task/<id> or task/<id>-<n>; task <id> is Done on the working branch and its merge commit is on the working branch; the branch is not checked out in any worktree. A script in scripts/checks.py decides this; only then may the manager run git branch -D on it. The run report lists each deleted branch with its last commit id, so it can be restored with git branch <name> <id> while git still holds the commit. Branches of a task that is not Done, and any branch not named for a task, are never deleted. Deleted by hand on 2026-11-17 on the owner's word, for the record: task/049 at 6ad8b8d and task/049-2 at b637e68.",
+  "notes": "A branch is superseded when all three hold: its name is task/<id> or task/<id>-<n>; task <id> is Done on the working branch and its merge commit is on the working branch; the branch is not checked out in any worktree. A script in scripts/checks.py decides this; only then may the manager run git branch -D on it. The run report lists each deleted branch with its last commit id, so it can be restored with git branch <name> <id> while git still holds the commit. Branches of a task that is not Done, and any branch not named for a task, are never deleted. Deleted by hand on 2026-11-17 on the owner's word, for the record: task/049 at 6ad8b8d and task/049-2 at b637e68. When a task branch is left over and the script does not confirm it (so the manager may not delete it), the run report must make the case itself, so the owner does not have to ask elsewhere: for each such branch, which of the three conditions failed, how many files differ from the working branch and how many exist only on the branch, and a recommendation to delete or keep with its reason. On 2026-11-17 the report said only that two branches 'are superseded and can be deleted'; the owner had to get the evidence from Claude in chat.",
   "depends_on": [
     {
       "id": 57,
@@ -14,7 +14,7 @@
     }
   ],
   "source_chat": "founder_and_builder project chat, 2026-11-17",
-  "done_means": "A checks.py command takes a branch name and exits 0 only when the three conditions in the notes hold. commands/manage.md and SKILL.md say the manager deletes a branch with git branch -D only after that command passes, and writes the branch's name and last commit id in the run report. Tests in temporary git repos cover: an earlier attempt of a Done task (deleted), a branch of a task that is not Done (kept), a checked-out branch (kept), a branch not named for a task (kept). The manager tests pass, all of them.",
+  "done_means": "A checks.py command takes a branch name and exits 0 only when the three conditions in the notes hold. commands/manage.md and SKILL.md say the manager deletes a branch with git branch -D only after that command passes, and writes the branch's name and last commit id in the run report. Tests in temporary git repos cover: an earlier attempt of a Done task (deleted), a branch of a task that is not Done (kept), a checked-out branch (kept), a branch not named for a task (kept). For a leftover task branch the command does not confirm, the run report states which condition failed, the count of files that differ from the working branch and of files only on the branch, and a recommendation with its reason. The manager tests pass, all of them.",
   "verified_by": [
     "script",
     "reviewer"
