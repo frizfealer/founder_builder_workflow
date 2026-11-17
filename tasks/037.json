@@ -13,14 +13,15 @@
   "done_means": "(1) An agent manager-advisor exists with model Fable, effort high and read-only tools, linked in .claude/agents/ like the other two. (2) tasks.py lint accepts 'advisor' in verified_by and the optional field verifier_of_line, and rejects a key that is not a line number written in done_means or a value that is not a verifier; references/task-fields.md documents both. (3) For a line whose verifier is advisor, commands/manage.md dispatches the advisor with only the paths the line names, saves the reply in tasks/advice/<id>-<n>.md and logs the ruling under decided_for_you; a checks.py command refuses a merge while an advisor line has no saved reply whose first line is 'RULING: HOLDS'. (4) commands/manage.md consults the advisor before every park except the always-park cases in the notes, and a checks.py command decides those cases; tests show each of them always parks. (5) commands/manage.md has jobs (c) and (d) as steps. (6) The manager tests pass, all of them.",
   "verified_by": [
     "script",
-    "reviewer"
+    "reviewer",
+    "you"
   ],
   "may_edit": [
     ".claude/skills/manage/",
     ".claude/agents/manager-advisor.md"
   ],
-  "draft_note": "First drafted by Claude on 2026-11-15; rewritten by Claude in chat on 2026-11-17 on the owner's go, after task 49. Changed from the first draft: the advisor has four jobs, not one; 'verified by you' blocks it per pass line, not per task; the always-park cases are decided by a script. It widens what merges without the owner; he approves that by setting it to Ready. If it parks twice, stop and go on with the BDD path, with Claude in chat as labeller.",
-  "status": "Backlog",
+  "draft_note": "First drafted by Claude on 2026-11-15; rewritten by Claude in chat on 2026-11-17 on the owner's go, after task 49. Changed from the first draft: the advisor has four jobs, not one; 'verified by you' blocks it per pass line, not per task; the always-park cases are decided by a script. It widens what merges without the owner; he approves that by setting it to Ready. If it parks twice, stop and go on with the BDD path, with Claude in chat as labeller. The owner asked on 2026-11-17 to read the changed manager rules before this task merges (\"read 37\"), so verified_by includes you. Set to Ready the same day on his instruction.",
+  "status": "Ready",
   "added": "2026-11-15",
   "finished": "",
   "source_chat": "",
