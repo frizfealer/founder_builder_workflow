@@ -1,0 +1,32 @@
+{
+  "id": 58,
+  "title": "Manager deletes a Done task's superseded attempt branches",
+  "item": "After a task merges, the manager deletes that task's earlier attempt branches when a script confirms they are superseded, and records each deleted branch's name and last commit id in the run report",
+  "motivation": "The manager may delete a merged task's branches only with git branch -d, which refuses a branch whose commits are not on the working branch. A retry copies the earlier work onto a fresh branch as a new commit, so the earlier attempts never count as merged and the owner deletes them by hand. It happened for every task that needed a retry: 28 and 36 on 2026-11-15, 49 on 2026-11-17. Whether a branch is superseded is a mechanical question, and by the owner's rule a mechanical check uses code.",
+  "status": "Backlog",
+  "added": "2026-11-17",
+  "finished": "",
+  "notes": "A branch is superseded when all three hold: its name is task/<id> or task/<id>-<n>; task <id> is Done on the working branch and its merge commit is on the working branch; the branch is not checked out in any worktree. A script in scripts/checks.py decides this; only then may the manager run git branch -D on it. The run report lists each deleted branch with its last commit id, so it can be restored with git branch <name> <id> while git still holds the commit. Branches of a task that is not Done, and any branch not named for a task, are never deleted. Deleted by hand on 2026-11-17 on the owner's word, for the record: task/049 at 6ad8b8d and task/049-2 at b637e68.",
+  "depends_on": [
+    {
+      "id": 57,
+      "soft": true
+    }
+  ],
+  "source_chat": "founder_and_builder project chat, 2026-11-17",
+  "done_means": "A checks.py command takes a branch name and exits 0 only when the three conditions in the notes hold. commands/manage.md and SKILL.md say the manager deletes a branch with git branch -D only after that command passes, and writes the branch's name and last commit id in the run report. Tests in temporary git repos cover: an earlier attempt of a Done task (deleted), a branch of a task that is not Done (kept), a checked-out branch (kept), a branch not named for a task (kept). The manager tests pass, all of them.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "runs_as": "build",
+  "priority": "medium",
+  "tags": [
+    "manager"
+  ],
+  "tokens": null,
+  "draft_note": "Drafted by Claude in chat on 2026-11-17 on the owner's yes. Soft dependency on task 57 only so the two changes to the manager do not collide."
+}
