@@ -16,7 +16,6 @@ Stopped because: no task to take.
 
 ### Needs you
 - task 049 (parked): part 1 passed review (049-2: PASS) and its 5 check commands exit 0 on task/049; part 2 did not run because the API refuses calls with "credit balance is too low" ($0 spent). Also read the 3 feature files and say whether this is the format you want. Recommended: add about $5 of credit, re-run `ant auth login` if expired, run `uv run python probe/run_part2.py` from the cafe folder, bring the transcripts to chat, then set 049 back to Ready. If you veto: lines 4 and 5 stay unproven and tasks 50 to 53 stay blocked; or move lines 4 and 5 to a new task and merge part 1 alone.
-- task 049: your chat session's commit 07be3ca (notes and plan use the ant login) is only on task/049; the park did not carry it to the working branch.
 - task 054 (Proposed): Café slice A: make the part 2 runner and data file robust before the real run. The fake's 3-id limit and lost usage on errored runs can waste or misreport the paid part 2 run.
 
 ## Run 2026-11-15 22:05
