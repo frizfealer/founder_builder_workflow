@@ -9,6 +9,13 @@
                                            tree; exit 1 when none exists or its first line is
                                            not "VERDICT: PASS" (only for a task verified by
                                            reviewer or script)
+  checks.py needs <task-id>                run the check of each of the task's outside_needs;
+                                           exit 1 with a one-line reason at the first that fails
+  checks.py unmerged <branch> <path>...    whether every path exists on <branch> and not on the
+                                           working branch, so findings about them go to the task's
+                                           for_retry; exit 1 when any path does not
+  checks.py owner <task-id>                exit 1 while the task waits for the owner's check
+                                           (verified_by includes you, owner_verified is empty)
   checks.py run-start | run-end            mark a manager run active / no longer active
   checks.py push-hook                      Claude Code PreToolUse hook: refuse git push while a run
                                            is active (reads the hook's JSON on stdin)
@@ -18,7 +25,8 @@
 A task merge is a merge commit on the working branch's first-parent line whose subject starts
 "Merge task <id>:". A review tag is any tag named review/<anything>, e.g. review/2026-11-20.
 The protected-path list and the task's "may edit" are read from the working branch, never from
-the task's branch, so a branch cannot grant itself an edit.
+the task's branch, so a branch cannot grant itself an edit. needs and owner read the task file
+from the working branch too.
 """
 import fnmatch
 import json
@@ -35,7 +43,8 @@ PROTECTED_LIST = f"{SKILL_DIR}/protected-paths.txt"
 LIMITS = f"{SKILL_DIR}/limits.json"
 TASKS_DIR = "tasks"
 # The only fields of its own task file a task branch may change; every other field is the
-# working branch's copy.
+# working branch's copy. So a task branch cannot set owner_verified (the owner's) or for_retry
+# (the manager writes it on the working branch when it parks the task).
 MANAGER_FIELDS = {"status", "finished", "tokens", "needs_you", "decided_for_you"}
 REVIEW_TAG_GLOB = "review/*"
 TASK_MERGE = re.compile(r"^Merge task \d+:")
@@ -138,6 +147,82 @@ def check_protected(repo, task_id, branch, base=WORKING_BRANCH):
         elif "named" in hit and not any(matches(e, path) for e in may_edit):
             fails.append(f"{path}: protected, and the task's may edit does not name it")
     return fails
+
+
+# --- outside needs --------------------------------------------------------------------------
+
+# The fixed set of outside needs (tasks.py OUTSIDE_NEEDS names the same), each with the one
+# command that checks it; exit 0 is a pass. claude-api: one call to the smallest model with one
+# output token (about 0.00001 USD) through the ant CLI, which uses the owner's `ant auth login`
+# (or ANTHROPIC_API_KEY when it is set), the credentials a builder's SDK picks up. Its output is
+# captured and only a one-line reason, with anything shaped like a credential masked, is printed.
+NEED_CHECKS = {
+    "claude-api": ["ant", "messages", "create", "--model", "claude-haiku-5-5", "--max-tokens", "1",
+                   "--message", '{role: user, content: "Hi"}'],
+}
+NEED_TIMEOUT = 60  # seconds
+CREDENTIAL = re.compile(r"sk-ant-[\w-]+")
+
+
+def task_on(repo, task_id, base):
+    """The task's file as the working branch holds it."""
+    text = show(repo, base, f"{TASKS_DIR}/{task_id:03d}.json")
+    if text is None:
+        raise ValueError(f"{TASKS_DIR}/{task_id:03d}.json does not exist on {base}")
+    return json.loads(text)
+
+
+def check_needs(repo, task_id, base=WORKING_BRANCH, commands=NEED_CHECKS):
+    """(ok, one-line message): run the check of each outside need in turn; stop at the first failure."""
+    needs = task_on(repo, task_id, base).get("outside_needs", [])
+    if not needs:
+        return True, f"task {task_id} has no outside needs"
+    for need in needs:
+        if need not in commands:
+            return False, f"{need}: not a known outside need (known: {', '.join(sorted(commands))})"
+        try:
+            r = subprocess.run(commands[need], capture_output=True, text=True, timeout=NEED_TIMEOUT)
+        except FileNotFoundError:
+            return False, f"{need}: the check cannot run, {commands[need][0]} is not installed"
+        except subprocess.TimeoutExpired:
+            return False, f"{need}: the check had no answer within {NEED_TIMEOUT} s"
+        if r.returncode != 0:
+            said = " ".join(CREDENTIAL.sub("<credential>", r.stderr + " " + r.stdout).split())[:300]
+            return False, f"{need}: the check failed (exit {r.returncode}): {said}"
+    return True, f"task {task_id}: every outside need passed ({', '.join(needs)})"
+
+
+# --- findings on unmerged work ---------------------------------------------------------------
+
+def check_unmerged(repo, branch, paths, base=WORKING_BRANCH):
+    """(ok, message): ok when every path exists on branch and not on base; one line per path."""
+    def exists(rev, path):
+        return git(repo, "cat-file", "-e", f"{rev}:{path}", check=False).returncode == 0
+
+    lines, ok = [], True
+    for path in paths:
+        on_branch, on_base = exists(branch, path), exists(base, path)
+        if on_branch and not on_base:
+            lines.append(f"{path}: only on {branch}")
+            continue
+        ok = False
+        lines.append(f"{path}: on {base}" if on_base else f"{path}: on neither {branch} nor {base}")
+    verdict = (f"every path is only on {branch}: the findings go to the task's for_retry" if ok
+               else f"not every path is only on {branch}: the findings go to the Proposed task")
+    return ok, "\n".join(lines + [verdict])
+
+
+# --- the owner's check -----------------------------------------------------------------------
+
+def check_owner(repo, task_id, base=WORKING_BRANCH):
+    """(ok, message). ok is False while verified_by includes you and owner_verified is empty."""
+    t = task_on(repo, task_id, base)
+    if "you" not in t["verified_by"]:
+        return True, f"task {task_id} has no line for the owner to check"
+    if t.get("owner_verified"):
+        return True, f"task {task_id}: the owner checked it on {t['owner_verified']}"
+    return False, (f"task {task_id} waits for the owner's check: verified_by includes you "
+                   f"and owner_verified is empty")
 
 
 # --- merge limit -----------------------------------------------------------------------------
@@ -262,6 +347,12 @@ def main(argv):
         ok, msg = check_merge_limit(".", base)
     elif cmd == "review" and len(argv) == 2:
         ok, msg = check_review(".", int(argv[1]))
+    elif cmd == "needs" and len(argv) == 2:
+        ok, msg = check_needs(".", int(argv[1]), base)
+    elif cmd == "unmerged" and len(argv) >= 3:
+        ok, msg = check_unmerged(".", argv[1], argv[2:], base)
+    elif cmd == "owner" and len(argv) == 2:
+        ok, msg = check_owner(".", int(argv[1]), base)
     elif cmd == "run-start":
         ok, msg = run_start(".")
     elif cmd == "run-end":

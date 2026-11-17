@@ -21,6 +21,9 @@ One JSON object per file, `tasks/<id>.json`, id zero-padded to 3 (`tasks/020.jso
 | `draft_note` | text, optional | Whoever drafted the fields |
 | `needs_you` | optional; `{"question", "recommendation", "if_vetoed"}`, required when status is Needs you | Manager |
 | `decided_for_you` | optional; list of `{"chosen", "rejected", "would_change"}` | Manager |
+| `outside_needs` | optional; list of distinct values from a fixed set, today only `claude-api`. `checks.py needs` runs one check per value before a builder starts; a failure parks the task | Owner; manager may draft |
+| `for_retry` | optional; list of findings, each quoted, on files that exist only on the task's branch (`checks.py unmerged`). Written when the task parks, on the working branch only; the retry builder's brief quotes it | Manager |
+| `owner_verified` | optional; `YYYY-MM-DD` the owner checked his lines of `verified_by`, or `""`. May be set while the task is Ready or Needs you. While `verified_by` includes `you` and this is empty, `checks.py owner` parks the task | Owner, or on his instruction; never the manager, never inferred from other text |
 
 A Ready task must have `done_means`, `verified_by`, `runs_as` and `priority`. A draft counts
 only when the owner sets the task to Ready; after that the manager changes none of the owner's

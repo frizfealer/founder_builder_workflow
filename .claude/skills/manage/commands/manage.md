@@ -23,6 +23,9 @@ Then `checks.py run-start`; if it fails, end the run the same way.
 
 ## 3. Branch
 
+First `checks.py needs <id>`. If it fails, park the task at once (step 8) with its one-line
+output as the question: no branch, no builder. Then go to step 2.
+
 Cut `task/<id>` from the working branch (an iterate task uses the branch `/iterate` names,
 cut from the working branch). If that name exists from an earlier run, add `-2`, `-3`. On the
 branch, set the task to In progress and commit `task <id>: in progress`.
@@ -32,7 +35,8 @@ branch, set the task to In progress and commit `task <id>: in progress`.
 - **build**, **measurement:** dispatch `manager-builder` with a complete brief: the task file's
   path and its `done_means` and `may_edit` quoted; the branch; the paths involved; the earlier
   branch of this task if one exists, whose work the builder brings over without any file under
-  `tasks/`, so the new branch's task files stay as the working branch has them; `DECISIONS.md`
+  `tasks/`, so the new branch's task files stay as the working branch has them; the task's
+  `for_retry`, when set, quoted in full as faults this run fixes; `DECISIONS.md`
   as the direction. It commits on the branch
   and returns what it changed, the check it wrote or ran for `done_means`, its decisions, a
   Proposed task only when `done_means` needs a protected path outside `may_edit`, and what it
@@ -61,12 +65,22 @@ none fits).
   those yourself, and every one must exit 0.
 - **metrics:** `python3 .claude/skills/skill-iterate/scripts/grade.py eval/<skill> --set <set>
   --gate` exits 0.
-- **you:** park.
+- **you:** `checks.py owner <id>`. If it fails, park with its output as the question. Once the
+  owner has set `owner_verified` it passes, and the task goes on to step 6 and merges with no
+  further park for the owner. Never set `owner_verified`, and never read it from other text.
 
 On a fail: if a blocking problem can be fixed only in a protected path the task's `may_edit`
 does not name, park at once with that path in the recommendation. Otherwise, one fresh retry:
 dispatch a new `manager-builder` with only the blocking problems, told to fix those and change
 nothing else, then a new `manager-reviewer`. If it still fails, park.
+
+Whenever the task parks, at this step or a later one, sort the findings first: the minor and
+outside problems, what the builder noticed, and any blocking problem still open. For each, run
+`checks.py unmerged <branch> <path>...` with the task's branch and the files the finding
+names. When it exits 0, the files exist only on the task's branch: the finding goes, quoted,
+into the task's `for_retry` (step 8) and not into the Proposed task. A finding that names no
+file, or whose check exits 1, goes to the Proposed task as above. When the task merges, its
+files reach the working branch, so every finding goes to the Proposed task.
 
 ## 6. Protected paths
 
@@ -90,8 +104,10 @@ list it under Needs you in the run report. Go to step 2.
 ## 8. Park
 
 On the working branch, edit only this task's file: `status` Needs you, `needs_you`,
-`decided_for_you`, `tokens`. Write each reviewer reply from step 5 verbatim to
-`tasks/reviews/<id>-<n>.md`, numbered as in step 7, and add the Proposed task from step 5.
+`decided_for_you`, `tokens`, and `for_retry`: the findings step 5 sorted into it, replacing
+any earlier list; remove the field when step 5 sorted none. Write each reviewer reply from
+step 5 verbatim to `tasks/reviews/<id>-<n>.md`, numbered as in step 7, and add the Proposed
+task from step 5.
 Commit all of it as `task <id>: parked`. The task's branch stays. Go to step 2.
 
 ## 9. End
