@@ -3,10 +3,10 @@
   "title": "Café slice A: make the part 2 runner and data file robust before the real run",
   "item": "Fix the minor problems the task 049 reviews found in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/: the fake has only 3 hold ids and 3 confirmation ids, so a 4th hold or booking in a whole conversation raises IndexError and stops all later part 2 runs; a run that raises after API calls loses its usage from money spent; the line 3 label test accepts any non-empty ref, while several 'from the spec' entries cite no C- or R- id; data.json names tests/test_harness.py instead of tests/test_part1.py; transcripts show the confirmation id of an unanswered booking call",
   "motivation": "Reviews tasks/reviews/049-1.md and 049-2.md. The first two can waste the paid part 2 run or misreport its cost; the others weaken line 3 of task 049 or could mislead the transcript labelling.",
-  "status": "Proposed",
+  "status": "Dropped",
   "added": "2026-11-17",
-  "finished": "",
-  "notes": "Best done before part 2 of task 049 is run. Builds on branch task/049.",
+  "finished": "2026-11-17",
+  "notes": "Best done before part 2 of task 049 is run. Builds on branch task/049. Dropped 2026-11-17 on the owner's instruction: folded into the retry of task 049, because the code it fixes exists only on the unmerged branch task/049.",
   "depends_on": [
     {
       "id": 49,
