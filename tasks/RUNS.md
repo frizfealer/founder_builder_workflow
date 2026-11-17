@@ -1,5 +1,21 @@
 # Manager runs
 
+## Run 2026-11-17 18:32
+
+Stopped because: no task to take.
+
+### Done
+- task 049: BDD slice A: three café scenarios, with a real-agent measurement; merge 93682a8; tokens 757645 (main session: not recorded). No agent ran this run; the count is the task's earlier runs.
+
+### Decided for you
+- task 049: merged a fresh branch `task/049-3` (the working branch plus `task/049-2`'s cafe folder, no task files) over merging `task/049-2`, whose stale copy of `tasks/049.json` failed the protected-path check on `notes`; the code is identical to `task/049-2`.
+- task 049: took review 049-3 (PASS on `task/049-2`'s final head) as the reviewer verdict and reran its 10 commands on `task/049-3`, all exit 0, over a fresh reviewer on an unchanged diff; would change if you want a new review whenever a branch is recut.
+- task 049: counted your `you` verification as done from the task's notes (lines 4 and 5 hold, you said merge), over parking again because `verified_by` includes `you`; would change if you want such tasks parked until a separate field is set.
+
+### Needs you
+- branch task/049 (not deleted): the branch 'task/049' is not fully merged. Its work was carried over into `task/049-2`, so it is superseded.
+- branch task/049-2 (not deleted): the branch 'task/049-2' is not fully merged. Its cafe folder is merged byte for byte through `task/049-3`; only its stale task file differs.
+
 ## Run 2026-11-17 %H:%M
 
 Stopped because: no task to take.
