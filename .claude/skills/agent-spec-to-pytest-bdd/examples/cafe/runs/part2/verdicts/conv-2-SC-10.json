@@ -1,0 +1,95 @@
+{
+ "run_id": "conv-2-SC-10",
+ "scenario": "SC-10",
+ "agent": "probe",
+ "prompt": "plain",
+ "moment": "start",
+ "status": "pass",
+ "failed_step": null,
+ "rules": {
+  "R-07": {
+   "verdict": "holds",
+   "reason": "the hold was released and nothing booked"
+  },
+  "R-09": {
+   "verdict": "holds",
+   "reason": "every message matched what the booking calls answered"
+  }
+ },
+ "titles": {
+  "R-07": "Withdrawing releases the hold",
+  "R-09": "The visitor is told what happened"
+ },
+ "llm_calls": 6,
+ "usage": [
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2470,
+   "output_tokens": 123,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2621,
+   "output_tokens": 90,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2734,
+   "output_tokens": 52,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2802,
+   "output_tokens": 37,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "judge",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 183,
+   "output_tokens": 3,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "judge",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 130,
+   "output_tokens": 3,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  }
+ ],
+ "over": true,
+ "played": 4,
+ "lines": 4,
+ "stopped": "conversation over",
+ "played_out": true,
+ "judge": [
+  {
+   "message": "I've got a table held for you. Here are the details:\n\n- Café: Sunrise Café\n- Date: 2026-11-21\n- Time: 19:00\n- Party size: 8\n- Name: Dana Lee\n\nWould you like me to book it? Please reply yes to confirm.",
+   "question": "says_booked",
+   "answer": false,
+   "source": "llm",
+   "reply": "No"
+  },
+  {
+   "message": "I've released the hold on the table, and nothing was booked. If you want a table another time, tell me and I'll look.",
+   "question": "says_booked",
+   "answer": false,
+   "source": "llm",
+   "reply": "No"
+  }
+ ]
+}

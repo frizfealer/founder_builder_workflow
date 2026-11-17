@@ -1,0 +1,93 @@
+{
+ "run_id": "run-09",
+ "scenario": "SC-10 Visitor withdraws after the proposal",
+ "mode": "one action from a tested moment",
+ "moment": "M7",
+ "situation": "the release call answered released",
+ "rules_to_label": {
+  "R-07": "## R-07 Withdrawing releases the hold\n\nWhen the visitor withdraws before the booking, the agent releases its hold and books nothing.",
+  "R-09": "## R-09 The visitor is told what happened\n\nThe agent says the table is booked only when the booking call answered \"booked\". When it cannot tell, it says so."
+ },
+ "world": [
+  "The table is free",
+  "visitor asks for a table for 8 or fewer",
+  "hold call answers held",
+  "visitor withdraws",
+  "release call answers released"
+ ],
+ "after_the_run": "The agent took one action from the tested moment; after it the conversation is over (the World has no visitor line next).",
+ "events": [
+  {
+   "kind": "visitor",
+   "text": "Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee.",
+   "means": "request",
+   "under_test": false
+  },
+  {
+   "kind": "call",
+   "tool": "hold_table",
+   "args": {
+    "date": "2026-11-21",
+    "time": "19:00",
+    "party_size": 8,
+    "name": "Dana Lee"
+   },
+   "under_test": false
+  },
+  {
+   "kind": "result",
+   "tool": "hold_table",
+   "answer": "held",
+   "payload": {
+    "answer": "held",
+    "hold_id": "H-1001"
+   },
+   "is_error": false,
+   "under_test": false
+  },
+  {
+   "kind": "message",
+   "text": "I'm holding a table for you at Sunrise Café on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee. Shall I book it?",
+   "under_test": false
+  },
+  {
+   "kind": "visitor",
+   "text": "Actually, I've changed my mind. Please don't book it.",
+   "means": "withdraw",
+   "under_test": false
+  },
+  {
+   "kind": "call",
+   "tool": "release_hold",
+   "args": {
+    "hold_id": "H-1001"
+   },
+   "under_test": false
+  },
+  {
+   "kind": "result",
+   "tool": "release_hold",
+   "answer": "released",
+   "payload": {
+    "answer": "released"
+   },
+   "is_error": false,
+   "under_test": false
+  },
+  {
+   "kind": "message",
+   "text": "I've released the hold, so nothing is booked. If you'd like a table another time, just tell me.",
+   "under_test": true
+  }
+ ],
+ "readable": [
+  "   VISITOR: Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee.",
+  "   AGENT CALLS hold_table {\"date\": \"2026-11-21\", \"time\": \"19:00\", \"party_size\": 8, \"name\": \"Dana Lee\"}",
+  "   BOOKING SYSTEM ANSWERS {\"answer\": \"held\", \"hold_id\": \"H-1001\"}",
+  "   AGENT TO VISITOR: I'm holding a table for you at Sunrise Café on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee. Shall I book it?",
+  "   VISITOR: Actually, I've changed my mind. Please don't book it.",
+  "   AGENT CALLS release_hold {\"hold_id\": \"H-1001\"}",
+  "   BOOKING SYSTEM ANSWERS {\"answer\": \"released\"}",
+  ">> AGENT TO VISITOR: I've released the hold, so nothing is booked. If you'd like a table another time, just tell me."
+ ]
+}

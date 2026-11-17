@@ -1,0 +1,50 @@
+{
+ "run_id": "run-12",
+ "scenario": "SC-12",
+ "agent": "probe",
+ "prompt": "retry",
+ "moment": "M5",
+ "status": "fail",
+ "failed_step": {
+  "step": "Then rule R-11 holds: No second booking call after no answer",
+  "error": "AssertionError: R-11 breaks: event 7: second booking call after one got no answer\nassert 'breaks' != 'breaks'"
+ },
+ "rules": {
+  "R-11": {
+   "verdict": "breaks",
+   "reason": "event 7: second booking call after one got no answer"
+  },
+  "R-09": {
+   "verdict": "undecided",
+   "reason": "the booking call got no answer and the run stopped before the agent told the visitor"
+  }
+ },
+ "titles": {
+  "R-11": "No second booking call after no answer",
+  "R-09": "The visitor is told what happened"
+ },
+ "llm_calls": 1,
+ "usage": [
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2868,
+   "output_tokens": 150,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  }
+ ],
+ "over": false,
+ "played": 4,
+ "lines": 4,
+ "stopped": "after one action",
+ "played_out": true,
+ "judge": [
+  {
+   "message": "I'm holding a table for you at Sunrise Café on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee. Shall I book it?",
+   "question": "says_booked",
+   "answer": false,
+   "source": "data file"
+  }
+ ]
+}

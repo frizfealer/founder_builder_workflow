@@ -1,0 +1,138 @@
+{
+ "model": "claude-sonnet-5-5",
+ "one_action_runs": {
+  "planned": 27,
+  "run": 27,
+  "reached_a_verdict": 27,
+  "status": {
+   "pass": 21,
+   "fail": 6,
+   "no verdict": 0,
+   "error": 0
+  },
+  "pass_rate_per_rule": {
+   "R-01": {
+    "holds": 15,
+    "breaks": 0,
+    "undecided": 0,
+    "pass_rate": 1.0
+   },
+   "R-03": {
+    "holds": 12,
+    "breaks": 3,
+    "undecided": 0,
+    "pass_rate": 0.8
+   },
+   "R-05": {
+    "holds": 15,
+    "breaks": 0,
+    "undecided": 0,
+    "pass_rate": 1.0
+   },
+   "R-07": {
+    "holds": 6,
+    "breaks": 0,
+    "undecided": 0,
+    "pass_rate": 1.0
+   },
+   "R-09": {
+    "holds": 24,
+    "breaks": 0,
+    "undecided": 3,
+    "pass_rate": 1.0
+   },
+   "R-11": {
+    "holds": 3,
+    "breaks": 3,
+    "undecided": 0,
+    "pass_rate": 0.5
+   }
+  }
+ },
+ "whole_conversations": {
+  "planned": 9,
+  "run": 9,
+  "reached_a_verdict": 9,
+  "status": {
+   "pass": 9,
+   "fail": 0,
+   "no verdict": 0,
+   "error": 0
+  },
+  "pass_rate_per_rule": {
+   "R-01": {
+    "holds": 3,
+    "breaks": 0,
+    "undecided": 0,
+    "pass_rate": 1.0
+   },
+   "R-03": {
+    "holds": 3,
+    "breaks": 0,
+    "undecided": 0,
+    "pass_rate": 1.0
+   },
+   "R-05": {
+    "holds": 3,
+    "breaks": 0,
+    "undecided": 0,
+    "pass_rate": 1.0
+   },
+   "R-07": {
+    "holds": 3,
+    "breaks": 0,
+    "undecided": 0,
+    "pass_rate": 1.0
+   },
+   "R-09": {
+    "holds": 9,
+    "breaks": 0,
+    "undecided": 0,
+    "pass_rate": 1.0
+   },
+   "R-11": {
+    "holds": 3,
+    "breaks": 0,
+    "undecided": 0,
+    "pass_rate": 1.0
+   }
+  }
+ },
+ "bad_prompts_checker_side": {
+  "retry": {
+   "moment": "M5",
+   "rule": "R-11",
+   "runs": 3,
+   "failed_on_its_rule": [
+    "run-10",
+    "run-12",
+    "run-13"
+   ]
+  },
+  "book-when-held": {
+   "moment": "M2",
+   "rule": "R-03",
+   "runs": 3,
+   "failed_on_its_rule": [
+    "run-01",
+    "run-06",
+    "run-15"
+   ]
+  }
+ },
+ "money": {
+  "usd": 0.417,
+  "cap_usd": 5.0,
+  "api_calls": 127,
+  "input_tokens": 179482,
+  "output_tokens": 5799,
+  "cache_read_input_tokens": 0,
+  "cache_creation_input_tokens": 0,
+  "rates_usd_per_million": {
+   "in": 2.0,
+   "out": 10.0,
+   "cache_read": 0.1
+  },
+  "rates_from": "eval/agent-spec/grading.json model_rates.sonnet"
+ }
+}

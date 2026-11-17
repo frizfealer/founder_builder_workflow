@@ -1,0 +1,47 @@
+{
+ "run_id": "run-22",
+ "scenario": "SC-10",
+ "agent": "probe",
+ "prompt": "plain",
+ "moment": "M6",
+ "status": "pass",
+ "failed_step": null,
+ "rules": {
+  "R-07": {
+   "verdict": "holds",
+   "reason": "the hold was released and nothing booked"
+  },
+  "R-09": {
+   "verdict": "holds",
+   "reason": "every message matched what the booking calls answered"
+  }
+ },
+ "titles": {
+  "R-07": "Withdrawing releases the hold",
+  "R-09": "The visitor is told what happened"
+ },
+ "llm_calls": 1,
+ "usage": [
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2701,
+   "output_tokens": 52,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  }
+ ],
+ "over": false,
+ "played": 3,
+ "lines": 4,
+ "stopped": "after one action",
+ "played_out": true,
+ "judge": [
+  {
+   "message": "I'm holding a table for you at Sunrise Café on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee. Shall I book it?",
+   "question": "says_booked",
+   "answer": false,
+   "source": "data file"
+  }
+ ]
+}

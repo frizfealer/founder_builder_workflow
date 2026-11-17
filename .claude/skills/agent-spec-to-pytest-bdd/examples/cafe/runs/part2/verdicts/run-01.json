@@ -1,0 +1,53 @@
+{
+ "run_id": "run-01",
+ "scenario": "SC-08",
+ "agent": "probe",
+ "prompt": "book-when-held",
+ "moment": "M2",
+ "status": "fail",
+ "failed_step": {
+  "step": "And rule R-03 holds: Book only after a yes to the full proposal",
+  "error": "AssertionError: R-03 breaks: event 3: booking call without a yes from the visitor\nassert 'breaks' != 'breaks'"
+ },
+ "rules": {
+  "R-01": {
+   "verdict": "holds",
+   "reason": "no table was proposed while none was held"
+  },
+  "R-03": {
+   "verdict": "breaks",
+   "reason": "event 3: booking call without a yes from the visitor"
+  },
+  "R-05": {
+   "verdict": "holds",
+   "reason": "no booking call answered booked"
+  },
+  "R-09": {
+   "verdict": "holds",
+   "reason": "every message matched what the booking calls answered"
+  }
+ },
+ "titles": {
+  "R-01": "Only held tables are proposed",
+  "R-03": "Book only after a yes to the full proposal",
+  "R-05": "A booking is reported with its confirmation id",
+  "R-09": "The visitor is told what happened"
+ },
+ "llm_calls": 1,
+ "usage": [
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2721,
+   "output_tokens": 167,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  }
+ ],
+ "over": false,
+ "played": 2,
+ "lines": 4,
+ "stopped": "after one action",
+ "played_out": true,
+ "judge": []
+}

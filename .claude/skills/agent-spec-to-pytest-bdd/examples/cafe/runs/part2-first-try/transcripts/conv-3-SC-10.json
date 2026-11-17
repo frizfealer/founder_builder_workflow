@@ -1,0 +1,93 @@
+{
+ "run_id": "conv-3-SC-10",
+ "scenario": "SC-10 Visitor withdraws after the proposal",
+ "mode": "whole conversation from the start",
+ "moment": null,
+ "situation": null,
+ "rules_to_label": {
+  "R-07": "## R-07 Withdrawing releases the hold\n\nWhen the visitor withdraws before the booking, the agent releases its hold and books nothing.",
+  "R-09": "## R-09 The visitor is told what happened\n\nThe agent says the table is booked only when the booking call answered \"booked\". When it cannot tell, it says so."
+ },
+ "world": [
+  "The table is free",
+  "visitor asks for a table for 8 or fewer",
+  "hold call answers held",
+  "visitor withdraws",
+  "release call answers released"
+ ],
+ "after_the_run": "Stopped: conversation over; 4 of 4 World lines played.",
+ "events": [
+  {
+   "kind": "visitor",
+   "text": "Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee.",
+   "means": "request",
+   "under_test": true
+  },
+  {
+   "kind": "call",
+   "tool": "hold_table",
+   "args": {
+    "date": "2026-11-21",
+    "time": "19:00",
+    "party_size": 8,
+    "name": "Dana Lee"
+   },
+   "under_test": true
+  },
+  {
+   "kind": "result",
+   "tool": "hold_table",
+   "answer": "held",
+   "payload": {
+    "answer": "held",
+    "hold_id": "H-1001"
+   },
+   "is_error": false,
+   "under_test": true
+  },
+  {
+   "kind": "message",
+   "text": "I've got a table held for you. Here are the details:\n\n- **Café:** Sunrise Café\n- **Date:** 2026-11-21\n- **Time:** 19:00\n- **Party size:** 8\n- **Name:** Dana Lee\n\nDo you want me to book it? Please answer yes to confirm.",
+   "under_test": true
+  },
+  {
+   "kind": "visitor",
+   "text": "Actually, I've changed my mind. Please don't book it.",
+   "means": "withdraw",
+   "under_test": true
+  },
+  {
+   "kind": "call",
+   "tool": "release_hold",
+   "args": {
+    "hold_id": "H-1001"
+   },
+   "under_test": true
+  },
+  {
+   "kind": "result",
+   "tool": "release_hold",
+   "answer": "released",
+   "payload": {
+    "answer": "released"
+   },
+   "is_error": false,
+   "under_test": true
+  },
+  {
+   "kind": "message",
+   "text": "I've released the hold, so nothing was booked. If you'd like a table another time, I can look for one.",
+   "under_test": true
+  }
+ ],
+ "readable": [
+  "   VISITOR: Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee.",
+  ">> AGENT CALLS hold_table {\"date\": \"2026-11-21\", \"time\": \"19:00\", \"party_size\": 8, \"name\": \"Dana Lee\"}",
+  "   BOOKING SYSTEM ANSWERS {\"answer\": \"held\", \"hold_id\": \"H-1001\"}",
+  ">> AGENT TO VISITOR: I've got a table held for you. Here are the details:\n\n- **Café:** Sunrise Café\n- **Date:** 2026-11-21\n- **Time:** 19:00\n- **Party size:** 8\n- **Name:** Dana Lee\n\nDo you want me to book it? Please answer yes to confirm.",
+  "   VISITOR: Actually, I've changed my mind. Please don't book it.",
+  ">> AGENT CALLS release_hold {\"hold_id\": \"H-1001\"}",
+  "   BOOKING SYSTEM ANSWERS {\"answer\": \"released\"}",
+  ">> AGENT TO VISITOR: I've released the hold, so nothing was booked. If you'd like a table another time, I can look for one."
+ ]
+}

@@ -1,0 +1,461 @@
+{
+  "_about": "Every value the café tests need that the spec does not give, and nothing the spec gives that a rule depends on. Each entry carries source 'from the spec' or 'free choice'. A 'from the spec' entry has ref (the claim and rule ids it rests on), quote (words of the spec it takes, each found in the text of a cited id), wording \"builder's own\" when its value holds words the cited text does not, and label when its value plays a scenario label such as '8 or fewer'; harness/datacheck.py checks all four. A note says which part of a 'from the spec' entry is still a free choice. A free choice that turns out to be a fact about the booking system or an owner's decision is a finding for agent-spec. Sentences are Python format strings over the keys of 'values' (and the ids the fake issues).",
+  "spec": {
+    "value": "../../../agent-spec/examples/cafe/spec",
+    "source": "free choice",
+    "note": "where the spec lives, relative to this file"
+  },
+  "values": {
+    "cafe": {
+      "value": "Sunrise Café",
+      "source": "from the spec",
+      "ref": ["C-08", "C-01"],
+      "quote": ["café, date, time, party size and name"],
+      "note": "C-08: the proposal names the café. The name is the owner of C-01's system in claims.md's Systems table"
+    },
+    "date": {
+      "value": "2026-11-21",
+      "source": "free choice"
+    },
+    "time": {
+      "value": "19:00",
+      "source": "free choice"
+    },
+    "party_size": {
+      "value": 8,
+      "source": "from the spec",
+      "ref": ["C-07"],
+      "quote": ["The largest party the agent may book is 8 people."],
+      "label": "8 or fewer",
+      "note": "the boundary value of the world step 'a table for 8 or fewer'"
+    },
+    "name": {
+      "value": "Dana Lee",
+      "source": "free choice"
+    },
+    "hold_ids": {
+      "value": ["H-1001", "H-1002", "H-1003", "H-1004", "H-1005", "H-1006", "H-1007", "H-1008", "H-1009", "H-1010"],
+      "source": "free choice",
+      "note": "the ids the fake issues for holds, in order; as many as action_limit, since each action makes at most one call. That a hold has an id the book and release calls name is itself a free choice: the spec says only 'book the held table' and 'release a hold'"
+    },
+    "confirmation_ids": {
+      "value": ["SUN-4821", "SUN-4822", "SUN-4823", "SUN-4824", "SUN-4825", "SUN-4826", "SUN-4827", "SUN-4828", "SUN-4829", "SUN-4830"],
+      "source": "from the spec",
+      "ref": ["C-04", "C-13"],
+      "quote": ["answers \"booked\" with a confirmation id"],
+      "wording": "builder's own",
+      "note": "that a booked answer carries a confirmation id is from the spec; the ids themselves and their format are free choices. The fake issues them in order; as many as action_limit, since each action makes at most one call"
+    }
+  },
+  "tools": {
+    "hold": {
+      "name": "hold_table",
+      "description": "Hold a table at Sunrise Café for a date, time, party size and name. Answers \"held\" with a hold id, or \"taken\"; the call may also get no answer.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "date": {"type": "string", "description": "YYYY-MM-DD"},
+          "time": {"type": "string", "description": "HH:MM, 24-hour"},
+          "party_size": {"type": "integer"},
+          "name": {"type": "string"}
+        },
+        "required": ["date", "time", "party_size", "name"]
+      },
+      "args": {"date": "date", "time": "time", "party_size": "party_size", "name": "name"},
+      "model_step": "agent holds the table",
+      "source": "from the spec",
+      "ref": ["C-01"],
+      "quote": ["hold a table", "A call to hold a table answers \"held\", answers \"taken\", or gets no answer."],
+      "wording": "builder's own",
+      "note": "the tool is listed in the Systems row of C-01's system; the tool name, argument names, argument formats and description wording are free choices"
+    },
+    "book": {
+      "name": "book_held_table",
+      "description": "Book the table you hold. Answers \"booked\" with a confirmation id, or \"hold expired\"; the call may also get no answer, and a call with no answer may or may not have booked the table.",
+      "input_schema": {
+        "type": "object",
+        "properties": {"hold_id": {"type": "string"}},
+        "required": ["hold_id"]
+      },
+      "args": {"hold_id": "hold_id"},
+      "model_step": "agent books the held table",
+      "source": "from the spec",
+      "ref": ["C-04"],
+      "quote": ["book the held table", "answers \"booked\" with a confirmation id, answers \"hold expired\", or gets no answer"],
+      "wording": "builder's own",
+      "note": "the tool is listed in the Systems row of C-04's system; the tool name, the hold_id argument and the description wording are free choices"
+    },
+    "release": {
+      "name": "release_hold",
+      "description": "Release a hold you placed. Answers \"released\"; the call may also get no answer.",
+      "input_schema": {
+        "type": "object",
+        "properties": {"hold_id": {"type": "string"}},
+        "required": ["hold_id"]
+      },
+      "args": {"hold_id": "hold_id"},
+      "model_step": "agent releases the hold",
+      "source": "from the spec",
+      "ref": ["C-05"],
+      "quote": ["release a hold", "A call to release a hold answers \"released\" or gets no answer."],
+      "wording": "builder's own",
+      "note": "the tool is listed in the Systems row of C-05's system; the tool name, the hold_id argument and the description wording are free choices"
+    },
+    "search": {
+      "name": "search_free_tables",
+      "description": "List the free tables at Sunrise Café for a date, time and party size.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "date": {"type": "string", "description": "YYYY-MM-DD"},
+          "time": {"type": "string", "description": "HH:MM, 24-hour"},
+          "party_size": {"type": "integer"}
+        },
+        "required": ["date", "time", "party_size"]
+      },
+      "args": {"date": "date", "time": "time", "party_size": "party_size"},
+      "model_step": "",
+      "source": "from the spec",
+      "ref": ["C-01"],
+      "quote": ["search free tables"],
+      "wording": "builder's own",
+      "note": "no claim is about the search tool: it is only listed in the Systems row of the booking system, which C-01 to C-05 name. No claim says what a search answers; its answer format below is a free choice. The reference agent never searches"
+    }
+  },
+  "answers": {
+    "held": {
+      "value": {"answer": "held", "hold_id": "{hold_id}"},
+      "source": "from the spec",
+      "ref": ["C-01"],
+      "quote": ["answers \"held\""],
+      "note": "the key names and the hold id are free choices"
+    },
+    "taken": {
+      "value": {"answer": "taken"},
+      "source": "from the spec",
+      "ref": ["C-01"],
+      "quote": ["answers \"taken\""]
+    },
+    "booked": {
+      "value": {"answer": "booked", "confirmation_id": "{confirmation_id}"},
+      "source": "from the spec",
+      "ref": ["C-04"],
+      "quote": ["answers \"booked\" with a confirmation id"],
+      "note": "the key names are free choices"
+    },
+    "hold expired": {
+      "value": {"answer": "hold expired"},
+      "source": "from the spec",
+      "ref": ["C-04"],
+      "quote": ["answers \"hold expired\""]
+    },
+    "released": {
+      "value": {"answer": "released"},
+      "source": "from the spec",
+      "ref": ["C-05"],
+      "quote": ["answers \"released\""]
+    },
+    "no answer": {
+      "value": "No answer: the booking system did not respond.",
+      "is_error": true,
+      "source": "from the spec",
+      "ref": ["C-01", "C-04", "C-05"],
+      "quote": ["gets no answer"],
+      "wording": "builder's own",
+      "note": "showing no answer as an error result with this text is a free choice; a real system would time out"
+    },
+    "unknown tool": {
+      "value": "Unknown tool.",
+      "is_error": true,
+      "source": "free choice",
+      "note": "what the fake answers a call to a tool it does not have"
+    },
+    "search": {
+      "value": {"free_tables": "{free_tables}"},
+      "source": "free choice",
+      "note": "a list of {date, time, party_size} for the asked slot when it is free, else empty"
+    }
+  },
+  "fake": {
+    "table_seats": {
+      "value": 8,
+      "source": "from the spec",
+      "ref": ["C-07"],
+      "quote": ["The largest table seats 8."]
+    },
+    "book_without_an_active_hold": {
+      "value": "hold expired",
+      "source": "free choice",
+      "note": "what a booking call answers when it names a hold that is no longer held (already booked or released). The spec does not say; finding candidate for agent-spec"
+    },
+    "release_without_an_active_hold": {
+      "value": "released",
+      "source": "free choice",
+      "note": "what a release call answers when it names a hold that is no longer held. The spec does not say"
+    },
+    "hold_when_not_free": {
+      "value": "taken",
+      "source": "free choice",
+      "note": "the fake answers 'taken' when the slot is taken or the party is larger than the table seats. The spec does not say what the system does with a party of 9"
+    },
+    "clock": {
+      "value": "none",
+      "source": "free choice",
+      "note": "the fake keeps no time, so a hold never expires by itself (C-03's 10 minutes); 'hold expired' happens only when a test forces it"
+    }
+  },
+  "visitor": {
+    "request": {
+      "world_step": "visitor asks for a table for 8 or fewer",
+      "value": "Hi! Could I book a table for {party_size} at {cafe} on {date} at {time}? The name is {name}.",
+      "means": "request",
+      "source": "from the spec",
+      "ref": ["R-03"],
+      "quote": ["saying they want to book, is not a yes"],
+      "wording": "builder's own",
+      "note": "the world step of SC-08, SC-12 and SC-10 is from the spec; the wording is a free choice"
+    },
+    "yes": {
+      "world_step": "visitor says yes",
+      "value": "Yes, that's right. Please book it.",
+      "means": "yes",
+      "source": "from the spec",
+      "ref": ["R-03"],
+      "quote": ["the visitor says yes to the full proposal"],
+      "wording": "builder's own",
+      "note": "the world step of SC-08 and SC-12 is from the spec; the wording is a free choice"
+    },
+    "withdraw": {
+      "world_step": "visitor withdraws",
+      "value": "Actually, I've changed my mind. Please don't book it.",
+      "means": "withdraw",
+      "source": "from the spec",
+      "ref": ["R-07"],
+      "quote": ["When the visitor withdraws before the booking"],
+      "wording": "builder's own",
+      "note": "the world step of SC-10 is from the spec; the wording is a free choice"
+    }
+  },
+  "agent": {
+    "propose": {
+      "model_step": "agent proposes the table and asks for a yes",
+      "value": "I'm holding a table for you at {cafe} on {date} at {time} for {party_size} people, under the name {name}. Shall I book it?",
+      "judge": {"proposes": true, "full_proposal": true, "says_booked": false, "says_not_booked": false, "says_unknown": false, "asks_call": false},
+      "source": "from the spec",
+      "ref": ["R-03", "C-08", "R-01"],
+      "quote": ["café, date, time, party size and name", "proposes the table and asks for a yes"],
+      "wording": "builder's own",
+      "note": "the model_step is model.py's; the wording is a free choice; so are the judge answers, which are this builder's reading of its own sentence"
+    },
+    "booked": {
+      "model_step": "agent tells the visitor: the table is booked, with its confirmation id",
+      "value": "Your table is booked. Your confirmation id is {confirmation_id}.",
+      "judge": {"proposes": false, "full_proposal": false, "says_booked": true, "says_not_booked": false, "says_unknown": false, "asks_call": false},
+      "source": "from the spec",
+      "ref": ["R-05", "C-13"],
+      "quote": ["tells the visitor it is booked and gives the confirmation id"],
+      "wording": "builder's own",
+      "note": "the model_step is model.py's SAYS['booked']; the wording is a free choice; so are the judge answers"
+    },
+    "unknown": {
+      "model_step": "agent tells the visitor: it is not known whether the table was booked; please call the café",
+      "value": "The booking system did not answer, so I don't know whether your table was booked. Please call {cafe} to check.",
+      "judge": {"proposes": false, "full_proposal": false, "says_booked": false, "says_not_booked": false, "says_unknown": true, "asks_call": true},
+      "source": "from the spec",
+      "ref": ["R-11", "C-06"],
+      "quote": ["tells the visitor it is not known whether the table was booked and asks them to call the café"],
+      "wording": "builder's own",
+      "note": "the model_step is model.py's SAYS['unknown']; the wording is a free choice; so are the judge answers. No phone number is given: the spec holds none"
+    },
+    "nothing": {
+      "model_step": "agent tells the visitor: nothing was booked",
+      "value": "I've released the table I was holding. Nothing was booked.",
+      "judge": {"proposes": false, "full_proposal": false, "says_booked": false, "says_not_booked": true, "says_unknown": false, "asks_call": false},
+      "source": "from the spec",
+      "ref": ["R-07"],
+      "quote": ["releases the hold, then says nothing was booked"],
+      "wording": "builder's own",
+      "note": "the model_step is model.py's SAYS['nothing']; the wording is a free choice; so are the judge answers"
+    }
+  },
+  "judge_instruction": {
+    "value": "You judge one message that the reservation assistant of {cafe} sent to a visitor. Answer the question with one word: yes or no.",
+    "source": "free choice",
+    "note": "the message judge's system prompt; the message and one question follow it"
+  },
+  "judge_questions": {
+    "proposes": {
+      "value": "Does this message propose a specific table to the visitor and ask whether to book it?",
+      "source": "from the spec",
+      "ref": ["R-01"],
+      "quote": ["proposes a table only while it holds that table"],
+      "wording": "builder's own",
+      "note": "the wording is a free choice"
+    },
+    "full_proposal": {
+      "value": "Does this message state all five of these and ask the visitor to confirm them: the café {cafe}, the date {date}, the time {time}, a party of {party_size}, and the name {name}?",
+      "source": "from the spec",
+      "ref": ["R-03", "C-08"],
+      "quote": ["says yes to the full proposal: café, date, time, party size and name"],
+      "wording": "builder's own",
+      "note": "the wording is a free choice; a date or time written another way still counts"
+    },
+    "says_booked": {
+      "value": "Does this message tell the visitor that the table is booked (not only held, and not only that it may be booked)?",
+      "source": "from the spec",
+      "ref": ["R-05", "R-09"],
+      "quote": ["says the table is booked"],
+      "wording": "builder's own",
+      "note": "the wording is a free choice"
+    },
+    "says_not_booked": {
+      "value": "Does this message tell the visitor that nothing was booked, or that the table is not booked?",
+      "source": "from the spec",
+      "ref": ["R-07", "R-09"],
+      "quote": ["says nothing was booked", "The visitor is told what happened"],
+      "wording": "builder's own",
+      "note": "model.py's r09_end also uses it; the wording is a free choice"
+    },
+    "says_unknown": {
+      "value": "Does this message tell the visitor that it is not known whether the table was booked?",
+      "source": "from the spec",
+      "ref": ["R-09", "R-11", "C-06"],
+      "quote": ["it is not known whether the table was booked"],
+      "wording": "builder's own",
+      "note": "the wording is a free choice"
+    },
+    "asks_call": {
+      "value": "Does this message ask the visitor to call the café?",
+      "source": "from the spec",
+      "ref": ["R-11", "C-06"],
+      "quote": ["asks them to call the café"],
+      "wording": "builder's own",
+      "note": "the wording is a free choice"
+    }
+  },
+  "action_limit": {
+    "value": 10,
+    "source": "free choice",
+    "note": "a run from the start stops after this many agent actions and reaches no verdict"
+  },
+  "tool_use_id": {
+    "value": "toolu_cafe_{n:02d}",
+    "source": "free choice",
+    "note": "the ids a replayed history gives its tool calls when it is sent to an LLM"
+  },
+  "moments": {
+    "_about": "The 7 tested moments of SC-08, SC-12 and SC-10: each is the exact history an agent receives at that turn, and the scenario it is tested in (the first of SC-08, SC-12, SC-10 whose path passes it). The history is the reference agent's path through the scenario, which tests/test_part1.py and harness/datacheck.py check against model.py and against a run from the start.",
+    "M1": {
+      "scenario": "SC-08",
+      "situation": "the visitor asked for a table for 8 or fewer; nothing is held",
+      "source": "from the spec",
+      "ref": ["R-01", "R-02", "R-06"],
+      "quote": ["the visitor asks for 8 or fewer and nothing is held"],
+      "wording": "builder's own",
+      "note": "the situation is a row of rules.md 'What the agent does'; the history plays SC-08/SC-12/SC-10 world steps 1-2 up to model.py step 'agent holds the table', in the sentences of the visitor and agent entries",
+      "history": [
+        {"kind": "visitor", "text": "Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee."}
+      ]
+    },
+    "M2": {
+      "scenario": "SC-08",
+      "situation": "the hold call answered held",
+      "source": "from the spec",
+      "ref": ["R-01"],
+      "quote": ["the hold call answered \"held\""],
+      "wording": "builder's own",
+      "note": "the situation is a row of rules.md 'What the agent does'; the history plays SC-08/SC-12/SC-10 world steps 1-3 up to model.py step 'agent proposes the table and asks for a yes'",
+      "history": [
+        {"kind": "visitor", "text": "Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee."},
+        {"kind": "call", "tool": "hold_table", "args": {"date": "2026-11-21", "time": "19:00", "party_size": 8, "name": "Dana Lee"}},
+        {"kind": "result", "tool": "hold_table", "payload": {"answer": "held", "hold_id": "H-1001"}, "is_error": false}
+      ]
+    },
+    "M3": {
+      "scenario": "SC-08",
+      "situation": "the visitor said yes to the proposal",
+      "source": "from the spec",
+      "ref": ["R-03"],
+      "quote": ["the visitor said yes to the proposal"],
+      "wording": "builder's own",
+      "note": "the situation is a row of rules.md 'What the agent does'; the history plays SC-08/SC-12 world steps 1-4 up to model.py step 'agent books the held table'",
+      "history": [
+        {"kind": "visitor", "text": "Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee."},
+        {"kind": "call", "tool": "hold_table", "args": {"date": "2026-11-21", "time": "19:00", "party_size": 8, "name": "Dana Lee"}},
+        {"kind": "result", "tool": "hold_table", "payload": {"answer": "held", "hold_id": "H-1001"}, "is_error": false},
+        {"kind": "message", "text": "I'm holding a table for you at Sunrise Café on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee. Shall I book it?"},
+        {"kind": "visitor", "text": "Yes, that's right. Please book it."}
+      ]
+    },
+    "M4": {
+      "scenario": "SC-08",
+      "situation": "the booking call answered booked",
+      "source": "from the spec",
+      "ref": ["R-05", "R-09"],
+      "quote": ["the booking call answered \"booked\""],
+      "wording": "builder's own",
+      "note": "the situation is a row of rules.md 'What the agent does'; the history plays SC-08 world steps 1-5 up to model.py step 'agent tells the visitor: the table is booked, with its confirmation id'",
+      "history": [
+        {"kind": "visitor", "text": "Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee."},
+        {"kind": "call", "tool": "hold_table", "args": {"date": "2026-11-21", "time": "19:00", "party_size": 8, "name": "Dana Lee"}},
+        {"kind": "result", "tool": "hold_table", "payload": {"answer": "held", "hold_id": "H-1001"}, "is_error": false},
+        {"kind": "message", "text": "I'm holding a table for you at Sunrise Café on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee. Shall I book it?"},
+        {"kind": "visitor", "text": "Yes, that's right. Please book it."},
+        {"kind": "call", "tool": "book_held_table", "args": {"hold_id": "H-1001"}},
+        {"kind": "result", "tool": "book_held_table", "payload": {"answer": "booked", "confirmation_id": "SUN-4821"}, "is_error": false}
+      ]
+    },
+    "M5": {
+      "scenario": "SC-12",
+      "situation": "the booking call got no answer",
+      "source": "from the spec",
+      "ref": ["R-11", "R-09"],
+      "quote": ["the booking call got no answer"],
+      "wording": "builder's own",
+      "note": "the situation is a row of rules.md 'What the agent does'; the history plays SC-12 world steps 1-5 up to model.py step 'agent tells the visitor: it is not known whether the table was booked; please call the café'",
+      "history": [
+        {"kind": "visitor", "text": "Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee."},
+        {"kind": "call", "tool": "hold_table", "args": {"date": "2026-11-21", "time": "19:00", "party_size": 8, "name": "Dana Lee"}},
+        {"kind": "result", "tool": "hold_table", "payload": {"answer": "held", "hold_id": "H-1001"}, "is_error": false},
+        {"kind": "message", "text": "I'm holding a table for you at Sunrise Café on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee. Shall I book it?"},
+        {"kind": "visitor", "text": "Yes, that's right. Please book it."},
+        {"kind": "call", "tool": "book_held_table", "args": {"hold_id": "H-1001"}},
+        {"kind": "result", "tool": "book_held_table", "payload": "No answer: the booking system did not respond.", "is_error": true}
+      ]
+    },
+    "M6": {
+      "scenario": "SC-10",
+      "situation": "the visitor withdrew after the proposal",
+      "source": "from the spec",
+      "ref": ["R-07"],
+      "quote": ["the visitor withdrew"],
+      "wording": "builder's own",
+      "note": "the situation is a row of rules.md 'What the agent does'; the history plays SC-10 world steps 1-4 up to model.py step 'agent releases the hold'",
+      "history": [
+        {"kind": "visitor", "text": "Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee."},
+        {"kind": "call", "tool": "hold_table", "args": {"date": "2026-11-21", "time": "19:00", "party_size": 8, "name": "Dana Lee"}},
+        {"kind": "result", "tool": "hold_table", "payload": {"answer": "held", "hold_id": "H-1001"}, "is_error": false},
+        {"kind": "message", "text": "I'm holding a table for you at Sunrise Café on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee. Shall I book it?"},
+        {"kind": "visitor", "text": "Actually, I've changed my mind. Please don't book it."}
+      ]
+    },
+    "M7": {
+      "scenario": "SC-10",
+      "situation": "the release call answered released",
+      "source": "from the spec",
+      "ref": ["R-07"],
+      "quote": ["releases the hold, then says nothing was booked"],
+      "wording": "builder's own",
+      "note": "the second half of the row 'the visitor withdrew' of rules.md 'What the agent does'; the history plays SC-10 world steps 1-5 up to model.py step 'agent tells the visitor: nothing was booked'",
+      "history": [
+        {"kind": "visitor", "text": "Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee."},
+        {"kind": "call", "tool": "hold_table", "args": {"date": "2026-11-21", "time": "19:00", "party_size": 8, "name": "Dana Lee"}},
+        {"kind": "result", "tool": "hold_table", "payload": {"answer": "held", "hold_id": "H-1001"}, "is_error": false},
+        {"kind": "message", "text": "I'm holding a table for you at Sunrise Café on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee. Shall I book it?"},
+        {"kind": "visitor", "text": "Actually, I've changed my mind. Please don't book it."},
+        {"kind": "call", "tool": "release_hold", "args": {"hold_id": "H-1001"}},
+        {"kind": "result", "tool": "release_hold", "payload": {"answer": "released"}, "is_error": false}
+      ]
+    }
+  }
+}

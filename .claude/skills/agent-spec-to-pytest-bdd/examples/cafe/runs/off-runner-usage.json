@@ -1,0 +1,94 @@
+{
+ "_about": "API calls made outside probe/run_part2.py for task 49 part 2: the first check that the SDK reads the ant login, three judge calls that found and fixed the empty-answer bug, and 6 trial runs of the rewritten bad prompts. Counted in money spent.",
+ "calls": [
+  {
+   "purpose": "first SDK check",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 10,
+   "output_tokens": 1,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "judge",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 176,
+   "output_tokens": 5,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "judge",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 175,
+   "output_tokens": 5,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "judge",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 175,
+   "output_tokens": 5,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "judge",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 175,
+   "output_tokens": 5,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2868,
+   "output_tokens": 166,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2868,
+   "output_tokens": 163,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2868,
+   "output_tokens": 197,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2721,
+   "output_tokens": 177,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2721,
+   "output_tokens": 154,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2721,
+   "output_tokens": 185,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  }
+ ],
+ "usd": 0.0456
+}
