@@ -1,0 +1,125 @@
+{
+ "run_id": "conv-3-SC-12",
+ "scenario": "SC-12",
+ "agent": "probe",
+ "prompt": "plain",
+ "moment": "start",
+ "status": "pass",
+ "failed_step": null,
+ "rules": {
+  "R-11": {
+   "verdict": "holds",
+   "reason": "no second booking call; the visitor was told it is not known and asked to call the café"
+  },
+  "R-09": {
+   "verdict": "holds",
+   "reason": "after the unanswered booking call the visitor was told it is not known"
+  }
+ },
+ "titles": {
+  "R-11": "No second booking call after no answer",
+  "R-09": "The visitor is told what happened"
+ },
+ "llm_calls": 8,
+ "usage": [
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2470,
+   "output_tokens": 123,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2621,
+   "output_tokens": 91,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2729,
+   "output_tokens": 53,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "agent",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 2808,
+   "output_tokens": 113,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "judge",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 197,
+   "output_tokens": 5,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "judge",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 189,
+   "output_tokens": 5,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "judge",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 184,
+   "output_tokens": 3,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  },
+  {
+   "purpose": "judge",
+   "model": "claude-sonnet-5-5",
+   "input_tokens": 206,
+   "output_tokens": 3,
+   "cache_read_input_tokens": 0,
+   "cache_creation_input_tokens": 0
+  }
+ ],
+ "over": true,
+ "played": 4,
+ "lines": 4,
+ "stopped": "conversation over",
+ "played_out": true,
+ "judge": [
+  {
+   "message": "I can't tell whether your table was booked. The booking system didn't respond, and the request may or may not have gone through. I won't send the request again, because that could book the table twice.\n\nPlease call the café to check your reservation for 8 at Sunrise Café on 2026-11-21 at 19:00 under Dana Lee. I'm sorry for the trouble.",
+   "question": "says_unknown",
+   "answer": true,
+   "source": "llm",
+   "reply": "Yes"
+  },
+  {
+   "message": "I can't tell whether your table was booked. The booking system didn't respond, and the request may or may not have gone through. I won't send the request again, because that could book the table twice.\n\nPlease call the café to check your reservation for 8 at Sunrise Café on 2026-11-21 at 19:00 under Dana Lee. I'm sorry for the trouble.",
+   "question": "asks_call",
+   "answer": true,
+   "source": "llm",
+   "reply": "Yes"
+  },
+  {
+   "message": "I'm holding a table for you. Here are the details:\n\n- Café: Sunrise Café\n- Date: 2026-11-21\n- Time: 19:00\n- Party size: 8\n- Name: Dana Lee\n\nDo you want me to book it? Please answer yes to confirm.",
+   "question": "says_booked",
+   "answer": false,
+   "source": "llm",
+   "reply": "No"
+  },
+  {
+   "message": "I can't tell whether your table was booked. The booking system didn't respond, and the request may or may not have gone through. I won't send the request again, because that could book the table twice.\n\nPlease call the café to check your reservation for 8 at Sunrise Café on 2026-11-21 at 19:00 under Dana Lee. I'm sorry for the trouble.",
+   "question": "says_booked",
+   "answer": false,
+   "source": "llm",
+   "reply": "No"
+  }
+ ]
+}

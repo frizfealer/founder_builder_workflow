@@ -1,0 +1,20 @@
+[project]
+name = "cafe-bdd-example"
+version = "0"
+description = "BDD tests for the Sunrise Café spec, slice A (task 49)"
+requires-python = ">=3.11"
+dependencies = [
+    "pytest>=8",
+    "pytest-bdd>=9",
+    # part 2 only: the probe agent and the message judge. 2.9 reads the owner's `ant auth login`.
+    "anthropic>=2.9",
+    # the SDK's HTTP client calls brotli's decompressor with arguments older brotli releases lack
+    "brotli>=1.2",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

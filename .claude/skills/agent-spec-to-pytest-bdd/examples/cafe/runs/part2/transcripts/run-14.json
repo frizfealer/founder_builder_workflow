@@ -1,0 +1,44 @@
+{
+ "run_id": "run-14",
+ "scenario": "SC-08 Table held and booked",
+ "mode": "one action from a tested moment",
+ "moment": "M1",
+ "situation": "the visitor asked for a table for 8 or fewer; nothing is held",
+ "rules_to_label": {
+  "R-01": "## R-01 Only held tables are proposed\n\nThe agent proposes a table only while it holds that table for the visitor. When the table is taken, or the hold call gets no answer, it tells the visitor and proposes nothing for that table.",
+  "R-03": "## R-03 Book only after a yes to the full proposal\n\nThe agent books only after the visitor says yes to the full proposal: café, date, time, party size and name. A question about free tables, or saying they want to book, is not a yes.",
+  "R-05": "## R-05 A booking is reported with its confirmation id\n\nWhen the table is booked, the agent tells the visitor it is booked and gives the confirmation id.",
+  "R-09": "## R-09 The visitor is told what happened\n\nThe agent says the table is booked only when the booking call answered \"booked\". When it cannot tell, it says so."
+ },
+ "world": [
+  "The table is free",
+  "visitor asks for a table for 8 or fewer",
+  "hold call answers held",
+  "visitor says yes",
+  "booking call answers booked"
+ ],
+ "after_the_run": "The agent took one action from the tested moment; after it the conversation goes on (a tool call, or the visitor speaks next).",
+ "events": [
+  {
+   "kind": "visitor",
+   "text": "Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee.",
+   "means": "request",
+   "under_test": false
+  },
+  {
+   "kind": "call",
+   "tool": "hold_table",
+   "args": {
+    "date": "2026-11-21",
+    "time": "19:00",
+    "party_size": 8,
+    "name": "Dana Lee"
+   },
+   "under_test": true
+  }
+ ],
+ "readable": [
+  "   VISITOR: Hi! Could I book a table for 8 at Sunrise Café on 2026-11-21 at 19:00? The name is Dana Lee.",
+  ">> AGENT CALLS hold_table {\"date\": \"2026-11-21\", \"time\": \"19:00\", \"party_size\": 8, \"name\": \"Dana Lee\"}"
+ ]
+}
