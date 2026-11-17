@@ -1,0 +1,27 @@
+{
+  "id": 57,
+  "title": "Manager: decide mechanical stops by code (outside needs checked first; findings on unmerged work go to the retry)",
+  "item": "Write down the rule that a stop or choice which can be decided mechanically is decided by a script, and apply it to the two cases task 49 showed: a missing outside need found only after the build, and review findings about unmerged code turned into a new task",
+  "motivation": "Task 49 needed the owner three times on 2026-11-17 and only one of those needed him. Its first run spent 443,860 agent tokens before reporting that the Claude API had no credit, which one tiny call at the start would have shown. Its reviews' findings became task 054, which could not run because the code it fixed existed only on branch task/049; the owner and Claude folded it into the retry by hand. SKILL.md says a rule stays prose until it is broken once; both have now been broken once.",
+  "status": "Backlog",
+  "added": "2026-11-17",
+  "finished": "",
+  "notes": "Owner's rule, 2026-11-17: any mechanical check uses code. (a) Outside needs. A new optional task field, outside_needs, a list from a fixed set that starts with one value, claude-api. Before a builder is dispatched for a task, a script runs one check per need; for claude-api that is one minimal API call with the credentials a builder would use (the owner logs in with the ant CLI and sets no ANTHROPIC_API_KEY; see the notes of task 49). On failure the manager parks the task at once with the script's reason as the question and takes the next task. The check costs under 0.01 USD and never prints or stores a credential. (b) Findings on unmerged work. When a review or a builder reports faults in files that exist on the task's own branch and not on the working branch, they belong to that task's retry. A script decides it from the paths; the manager then records the findings in a new optional field of that task, for_retry (a list of strings, a manager field), creates no Proposed task for them, and the retry builder's brief quotes for_retry. Findings about files that are on the working branch still become at most one Proposed task per task run, as today. Keep both checks in scripts/checks.py with tests in temporary git repos, like the existing checks; document the two fields in references/task-fields.md.",
+  "depends_on": [],
+  "source_chat": "founder_and_builder project chat, 2026-11-17",
+  "done_means": "(1) SKILL.md states the rule 'a stop or choice that can be decided mechanically is decided by a script' and names these two cases. (2) tasks.py lint accepts outside_needs with values from the fixed set and rejects any other value. A checks.py command runs the check for each need of a task and exits 1 with a one-line reason when one fails; commands/manage.md runs it before dispatching a builder and parks on failure without building. Tests with a stand-in check command cover: no needs, a need that passes, a need that fails. (3) A checks.py command takes a branch and paths and says whether every path is absent from the working branch; commands/manage.md uses it so that such findings go into for_retry of the same task and no Proposed task is created for them, and the retry brief quotes for_retry. Tests cover both outcomes. (4) The manager tests pass, all of them.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "runs_as": "build",
+  "priority": "high",
+  "tags": [
+    "manager"
+  ],
+  "tokens": null,
+  "draft_note": "Drafted by Claude in chat on 2026-11-17 on the owner's go. It changes the manager's own rules; the owner approves the design by setting it to Ready and sees the result at his next review tag."
+}

@@ -1,25 +1,31 @@
 {
   "id": 37,
-  "title": "Advisor consulted before a task is parked",
-  "item": "Before the manager parks a task, it consults a read-only advisor agent on Fable at high effort, which may say the task can go on without the owner and how",
-  "motivation": "Some parks may be avoidable: the manager parks on a doubt another strong model could settle from the repo. The owner's review should hold only what truly needs him.",
-  "notes": "The advisor may not unpark: a fact only the owner knows, a failed protected-path check, a task verified by the owner (verified_by includes you, or runs_as is you), or anything on the never list. Those park whatever it says.",
-  "depends_on": [],
-  "done_means": "A manager-advisor agent exists with model Fable, effort high and read-only tools, linked in .claude/agents/ like the other two. commands/manage.md consults it before every park and parks anyway in the four cases above. SKILL.md says so. A test covers that the four cases always park.",
+  "title": "Advisor: a fourth verifier, for judgement that needs no fact only the owner has",
+  "item": "Add a read-only advisor agent on Fable at high effort. It verifies the pass lines assigned to it, is consulted before a park, checks a builder's decision that changes what a pass line proves, and drafts the next task of a chain as Proposed",
+  "motivation": "Of the three times task 49 needed the owner on 2026-11-17, one was judgement with no owner-only fact in it: label 27 transcripts blind, say how strong the result is, write the next tasks. The owner carried the transcripts to Claude in chat, the same model the advisor would be. An advisor inside the manager removes that trip. The owner's review should hold only what truly needs him: money and accounts, facts about his product, taste the first time a format appears, his own fields, DECISIONS.md, anything that cannot be undone.",
+  "notes": "Jobs. (a) Verify a pass line assigned to it, such as blind labelling: it gets a fresh context, read-only tools, and only the paths the line names (for labelling: the transcripts, never the verdicts). (b) Before any park: say whether the task can go on without the owner, and how. (c) When a builder logs a decision under decided_for_you that changes what a done_means line proves, say whether the line still proves what it was written to prove; if not, the task goes back to the builder once with that reply. (d) After a task merges: for a Proposed task that hard-depends on it and has an empty done_means, draft its fields from the results; it stays Proposed. Assigning lines. 'advisor' becomes a valid value of verified_by. A new optional field, verifier_of_line, maps the number of a done_means line, written '(n)' in the text, to one verifier; a line not in the map is verified by every verifier in verified_by, as today. What the advisor never does, decided by a script and not by the advisor: rule on a line whose verifier is you; unpark a task whose runs_as is you; override a failed protected-path check or a failed outside-need check (task 57); spend money or touch accounts; change an owner's field; set Ready; anything on the never list. A task with one line for the owner still parks for that line, after the advisor's lines are done, and its question names only the owner's lines. Record. Every advisor reply is saved verbatim in tasks/advice/<id>-<n>.md and its ruling is logged under decided_for_you with what would change it. Its agent definition sets model and effort explicitly, like every agent in this repo. First real use: task 56, line 3. Claude in chat labels the same transcripts separately, to compare.",
+  "depends_on": [
+    {
+      "id": 57,
+      "soft": false
+    }
+  ],
+  "done_means": "(1) An agent manager-advisor exists with model Fable, effort high and read-only tools, linked in .claude/agents/ like the other two. (2) tasks.py lint accepts 'advisor' in verified_by and the optional field verifier_of_line, and rejects a key that is not a line number written in done_means or a value that is not a verifier; references/task-fields.md documents both. (3) For a line whose verifier is advisor, commands/manage.md dispatches the advisor with only the paths the line names, saves the reply in tasks/advice/<id>-<n>.md and logs the ruling under decided_for_you; a checks.py command refuses a merge while an advisor line has no saved reply whose first line is 'RULING: HOLDS'. (4) commands/manage.md consults the advisor before every park except the always-park cases in the notes, and a checks.py command decides those cases; tests show each of them always parks. (5) commands/manage.md has jobs (c) and (d) as steps. (6) The manager tests pass, all of them.",
   "verified_by": [
     "script",
     "reviewer"
   ],
   "may_edit": [
-    ".claude/skills/manage/"
+    ".claude/skills/manage/",
+    ".claude/agents/manager-advisor.md"
   ],
-  "draft_note": "Drafted by Claude on 2026-11-15 at the owner's request. Priority left for the owner. Open choice: whether the four always-park cases are checked by a script or stay prose in manage.md; the test in done_means assumes a script.",
-  "status": "Proposed",
+  "draft_note": "First drafted by Claude on 2026-11-15; rewritten by Claude in chat on 2026-11-17 on the owner's go, after task 49. Changed from the first draft: the advisor has four jobs, not one; 'verified by you' blocks it per pass line, not per task; the always-park cases are decided by a script. It widens what merges without the owner; he approves that by setting it to Ready. If it parks twice, stop and go on with the BDD path, with Claude in chat as labeller.",
+  "status": "Backlog",
   "added": "2026-11-15",
   "finished": "",
   "source_chat": "",
   "runs_as": "build",
-  "priority": "",
+  "priority": "high",
   "tags": [
     "manager"
   ],
