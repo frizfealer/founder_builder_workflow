@@ -1,5 +1,24 @@
 # Manager runs
 
+## Run 2026-11-17 08:14
+
+Stopped because: no task to take.
+
+### Done
+- none.
+
+### Decided for you
+- task 049: probe model claude-sonnet-5-5, priced at grading.json model_rates.sonnet, over another model; would change if you name another model or the real price differs.
+- task 049: each tested moment judged on its home scenario's cited rules, over every scenario's rules at every moment; would change if you want the union (moments.*.scenario and CITED).
+- task 049: histories stored literally in data.json, over references; would change if the file grows too large in slice B.
+- task 049: the second sentence of R-01 left unchecked, over checking it now; would change in slice B, where a scenario reaches it.
+- task 049: preflight usage kept in verdicts/ and skipped as a verdict, over moving it out; would change if you want verdicts/ to hold verdicts only.
+
+### Needs you
+- task 049 (parked): part 1 passed review (049-2: PASS) and its 5 check commands exit 0 on task/049; part 2 did not run because the API refuses calls with "credit balance is too low" ($0 spent). Also read the 3 feature files and say whether this is the format you want. Recommended: add about $5 of credit, re-run `ant auth login` if expired, run `uv run python probe/run_part2.py` from the cafe folder, bring the transcripts to chat, then set 049 back to Ready. If you veto: lines 4 and 5 stay unproven and tasks 50 to 53 stay blocked; or move lines 4 and 5 to a new task and merge part 1 alone.
+- task 049: your chat session's commit 07be3ca (notes and plan use the ant login) is only on task/049; the park did not carry it to the working branch.
+- task 054 (Proposed): Café slice A: make the part 2 runner and data file robust before the real run. The fake's 3-id limit and lost usage on errored runs can waste or misreport the paid part 2 run.
+
 ## Run 2026-11-15 22:05
 
 Stopped because: merge limit (3 task merges since review/2026-11-15; no other task is Ready either).
