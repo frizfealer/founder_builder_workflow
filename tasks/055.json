@@ -1,0 +1,31 @@
+{
+  "id": 55,
+  "title": "Café slice A: transcripts without labelling hints, and total spend in the part 2 summary",
+  "item": "Fix the minor problems review tasks/reviews/049-3.md found in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/: transcripts carry the scenario title and World line that say an unanswered booking went through, and the checker's 'means' and 'answer' fields, which can anchor the labeller; runs/part2/verdicts/summary.json reports $0.417 while part 2 spent $0.88 with the first try and off-runner calls, and STOP_AT ignores earlier spending; runs/off-runner-usage.json says three judge calls but lists four; harness/judge.py reads any reply starting 'no' (e.g. 'Not sure', 'None') as No",
+  "motivation": "Review 049-3, problems 2, 3 and 5. The transcript hints can bias the labels that lines 4 and 5 of task 049 rest on; the money figure misreports cost.",
+  "status": "Proposed",
+  "added": "2026-11-17",
+  "finished": "",
+  "notes": "Builds on branch task/049-2. The transcript fix is best done before the transcripts are labelled; if done after, the labels may need redoing.",
+  "depends_on": [
+    {
+      "id": 49,
+      "soft": true
+    }
+  ],
+  "source_chat": "",
+  "done_means": "",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "",
+  "tags": [
+    "bdd",
+    "examples"
+  ],
+  "tokens": null,
+  "draft_note": "Proposed by the manager on 2026-11-17 from the minor problems in review 049-3. done_means and priority left for the owner."
+}
