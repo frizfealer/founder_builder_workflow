@@ -2,26 +2,33 @@
   "id": 50,
   "title": "BDD slice B: all of the café",
   "item": "Extend the slice A tests to all 17 café scenarios and 11 rule checkers",
-  "motivation": "A slice of task 1, the BDD skill. Its content depends on what the slice before it shows.",
-  "status": "Proposed",
+  "motivation": "Second slice of task 1. Slice A proved the test design on 3 scenarios and 6 rules; a gate needs every scenario and every rule of the spec.",
+  "status": "Backlog",
   "added": "2026-11-17",
   "finished": "",
-  "notes": "SC-17 has no World steps and its rule R-08 is cited nowhere else: it gets a test from its rule or becomes a finding for agent-spec. If slice A fails its lines 4 or 5, this task is rewritten or dropped.",
+  "notes": "Work in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/, on top of slice A and task 56. Read tasks/plans/001.md first. Extend the data file for the new World steps (a party of 9 for 'more than 8', a changed party size, and so on), under the same script checks as slice A. Write the missing rule checkers (R-02, R-04, R-06, R-10, and R-08 if SC-17 gets a test) and complete R-01, whose second sentence slice A left unchecked. Each checker's first sentence says exactly what it checks. The feature-file script adds one closing sentence to every scenario, 'And no other rule is broken', which runs the checkers of the rules the scenario does not cite. SC-17 has no World steps and its rule R-08 is cited nowhere else: give it a test from its rule if the spec holds enough to run one, else write it up as a finding for agent-spec (which spec line is missing) and leave it out; say which in the report. If task 56 failed a line, stop and park: this task is then rewritten.",
   "depends_on": [
     {
       "id": 49,
       "soft": false
+    },
+    {
+      "id": 56,
+      "soft": false
     }
   ],
   "source_chat": "founder_and_builder project chat, 2026-11-16 and 2026-11-17",
-  "done_means": "",
-  "verified_by": [],
+  "done_means": "(1) Every café scenario that has World steps passes with the reference agent, with 0 LLM calls: 16 of 16, plus SC-17 or a written finding for it. (2) The feature files equal the script's output and every scenario ends with 'And no other rule is broken'; the drift check and the data-file script checks of slice A pass with the new entries. (3) Every rule of rules.md that a scenario cites has a checker, and one file lists, per rule, any sentence of the rule the checker does not check, with the reason; R-01 is not on that list. (4) The two broken variants of slice A still fail the Then sentence of their own rule, and a failing test's message quotes the rule's full text and says what the agent did. (5) Slice A's tests still pass.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
   "may_edit": [],
   "runs_as": "build",
-  "priority": "",
+  "priority": "high",
   "tags": [
     "bdd"
   ],
   "tokens": null,
-  "draft_note": "Placeholder written by Claude in chat on 2026-11-17 so the whole path of task 1 shows in the task list. done_means, verified_by and priority are left empty on purpose: Claude writes them from the results of the task this one depends on, and only then is it offered to the owner. Outline in tasks/plans/001.md, section 'Slices B to E'."
+  "draft_note": "Written out by Claude in chat on 2026-11-17 from slice A's results. The owner approves it by setting it to Ready, after task 56."
 }

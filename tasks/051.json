@@ -6,7 +6,7 @@
   "status": "Proposed",
   "added": "2026-11-17",
   "finished": "",
-  "notes": "A rule with a tool-call half and a message half gets one variant per half. A variant that passes every test means that rule's checker is too weak. Each manager task gets a fresh builder, which is what keeps this builder apart from the one that wrote the checkers.",
+  "notes": "A rule with a tool-call half and a message half gets one variant per half. A variant that passes every test means that rule's checker is too weak. Each manager task gets a fresh builder, which is what keeps this builder apart from the one that wrote the checkers. Includes variants whose fault is in a message, not a tool call (says booked after no answer; reports a booking without its id; says the booking is unknown but does not ask the visitor to call): slice A's variants both made a wrong tool call.",
   "depends_on": [
     {
       "id": 50,

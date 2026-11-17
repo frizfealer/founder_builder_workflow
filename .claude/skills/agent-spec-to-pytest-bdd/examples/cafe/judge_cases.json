@@ -1,0 +1,261 @@
+{
+ "_about": "Messages with known answers for the message judge's yes/no questions (data.json judge_questions). Written by Claude in chat on 2026-11-17, not by the builder who wrote the questions. 'hard' cases are reported, not counted in the pass line. The café values are those of data.json: Sunrise Café, 2026-11-21, 19:00, party of 8, name Dana Lee.",
+ "cases": [
+  {
+   "id": "J01",
+   "question": "proposes",
+   "message": "Good news: I have a table on hold for 8 at 19:00 on 21 November. Want me to go ahead and book it?",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of a proposal"
+  },
+  {
+   "id": "J02",
+   "question": "proposes",
+   "message": "There's a table for you: Sunrise Café, 2026-11-21, 19:00, 8 people, name Dana Lee. Shall I confirm the booking?",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of a proposal"
+  },
+  {
+   "id": "J03",
+   "question": "proposes",
+   "message": "Let me check whether a table is free at that time.",
+   "expected": "no",
+   "hard": false,
+   "why": "announces a lookup, proposes nothing"
+  },
+  {
+   "id": "J04",
+   "question": "proposes",
+   "message": "Sorry, that table is taken.",
+   "expected": "no",
+   "hard": false,
+   "why": "reports, proposes nothing"
+  },
+  {
+   "id": "J05",
+   "question": "proposes",
+   "message": "Your table is booked for 19:00.",
+   "expected": "no",
+   "hard": false,
+   "why": "a statement that it is booked, not a proposal"
+  },
+  {
+   "id": "J06",
+   "question": "proposes",
+   "message": "We have tables free at 19:00 and at 20:00. Which would you like?",
+   "expected": "no",
+   "hard": true,
+   "why": "asks about free tables; rules.md R-03 says a question about free tables is not a proposal to book one"
+  },
+  {
+   "id": "J07",
+   "question": "full_proposal",
+   "message": "To confirm: Sunrise Café, 21 Nov 2026, 7pm, a party of 8, under the name Dana Lee. Is that right?",
+   "expected": "yes",
+   "hard": false,
+   "why": "all five parts, date and time written another way, asks to confirm"
+  },
+  {
+   "id": "J08",
+   "question": "full_proposal",
+   "message": "Here is what I have:\n- Café: Sunrise Café\n- Date: 2026-11-21\n- Time: 19:00\n- Party size: 8\n- Name: Dana Lee\nShall I book it?",
+   "expected": "yes",
+   "hard": false,
+   "why": "all five parts as a list, asks to confirm"
+  },
+  {
+   "id": "J09",
+   "question": "full_proposal",
+   "message": "I'm holding a table at Sunrise Café on 2026-11-21 at 19:00 for 8 people. Shall I book it?",
+   "expected": "no",
+   "hard": false,
+   "why": "the name is missing"
+  },
+  {
+   "id": "J10",
+   "question": "full_proposal",
+   "message": "I'm holding a table at Sunrise Café on 2026-11-21 at 19:00 for 6 people, under the name Dana Lee. Shall I book it?",
+   "expected": "no",
+   "hard": false,
+   "why": "party of 6, not 8"
+  },
+  {
+   "id": "J11",
+   "question": "full_proposal",
+   "message": "I'm holding a table at Sunrise Café on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee.",
+   "expected": "no",
+   "hard": false,
+   "why": "all five parts but no question to confirm"
+  },
+  {
+   "id": "J12",
+   "question": "full_proposal",
+   "message": "I'm holding your table on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee. Shall I book it?",
+   "expected": "no",
+   "hard": true,
+   "why": "the café is not named"
+  },
+  {
+   "id": "J13",
+   "question": "says_booked",
+   "message": "All set! Your reservation is confirmed. Your confirmation id is SUN-4821.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of booked"
+  },
+  {
+   "id": "J14",
+   "question": "says_booked",
+   "message": "Done, you're booked in for 8 at 19:00.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of booked"
+  },
+  {
+   "id": "J15",
+   "question": "says_booked",
+   "message": "I've put a hold on the table for you.",
+   "expected": "no",
+   "hard": false,
+   "why": "held, not booked"
+  },
+  {
+   "id": "J16",
+   "question": "says_booked",
+   "message": "The booking may have gone through, but I can't be sure.",
+   "expected": "no",
+   "hard": false,
+   "why": "may be booked"
+  },
+  {
+   "id": "J17",
+   "question": "says_booked",
+   "message": "I'll book it for you now.",
+   "expected": "no",
+   "hard": false,
+   "why": "an intention, not a result"
+  },
+  {
+   "id": "J18",
+   "question": "says_not_booked",
+   "message": "No booking was made.",
+   "expected": "yes",
+   "hard": false,
+   "why": "plain statement"
+  },
+  {
+   "id": "J19",
+   "question": "says_not_booked",
+   "message": "I've cancelled the hold, so you have no reservation with us.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of nothing booked"
+  },
+  {
+   "id": "J20",
+   "question": "says_not_booked",
+   "message": "I don't know whether the booking went through.",
+   "expected": "no",
+   "hard": false,
+   "why": "unknown is not the same as not booked"
+  },
+  {
+   "id": "J21",
+   "question": "says_not_booked",
+   "message": "Your table is booked.",
+   "expected": "no",
+   "hard": false,
+   "why": "the opposite"
+  },
+  {
+   "id": "J22",
+   "question": "says_not_booked",
+   "message": "I've released the hold.",
+   "expected": "no",
+   "hard": true,
+   "why": "says the hold is released, does not say whether anything is booked"
+  },
+  {
+   "id": "J23",
+   "question": "says_unknown",
+   "message": "The system didn't reply, so I can't say whether your reservation exists.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of not known"
+  },
+  {
+   "id": "J24",
+   "question": "says_unknown",
+   "message": "It's unclear whether the booking succeeded.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of not known"
+  },
+  {
+   "id": "J25",
+   "question": "says_unknown",
+   "message": "The booking failed.",
+   "expected": "no",
+   "hard": false,
+   "why": "claims to know it failed"
+  },
+  {
+   "id": "J26",
+   "question": "says_unknown",
+   "message": "Your table is booked.",
+   "expected": "no",
+   "hard": false,
+   "why": "claims to know it succeeded"
+  },
+  {
+   "id": "J27",
+   "question": "says_unknown",
+   "message": "The booking system is slow today; one moment please.",
+   "expected": "no",
+   "hard": false,
+   "why": "says nothing about the booking's outcome"
+  },
+  {
+   "id": "J28",
+   "question": "asks_call",
+   "message": "Please ring Sunrise Café to check.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of call the café"
+  },
+  {
+   "id": "J29",
+   "question": "asks_call",
+   "message": "It would be best to phone the café directly to confirm.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of call the café"
+  },
+  {
+   "id": "J30",
+   "question": "asks_call",
+   "message": "Please try again later.",
+   "expected": "no",
+   "hard": false,
+   "why": "asks the visitor to retry, not to call"
+  },
+  {
+   "id": "J31",
+   "question": "asks_call",
+   "message": "I'll call the café for you.",
+   "expected": "no",
+   "hard": false,
+   "why": "the agent calls, the visitor is not asked to"
+  },
+  {
+   "id": "J32",
+   "question": "asks_call",
+   "message": "Please check your email for a confirmation.",
+   "expected": "no",
+   "hard": false,
+   "why": "another channel, no call"
+  }
+ ]
+}
