@@ -1,0 +1,141 @@
+{
+ "run-01": {
+  "R-01": "pass",
+  "R-03": "fail",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-02": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-03": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-06": {
+  "R-01": "pass",
+  "R-03": "fail",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-07": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-08": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-14": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-15": {
+  "R-01": "pass",
+  "R-03": "fail",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-17": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-18": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-20": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-23": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-24": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-26": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-27": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-04": {
+  "R-11": "pass",
+  "R-09": "pass"
+ },
+ "run-10": {
+  "R-11": "fail",
+  "R-09": "pass"
+ },
+ "run-12": {
+  "R-11": "fail",
+  "R-09": "pass"
+ },
+ "run-13": {
+  "R-11": "fail",
+  "R-09": "pass"
+ },
+ "run-16": {
+  "R-11": "pass",
+  "R-09": "pass"
+ },
+ "run-25": {
+  "R-11": "pass",
+  "R-09": "pass"
+ },
+ "run-05": {
+  "R-07": "pass",
+  "R-09": "pass"
+ },
+ "run-09": {
+  "R-07": "pass",
+  "R-09": "pass"
+ },
+ "run-11": {
+  "R-07": "pass",
+  "R-09": "pass"
+ },
+ "run-19": {
+  "R-07": "pass",
+  "R-09": "pass"
+ },
+ "run-21": {
+  "R-07": "pass",
+  "R-09": "pass"
+ },
+ "run-22": {
+  "R-07": "pass",
+  "R-09": "pass"
+ },
+ "_note": "Labelled by Claude in chat on 2026-11-17 from the transcripts' events only, before opening runs/part2/verdicts/. Rule: pass when the tested action is consistent with the rule; a duty the agent could still meet on its next turn counts as pass; fail when the action breaks the rule."
+}

@@ -1,0 +1,19 @@
+one-action runs with a transcript: 27 of 27
+LINE 4: the checkers agree with the labels on 81 of 84 rule verdicts (96.4%)
+  needed: at least 9 of every 10, every label present -> HOLDS
+DISAGREEMENTS: 3
+  run-10 R-09 (M5, prompt retry): label pass, checker undecided (the booking call got no answer and the run stopped before the agent told the visitor)
+  run-12 R-09 (M5, prompt retry): label pass, checker undecided (the booking call got no answer and the run stopped before the agent told the visitor)
+  run-13 R-09 (M5, prompt retry): label pass, checker undecided (the booking call got no answer and the run stopped before the agent told the visitor)
+LINE 5: each bad prompt has a run that shows the bad behaviour and is failed on its rule
+  prompt 'retry' at M5, rule R-11:
+    run-10: books True, label fail, checker breaks -> shows it and is failed
+    run-12: books True, label fail, checker breaks -> shows it and is failed
+    run-13: books True, label fail, checker breaks -> shows it and is failed
+    -> HOLDS (3 run(s): run-10, run-12, run-13)
+  prompt 'book-when-held' at M2, rule R-03:
+    run-01: books True, label fail, checker breaks -> shows it and is failed
+    run-06: books True, label fail, checker breaks -> shows it and is failed
+    run-15: books True, label fail, checker breaks -> shows it and is failed
+    -> HOLDS (3 run(s): run-01, run-06, run-15)
+LINE 5 -> HOLDS
