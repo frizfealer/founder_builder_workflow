@@ -1,17 +1,19 @@
 {
   "id": 1,
   "title": "pytest-bdd skill (agent-spec-to-pytest-bdd)",
-  "item": "pytest-bdd skill — build it from the order-cancel example conversion",
-  "motivation": "Converting specs by hand doesn't scale; the conversion also feeds findings back into agent-spec",
+  "item": "pytest-bdd skill: turn a new-format agent spec into BDD tests that gate a built agent, built on the cafe example first",
+  "motivation": "A built agent needs a gate that checks it against the spec's rules; writing those tests spec by spec without a skill does not scale; and the work feeds findings back into agent-spec",
   "status": "Backlog",
   "added": "2026-11-07",
   "finished": "",
-  "notes": "Build order: fake order system → grader primitives → scripted reference agent with broken variants → convert S01, S12, S20, S26, S41 → review findings → write the skill → convert the rest. Café hand-conversion is the reference.",
+  "notes": "Plan: tasks/plans/001.md (draft of 2026-11-16, not yet approved by the owner). Five slices, each to become its own task file: A three cafe scenarios end to end, with a measurement on a throwaway real LLM agent; B all of the cafe; C broken variants written by a different builder that has not seen the rule checkers; D write the skill from the cafe work; E blind run of the skill in a fresh session. This task stays open as their parent and closes when E passes. Riskiest assumption, agreed with the owner 2026-11-16: tests proven on a scripted agent also work on a real LLM agent. Slice A measures it. A real agent is gated 'from the tested moment': the scripted agent's turns are replayed as history and the real agent takes one turn (the owner's idea). Whole conversations with a real agent are measured, not gated, and belong to tasks 9 and 19. Superseded: the earlier build order (fake order system, grader primitives, S01, S12, S20, S26, S41) was for the old spec format and the order-cancel example.",
   "depends_on": [],
   "source_chat": "Pytest-bdd verification for agent-spec (Nov 1); Order-support agent login design (Nov 5–6)",
-  "done_means": "The agent-spec-to-pytest-bdd skill turns a new-format spec's scenarios into feature files and steps without rewording. On the cafe example the reference agent passes every test and each broken variant fails at least one. A drift check fails when a scenario changes in the spec.",
+  "done_means": "The agent-spec-to-pytest-bdd skill turns a new-format spec into feature files, written by a script with every word copied from the spec, and a test harness. On the cafe example the reference agent passes every test, and each broken variant, written by a builder that did not see the rule checkers, fails the Then sentence of the rule it breaks. A drift check stops the test run when a scenario changes in the spec. Every test can also run with a real LLM agent taking over at the tested moment; in slice A at least 32 of 36 such runs reached a verdict. A fresh session using only the skill reproduces all of this for the cafe spec.",
   "verified_by": [
-    "script"
+    "script",
+    "reviewer",
+    "you"
   ],
   "may_edit": [],
   "runs_as": "build",
@@ -20,5 +22,5 @@
     "bdd"
   ],
   "tokens": null,
-  "draft_note": "Owner decided 2026-11-15: build on the cafe new-format spec first. No longer depends on 11 or 19: BDD tests gate with a scripted reference agent. S01, S12, S20, S26, S41 were old-format scenario IDs. Branch add-agent-spec-to-pytest-bdd holds earlier work, not reviewed."
+  "draft_note": "Rewritten by Claude in chat on 2026-11-16 at the owner's request, from the plan in tasks/plans/001.md. done_means and verified_by are drafts until the owner approves the plan. Owner decided 2026-11-15: build on the cafe new-format spec first. Branch add-agent-spec-to-pytest-bdd holds earlier work for the old format, not reviewed and not built on."
 }
