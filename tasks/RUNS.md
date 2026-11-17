@@ -1,5 +1,23 @@
 # Manager runs
 
+## Run 2026-11-17 %H:%M
+
+Stopped because: no task to take.
+
+### Done
+- none.
+
+### Decided for you
+- task 049: cited text of a claim is its row plus the Systems-table row it names, and of a rule its rules.md section plus the "What the agent does" rows naming it, over citing the id-less Systems table; would change if Systems rows get their own ids.
+- task 049: a checker "undecided" counts as a disagreement in line 4, over leaving it out; would change if you rule an undecided verdict is no verdict.
+- task 049: judge calls send thinking `between_tools`, over raising max_tokens, because sonnet-5-5 thought first and returned no text; would change if you want judge thinking on.
+- task 049: both bad prompts rewritten to name the rule they override and the call to make, over keeping the plan's sentences, which broke their rule in 0 of 6 runs; would change if you want subtler wording.
+- task 049: all 36 runs rerun with the first try kept in `runs/part2-first-try/`, over rerunning only the affected runs.
+
+### Needs you
+- task 049 (parked): bring `.claude/skills/agent-spec-to-pytest-bdd/examples/cafe/runs/part2/transcripts/` (branch `task/049-2`) to chat for labelling. Lines 1 to 3 hold (review 049-3 PASS, 69 tests and the drift check exit 0); part 2 ran on claude-sonnet-5-5, 27 of 27 runs and 9 of 9 conversations reached a verdict, $0.88 spent. The rewritten bad prompts dictate the exact booking call, so line 5 adds little beyond line 2; transcripts still hint that the unanswered booking went through. Recommended: label from `probe/agreement.py --template` without opening the verdict folders, run `probe/agreement.py labels.json`, and set 049 Ready if lines 4 and 5 hold. If you veto: ask for weaker bad prompts and a rerun (about $0.45), or merge part 1 alone and move lines 4 and 5 to a new task.
+- task 055 (Proposed): Café slice A: transcripts without labelling hints, and total spend in the part 2 summary. The hints can bias the labels lines 4 and 5 rest on, so it is best done before labelling.
+
 ## Run 2026-11-17 08:14
 
 Stopped because: no task to take.
