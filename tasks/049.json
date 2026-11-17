@@ -1,0 +1,26 @@
+{
+  "id": 49,
+  "title": "BDD slice A: three café scenarios, with a real-agent measurement",
+  "item": "Build the BDD tests for café scenarios SC-08, SC-12 and SC-10 end to end, prove them on a scripted agent, and measure with a throwaway real LLM agent whether their verdicts are right",
+  "motivation": "First slice of task 1. It tests the riskiest assumption before anything larger is built: that tests proven on a scripted agent give right verdicts on a real LLM agent. It also shows the test format to the owner on 3 scenarios.",
+  "status": "Backlog",
+  "added": "2026-11-16",
+  "finished": "",
+  "notes": "The full description is the section 'Slice A' of tasks/plans/001.md; read the whole plan first, terms included. Work goes in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/ (no SKILL.md yet; the skill is written in a later slice). The spec is .claude/skills/agent-spec/examples/cafe/spec/; read it, and read .claude/skills/agent-spec/scripts/check.py for how a scenario replays through model.py; edit neither. Build in the plan's order, data file first. Save every probe-agent transcript in one folder and the checkers' verdicts in another, so the transcripts can be labelled without seeing the verdicts. Part 2 needs an API key in the environment; if there is none, finish part 1, write that under needs_you and park. Spend at most 5 USD on part 2 and report what was spent. The probe agent's model is a draft choice: a mid-size current Claude model, named in the report. Do not open the branch add-agent-spec-to-pytest-bdd.",
+  "depends_on": [],
+  "source_chat": "founder_and_builder project chat, 2026-11-16",
+  "done_means": "For SC-08, SC-12 and SC-10: (1) 3 of 3 pass with the reference agent, with 0 LLM calls; (2) each of the 2 broken variants (R-03, R-11) fails the Then sentence of its own rule; (3) every value a step, the fake or a replayed history uses comes from the data file, every entry there is labelled 'from the spec' with its claim or rule, or 'free choice', and the feature files equal the script's output; (4) on the 27 one-action probe runs the rule checkers agree with the labels Claude in chat gives the transcripts on at least 9 of every 10 rule verdicts, every disagreement listed; (5) for each of the 2 bad prompts at least 1 run shows the bad behaviour and is failed on its rule. Reported with the result: runs that reach a verdict out of 27 and out of 9 whole conversations, pass rate per rule, money spent.",
+  "verified_by": [
+    "script",
+    "reviewer",
+    "you"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "high",
+  "tags": [
+    "bdd"
+  ],
+  "tokens": null,
+  "draft_note": "Drafted by Claude in chat on 2026-11-16 from tasks/plans/001.md. Lines 1 to 3 of done_means are for script and reviewer; lines 4 and 5 need the owner to bring the transcripts to chat, which is why verified_by includes you. The owner approves the plan's slice A by setting this task to Ready."
+}
