@@ -3,7 +3,7 @@
   "title": "BDD slice A: three café scenarios, with a real-agent measurement",
   "item": "Build the BDD tests for café scenarios SC-08, SC-12 and SC-10 end to end, prove them on a scripted agent, and measure with a throwaway real LLM agent whether their verdicts are right",
   "motivation": "First slice of task 1. It tests the riskiest assumption before anything larger is built: that tests proven on a scripted agent give right verdicts on a real LLM agent. It also shows the test format to the owner on 3 scenarios.",
-  "status": "Ready",
+  "status": "Needs you",
   "added": "2026-11-16",
   "finished": "",
   "notes": "The full description is the section 'Slice A' of tasks/plans/001.md; read the whole plan first, terms included. Work goes in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/ (no SKILL.md yet; the skill is written in a later slice). The spec is .claude/skills/agent-spec/examples/cafe/spec/; read it, and read .claude/skills/agent-spec/scripts/check.py for how a scenario replays through model.py; edit neither. Build in the plan's order, data file first. Save every probe-agent transcript in one folder and the checkers' verdicts in another, so the transcripts can be labelled without seeing the verdicts. Part 2 calls the Claude API. The owner is logged in with the ant CLI (`ant auth login`) and has no ANTHROPIC_API_KEY set; do not park for a missing key. Run `ant auth status` first. Use, in this order: the Python SDK if it picks up the ant login by itself; else the SDK with ANTHROPIC_AUTH_TOKEN set from `ant auth print-credentials --access-token`, fetched again when a call is refused as expired; else `ant messages create` as a subprocess. Never write a token or key to a file or a log. Only if `ant auth status` shows no login and no key is set: finish part 1, write that under needs_you and park. Spend at most 5 USD on part 2 and report what was spent. The probe agent's model is a draft choice: a mid-size current Claude model, named in the report. Do not open the branch add-agent-spec-to-pytest-bdd.",
@@ -21,6 +21,41 @@
   "tags": [
     "bdd"
   ],
-  "tokens": null,
-  "draft_note": "Drafted by Claude in chat on 2026-11-16 from tasks/plans/001.md. Lines 1 to 3 of done_means are for script and reviewer; lines 4 and 5 need the owner to bring the transcripts to chat, which is why verified_by includes you. Set to Ready on 2026-11-17 by Claude in chat on the owner's instruction (\"set Task 49 to ready\")."
+  "tokens": {
+    "agents": 443860,
+    "main_session": "not recorded"
+  },
+  "draft_note": "Drafted by Claude in chat on 2026-11-16 from tasks/plans/001.md. Lines 1 to 3 of done_means are for script and reviewer; lines 4 and 5 need the owner to bring the transcripts to chat, which is why verified_by includes you. Set to Ready on 2026-11-17 by Claude in chat on the owner's instruction (\"set Task 49 to ready\").",
+  "needs_you": {
+    "question": "Part 1 is built, reviewed (second review PASS) and its 5 check commands exit 0 on branch task/049. Part 2 (done_means lines 4 and 5) did not run: your ant login authenticates, but the API refuses every call with 'Your credit balance is too low'. $0 spent. Also, verified_by includes you: read the 3 feature files in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/features/ and say whether this is the test format you want. Note: your chat session's commit 07be3ca (task notes and plan now use the ant login) is only on task/049; this park did not carry it to the working branch.",
+    "recommendation": "Add about $5 of API credit, run `ant auth login` again if the token has expired (it expires 15:36 on 2026-11-17), then from the cafe folder run `uv run python probe/run_part2.py` (stops itself at $4.50). Bring runs/part2/transcripts/ to chat for labelling before opening runs/part2/verdicts/. Then set 049 back to Ready so the manager merges task/049 with the results.",
+    "if_vetoed": "If you do not add credit, lines 4 and 5 cannot be shown and slices B to E (tasks 50 to 53) stay blocked on the riskiest assumption; the alternative is to merge part 1 alone after changing done_means to drop lines 4 and 5 into a new task."
+  },
+  "decided_for_you": [
+    {
+      "chosen": "Probe model claude-sonnet-5-5, priced at grading.json model_rates.sonnet ($2 in / $10 out per million)",
+      "rejected": "Another model, or prices from elsewhere",
+      "would_change": "If you name another model or the real sonnet-5-5 price differs"
+    },
+    {
+      "chosen": "Each tested moment runs in one home scenario and is judged on that scenario's cited rules",
+      "rejected": "Judging every scenario's rules at every moment, which adds trivially held verdicts and inflates line 4's agreement",
+      "would_change": "If you want the union of rules; change moments.*.scenario and CITED"
+    },
+    {
+      "chosen": "Histories stored literally in data.json, kept equal to the reference run by tests",
+      "rejected": "Storing histories as references into other entries",
+      "would_change": "If the file grows too large to read in slice B"
+    },
+    {
+      "chosen": "The second sentence of R-01 (tell the visitor after 'taken' or no answer) is not checked",
+      "rejected": "Checking it now",
+      "would_change": "Slice B, where a scenario reaches it"
+    },
+    {
+      "chosen": "Preflight usage stays in verdicts/preflight-usage.json, skipped as a verdict but counted as cost",
+      "rejected": "Moving it outside verdicts/",
+      "would_change": "If you want verdicts/ to hold verdicts only"
+    }
+  ]
 }
