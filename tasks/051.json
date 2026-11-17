@@ -1,0 +1,27 @@
+{
+  "id": 51,
+  "title": "BDD slice C: broken variants by a different builder",
+  "item": "A builder that has not opened the rule checkers writes the broken variants of the reference agent, one per rule that has a test",
+  "motivation": "A slice of task 1, the BDD skill. Its content depends on what the slice before it shows.",
+  "status": "Proposed",
+  "added": "2026-11-17",
+  "finished": "",
+  "notes": "A rule with a tool-call half and a message half gets one variant per half. A variant that passes every test means that rule's checker is too weak. Each manager task gets a fresh builder, which is what keeps this builder apart from the one that wrote the checkers.",
+  "depends_on": [
+    {
+      "id": 50,
+      "soft": false
+    }
+  ],
+  "source_chat": "founder_and_builder project chat, 2026-11-16 and 2026-11-17",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "",
+  "tags": [
+    "bdd"
+  ],
+  "tokens": null,
+  "draft_note": "Placeholder written by Claude in chat on 2026-11-17 so the whole path of task 1 shows in the task list. done_means, verified_by and priority are left empty on purpose: Claude writes them from the results of the task this one depends on, and only then is it offered to the owner. Outline in tasks/plans/001.md, section 'Slices B to E'."
+}

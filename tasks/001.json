@@ -6,8 +6,29 @@
   "status": "Backlog",
   "added": "2026-11-07",
   "finished": "",
-  "notes": "Plan: tasks/plans/001.md, rewritten 2026-11-16 after an independent review. Only slice A is up for approval: task 49. Slices B to E are an outline (B all of the cafe; C broken variants by a different builder; D write the skill; E blind run on a Harbor Goods spec) and are planned again from A's results. This task stays open as the parent and closes when the last slice passes. Riskiest assumption, agreed with the owner 2026-11-16: tests proven on a scripted agent give right verdicts on a real LLM agent. Values the spec does not hold live in one labelled data file in the test folder; agent-spec is not changed. Superseded: the earlier build order (fake order system, grader primitives, S01, S12, S20, S26, S41) was for the old spec format and the order-cancel example.",
-  "depends_on": [],
+  "notes": "Plan: tasks/plans/001.md, rewritten 2026-11-16 after an independent review. Parent task: it holds no work of its own and is closed by the owner when tasks 49 to 53 are Done. Only slice A is up for approval: task 49. Slices B to E are placeholders, tasks 50 to 53, each written out from the results of the one before; in outline (B all of the cafe; C broken variants by a different builder; D write the skill; E blind run on a Harbor Goods spec) and are planned again from A's results. This task stays open as the parent and closes when the last slice passes. Riskiest assumption, agreed with the owner 2026-11-16: tests proven on a scripted agent give right verdicts on a real LLM agent. Values the spec does not hold live in one labelled data file in the test folder; agent-spec is not changed. Superseded: the earlier build order (fake order system, grader primitives, S01, S12, S20, S26, S41) was for the old spec format and the order-cancel example.",
+  "depends_on": [
+    {
+      "id": 49,
+      "soft": false
+    },
+    {
+      "id": 50,
+      "soft": false
+    },
+    {
+      "id": 51,
+      "soft": false
+    },
+    {
+      "id": 52,
+      "soft": false
+    },
+    {
+      "id": 53,
+      "soft": false
+    }
+  ],
   "source_chat": "Pytest-bdd verification for agent-spec (Nov 1); Order-support agent login design (Nov 5–6)",
   "done_means": "Draft, to be fixed when slices B to E are planned. The agent-spec-to-pytest-bdd skill turns a new-format spec into feature files, written by a script with every word copied from the spec, a labelled data file, and a test harness. On the cafe example the reference agent passes every test, and each broken variant, written by a builder that did not see the rule checkers, fails the Then sentence of the rule it breaks. A drift check stops the test run when a scenario changes in the spec. Slice A's five pass/fail lines held (task 49). A fresh session using only the skill produces the same for a Harbor Goods new-format spec.",
   "verified_by": [
@@ -16,7 +37,7 @@
     "you"
   ],
   "may_edit": [],
-  "runs_as": "build",
+  "runs_as": "you",
   "priority": "high",
   "tags": [
     "bdd"
