@@ -74,6 +74,22 @@ Cheapest first; a later check does not repeat an earlier one.
 Order of change: the eval harness for the new format first, then the format switch, then a new
 baseline.
 
+## What the repo keeps
+
+A file or folder stays only while it is needed. It is not needed when all five hold:
+
+1. Nothing in the repo reads it.
+2. It is not a decision of the owner.
+3. It is not data a person labelled.
+4. It is not client data.
+5. It is not knowledge brought in from outside, such as docs, papers or book notes.
+
+- The owner approves every deletion.
+- An agent proposes and does not delete. A proposal states the result of each of the
+  five tests and a recommendation.
+- Exception: the manager deletes the leftover branches of a merged task by itself, and
+  lists them in its run report.
+
 ## Testing the built agent
 
 - BDD tests gate, agent eval measures. Same scenarios, same step definitions.

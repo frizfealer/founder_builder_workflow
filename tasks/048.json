@@ -1,28 +1,25 @@
 {
   "id": 48,
-  "title": "Keep rule: what the repo keeps, and a report of files nothing needs",
-  "item": "Write the keep rule into DECISIONS.md, and add a script that lists candidate files for the owner to remove. The script only reports; nothing deletes without the owner's yes",
+  "title": "A report of results folders nothing needs",
+  "item": "A script that lists candidate results folders for the owner to remove. It only reports; nothing deletes without the owner's yes",
   "motivation": "On 2026-11-16 two folders sat in eval/agent-spec/results/ that nothing needed (a test fixture and a try-out run); they made every /grade list 2 judge tasks. Claude first recommended keeping them and changing grade.py. The owner's rule: a file is not needed when nothing in the repo reads it and it is not the owner's decision, human-labelled data, client data or external knowledge. The owner wants the first test raised by a lint, the other four written down as direction, and to be asked before any deletion.",
   "status": "Backlog",
   "added": "2026-11-16",
   "finished": "",
-  "notes": "Two parts. (1) DECISIONS.md, a short section: the five tests; agents never delete and may only propose; the owner approves every deletion; where each kept class lives (owner's decisions and rulings: DECISIONS.md, eval/*/calibration/, the frozen trial inputs; these are already 'named' lines in protected-paths.txt). (2) A report script, exit 0 always, run at the owner's review, not on every commit. 'Nothing reads it' cannot be found by searching for a file's name alone: README named switch-smoke-1 and grade.py walked it, and it still was not needed. So start narrow, where the test can be stated exactly: a folder under eval/<skill>/results/ is a candidate when it is not a baseline label in grading.json, not cited in EXPERIMENTS.md, and not named in a test. Tried by hand on 2026-11-16 after commit fc42319: 49 folders, 14 baseline, 25 cited and not baseline, 10 neither (standin-1 and switch-base-1 to -9); standin-1 is named in test_grade_build2.py, which leaves 9. Skip every protected 'named' path. Widen to other folders only if the narrow report proves useful. Added 2026-11-17, the owner's ruling: a proposal to delete comes from whoever finds the candidate, the manager included, and carries its own evidence: the result of each of the five tests for that file or folder, and a recommendation. The owner should not have to ask a second party for the analysis.",
+  "notes": "Two parts. (1) DECISIONS.md, a short section: the five tests; agents never delete and may only propose; the owner approves every deletion; where each kept class lives (owner's decisions and rulings: DECISIONS.md, eval/*/calibration/, the frozen trial inputs; these are already 'named' lines in protected-paths.txt). (2) A report script, exit 0 always, run at the owner's review, not on every commit. 'Nothing reads it' cannot be found by searching for a file's name alone: README named switch-smoke-1 and grade.py walked it, and it still was not needed. So start narrow, where the test can be stated exactly: a folder under eval/<skill>/results/ is a candidate when it is not a baseline label in grading.json, not cited in EXPERIMENTS.md, and not named in a test. Tried by hand on 2026-11-16 after commit fc42319: 49 folders, 14 baseline, 25 cited and not baseline, 10 neither (standin-1 and switch-base-1 to -9); standin-1 is named in test_grade_build2.py, which leaves 9. Skip every protected 'named' path. Widen to other folders only if the narrow report proves useful. Added 2026-11-17, the owner's ruling: a proposal to delete comes from whoever finds the candidate, the manager included, and carries its own evidence: the result of each of the five tests for that file or folder, and a recommendation. The owner should not have to ask a second party for the analysis. 2026-11-17: the DECISIONS.md half of this task is done. The owner approved the wording in chat and Claude committed the section 'What the repo keeps' directly. Only the report script is left; its proposals follow that section (the result of each of the five tests, and a recommendation).",
   "depends_on": [],
   "source_chat": "founder_and_builder project chat, 2026-11-16",
-  "done_means": "DECISIONS.md states the keep rule: the five tests, that agents never delete, and that the owner approves every deletion. A script prints the results folders that are not a baseline label, not cited in EXPERIMENTS.md and not named in a test, for every eval/<skill>/; it deletes nothing and exits 0. Its tests pass. Run on the tree at fc42319 it prints switch-base-1 to switch-base-9 for agent-spec and does not print standin-1 or any baseline label.",
+  "done_means": "A script prints the results folders that are not a baseline label, not cited in EXPERIMENTS.md and not named in a test, for every eval/<skill>/, each with the result of the five tests of DECISIONS.md 'What the repo keeps' as far as a script can tell and 'needs a reader' where it cannot; it deletes nothing and exits 0. Its tests pass. Run on the tree at fc42319 it prints switch-base-1 to switch-base-9 for agent-spec and does not print standin-1 or any baseline label.",
   "verified_by": [
     "script",
-    "reviewer",
-    "you"
+    "reviewer"
   ],
-  "may_edit": [
-    "DECISIONS.md"
-  ],
+  "may_edit": [],
   "runs_as": "build",
   "priority": "low",
   "tags": [
     "repo"
   ],
   "tokens": null,
-  "draft_note": "Drafted by Claude in chat on 2026-11-16 at the owner's request. The DECISIONS.md wording is the owner's to approve: which is why verified_by includes you. The script's home is left to the builder; if it goes under .claude/skills/manage/, that path must be added to may_edit by the owner first. Priority is a draft."
+  "draft_note": "Drafted by Claude in chat on 2026-11-16 at the owner's request; shrunk to the script on 2026-11-17 after the DECISIONS.md section was committed by hand. Priority is a draft."
 }

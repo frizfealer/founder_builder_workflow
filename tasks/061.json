@@ -1,0 +1,36 @@
+{
+  "id": 61,
+  "title": "Manager runs up to N independent tasks at once, each builder in its own worktree",
+  "item": "The manager takes up to N Ready tasks that are independent of each other, builds and reviews them at the same time, each in its own git worktree, and merges them one at a time",
+  "motivation": "The manager builds one task at a time in the repo's main folder. On 2026-11-17 the BDD work (task 56) waited behind three manager tasks it shares no file with, and the main folder sat on a task branch during every run, so nothing else could be committed safely. The owner asked for N parallel builders on independent tasks and raised its priority.",
+  "status": "Backlog",
+  "added": "2026-11-17",
+  "finished": "",
+  "notes": "First step, before changing any command: show in a temporary repo that one manager session can run two builder agents at the same time, each in its own git worktree, and still record tokens, reviews and decisions per task. This is the riskiest assumption; if Claude Code cannot do it, park with what was found. Independent means, decided by a script: no hard dependency between the tasks in either direction; no protected path named in both tasks' may_edit; at most one iterate task per skill at a time (another task may run beside an iterate task; if a task that merged meanwhile changed that skill's folder or its eval folder, the iterate result parks for the owner, because it was measured on an older version). Tags are not part of the test. N comes from limits.json and starts at 2. No token cap; the run report gives agent tokens per task and in total. Each builder and its reviewer work only in that task's worktree, on its task branch. The repo's main folder stays on the working branch for the whole run. Merges stay one at a time. Before each merge after the first of a run, the task's check commands are run again on its branch merged with the updated working branch. A conflict or a failing check sends the task back to its builder once, on the updated working branch; a second failure parks it. The task limit per review is counted as today; a task built when the limit is reached parks with that reason and its branch stays. At the start of a run: remove worktrees left by an earlier run that hold no uncommitted change, report those that do, and report a task left In progress with a recommendation. This replaces task 35 (run the manager in its own worktree), which the owner can drop. Planned first real use: tasks 56 (BDD) and 58 (manager) together.",
+  "depends_on": [
+    {
+      "id": 37,
+      "soft": false
+    },
+    {
+      "id": 34,
+      "soft": true
+    }
+  ],
+  "source_chat": "founder_and_builder project chat, 2026-11-17",
+  "done_means": "(1) A script returns up to N takeable tasks that are independent by the three conditions in the notes; tests cover a hard dependency, a shared protected path, two iterate tasks on one skill, and N. (2) In a temporary repo, two independent Ready tasks are built at the same time in two worktrees while the main folder stays on the working branch with its files unchanged; both merge, one after the other. (3) A test shows a branch that conflicts with the first merge is rebuilt once on the updated working branch, and parks on a second failure. (4) A run start removes a clean leftover worktree and reports a dirty one without deleting it. (5) Tokens, review replies and decided_for_you are recorded per task, and the run report lists each task and the total. (6) SKILL.md and commands/manage.md describe all of this, and the manager tests pass, all of them.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "runs_as": "build",
+  "priority": "high",
+  "tags": [
+    "manager"
+  ],
+  "tokens": null,
+  "draft_note": "Drafted by Claude in chat on 2026-11-17 on the owner's request to raise its priority. N = 2 and the independence test follow the owner's rulings of that day (tags too strict; one iterate task plus other tasks is allowed; no token cap for now). Hard dependency on task 37 because both change the same manager files."
+}
