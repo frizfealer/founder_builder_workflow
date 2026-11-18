@@ -167,3 +167,29 @@ def test_board_server_reads_task_files_per_request(tmp_path):
     finally:
         server.shutdown()
         server.server_close()
+
+
+def test_lint_outside_needs_known_value():
+    """Should accept outside_needs that lists values from the fixed set, and an empty list."""
+    assert tasks.lint(as_files(task(1) | {"outside_needs": ["claude-api"]}, task(2) | {"outside_needs": []}), TAGS) == []
+
+
+def test_lint_outside_needs_unknown_value():
+    """Should fail outside_needs that holds a value outside the fixed set, or is not a list."""
+    for bad in (["claude-api", "github"], "claude-api", ["claude-api", "claude-api"]):
+        errs = tasks.lint(as_files(task(1) | {"outside_needs": bad}), TAGS)
+        assert any("outside_needs" in e for e in errs), bad
+
+
+def test_lint_owner_verified_date():
+    """Should accept owner_verified as a date or empty, and fail any other value."""
+    assert tasks.lint(as_files(task(1) | {"owner_verified": "2026-11-17"}, task(2) | {"owner_verified": ""}), TAGS) == []
+    for bad in ("yes", True, "17/11/2026"):
+        errs = tasks.lint(as_files(task(1) | {"owner_verified": bad}), TAGS)
+        assert any("owner_verified" in e for e in errs), bad
+
+
+def test_lint_for_retry_strings():
+    """Should accept for_retry as a list of strings and fail anything else."""
+    assert tasks.lint(as_files(task(1) | {"for_retry": ["probe/fake.py: IndexError on a 4th hold"]}), TAGS) == []
+    assert any("for_retry" in e for e in tasks.lint(as_files(task(1) | {"for_retry": "fix it"}), TAGS))

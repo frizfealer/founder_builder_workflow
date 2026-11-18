@@ -42,15 +42,27 @@ to another task. He reads one report at his review.
 5. Inside an iterate task, skill-iterate's `references/escalation.md` applies as well. Outside
    it, this skill's stop list is the only one. `DECISIONS.md` is the direction every brief
    points to; the manager does not restate it.
+6. A stop or choice that can be decided mechanically is decided by a script, not by the
+   manager reading text. Two cases so far, both from task 49: whether a task's outside needs
+   are met is checked before its builder starts (`checks.py needs`), not found after the build;
+   and whether review or builder findings belong to the task's own retry, because the files they
+   name exist only on the task's branch, is decided from the paths (`checks.py unmerged`), so
+   they go into that task's `for_retry` and not into a Proposed task. Whether the owner has done
+   his check is a field the owner sets, `owner_verified`, read by `checks.py owner`; the manager
+   never sets it and never infers it from other text.
 
 ## Park, never ask
 
 Park the task when:
+- `checks.py needs <id>` fails: an outside need is not met. Park before any branch or builder,
+  with the script's reason as the question;
 - it needs a fact about the owner's product or an outside system that only he knows;
 - the protected-path check fails, or verification still fails after one fresh retry;
 - a blocking problem can be fixed only in a protected path the task's `may_edit` does not name.
   Park at once, with no retry, and name that path in the recommendation;
-- `verified_by` includes `you`, or `runs_as` is `you`;
+- `checks.py owner <id>` fails (`verified_by` includes `you` and `owner_verified` is empty), or
+  `runs_as` is `you`. Once the owner has set `owner_verified`, the task is not parked for him
+  again;
 - finishing would need something from the never list.
 
 A parked task's `needs_you` holds the question, a recommended answer the owner can veto, and
@@ -72,7 +84,8 @@ All from the repo root, all with `python3`:
 - `scripts/checks.py protected <id> <branch>`: the branch's changes since it left the working
   branch, against `protected-paths.txt` and the working branch's copy of the task's `may_edit`.
   In `tasks/`, a task branch may change only `status`, `finished`, `tokens`, `needs_you` and
-  `decided_for_you` of its own task file, and add Proposed tasks. The whole skill folder and
+  `decided_for_you` of its own task file, and add Proposed tasks; so it cannot set
+  `owner_verified` or `for_retry`. The whole skill folder and
   its three links in `.claude/` are protected.
 - `scripts/checks.py merge-limit`: task merges since the latest review tag, against
   `limits.json`. At the limit the manager merges nothing more and ends the run.
@@ -80,6 +93,14 @@ All from the repo root, all with `python3`:
   `tasks/reviews/<id>-<n>.md`, in the working tree during the merge. It refuses the merge when
   no reply is saved or the latest's first line is not `VERDICT: PASS`. A task verified by
   neither `reviewer` nor `script` has no reviewer and passes.
+- `scripts/checks.py needs <id>`: runs one check per entry of the task's `outside_needs` and
+  exits 1 with a one-line reason at the first that fails. For `claude-api` the check is one
+  call with one output token to the smallest model through the ant CLI, with the credentials a
+  builder would use; it costs under 0.01 USD and prints no credential.
+- `scripts/checks.py unmerged <branch> <path>...`: exits 0 when every path exists on the branch
+  and not on the working branch (the findings go to the task's `for_retry`), 1 otherwise.
+- `scripts/checks.py owner <id>`: exits 1 while `verified_by` includes `you` and
+  `owner_verified` is empty on the working branch.
 - `scripts/checks.py run-start | run-end`: mark a run active with `.git/manage-run-active`.
   While it exists, the `PreToolUse` hook in `.claude/settings.json` refuses any Bash command
   whose text runs `git push`, for the main session and every subagent. It reads command text,
@@ -108,6 +129,7 @@ ln -s ../skills/manage/agents/reviewer.md   .claude/agents/manager-reviewer.md
 ## Records
 
 - Each task's file: `decided_for_you` (one entry per decision made without the owner: chosen,
-  rejected, what would change it), `needs_you` when parked, `tokens`.
+  rejected, what would change it), `needs_you` when parked, `for_retry` when parked with
+  findings on files only its branch has, `tokens`.
 - `tasks/reviews/<id>-<n>.md`: each reviewer reply verbatim, in the task's merge or park commit.
 - `tasks/RUNS.md`: one report per run, newest first, in skill-iterate's three sections.

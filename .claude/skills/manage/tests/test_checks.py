@@ -334,3 +334,139 @@ def test_review_not_needed_for_metrics_task(repo):
     t["verified_by"] = ["metrics"]
     repo.write_task(t)
     assert checks.check_review(repo.path, 1)[0]
+
+
+# --- outside needs ---------------------------------------------------------------------------
+
+def stand_in(code, said=""):
+    """A command standing in for a need's real check: prints to stderr and exits with code."""
+    return [sys.executable, "-c", f"import sys; print({said!r}, file=sys.stderr); sys.exit({code})"]
+
+
+def with_needs(repo, needs):
+    repo.write_task(task(1) | {"outside_needs": needs})
+    repo.commit("task 1 needs the API")
+
+
+def test_needs_none(repo):
+    """Should pass without running any check when the task lists no outside needs."""
+    ok, msg = checks.check_needs(repo.path, 1, base=BASE, commands={"claude-api": stand_in(1)})
+    assert ok
+    assert "no outside needs" in msg
+
+
+def test_needs_check_passes(repo):
+    """Should pass when the stand-in check for the task's one need exits 0."""
+    with_needs(repo, ["claude-api"])
+    ok, _ = checks.check_needs(repo.path, 1, base=BASE, commands={"claude-api": stand_in(0)})
+    assert ok
+
+
+def test_needs_check_fails(repo, monkeypatch, capsys):
+    """Should exit 1 with a one-line reason naming the need and its output, with a credential masked."""
+    with_needs(repo, ["claude-api"])
+    monkeypatch.setitem(checks.NEED_CHECKS, "claude-api",
+                        stand_in(1, "400 Bad Request\ncredit balance too low; key sk-ant-oat01-abc_DEF-9"))
+    monkeypatch.chdir(repo.path)
+    assert checks.main(["needs", "1", "--base", BASE]) == 1
+    out = capsys.readouterr().out.splitlines()
+    assert len(out) == 1
+    assert out[0].startswith("claude-api: the check failed (exit 1)")
+    assert "credit balance too low" in out[0]
+    assert "sk-ant" not in out[0]
+
+
+def test_needs_real_check_command_is_one_tiny_call():
+    """Should check claude-api with one call of at most one output token to the smallest model."""
+    cmd = checks.NEED_CHECKS["claude-api"]
+    assert cmd[:3] == ["ant", "messages", "create"]
+    assert cmd[cmd.index("--max-tokens") + 1] == "1"
+    assert "haiku" in cmd[cmd.index("--model") + 1]
+
+
+def test_needs_set_matches_lint():
+    """Should hold a check for exactly the outside needs tasks.py lint accepts."""
+    import tasks
+    assert set(checks.NEED_CHECKS) == set(tasks.OUTSIDE_NEEDS)
+
+
+# --- findings on unmerged work ---------------------------------------------------------------
+
+def test_unmerged_paths_only_on_task_branch(repo):
+    """Should pass when every path exists on the task's branch and not on the working branch."""
+    b = on_branch(repo)
+    repo.write("probe/fake.py", "x\n")
+    repo.write("probe/run.py", "y\n")
+    repo.commit("new code")
+    ok, msg = checks.check_unmerged(repo.path, b, ["probe/fake.py", "probe/run.py"], base=BASE)
+    assert ok
+    assert "for_retry" in msg
+
+
+def test_unmerged_path_on_working_branch(repo):
+    """Should fail when one path also exists on the working branch, and name that path."""
+    b = on_branch(repo)
+    repo.write("probe/fake.py", "x\n")
+    repo.write("DECISIONS.md", "# Decisions\nchanged\n")
+    repo.commit("new code and an edit")
+    ok, msg = checks.check_unmerged(repo.path, b, ["probe/fake.py", "DECISIONS.md"], base=BASE)
+    assert not ok
+    assert f"DECISIONS.md: on {BASE}" in msg
+    assert "Proposed" in msg
+
+
+def test_unmerged_path_on_neither_branch(repo):
+    """Should fail when a path exists on neither branch, so a mistyped path does not go to the retry."""
+    b = on_branch(repo)
+    ok, msg = checks.check_unmerged(repo.path, b, ["probe/missing.py"], base=BASE)
+    assert not ok
+    assert "on neither" in msg
+
+
+# --- the owner's check -----------------------------------------------------------------------
+
+def owner_task(repo, **extra):
+    repo.write_task(task(1) | {"verified_by": ["reviewer", "you"]} | extra)
+    repo.commit("task 1 has a line for the owner")
+
+
+def test_owner_check_waits_without_owner_verified(repo):
+    """Should fail while verified_by includes you and owner_verified is absent or empty."""
+    owner_task(repo)
+    ok, msg = checks.check_owner(repo.path, 1, base=BASE)
+    assert not ok
+    assert "waits for the owner" in msg
+    owner_task(repo, owner_verified="")
+    assert not checks.check_owner(repo.path, 1, base=BASE)[0]
+
+
+def test_owner_check_passes_once_owner_verified(repo):
+    """Should pass once owner_verified holds a date."""
+    owner_task(repo, owner_verified="2026-11-17")
+    ok, msg = checks.check_owner(repo.path, 1, base=BASE)
+    assert ok
+    assert "2026-11-17" in msg
+
+
+def test_owner_check_not_needed(repo):
+    """Should pass when verified_by does not include you."""
+    assert checks.check_owner(repo.path, 1, base=BASE)[0]
+
+
+def test_owner_check_reads_working_branch(repo):
+    """Should ignore owner_verified set on a task branch; the working branch's copy counts."""
+    owner_task(repo)
+    on_branch(repo)
+    repo.write_task(task(1) | {"verified_by": ["reviewer", "you"], "owner_verified": "2026-11-17"})
+    repo.commit("branch claims the owner's check")
+    assert not checks.check_owner(repo.path, 1, base=BASE)[0]
+
+
+@pytest.mark.parametrize("field, value", [("owner_verified", "2026-11-17"),
+                                          ("for_retry", ["probe/fake.py: IndexError"])])
+def test_protected_own_task_owner_verified_or_for_retry_set(repo, field, value):
+    """Should fail when a task branch sets owner_verified or for_retry on its own task file."""
+    b = on_branch(repo)
+    repo.write_task(task(1) | {field: value})
+    repo.commit(f"set {field}")
+    assert any(field in f for f in protected(repo, b))

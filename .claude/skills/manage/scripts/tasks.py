@@ -27,6 +27,7 @@ CLOSED = {"Done", "Dropped"}
 VERIFIERS = {"script", "metrics", "reviewer", "you"}
 RUNS_AS = {"build", "iterate", "measurement", "you"}
 PRIORITIES = ["high", "medium", "low"]
+OUTSIDE_NEEDS = ["claude-api"]  # the fixed set; checks.py NEED_CHECKS holds the check for each
 BOARD_TEMPLATE = Path(__file__).with_name("board.html")
 BOARD_OUT = "build/task-board.html"
 BOARD_PORT = 8765
@@ -38,7 +39,9 @@ REQUIRED = ["id", "title", "item", "motivation", "status", "added", "finished", 
             "depends_on", "source_chat", "done_means", "verified_by", "may_edit", "runs_as",
             "priority", "tags", "tokens"]
 # needs_you: the parked question. decided_for_you: one entry per decision made without the owner.
-OPTIONAL = ["draft_note", "needs_you", "decided_for_you"]
+# outside_needs: what the task needs from outside systems, checked before a builder starts.
+# for_retry: findings on files only the task's branch has. owner_verified: the date the owner checked.
+OPTIONAL = ["draft_note", "needs_you", "decided_for_you", "outside_needs", "for_retry", "owner_verified"]
 NEEDS_YOU_KEYS = ["question", "recommendation", "if_vetoed"]
 DECIDED_KEYS = ["chosen", "rejected", "would_change"]
 
@@ -154,6 +157,14 @@ def lint_task(name, t, allowed_tags):
         for d in dfy
     )):
         e(f"{name}: decided_for_you must be a list of {DECIDED_KEYS}")
+    needs = t.get("outside_needs", [])
+    if not _is_str_list(needs) or not set(needs) <= set(OUTSIDE_NEEDS) or len(set(needs)) != len(needs):
+        e(f"{name}: outside_needs must be a list of distinct values from {OUTSIDE_NEEDS}")
+    if not _is_str_list(t.get("for_retry", [])):
+        e(f"{name}: for_retry must be a list of strings")
+    ov = t.get("owner_verified", "")
+    if not (isinstance(ov, str) and (ov == "" or DATE.match(ov))):
+        e(f"{name}: owner_verified must be YYYY-MM-DD, or empty")
     return errs
 
 

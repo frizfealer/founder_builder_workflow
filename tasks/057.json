@@ -3,9 +3,9 @@
   "title": "Manager: decide mechanical stops by code (outside needs first; unmerged findings to the retry; the owner's check as a field)",
   "item": "Write down the rule that a stop or choice which can be decided mechanically is decided by a script, and apply it to the two cases task 49 showed: a missing outside need found only after the build, and review findings about unmerged code turned into a new task",
   "motivation": "Task 49 needed the owner three times on 2026-11-17 and only one of those needed him. Its first run spent 443,860 agent tokens before reporting that the Claude API had no credit, which one tiny call at the start would have shown. Its reviews' findings became task 054, which could not run because the code it fixed existed only on branch task/049; the owner and Claude folded it into the retry by hand. SKILL.md says a rule stays prose until it is broken once; both have now been broken once.",
-  "status": "Ready",
+  "status": "Done",
   "added": "2026-11-17",
-  "finished": "",
+  "finished": "2026-11-17",
   "notes": "Owner's rule, 2026-11-17: any mechanical check uses code. (a) Outside needs. A new optional task field, outside_needs, a list from a fixed set that starts with one value, claude-api. Before a builder is dispatched for a task, a script runs one check per need; for claude-api that is one minimal API call with the credentials a builder would use (the owner logs in with the ant CLI and sets no ANTHROPIC_API_KEY; see the notes of task 49). On failure the manager parks the task at once with the script's reason as the question and takes the next task. The check costs under 0.01 USD and never prints or stores a credential. (b) Findings on unmerged work. When a review or a builder reports faults in files that exist on the task's own branch and not on the working branch, they belong to that task's retry. A script decides it from the paths; the manager then records the findings in a new optional field of that task, for_retry (a list of strings, a manager field), creates no Proposed task for them, and the retry builder's brief quotes for_retry. Findings about files that are on the working branch still become at most one Proposed task per task run, as today. Keep both checks in scripts/checks.py with tests in temporary git repos, like the existing checks; document the two fields in references/task-fields.md. (c) The owner's own check. On 2026-11-17 the manager merged task 49, whose verified_by includes you, by reading a sentence in its notes as the owner's verification, and reported that it broke the rule 'park any task the owner verifies' to do so. Make it a field: a new optional field owner_verified holds the date the owner checked his lines, set by the owner or on his instruction, and it may be set while the task is Ready or Needs you. A script decides: a task with a line for the owner parks until owner_verified is set, and is not parked for the owner again once it is. The manager never sets this field and never infers it from other text.",
   "depends_on": [],
   "source_chat": "founder_and_builder project chat, 2026-11-17",
@@ -22,6 +22,56 @@
   "tags": [
     "manager"
   ],
-  "tokens": null,
-  "draft_note": "Drafted by Claude in chat on 2026-11-17 on the owner's go. It changes the manager's own rules; the owner approves the design by setting it to Ready and sees the result at his next review tag. Clause (c) and line 4 were added on 2026-11-17 after the manager's report on task 49. Set to Ready on 2026-11-17 on the owner's instruction (\"we can put both tasks as ready\")."
+  "tokens": {
+    "agents": 150045,
+    "main_session": "not recorded"
+  },
+  "draft_note": "Drafted by Claude in chat on 2026-11-17 on the owner's go. It changes the manager's own rules; the owner approves the design by setting it to Ready and sees the result at his next review tag. Clause (c) and line 4 were added on 2026-11-17 after the manager's report on task 49. Set to Ready on 2026-11-17 on the owner's instruction (\"we can put both tasks as ready\").",
+  "decided_for_you": [
+    {
+      "chosen": "claude-api check runs `ant messages create --model claude-haiku-5-5 --max-tokens 1` as a subprocess",
+      "rejected": "the Python SDK, since checks.py runs under plain python3 with no dependencies",
+      "would_change": "if builders stop using the `ant auth login` credentials, or claude-haiku-5-5 is retired"
+    },
+    {
+      "chosen": "`needs` and `owner` read the task file from the working branch with git show",
+      "rejected": "reading the working tree, where a task branch could grant itself owner_verified",
+      "would_change": "if the owner sets fields without committing them"
+    },
+    {
+      "chosen": "`unmerged` passes only when each path exists on the task branch and is absent from the working branch",
+      "rejected": "absent from the working branch alone, so a mistyped path would go to for_retry",
+      "would_change": "if the owner wants done_means line 3 read literally"
+    },
+    {
+      "chosen": "findings are sorted into for_retry only when the task parks; on a merge every finding goes to the Proposed task",
+      "rejected": "sorting at every review, which would leave findings in a Done task's for_retry",
+      "would_change": "if the owner wants for_retry kept on merged tasks"
+    },
+    {
+      "chosen": "blocking problems still open at a park go into for_retry along with minor and outside ones",
+      "rejected": "only non-blocking findings in for_retry",
+      "would_change": "if the owner wants only non-blocking findings there"
+    },
+    {
+      "chosen": "for_retry and owner_verified stay out of the fields a task branch may change; the manager writes for_retry on the working branch at park",
+      "rejected": "letting a task branch write for_retry",
+      "would_change": "if the manager ever needs to write for_retry on a task branch"
+    },
+    {
+      "chosen": "a park replaces for_retry and removes it when nothing was sorted into it",
+      "rejected": "appending to an earlier list",
+      "would_change": "if old findings should carry over across parks"
+    },
+    {
+      "chosen": "`needs` runs once, at step 3, not again before the in-run retry builder",
+      "rejected": "re-checking before every builder",
+      "would_change": "if credentials expire within one run"
+    },
+    {
+      "chosen": "outside_needs documented as 'Owner; manager may draft', not added to rule 1's owner fields",
+      "rejected": "locking it with the owner's fields once Ready",
+      "would_change": "if the owner wants it locked once Ready"
+    }
+  ]
 }
