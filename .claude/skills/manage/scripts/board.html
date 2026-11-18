@@ -22,6 +22,8 @@
   fieldset { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px 10px; }
   legend { font-weight: 600; float: left; margin-right: 6px; }
   label { white-space: nowrap; cursor: pointer; }
+  button.all { font: inherit; font-size: 12px; padding: 0 6px; cursor: pointer; background: var(--card);
+               color: var(--text); border: 1px solid var(--line); border-radius: 3px; }
   main { display: flex; gap: 12px; padding: 12px 16px; overflow-x: auto; align-items: flex-start; }
   section { flex: 0 0 260px; background: rgba(127,127,127,.08); border-radius: 6px; padding: 8px; }
   section.collapsed { flex-basis: 140px; }
@@ -51,7 +53,10 @@
 <header>
   <input type="search" id="q" placeholder="Search id, title, notes, tags" aria-label="Search">
   <fieldset id="pri"><legend>Priority</legend></fieldset>
-  <fieldset id="tags"><legend>Tags</legend></fieldset>
+  <fieldset id="tags"><legend>Tags</legend>
+    <button type="button" class="all" data-check="true">select all</button>
+    <button type="button" class="all" data-check="false">deselect all</button>
+  </fieldset>
   <div id="error" role="alert"></div>
 </header>
 <main id="board"></main>
@@ -83,6 +88,12 @@ function boxes(id, values) {
 boxes("pri", DATA.priorities);
 boxes("tags", DATA.tags);
 document.getElementById("q").addEventListener("input", render);
+for (const b of document.querySelectorAll("#tags button.all")) {
+  b.addEventListener("click", () => {
+    for (const c of document.querySelectorAll("#tags input")) c.checked = b.dataset.check === "true";
+    render();
+  });
+}
 
 function checked(id) {
   return [...document.querySelectorAll(`#${id} input`)].filter(c => c.checked).map(c => c.value);
