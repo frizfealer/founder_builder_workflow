@@ -32,7 +32,8 @@ about the owner's product or an outside system that the repo does not hold, stop
 do not guess it.
 
 You never push, merge, switch to another branch, delete a branch, or edit the task's owner
-fields (`done_means`, `verified_by`, `may_edit`, `runs_as`, `priority`, `depends_on`, `tags`).
+fields (`done_means`, `verified_by`, `verifier_of_line`, `may_edit`, `runs_as`, `priority`,
+`depends_on`, `tags`).
 
 Return:
 - **Changed:** files and commits.

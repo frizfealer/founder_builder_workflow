@@ -193,3 +193,63 @@ def test_lint_for_retry_strings():
     """Should accept for_retry as a list of strings and fail anything else."""
     assert tasks.lint(as_files(task(1) | {"for_retry": ["probe/fake.py: IndexError on a 4th hold"]}), TAGS) == []
     assert any("for_retry" in e for e in tasks.lint(as_files(task(1) | {"for_retry": "fix it"}), TAGS))
+
+
+def test_lint_advisor_verifier():
+    """Should accept advisor as a value of verified_by."""
+    assert tasks.lint(as_files(task(1) | {"verified_by": ["reviewer", "advisor"]}), TAGS) == []
+
+
+def test_lint_verifier_of_line_valid():
+    """Should accept verifier_of_line mapping line numbers written (n) in done_means to verifiers."""
+    t = task(1) | {"done_means": "(1) A file exists. (2) Labels agree.", "verifier_of_line": {"2": "advisor", "1": "you"}}
+    assert tasks.lint(as_files(t, task(2) | {"verifier_of_line": {}}), TAGS) == []
+
+
+def test_lint_verifier_of_line_key_not_written():
+    """Should fail a verifier_of_line key that is not a line number written (n) in done_means."""
+    for key in ("3", "(1)", "one"):
+        t = task(1) | {"done_means": "(1) A file exists. (2) Labels agree.", "verifier_of_line": {key: "advisor"}}
+        errs = tasks.lint(as_files(t), TAGS)
+        assert any("verifier_of_line keys" in e for e in errs), key
+    unnumbered = task(1) | {"verifier_of_line": {"1": "advisor"}}
+    assert any("verifier_of_line keys" in e for e in tasks.lint(as_files(unnumbered), TAGS))
+
+
+def test_lint_verifier_of_line_value_not_verifier():
+    """Should fail a verifier_of_line value that is not a verifier, and a value that is not an object."""
+    for value in ("builder", ["advisor"], None):
+        t = task(1) | {"done_means": "(1) A file exists.", "verifier_of_line": {"1": value}}
+        errs = tasks.lint(as_files(t), TAGS)
+        assert any("verifier_of_line values" in e for e in errs), value
+    errs = tasks.lint(as_files(task(1) | {"verifier_of_line": ["1", "advisor"]}), TAGS)
+    assert any("verifier_of_line must be an object" in e for e in errs)
+
+
+def test_line_verifiers_map_and_rest():
+    """Should give a mapped line its one verifier, every other line all of verified_by, and an unnumbered done_means one line 1."""
+    t = task(1) | {"done_means": "(1) a. (2) b. (3) c.", "verified_by": ["script", "you"],
+                   "verifier_of_line": {"3": "advisor"}}
+    assert tasks.line_verifiers(t) == {"1": {"script", "you"}, "2": {"script", "you"}, "3": {"advisor"}}
+    assert tasks.line_verifiers(task(1)) == {"1": {"script"}}
+
+
+def test_written_lines_only_where_a_line_starts():
+    """Should count a (n) at the start of the text, of a text line, or after the punctuation that ends a line, and not one inside a line."""
+    dm = "(1) A file. (2) The board shows (7) columns: (3) x; (4) 'y'. (5) z\n(6) w"
+    assert tasks.written_lines(dm) == ["1", "2", "3", "4", "5", "6"]
+    t = task(1) | {"done_means": "(1) The board shows (7) columns.", "verifier_of_line": {"7": "advisor"}}
+    assert any("verifier_of_line keys" in e for e in tasks.lint(as_files(t), TAGS))
+
+
+def test_lint_advisor_and_you_on_unmapped_line():
+    """Should fail a task whose verified_by holds advisor and you while a line is mapped to neither, and pass once every line is mapped."""
+    dm = "(1) A file exists. (2) Labels agree."
+    both = task(1) | {"done_means": dm, "verified_by": ["advisor", "you"], "verifier_of_line": {"2": "advisor"}}
+    errs = tasks.lint(as_files(both), TAGS)
+    assert any("advisor and you" in e and "['1']" in e for e in errs)
+    unnumbered = task(1) | {"verified_by": ["advisor", "you"]}
+    assert any("advisor and you" in e for e in tasks.lint(as_files(unnumbered), TAGS))
+    mapped = both | {"verifier_of_line": {"1": "you", "2": "advisor"}}
+    assert tasks.lint(as_files(mapped), TAGS) == []
+    assert tasks.lint(as_files(task(1) | {"verified_by": ["advisor", "reviewer"]}), TAGS) == []

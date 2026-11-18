@@ -46,6 +46,13 @@ append-only  eval/*/EXPERIMENTS.md
 named        .claude/skills/manage/
 named        .claude/agents/manager-builder.md
 named        .claude/agents/manager-reviewer.md
+named        .claude/agents/manager-advisor.md
 named        .claude/commands/manage.md
 named        .claude/settings*.json
 named        .git/hooks/
+
+# The reviewer's and the advisor's saved replies, which checks.py review and advice read at the
+# merge: the manager writes them on the working branch in the merge or park commit, so a task
+# branch may not add or change one
+named        tasks/reviews/
+named        tasks/advice/

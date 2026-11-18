@@ -24,7 +24,7 @@ TAGS_FILE = "tags.txt"  # in TASKS_DIR, one allowed tag per line
 MAX_TAGS = 3
 STATUSES = ["Proposed", "Backlog", "Ready", "In progress", "Needs you", "Done", "Dropped"]
 CLOSED = {"Done", "Dropped"}
-VERIFIERS = {"script", "metrics", "reviewer", "you"}
+VERIFIERS = {"script", "metrics", "reviewer", "advisor", "you"}
 RUNS_AS = {"build", "iterate", "measurement", "you"}
 PRIORITIES = ["high", "medium", "low"]
 OUTSIDE_NEEDS = ["claude-api"]  # the fixed set; checks.py NEED_CHECKS holds the check for each
@@ -32,16 +32,22 @@ BOARD_TEMPLATE = Path(__file__).with_name("board.html")
 BOARD_OUT = "build/task-board.html"
 BOARD_PORT = 8765
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+# A done_means line, written (n) where a line starts: at the start of the text or of a text line,
+# or after the . : ; ! or ? that ends the line before. A (n) inside a line is not a line number.
+LINE_NUMBER = re.compile(r"(?:^\s*|[.:;!?]['\")\]]*\s+)\((\d+)\)", re.M)
 
 # The owner's fields: set by the owner; the manager may draft them only before Ready.
-OWNER_FIELDS = ["done_means", "verified_by", "may_edit", "runs_as", "priority", "depends_on", "tags"]
+OWNER_FIELDS = ["done_means", "verified_by", "verifier_of_line", "may_edit", "runs_as", "priority",
+                "depends_on", "tags"]
 REQUIRED = ["id", "title", "item", "motivation", "status", "added", "finished", "notes",
             "depends_on", "source_chat", "done_means", "verified_by", "may_edit", "runs_as",
             "priority", "tags", "tokens"]
 # needs_you: the parked question. decided_for_you: one entry per decision made without the owner.
 # outside_needs: what the task needs from outside systems, checked before a builder starts.
 # for_retry: findings on files only the task's branch has. owner_verified: the date the owner checked.
-OPTIONAL = ["draft_note", "needs_you", "decided_for_you", "outside_needs", "for_retry", "owner_verified"]
+# verifier_of_line: the one verifier of a done_means line, keyed by the line's number.
+OPTIONAL = ["draft_note", "needs_you", "decided_for_you", "outside_needs", "for_retry", "owner_verified",
+            "verifier_of_line"]
 NEEDS_YOU_KEYS = ["question", "recommendation", "if_vetoed"]
 DECIDED_KEYS = ["chosen", "rejected", "would_change"]
 
@@ -72,6 +78,20 @@ def load_tags(root):
 
 def write(root, task):
     task_path(root, task["id"]).write_text(json.dumps(task, indent=2, ensure_ascii=False) + "\n")
+
+
+def written_lines(done_means):
+    """The line numbers written (n) in done_means, as strings, in the order they first appear."""
+    return list(dict.fromkeys(LINE_NUMBER.findall(done_means)))
+
+
+def line_verifiers(t):
+    """{line number: set of verifiers} for a task that lints. A line verifier_of_line names has
+    that one verifier; any other line has every verifier in verified_by. A done_means that numbers
+    no line is one line, "1"."""
+    vol = t.get("verifier_of_line", {})
+    return {n: {vol[n]} if n in vol else set(t["verified_by"])
+            for n in written_lines(t["done_means"]) or ["1"]}
 
 
 def _is_str_list(v):
@@ -115,6 +135,21 @@ def lint_task(name, t, allowed_tags):
             e(f"{name}: finished is set but status is {status}")
     if not _is_str_list(t["verified_by"]) or not set(t["verified_by"]) <= VERIFIERS:
         e(f"{name}: verified_by must be a list drawn from {sorted(VERIFIERS)}")
+    vol = t.get("verifier_of_line", {})
+    if not isinstance(vol, dict):
+        e(f"{name}: verifier_of_line must be an object from a line number of done_means to one verifier")
+    else:
+        written = written_lines(t["done_means"]) if isinstance(t["done_means"], str) else []
+        bad_keys = [k for k in vol if k not in written]
+        bad_values = [v for v in vol.values() if not (isinstance(v, str) and v in VERIFIERS)]
+        if bad_keys:
+            e(f"{name}: verifier_of_line keys {bad_keys} are not line numbers written (n) in done_means")
+        if bad_values:
+            e(f"{name}: verifier_of_line values {bad_values} are not verifiers; use one of {sorted(VERIFIERS)}")
+        unmapped = [n for n in written or ["1"] if n not in vol]
+        if unmapped and _is_str_list(t["verified_by"]) and {"advisor", "you"} <= set(t["verified_by"]):
+            e(f"{name}: verified_by has advisor and you, so line(s) {unmapped} would go to both, and the "
+              f"advisor never rules on a line of yours; map each of them to one verifier in verifier_of_line")
     if not _is_str_list(t["may_edit"]):
         e(f"{name}: may_edit must be a list of paths")
     if t["runs_as"] not in RUNS_AS | {""}:

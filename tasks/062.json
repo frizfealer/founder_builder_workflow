@@ -1,0 +1,32 @@
+{
+  "id": 62,
+  "title": "Manager: small fixes left by task 037 (consult exit code, consult cost note, line numbers after abbreviations, labels against verdicts for task 56)",
+  "item": "Give checks.py consult a distinct exit code when the task file is missing; say in SKILL.md that consult re-runs the paid claude-api check for a task with outside_needs; stop LINE_NUMBER counting a (n) after an abbreviation such as 'e.g.'; add a step that compares the advisor's blind labels (job a) with the verdicts, for a line like task 56 line 3",
+  "motivation": "Review 037-2 minor 2, 3 and 4, and the outside problem carried from 037-1 that both builders also noted. Today a consult crash and a real always-park both exit 1; no done_means writes 'e.g. (n)'; and task 56 line 3, the advisor's first real use, needs labels compared with verdicts that job (a) never sees.",
+  "notes": "Also noticed by the builder: commands/manage.md line 70 is 147 characters long (older than task 037).",
+  "done_means": "",
+  "draft_note": "Drafted by the manager on 2026-11-17 from review 037-2 and the task 037 builder's notes. Priority, done_means and may_edit left for the owner; every change is under .claude/skills/manage/, which is protected.",
+  "depends_on": [
+    {
+      "id": 37,
+      "soft": false
+    }
+  ],
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "status": "Proposed",
+  "added": "2026-11-17",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tags": [
+    "manager"
+  ],
+  "tokens": null
+}

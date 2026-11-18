@@ -21,9 +21,9 @@
     ".claude/agents/manager-advisor.md"
   ],
   "draft_note": "First drafted by Claude on 2026-11-15; rewritten by Claude in chat on 2026-11-17 on the owner's go, after task 49. Changed from the first draft: the advisor has four jobs, not one; 'verified by you' blocks it per pass line, not per task; the always-park cases are decided by a script. It widens what merges without the owner; he approves that by setting it to Ready. If it parks twice, stop and go on with the BDD path, with Claude in chat as labeller. The owner asked on 2026-11-17 to read the changed manager rules before this task merges (\"read 37\"), so verified_by includes you. Set to Ready the same day on his instruction. 2026-11-17: the owner read a summary of the changed manager rules in chat and approved them with the fixes in for_retry (\"approve 37 with fixes\"). owner_verified and Ready were set by Claude in chat on that instruction.",
-  "status": "Ready",
+  "status": "Done",
   "added": "2026-11-15",
-  "finished": "",
+  "finished": "2026-11-17",
   "source_chat": "",
   "runs_as": "build",
   "priority": "high",
@@ -31,22 +31,9 @@
     "manager"
   ],
   "tokens": {
-    "agents": 235182,
+    "agents": 443850,
     "main_session": "not recorded"
   },
-  "for_retry": [
-    "Review 037-1, minor: `advisor.md` line 20. The blindness of job (a) rests only on the brief; the Read tool can open the verdicts. This is inherent to the tools, but worth knowing.",
-    "Owner, 2026-11-17: fix these on the branch before the merge; they were sorted into Proposed task 060 only because they sit in files that already exist on the working branch, and they are all about lines this task added.",
-    "Review 037-1, minor 1: a task whose verified_by holds both advisor and you, with a done_means line mapped to neither, can never merge (check_advice demands a HOLDS reply the manager is told never to request). Make tasks.py lint reject advisor and you together on an unmapped line, and make check_advice skip a line the owner verifies.",
-    "Owner, 2026-11-17: the task limit is his own control. Move merge-limit from the consult list to the always-park list; decide review and advice the same way and say which in decided_for_you.",
-    "Owner, 2026-11-17: checks.py consult must check the condition itself wherever the repo shows it, not only the reason label the manager passes: a line verified by you with owner_verified empty, runs_as you, a failing protected-path check, a failing outside-need check, the task limit reached. When the condition holds, it is always park, whatever label was passed. Money, accounts and the never list have no state to read and stay on the label.",
-    "Review 037-1: consult's except ValueError hides a missing task file.",
-    "Review 037-1: job (d) appends to draft_note instead of overwriting it.",
-    "Review 037-1: LINE_NUMBER matches only a (n) that starts a line.",
-    "Review 037-1: SKILL.md rule 3 does not mention the retry that follows a job (b) GO ON.",
-    "Review 037-1: reviewer.md's Return wording for lines owned by another verifier.",
-    "Review 037-1: protect tasks/reviews/ the way tasks/advice/ is protected."
-  ],
   "decided_for_you": [
     {
       "chosen": "advisor reply files numbered like tasks/reviews/, with a `JOB: a (<n>)` second line tying a reply to its line",
@@ -59,9 +46,9 @@
       "would_change": "if you want the literal 'any'"
     },
     {
-      "chosen": "tasks/advice/ is a named protected path, so a task branch cannot plant a HOLDS ruling",
-      "rejected": "unprotected like tasks/reviews/, or append-only",
-      "would_change": "if a task ever needs to write advice on its branch"
+      "chosen": "tasks/advice/ and tasks/reviews/ are both named protected paths, so a task branch can plant neither a HOLDS ruling nor a PASS verdict",
+      "rejected": "leaving either folder unprotected, or append-only",
+      "would_change": "if a task ever needs to write advice or reviews on its branch"
     },
     {
       "chosen": "verifier_of_line accepts any verifier, not only those in verified_by",
@@ -79,9 +66,9 @@
       "would_change": "if you want the manager to map lines"
     },
     {
-      "chosen": "park reasons are a fixed word list in checks.py consult; always-park is exactly the eight cases in the notes; merge-limit, review and advice refusals consult the advisor",
-      "rejected": "adding those three to always-park",
-      "would_change": "if you add them to always-park (review minor 3 argues for it)"
+      "chosen": "park reasons are a fixed word list in checks.py consult; always-park is the eight cases in the notes plus merge-limit (the owner's ruling), review and advice refusals; consult also checks each always-park condition the repo shows, whatever reason is passed",
+      "rejected": "review and advice refusals consulting the advisor: they happen only after step 5 passed, so something mechanical is wrong, and the advisor's only way on would be re-running a verifier, which re-rolls a merge gate",
+      "would_change": "if you want the advisor to try re-saving or re-running before a review or advice park"
     },
     {
       "chosen": "at most one advisor GO ON is followed per task run; a later park parks with the advisor's reply in the recommendation",
@@ -102,6 +89,36 @@
       "chosen": "review findings sorted by checks.py unmerged: only the advisor.md one went to for_retry; the rest name files that also exist on the working branch, so they went to Proposed task 60 even though the code they fault is new on task/037",
       "rejected": "overriding the script",
       "would_change": "if checks.py unmerged is changed to look at changed lines, not whole files"
+    },
+    {
+      "chosen": "consult takes the task's branch as an optional third argument",
+      "rejected": "guessing it from task/<id>*, which misses iterate branches",
+      "would_change": "if a park ever has a branch and the manager leaves it out"
+    },
+    {
+      "chosen": "consult runs the outside-need check for real on every park of a task with outside_needs (one 1-token call, under 0.01 USD)",
+      "rejected": "reading only the reason label for needs",
+      "would_change": "if you don't want that cost on each park"
+    },
+    {
+      "chosen": "a missing task file makes consult raise, exit 1, as needs and owner already do",
+      "rejected": "a separate exit code",
+      "would_change": "if the manager must tell a crash from an always-park (review 037-2, minor 2; in task 062)"
+    },
+    {
+      "chosen": "a (n) counts as a done_means line number at the start of the text or of a text line, or after . : ; ! ? and whitespace",
+      "rejected": "start of the text only, or line breaks only, since existing tasks write their lines inline",
+      "would_change": "if a done_means writes a bracketed number mid-line after a colon or an abbreviation like e.g."
+    },
+    {
+      "chosen": "any park of a task with an unchecked you line skips the advisor, whatever the reason (literal reading of the owner's item 5)",
+      "rejected": "checking the owner condition only for the owner reason",
+      "would_change": "if you want job (b) to still run for those tasks"
+    },
+    {
+      "chosen": "for_retry removed at the merge, since every item in it is fixed on task/037-2",
+      "rejected": "leaving it on a Done task",
+      "would_change": "if you want it kept as a record (the review files hold it too)"
     }
   ],
   "owner_verified": "2026-11-17"
