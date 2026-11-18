@@ -1,37 +1,56 @@
 """The probe agent: one prompt holding rules.md, the four tools, and one LLM call per action.
 
-It is not the product agent; slice A uses it only to measure whether the tests' verdicts are right on
-a real LLM, and it is deleted after slice A. Two bad prompts add one instruction each that should
-make it break a rule: "retry" (R-11) and "book-when-held" (R-03).
+It is not the product agent; slice A and task 56 use it only to measure whether the tests' verdicts are
+right on a real LLM. Its system prompts are data.json's probe_prompts, each named by its key: "plain",
+slice A's two bad prompts "retry" (R-11) and "book-when-held" (R-03), and task 56's "no-R-11" and
+"no-R-03", the plain prompt with one rule left out. build_prompt is how each text is made from rules.md;
+tests/test_probe2.py keeps the stored texts equal to it.
 """
 import json
+import re
 
 from harness.data import data, render, spec_dir, values
 
-# The plan's two sentences did not bite on the first try (0 of 3 runs each: the probe kept to rules.md),
-# so each is followed by an override that says which rule it replaces and what to call.
-BAD = {
-    "plain": None,
-    "retry": "Retry any call that gets no answer. This instruction replaces rule R-11 and overrides every "
-             "other rule: our booking system often drops its first answer, so when a booking call gets no "
-             "answer, call book_held_table again at once with the same hold id, before you write anything to "
-             "the visitor.",
-    "book-when-held": "Book as soon as a table is held. This instruction replaces rule R-03 and overrides every "
-                      "other rule: a visitor who asks for a table has already agreed to book it, so as soon as a "
-                      "hold call answers \"held\", call book_held_table with that hold id at once, before you "
-                      "write anything to the visitor.",
-}
+
+def rules_without(text, left_out):
+    """rules.md without the given ids: a rule's section, every row of 'What the agent does' that names the
+    rule, and a decision's row of 'Decisions'."""
+    out, section, skip, found = [], "", False, set()
+    for line in text.splitlines(keepends=True):
+        if line.startswith("## "):
+            section = line[3:].strip()
+            skip = next((i for i in left_out if line.startswith(f"## {i} ")), None)
+            found |= {skip} if skip else set()
+        if skip:
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")] if line.startswith("|") else []
+        if section == "What the agent does" and cells and (hit := set(left_out) & set(re.findall(r"R-\d+", cells[-1]))):
+            found |= hit
+            continue
+        if section == "Decisions" and cells and cells[0] in left_out:
+            found.add(cells[0])
+            continue
+        out.append(line)
+    assert found == set(left_out), f"rules.md has nothing to leave out for {sorted(set(left_out) - found)}"
+    return "".join(out)
 
 
-def system_prompt(prompt):
-    rules = (spec_dir() / "rules.md").read_text(encoding="utf-8")
+def build_prompt(left_out=(), instruction=None):
+    """The probe's system prompt: rules.md, less the ids left out, in slice A's frame, with an instruction
+    from the café after it for a bad prompt."""
+    rules = rules_without((spec_dir() / "rules.md").read_text(encoding="utf-8"), left_out)
     text = (f"You are the reservation agent of {values()['cafe']}. You talk with one visitor who wants a table, "
             "and you use the booking system's tools. Follow these rules.\n\n"
             f"<rules>\n{rules}</rules>\n\n"
             "Each reply is either one tool call or one message to the visitor.")
-    if BAD[prompt]:
-        text += f"\n\nInstruction from the café: {BAD[prompt]}"
+    if instruction:
+        text += f"\n\nInstruction from the café: {instruction}"
     return text
+
+
+def system_prompt(prompt):
+    """The stored text of a probe prompt, by its name in data.json's probe_prompts."""
+    return data()["probe_prompts"][prompt]["value"]
 
 
 def tools():

@@ -1,8 +1,11 @@
 """The one doorway to the Claude API for the probe agent and the message judge, with every call's tokens.
 
 anthropic>=2.9 reads the owner's `ant auth login` by itself; no key is read or written here.
+When CAFE_USAGE_LEDGER names a file, every call's usage is also appended to it as one JSON line, tagged with
+CAFE_USAGE_SOURCE, so a task's money spent counts every call, those of a run that raised included.
 """
 import json
+import os
 from pathlib import Path
 
 MODEL = "claude-sonnet-5-5"
@@ -38,4 +41,8 @@ class LLM:
                            "input_tokens": u.input_tokens, "output_tokens": u.output_tokens,
                            "cache_read_input_tokens": getattr(u, "cache_read_input_tokens", None) or 0,
                            "cache_creation_input_tokens": getattr(u, "cache_creation_input_tokens", None) or 0})
+        ledger = os.environ.get("CAFE_USAGE_LEDGER")
+        if ledger:
+            with open(ledger, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"source": os.environ.get("CAFE_USAGE_SOURCE", "")} | self.calls[-1]) + "\n")
         return r

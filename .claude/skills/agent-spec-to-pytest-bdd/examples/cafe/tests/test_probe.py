@@ -8,7 +8,7 @@ from types import SimpleNamespace
 from harness.checkers import verdict
 from harness.data import HERE, data
 from harness.judge import MessageJudge
-from probe.agent import BAD, ProbeAgent, judge_llm, system_prompt, to_messages
+from probe.agent import ProbeAgent, judge_llm, system_prompt, to_messages
 from probe.llm import LLM, cost
 from stub_api import StubClient
 from test_part1 import run_scenario
@@ -27,10 +27,11 @@ def test_render_history_m5_pairs_each_result_with_its_call():
 def test_build_prompt_bad_adds_one_instruction():
     """Should hold rules.md in every prompt and add the bad instruction only to a bad prompt."""
     plain, retry = system_prompt("plain"), system_prompt("retry")
+    bad = {p: data()["probe_prompts"][p]["instruction"] for p in ("retry", "book-when-held")}
     assert "## R-11 No second booking call after no answer" in plain
-    assert retry.startswith(plain) and retry.endswith(BAD["retry"])
-    assert BAD["retry"].startswith("Retry any call that gets no answer.")
-    assert BAD["book-when-held"].startswith("Book as soon as a table is held.")
+    assert retry.startswith(plain) and retry.endswith(bad["retry"])
+    assert bad["retry"].startswith("Retry any call that gets no answer.")
+    assert bad["book-when-held"].startswith("Book as soon as a table is held.")
 
 
 def test_run_moment_probe_second_booking_call_breaks_r11():

@@ -9,14 +9,15 @@ sends a message and the next World line is not the visitor's (or there is none).
 - from the start: the agent in the slot plays every turn, up to data.json's action limit.
 - from a tested moment: the moment's history from data.json is replayed through the fake (each
   result must come out as the history says), then the agent in the slot takes one action. That
-  action is judged as it stands; a tool call it makes is not answered.
+  action is judged as it stands; a tool call it makes is not answered. A moment of the second probe
+  run is replayed in its scenario's World as moment_world changes it.
 
 An agent is any object with act(events) -> [event, ...]: one action, which is a message, a tool
 call, or a message followed by a tool call.
 """
 from dataclasses import dataclass, field
 
-from harness.data import data, render, tool_kind, visitor_entry
+from harness.data import data, moment as moment_entry, render, tool_kind, visitor_entry
 from harness.fake import outcome_of
 
 
@@ -32,6 +33,15 @@ def world_line(label):
     if outcome:
         return WorldLine(label, outcome=outcome)
     return WorldLine(label, visitor=visitor_entry(label))
+
+
+def moment_world(world, entry):
+    """The World a moment is replayed in: the scenario's lines, with the visitor sentences the moment puts in
+    place of theirs, then the visitor lines a probe-only moment adds after them."""
+    visitor = data()["visitor"]
+    swap = entry.get("visitor_sentences", {})
+    lines = [WorldLine(l.label, visitor=visitor[swap[l.label]]) if l.label in swap else l for l in world]
+    return lines + [WorldLine(visitor[k]["world_step"], visitor=visitor[k]) for k in entry.get("world_after", [])]
 
 
 @dataclass
@@ -100,7 +110,9 @@ class Driver:
         return self._done(over=False, stopped=f"action limit ({limit})")
 
     def _from_moment(self, moment):
-        history = data()["moments"][moment]["history"]
+        entry = moment_entry(moment)
+        self.world = moment_world(self.world, entry)
+        history = entry["history"]
         for j, h in enumerate(history):
             if h["kind"] == "visitor":
                 self.visitor_speaks()
