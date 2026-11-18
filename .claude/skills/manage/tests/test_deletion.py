@@ -261,6 +261,27 @@ def test_hook_still_refuses_push_while_run_active(run):
     assert code == 2 and "owner pushes" in err
 
 
+# Task 58's own title, which its merge commit's subject holds.
+TITLE = ("Manager: deletion decided by code (superseded branches deleted; file deletions checked "
+         "at merge; git clean refused)")
+
+
+@pytest.mark.parametrize("command", [
+    f'git commit -m "Merge task 58: {TITLE}"',
+    f"git commit -q --message='Merge task 58: {TITLE}'",
+    'git commit -m "$(cat <<\'EOF\'\ntask 1: the hook refuses git branch -D x and git push\nEOF\n)"',
+])
+def test_hook_allows_commit_message_naming_refused_commands(run, command):
+    """Should allow a commit whose quoted message names git clean, git push or a forced deletion, such as this task's own merge, since a message is not commands."""
+    assert "git clean" in TITLE
+    assert hook(run, command) == (0, "")
+
+
+def test_hook_refuses_command_after_commit_message(run):
+    """Should still refuse a git clean that follows a commit with a quoted message."""
+    assert hook(run, 'git commit -m "tidy" && git clean -fd')[0] == 2
+
+
 # --- protected: file deletions checked at merge ----------------------------------------------
 
 def with_old_file(repo, **fields):

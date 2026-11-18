@@ -334,8 +334,7 @@ def check_superseded(repo, branch, base=WORKING_BRANCH):
         failed.append(f"(3) it is checked out in {', '.join(worktrees)}")
     if not failed:
         return True, (f"branch {branch} is superseded: {merged}, and no worktree has it checked out. "
-                      f"Last commit {tip}. Delete it with git branch -D {branch}; "
-                      f"restore it with git branch {branch} {tip}")
+                      f"Last commit {tip}; once deleted, git branch {branch} {tip} restores it")
 
     def files(*flags):
         out = git(repo, "diff", "--name-only", "--no-renames", "-z", *flags, base, branch).stdout
@@ -686,13 +685,16 @@ def tokens(repo):
 
 
 GIT_OPTS_WITH_ARG = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
+# A quoted -m / --message argument is a commit or tag message, not commands: a task merge's
+# subject holds the task's title, and a title can name git clean or git push.
+MESSAGE_ARG = re.compile(r"""(?:-m|--message)(?:=|\s+)(?:"(?:[^"\\]|\\.)*"|'[^']*')""")
 
 
 def git_calls(command):
     """(subcommand, the words after it) for each `git ...` the command text runs. Text only: an
     alias or a script is missed."""
     calls = []
-    for part in re.split(r"[;&|\n()`]+|\$\(", command):
+    for part in re.split(r"[;&|\n()`]+|\$\(", MESSAGE_ARG.sub("-m _", command)):
         toks = [t.strip("'\"") for t in part.split()]
         for i, t in enumerate(toks):
             if os.path.basename(t) != "git":
