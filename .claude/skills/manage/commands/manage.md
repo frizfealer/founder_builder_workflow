@@ -180,7 +180,9 @@ advice <id>`; if either fails, `git merge --abort` and park the task with its ou
 `review` or `advice`). Then set the task file's `status` to Done, `finished` to today, `tokens`
 (its `agents` so far plus this run's count from `checks.py tokens`), and `decided_for_you` with
 each advisor ruling, add the Proposed task from step 5, and commit all of it with the subject
-`Merge task <id>: <title>`.
+`Merge task <id>: <title>`, as a plain quoted `git commit -m "Merge task <id>: <title>"`, not a
+heredoc: the hook reads a heredoc message as commands. When the title holds a backtick or `$(`,
+write the subject to a file and commit with `git commit -F <file>`.
 
 Right after that commit, remove each worktree of this task's branches with `git worktree remove
 <path>`, never `--force`; if git refuses, leave it and list it under Needs you in the run report.

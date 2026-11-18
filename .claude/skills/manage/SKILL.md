@@ -201,8 +201,11 @@ All from the repo root, all with `python3`:
   branch it names, which is the manager's cleanup step; for the main session and every
   subagent. It reads command text, so it is an early stop, not proof: an alias, a script or
   `gh` can still push, and it does not try to stop `rm`, which builders use on their own
-  temporary files. A quoted `-m` or `--message` argument is a message, not commands, so a task
-  merge whose title names one of these still commits. If a run
+  temporary files. A `-m` or `--message` argument that bash runs nothing in is a message, not
+  commands, so a task merge whose title names one of these still commits: a single-quoted
+  argument, or a double-quoted one with no backtick and no `$(`. Any other message, a heredoc's
+  included, is read as commands like the rest; write such a message to a file and commit with
+  `git commit -F <file>`. If a run
   crashed and left the marker, the owner deletes the file. The marker also holds the run's
   state: the working branch's commit at the start, each failed `try-merge`, each agent's tokens.
   `run-start` then removes each worktree under `build/worktrees/` that holds no uncommitted

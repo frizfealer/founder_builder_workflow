@@ -269,10 +269,11 @@ TITLE = ("Manager: deletion decided by code (superseded branches deleted; file d
 @pytest.mark.parametrize("command", [
     f'git commit -m "Merge task 58: {TITLE}"',
     f"git commit -q --message='Merge task 58: {TITLE}'",
-    'git commit -m "$(cat <<\'EOF\'\ntask 1: the hook refuses git branch -D x and git push\nEOF\n)"',
+    "git commit -am 'say `git clean -fd` and $(git push) are refused'",
+    'git commit -m "say \\`git clean -fd\\` is refused"',
 ])
 def test_hook_allows_commit_message_naming_refused_commands(run, command):
-    """Should allow a commit whose quoted message names git clean, git push or a forced deletion, such as this task's own merge, since a message is not commands."""
+    """Should allow a commit whose quoted message names git clean, git push or a forced deletion, such as this task's own merge, when bash runs nothing in the message."""
     assert "git clean" in TITLE
     assert hook(run, command) == (0, "")
 
@@ -280,6 +281,22 @@ def test_hook_allows_commit_message_naming_refused_commands(run, command):
 def test_hook_refuses_command_after_commit_message(run):
     """Should still refuse a git clean that follows a commit with a quoted message."""
     assert hook(run, 'git commit -m "tidy" && git clean -fd')[0] == 2
+
+
+@pytest.mark.parametrize("command", [
+    'git commit -m "say `git clean -fd` is refused"',
+    'git commit -m "$(git clean -fd)"',
+    'git commit -m "say `git push` is refused"',
+    'git commit -m "$(git push)"',
+    'git commit -m "$(git branch -D owner-idea)"',
+    'git commit -m "$(cat <<\'EOF\'\ntask 1: the hook refuses git push\nEOF\n)"',
+    "echo '-m \"' ; git clean -fd ; echo '\"'",
+    "echo 'x-m \"' ; git clean -fd ; echo '\"'",
+])
+def test_hook_refuses_command_bash_runs_inside_commit_message(run, command):
+    """Should refuse a git clean, push or forced deletion that bash runs inside a double-quoted message, a heredoc message, or after a -m that does not start a word."""
+    run.git("branch", "owner-idea", BASE)
+    assert hook(run, command)[0] == 2
 
 
 # --- protected: file deletions checked at merge ----------------------------------------------

@@ -685,9 +685,13 @@ def tokens(repo):
 
 
 GIT_OPTS_WITH_ARG = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
-# A quoted -m / --message argument is a commit or tag message, not commands: a task merge's
-# subject holds the task's title, and a title can name git clean or git push.
-MESSAGE_ARG = re.compile(r"""(?:-m|--message)(?:=|\s+)(?:"(?:[^"\\]|\\.)*"|'[^']*')""")
+# A quoted -m / --message argument that bash runs nothing in is a commit or tag message, not
+# commands: a task merge's subject holds the task's title, and a title can name git clean or git
+# push. That is a single-quoted argument, or a double-quoted one with no backtick and no $( (an
+# escaped \` or \$ is literal). Any other message, a heredoc's included, stays in the scanned text.
+# The flag starts a word (-m, or short flags ending in m such as -am), so x-m "..." is not one.
+MESSAGE_ARG = re.compile(
+    r"""(?<!\S)(?:-[A-Za-z]*m|--message)(?:=|\s+)(?:"(?:[^"\\`$]|\\.|\$(?!\())*"|'[^']*')""")
 
 
 def git_calls(command):
