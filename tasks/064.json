@@ -1,0 +1,32 @@
+{
+  "id": 64,
+  "title": "Manager: small fixes left by task 061 (job b worktree, main-folder during a merge, rebuilt task's two worktrees, tests that read limits.json, a check on builder spend)",
+  "item": "Fix the minor problems review 061-1 and advisor 061-1 left in the parallel manager, and add a script check for money a builder spends when its task has no outside_needs or cap",
+  "motivation": "Review 061-1 minor 1-8 and advisor 061-1's notes; none blocked task 61. The task 61 builder spent about 0.59 USD on claude -p runs with no money field on the task: rule 2 says a broken rule that no script checks gets a task to build that check.",
+  "notes": "Review 061-1: (1) step 8's job (b) brief does not pass the task's worktree that agents/advisor.md expects; (2) main-folder fails on a staged change, so running it while a step-7 merge --no-commit is open (a background builder returning mid-merge) ends the run with the merge open; the text should say to wait until the merge is committed or aborted; (3) after a failed main-folder check the text says change nothing on the working branch, but step 9 commits RUNS.md, and nothing covers agents still running; (4) a park removes one worktree, but a rebuilt task has two; (5) your own commit or tracked edit in the main folder during a run ends the run, and no doc tells you; (6) test_batch_hard_dependency_between_tasks's batch assertion passes without the dependency check; (7) tasks_at_once is not validated (0 or missing); (8) advisor.md's Never list does not name conflict and stale. Advisor 061-1: test_limits_tasks_at_once_starts_at_2 and the parallel test read the real limits.json, so they fail when you change tasks_at_once; SKILL.md rule 8 overstates the isolation: \"worktree\" result. Builder: the push hook refuses any Bash text containing the words of a push, even in a heredoc that writes docs; skill-iterate's commands/iterate.md still assumes the main folder (another skill); tasks.py next is kept beside batch.",
+  "done_means": "",
+  "draft_note": "Drafted by the manager on 2026-11-17 from review 061-1, advisor 061-1 and the task 061 builder's notes.",
+  "depends_on": [
+    {
+      "id": 61,
+      "soft": false
+    }
+  ],
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "status": "Proposed",
+  "added": "2026-11-17",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tags": [
+    "manager"
+  ],
+  "tokens": null
+}

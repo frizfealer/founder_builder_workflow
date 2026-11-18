@@ -28,7 +28,25 @@
                                            left out when there is none
   checks.py drafts <task-id>               the Proposed tasks that hard-depend on the task and have
                                            an empty done_means, one id per line (the advisor drafts them)
-  checks.py run-start | run-end            mark a manager run active / no longer active
+  checks.py run-start | run-end            mark a manager run active / no longer active. run-start
+                                           also removes each leftover worktree under build/worktrees/
+                                           that holds no uncommitted change, reports the others, and
+                                           reports each task left In progress, with a recommendation
+  checks.py main-folder                    during a run: exit 1 unless the main folder is on the
+                                           working branch with no change to a tracked file, and every
+                                           commit the working branch gained since run-start is the
+                                           manager's
+  checks.py try-merge <task-id> <worktree> [<command>...]
+                                           during a run: merge the working branch into the task's
+                                           worktree without committing, run each command there, undo
+                                           the merge. Exit 0 when it merges and every command passes;
+                                           on a conflict or a failing command, exit 1 the first time
+                                           in this run (rebuild once) and 3 after that (park); exit 2
+                                           when it cannot run (no active run, uncommitted changes)
+  checks.py stale <skill> <branch>         exit 1 when the working branch changed the skill's folder
+                                           or its eval folder since <branch> left it
+  checks.py tokens [<task-id> <n>]         during a run: add n agent tokens to the task's count; with
+                                           no arguments, print each task's count and the total
   checks.py push-hook                      Claude Code PreToolUse hook: refuse git push while a run
                                            is active (reads the hook's JSON on stdin)
 
@@ -68,6 +86,13 @@ ADVICE_DIR = f"{TASKS_DIR}/advice"  # <id>-<n>.md, one per advisor reply, n from
 ADVICE_HOLDS = "RULING: HOLDS"
 ADVICE_LINE = re.compile(r"^JOB: a \((\d+)\)$")  # second line of a reply that verifies line (n)
 MARKER = "manage-run-active"  # in the git common dir, so every worktree of the clone sees it
+# The run's state, one "<key> <value>" line each after the marker's first line (the start time):
+# "start <commit>" the working branch at run-start, "merge-failed <id>" for each failed try-merge,
+# "tokens <id> <n>" for each agent result.
+WORKTREES = "build/worktrees"  # the task worktrees, under the main folder; build/ is git-ignored
+# The commits the manager makes on the working branch between run-start and run-end. Every one
+# but a task merge changes only files under tasks/.
+MANAGER_COMMIT = re.compile(r"^task \d+: (in progress|parked|drafted from task \d+)$")
 
 
 def git(repo, *args, check=True):
@@ -291,6 +316,8 @@ ALWAYS_PARK = {
     "merge-limit": "the task limit is reached; it is the owner's own control",
     "review": "checks.py review refused the merge; the advisor never overrides a merge check",
     "advice": "checks.py advice refused the merge; the advisor never overrides a merge check",
+    "conflict": "the task failed checks.py try-merge again after its one rebuild",
+    "stale": "the iterate result was measured on an older version of its skill",
 }
 CONSULT = {
     "owner-fact": "it needs a fact about the owner's product or an outside system",
@@ -398,18 +425,165 @@ def marker_path(cwd):
     return Path(r.stdout.strip()) / MARKER if r.returncode == 0 else None
 
 
-def run_start(repo):
+def run_state(repo):
+    """The marker's "<key> <value>" lines as (key, value) pairs; raises ValueError when no run is active."""
+    m = marker_path(repo)
+    if m is None or not m.exists():
+        raise ValueError("no manager run is active; checks.py run-start marks one")
+    return [tuple(line.split(" ", 1)) for line in m.read_text().splitlines()[1:] if " " in line]
+
+
+def add_state(repo, key, value):
+    run_state(repo)
+    with marker_path(repo).open("a") as f:
+        f.write(f"{key} {value}\n")
+
+
+def leftover_worktrees(repo):
+    """(path, branch or None) of each worktree under the main folder's WORKTREES."""
+    main = Path(git(repo, "rev-parse", "--show-toplevel").stdout.strip()).resolve()
+    under = main / WORKTREES
+    out, path, branch = [], None, None
+    for line in git(repo, "worktree", "list", "--porcelain").stdout.splitlines() + [""]:
+        if line.startswith("worktree "):
+            path, branch = Path(line[len("worktree "):]), None
+        elif line.startswith("branch refs/heads/"):
+            branch = line[len("branch refs/heads/"):]
+        elif not line and path is not None:
+            if path.resolve().is_relative_to(under):
+                out.append((path, branch))
+            path = None
+    return out
+
+
+def tasks_on(repo, base):
+    """Every task file the working branch holds, keyed by id."""
+    names = git(repo, "ls-tree", "--name-only", base, f"{TASKS_DIR}/").stdout.split()
+    return {t["id"]: t for t in (json.loads(show(repo, base, n)) for n in names if n.endswith(".json"))}
+
+
+def run_start(repo, base=WORKING_BRANCH):
+    """(ok, message). Marks the run active with the working branch's commit, then clears what an
+    earlier run left: removes each worktree under WORKTREES with no uncommitted change (its
+    branch stays), and reports each other one and each task left In progress."""
     m = marker_path(repo)
     if m.exists():
-        return False, f"a manager run is already marked active since {m.read_text().strip()} ({m})"
-    m.write_text(datetime.now().isoformat(timespec="seconds") + "\n")
-    return True, f"run marked active ({m})"
+        return False, f"a manager run is already marked active since {m.read_text().splitlines()[0]} ({m})"
+    tip = git(repo, "rev-parse", base).stdout.strip()
+    m.write_text(f"{datetime.now().isoformat(timespec='seconds')}\nstart {tip}\n")
+    lines = [f"run marked active ({m})"]
+    git(repo, "worktree", "prune")
+    for path, branch in leftover_worktrees(repo):
+        held = f"branch {branch}" if branch else "no branch"
+        if git(path, "status", "--porcelain").stdout.strip():
+            lines.append(f"worktree {path} ({held}) holds uncommitted changes; left as it is. "
+                         f"Recommended: commit or discard them, then delete the worktree with "
+                         f"git worktree remove. If you veto: it stays, and runs leave it alone")
+            continue
+        r = git(repo, "worktree", "remove", str(path), check=False)
+        lines.append(f"removed leftover worktree {path}; {held} stays" if r.returncode == 0
+                     else f"worktree {path} ({held}) not removed: {r.stderr.strip()}")
+    for t in sorted(tasks_on(repo, base).values(), key=lambda t: t["id"]):
+        if t["status"] != "In progress":
+            continue
+        own = git(repo, "branch", "--list", "--format=%(refname:short)",
+                  f"task/{t['id']:03d}", f"task/{t['id']:03d}-*").stdout.split()
+        work = f"the work on {own[-1]}" if own else "nothing; it has no task branch"
+        lines.append(f"task {t['id']} is In progress, left by an earlier run; its branches: "
+                     f"{', '.join(own) or 'none'}. Recommended: set it to Ready again, and the next "
+                     f"run rebuilds it from {work}. If you veto: set it to Backlog; its branches stay")
+    return True, "\n".join(lines)
 
 
 def run_end(repo):
     m = marker_path(repo)
     m.unlink(missing_ok=True)
     return True, "run no longer active"
+
+
+def check_main_folder(repo, base=WORKING_BRANCH):
+    """(ok, message). ok while the main folder is on base with no change to a tracked file, and each
+    commit on base's first-parent line since run-start is the manager's: a task merge, or one of
+    MANAGER_COMMIT that changes only files under tasks/. A builder that worked in
+    the main folder instead of its worktree fails it."""
+    start = dict(run_state(repo)).get("start")
+    head = git(repo, "symbolic-ref", "--short", "-q", "HEAD", check=False).stdout.strip()
+    fails = []
+    if head != base:
+        fails.append(f"the main folder is on {head or 'a detached HEAD'}, not {base}")
+    changed = git(repo, "status", "--porcelain", "--untracked-files=no").stdout.splitlines()
+    if changed:
+        fails.append(f"the main folder has uncommitted changes to tracked files: "
+                     f"{', '.join(c[3:] for c in changed)}")
+    for line in git(repo, "rev-list", "--first-parent", "--parents", f"{start}..{base}").stdout.splitlines():
+        commit, *parents = line.split()
+        subject = git(repo, "log", "-1", "--format=%s", commit).stdout.strip()
+        if len(parents) > 1:
+            if not TASK_MERGE.match(subject):
+                fails.append(f"{commit[:7]} {subject!r}: a merge on {base} that is not a task merge")
+            continue
+        files = git(repo, "diff-tree", "--no-commit-id", "--name-only", "-r", commit).stdout.split()
+        if not MANAGER_COMMIT.match(subject):
+            fails.append(f"{commit[:7]} {subject!r}: not a commit the manager makes on {base}")
+        elif any(not f.startswith(f"{TASKS_DIR}/") for f in files):
+            fails.append(f"{commit[:7]} {subject!r}: changes files outside {TASKS_DIR}/")
+    if fails:
+        return False, "\n".join(fails + [f"Stop the run; change nothing on {base}."])
+    return True, f"the main folder is on {base}, unchanged but for the manager's commits since run-start"
+
+
+def check_try_merge(repo, task_id, worktree, commands, base=WORKING_BRANCH):
+    """(code, message): merge base into the task's worktree with --no-commit, run each command there
+    (a shell command, from the worktree), then undo the merge. 0 when it merges and every command
+    exits 0. On a conflict or a failing command: 1 the first time for the task in this run, so the
+    task goes back to its builder once, on the updated working branch; 3 after that, and it parks."""
+    state = run_state(repo)
+    if git(worktree, "status", "--porcelain", "--untracked-files=no").stdout.strip():
+        raise ValueError(f"{worktree} has uncommitted changes to tracked files; its builder commits everything")
+    fail = None
+    r = git(worktree, "merge", "--no-ff", "--no-commit", base, check=False)
+    if r.returncode != 0:
+        files = git(worktree, "diff", "--name-only", "--diff-filter=U", check=False).stdout.split()
+        fail = f"merging {base} conflicts in {', '.join(files) or '(git: ' + r.stderr.strip() + ')'}"
+    else:
+        for cmd in commands:
+            c = subprocess.run(cmd, shell=True, cwd=worktree, capture_output=True, text=True)
+            if c.returncode != 0:
+                tail = "\n".join((c.stdout + c.stderr).strip().splitlines()[-20:])
+                fail = f"on the merge with {base}, {cmd!r} exits {c.returncode}:\n{tail}"
+                break
+    if git(worktree, "rev-parse", "-q", "--verify", "MERGE_HEAD", check=False).returncode == 0:
+        git(worktree, "merge", "--abort")
+    if fail is None:
+        return 0, f"task {task_id}: merges with {base} and every check passes ({len(commands)} command(s))"
+    first = ("merge-failed", str(task_id)) not in state
+    add_state(repo, "merge-failed", task_id)
+    if first:
+        return 1, (f"task {task_id}: {fail}\nRebuild once: a fresh builder on a branch cut from the "
+                   f"updated {base}, with this output as the fault to fix.")
+    return 3, f"task {task_id}: {fail}\nIt failed once already in this run: park it (reason conflict)."
+
+
+def check_stale(repo, skill, branch, base=WORKING_BRANCH):
+    """(ok, message). ok when base has not changed the skill's folder or eval/<skill>/ since branch
+    left it; an iterate result measured on an older version of its skill parks."""
+    fork = git(repo, "merge-base", base, branch).stdout.strip()
+    files = git(repo, "diff", "--name-only", fork, base, "--",
+                f".claude/skills/{skill}/", f"eval/{skill}/").stdout.split()
+    if files:
+        return False, (f"{base} changed {skill} since {branch} left it, so its result was measured on "
+                       f"an older version: {', '.join(files)}")
+    return True, f"{base} has not changed {skill} or eval/{skill}/ since {branch} left it"
+
+
+def tokens(repo):
+    """{task id: agent tokens added in this run}, in the order the tasks were first counted."""
+    out = {}
+    for key, value in run_state(repo):
+        if key == "tokens":
+            task_id, n = value.split()
+            out[int(task_id)] = out.get(int(task_id), 0) + int(n)
+    return out
 
 
 GIT_OPTS_WITH_ARG = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
@@ -484,7 +658,30 @@ def main(argv):
         ids = drafts(".", int(argv[1]))
         ok, msg = True, "\n".join(map(str, ids)) or f"no Proposed task to draft for task {argv[1]}"
     elif cmd == "run-start":
-        ok, msg = run_start(".")
+        ok, msg = run_start(".", base)
+    elif cmd in {"main-folder", "try-merge", "stale", "tokens"}:
+        try:
+            if cmd == "main-folder" and len(argv) == 1:
+                ok, msg = check_main_folder(".", base)
+            elif cmd == "try-merge" and len(argv) >= 3:
+                code, msg = check_try_merge(".", int(argv[1]), argv[2], argv[3:], base)
+                print(msg)
+                return code
+            elif cmd == "stale" and len(argv) == 3:
+                ok, msg = check_stale(".", argv[1], argv[2], base)
+            elif cmd == "tokens" and len(argv) == 3:
+                add_state(".", "tokens", f"{int(argv[1])} {int(argv[2])}")
+                ok, msg = True, f"task {argv[1]}: {tokens('.')[int(argv[1])]} agent tokens in this run"
+            elif cmd == "tokens" and len(argv) == 1:
+                counts = tokens(".")
+                lines = [f"task {i:03d}: {n}" for i, n in counts.items()]
+                ok, msg = True, "\n".join(lines + [f"total: {sum(counts.values())}"])
+            else:
+                print(__doc__)
+                return 2
+        except (ValueError, RuntimeError) as e:
+            print(f"FAIL {e}")
+            return 2
     elif cmd == "run-end":
         ok, msg = run_end(".")
     else:

@@ -1,16 +1,17 @@
 ---
 name: manage
-description: Run the repo's task list unattended. Takes the next Ready task, builds or iterates it on its own branch, has another agent verify it, and merges it into the working branch, parking what needs the owner.
+description: Run the repo's task list unattended. Takes up to N independent Ready tasks at once, builds or iterates each on its own branch in its own worktree, has another agent verify it, and merges them into the working branch one at a time, parking what needs the owner.
 argument-hint: "[--dry-run]"
 disable-model-invocation: true
 ---
 
 # manage
 
-The owner commits to tasks by setting them Ready; the manager takes them one at a time and runs
-them without asking what is next. It never interrupts the owner during a run. What needs him is
-*parked*: the task is set to "Needs you" with the question in its file, and the manager goes on
-to another task. He reads one report at his review.
+The owner commits to tasks by setting them Ready; the manager takes up to N of them at a time,
+independent of each other, builds them side by side, and runs them without asking what is next.
+It never interrupts the owner during a run. What needs him is *parked*: the task is set to
+"Needs you" with the question in its file, and the manager goes on to another task. He reads one
+report at his review.
 
 ## Terms
 
@@ -22,6 +23,12 @@ to another task. He reads one report at his review.
 - **Review tag:** `review/<date>`, set by the owner on the working branch after each review
   (`git tag review/2026-11-20 re-create-from-scratch`; add `-2` for a second review that day).
 - **Task merge:** a merge commit on the working branch whose subject starts `Merge task <id>:`.
+- **Main folder:** the repo's own folder. It stays on the working branch for the whole run.
+- **Worktree:** a task's own git worktree, `build/worktrees/<branch>` with each `/` as `-`
+  (`build/worktrees/task-058`), on its task branch. `build/` is git-ignored, so the main folder
+  shows no change, and the folder is inside the project, so agents need no extra permission.
+- **Batch:** the tasks a run takes together, at most `tasks_at_once` in `limits.json` (the owner
+  sets it; 1 gives one task at a time).
 
 ## Rules
 
@@ -63,6 +70,22 @@ to another task. He reads one report at his review.
    decides is decided by a script, `checks.py consult`: the always-park cases below. Every advisor
    reply is saved verbatim in `tasks/advice/<id>-<n>.md` and its ruling is logged under
    `decided_for_you` with what would change it.
+8. Tasks run side by side only when `tasks.py batch` finds them independent: no hard dependency
+   between them in either direction, no protected path named in both `may_edit`, and at most
+   one iterate task per skill (another task may run beside an iterate task). Tags are not part
+   of the test. Each task's builder and verifiers work only in its worktree, on its branch.
+   Only the manager commits in the main folder, and only on the working branch;
+   `checks.py main-folder` checks that after every agent that can write returns. Merges stay
+   one at a time.
+   Before each merge after the first of a run, `checks.py try-merge` runs the task's checks on
+   its branch merged with the updated working branch; a conflict or a failing check sends the
+   task back to its builder once, on a branch cut from the updated working branch, and a second
+   failure parks it. An iterate result parks when a task that merged meanwhile changed its
+   skill's folder or its eval folder (`checks.py stale`), since it was measured on an older
+   version. Claude Code's Agent `cwd` parameter and `isolation: "worktree"` do not keep a
+   subagent's Bash in a folder: on 2026-11-17 builders given either one wrote to the main folder.
+   So the manager makes each worktree itself, and the brief and `checks.py main-folder` keep the
+   builder in it.
 
 ## Park, never ask
 
@@ -94,7 +117,11 @@ read, so for them the reason alone decides.
 - `merge-limit`, *always*: `checks.py merge-limit` refuses the merge; the task limit is the
   owner's own control;
 - `review`, `advice`, *always*: `checks.py review` or `advice` refuses the merge after
-  verification passed in step 5.
+  verification passed in step 5;
+- `conflict`, *always*: `checks.py try-merge` fails for the task a second time in the run, on
+  its rebuild (exit 3), or cannot run (exit 2);
+- `stale`, *always*: `checks.py stale` fails, an iterate result was measured on an older version
+  of its skill.
 
 A parked task's `needs_you` holds the question, a recommended answer the owner can veto, and
 what changes if he vetoes.
@@ -105,6 +132,8 @@ Push. Delete a branch, except the merged task's own branches with `git branch -d
 `commands/manage.md`). Delete anything outside the task's own branch. Change a protected path the
 task's `may_edit` does not name. Set a task to Ready, or change the owner's fields on a Ready
 task. Start a task whose hard dependency is not Done. Let the builder verify its own work.
+Switch the main folder to another branch during a run. Remove a worktree with `--force`, or one
+outside `build/worktrees/`.
 
 ## What the scripts enforce
 
@@ -112,6 +141,11 @@ All from the repo root, all with `python3`:
 
 - `scripts/tasks.py lint | list | next`: field validity; the task to take (Ready, every hard
   dependency Done; then priority, then most open dependents, then lowest id).
+- `scripts/tasks.py batch [<n>]`: the batch, in `next`'s order: a task joins when it is
+  independent (rule 8) of every task already taken, up to `n`, which defaults to `tasks_at_once`
+  in `limits.json`. An iterate task's skill is the one folder of `.claude/skills/` its title or
+  item names as a whole name; one that names none, or two, counts as iterating every skill. Its
+  `why:` line names each takeable task left out and the reason.
 - `scripts/checks.py protected <id> <branch>`: the branch's changes since it left the working
   branch, against `protected-paths.txt` and the working branch's copy of the task's `may_edit`.
   In `tasks/`, a task branch may change only `status`, `finished`, `tokens`, `needs_you` and
@@ -148,7 +182,23 @@ All from the repo root, all with `python3`:
   While it exists, the `PreToolUse` hook in `.claude/settings.json` refuses any Bash command
   whose text runs `git push`, for the main session and every subagent. It reads command text,
   so it is an early stop, not proof: an alias, a script or `gh` can still push. If a run
-  crashed and left the marker, the owner deletes the file.
+  crashed and left the marker, the owner deletes the file. The marker also holds the run's
+  state: the working branch's commit at the start, each failed `try-merge`, each agent's tokens.
+  `run-start` then removes each worktree under `build/worktrees/` that holds no uncommitted
+  change (its branch stays), and prints a line for each one that does, left as it is, and for
+  each task left In progress, with a recommendation.
+- `scripts/checks.py main-folder`: exits 1 unless the main folder is on the working branch with
+  no change to a tracked file, and every commit the working branch gained since `run-start` is
+  a task merge or a `task <id>: in progress | parked | drafted from task <id>` commit that changes
+  only files under `tasks/`. It does not see a new untracked file.
+- `scripts/checks.py try-merge <id> <worktree> [<command>...]`: in the task's worktree, merges
+  the working branch with `--no-commit`, runs each command there, and undoes the merge. Exit 0
+  when it merges and every command passes. On a conflict or a failing command: exit 1 the first
+  time for the task in the run (rebuild once) and 3 after that (park); exit 2 when it cannot run.
+- `scripts/checks.py stale <skill> <branch>`: exits 1 when the working branch changed
+  `.claude/skills/<skill>/` or `eval/<skill>/` since the branch left it.
+- `scripts/checks.py tokens [<id> <n>]`: adds an agent's tokens to its task's count for the run;
+  with no arguments, prints each task's count and the total.
 
 Tests: `uv run --with pytest pytest .claude/skills/manage/tests`. They run in temporary git repos.
 
@@ -175,7 +225,9 @@ ln -s ../skills/manage/agents/advisor.md    .claude/agents/manager-advisor.md
 
 - Each task's file: `decided_for_you` (one entry per decision made without the owner: chosen,
   rejected, what would change it), `needs_you` when parked, `for_retry` when parked with
-  findings on files only its branch has, `tokens`.
+  findings on files only its branch has, `tokens`. With tasks side by side, every agent's
+  description starts `task <id>:`, so each result, its tokens and its decisions belong to one
+  task; `checks.py tokens` counts the tokens per task.
 - `tasks/reviews/<id>-<n>.md`: each reviewer reply verbatim, in the task's merge or park commit.
 - `tasks/advice/<id>-<n>.md`: each advisor reply verbatim, in the task's merge or park commit,
   or for job (d) in the drafted task's commit.

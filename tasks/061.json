@@ -3,9 +3,9 @@
   "title": "Manager runs up to N independent tasks at once, each builder in its own worktree",
   "item": "The manager takes up to N Ready tasks that are independent of each other, builds and reviews them at the same time, each in its own git worktree, and merges them one at a time",
   "motivation": "The manager builds one task at a time in the repo's main folder. On 2026-11-17 the BDD work (task 56) waited behind three manager tasks it shares no file with, and the main folder sat on a task branch during every run, so nothing else could be committed safely. The owner asked for N parallel builders on independent tasks and raised its priority.",
-  "status": "Ready",
+  "status": "Done",
   "added": "2026-11-17",
-  "finished": "",
+  "finished": "2026-11-17",
   "notes": "First step, before changing any command: show in a temporary repo that one manager session can run two builder agents at the same time, each in its own git worktree, and still record tokens, reviews and decisions per task. This is the riskiest assumption; if Claude Code cannot do it, park with what was found. Independent means, decided by a script: no hard dependency between the tasks in either direction; no protected path named in both tasks' may_edit; at most one iterate task per skill at a time (another task may run beside an iterate task; if a task that merged meanwhile changed that skill's folder or its eval folder, the iterate result parks for the owner, because it was measured on an older version). Tags are not part of the test. N comes from limits.json, as a second number beside task_merges_per_review, and starts at 2; the owner changes it there with no code change, and 1 gives one task at a time. No token cap; the run report gives agent tokens per task and in total. Each builder and its reviewer work only in that task's worktree, on its task branch. The repo's main folder stays on the working branch for the whole run. Merges stay one at a time. Before each merge after the first of a run, the task's check commands are run again on its branch merged with the updated working branch. A conflict or a failing check sends the task back to its builder once, on the updated working branch; a second failure parks it. The task limit per review is counted as today; a task built when the limit is reached parks with that reason and its branch stays. At the start of a run: remove worktrees left by an earlier run that hold no uncommitted change, report those that do, and report a task left In progress with a recommendation. This replaces task 35 (run the manager in its own worktree), which the owner can drop. Planned first real use: tasks 56 (BDD) and 58 (manager) together.",
   "depends_on": [
     {
@@ -31,6 +31,51 @@
   "tags": [
     "manager"
   ],
-  "tokens": null,
-  "draft_note": "Drafted by Claude in chat on 2026-11-17 on the owner's request to raise its priority. N = 2 and the independence test follow the owner's rulings of that day (tags too strict; one iterate task plus other tasks is allowed; no token cap for now). Hard dependency on task 37 because both change the same manager files. Set to Ready on 2026-11-17 on the owner's instruction (\"ready 61\")."
+  "tokens": {
+    "agents": 462518,
+    "main_session": "not recorded"
+  },
+  "draft_note": "Drafted by Claude in chat on 2026-11-17 on the owner's request to raise its priority. N = 2 and the independence test follow the owner's rulings of that day (tags too strict; one iterate task plus other tasks is allowed; no token cap for now). Hard dependency on task 37 because both change the same manager files. Set to Ready on 2026-11-17 on the owner's instruction (\"ready 61\").",
+  "decided_for_you": [
+    {
+      "chosen": "RULING: HOLDS on lines (2), (3), (6) for the builder's decisions, advisor job c, tasks/advice/061-1.md",
+      "rejected": "RULING: FAILS",
+      "would_change": "Line (2): you meant a repeatable real-agent check; the first real two-task run shows a builder writing or leaving an untracked file in the main folder; you want to commit on the working branch during a run; a Claude Code version confines a subagent's Bash. Line (3): you want the advisor's one GO ON to apply to a second try-merge failure. Line (6): the suite fails, or you want the merge-limit tests to follow your limits.json value."
+    },
+    {
+      "chosen": "Builder: the manager creates each worktree under build/worktrees/ (git-ignored), briefs start every Bash command with cd <worktree> &&, and checks.py main-folder catches a stray commit",
+      "rejected": "The Agent tool's cwd and isolation: \"worktree\" (in the builder's experiments both let builders reach the main folder); sibling folders outside the repo; .claude/worktrees/",
+      "would_change": "If a Claude Code version confines a subagent's Bash, or build/ stops being ignored"
+    },
+    {
+      "chosen": "Builder: main-folder fails on any non-manager commit on the working branch, or any edit to a tracked file in the main folder, during a run, so your own work there ends the run (advisor: this cuts against task 35's aim, which task 61 replaces; see it before dropping 35). It cannot see a new untracked file.",
+      "rejected": "Telling your commits from a builder's (same author)",
+      "would_change": "If you want to commit on the working branch during runs"
+    },
+    {
+      "chosen": "Builder: In progress is committed on the working branch, not the task branch; one batch at a time, merges one at a time in ready order; the batch is not cut to the merges left before the limit",
+      "rejected": "In progress on the task branch; a rolling scheduler; cutting the batch",
+      "would_change": "If waiting for the slowest task wastes too much time, or you would rather not build a task that cannot merge"
+    },
+    {
+      "chosen": "Builder: rebuild once counted per run in the run marker (try-merge exit 1 rebuild, exit 3 park); conflict and stale are always-park reasons",
+      "rejected": "Counting in prose; letting the advisor's GO ON add a rebuild",
+      "would_change": "If you want the advisor's one GO ON to apply here too"
+    },
+    {
+      "chosen": "Builder: an iterate task's skill is the .claude/skills/ folder its title or item names as a whole word; none or two counts as every skill",
+      "rejected": "Tags; a new owner field; one iterate task per batch",
+      "would_change": "If you add a skill field to tasks"
+    },
+    {
+      "chosen": "Builder: two merge-limit tests in test_checks.py set their own limit of 3 (they failed on the working branch since 61ba08a raised limits.json to 10)",
+      "rejected": "Leaving them failing",
+      "would_change": "If you want those tests to follow your limits.json value"
+    },
+    {
+      "chosen": "Builder: spent about 0.59 USD on headless claude -p runs (sonnet and haiku) in scratchpad temp repos for the first-step experiment the notes require; no outside_needs or money cap was set on the task",
+      "rejected": "Showing the first step without real agents",
+      "would_change": "If you did not mean the first step to spend money; Proposed task 064 asks for a check"
+    }
+  ]
 }
