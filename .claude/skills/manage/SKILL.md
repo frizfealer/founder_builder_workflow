@@ -25,8 +25,9 @@ to another task. He reads one report at his review.
 
 ## Rules
 
-1. Only the owner sets Ready. Once a task is Ready its `done_means`, `verified_by`, `may_edit`,
-   `runs_as`, `priority`, `depends_on` and `tags` are his; the manager drafts them only before then.
+1. Only the owner sets Ready. Once a task is Ready its `done_means`, `verified_by`,
+   `verifier_of_line`, `may_edit`, `runs_as`, `priority`, `depends_on` and `tags` are his; the
+   manager drafts them only before then.
 2. The manager adds at most one Proposed task per task run, bundling the review findings worth
    doing. The builder proposes a task only when `done_means` needs a protected path its
    `may_edit` does not name. When a rule in this skill is broken and no script checks it, the
@@ -50,20 +51,41 @@ to another task. He reads one report at his review.
    they go into that task's `for_retry` and not into a Proposed task. Whether the owner has done
    his check is a field the owner sets, `owner_verified`, read by `checks.py owner`; the manager
    never sets it and never infers it from other text.
+7. The advisor (`agents/advisor.md`) gets a fresh context and read-only tools, like the
+   reviewer, and has four jobs: (a) verify the `done_means` lines assigned to it, given only the
+   paths the line names; (b) before a park, say whether the task can go on without the owner,
+   and how; (c) when a builder's decision changes what a line proves, say whether the line still
+   proves what it was written to prove; (d) after a merge, draft the fields of a Proposed task
+   that hard-depends on the merged one and has an empty `done_means`, which stays Proposed. What
+   it never decides is decided by a script, `checks.py consult`: the always-park cases below.
+   Every advisor reply is saved verbatim in `tasks/advice/<id>-<n>.md` and its ruling is logged
+   under `decided_for_you` with what would change it.
 
 ## Park, never ask
 
-Park the task when:
-- `checks.py needs <id>` fails: an outside need is not met. Park before any branch or builder,
-  with the script's reason as the question;
-- it needs a fact about the owner's product or an outside system that only he knows;
-- the protected-path check fails, or verification still fails after one fresh retry;
-- a blocking problem can be fixed only in a protected path the task's `may_edit` does not name.
-  Park at once, with no retry, and name that path in the recommendation;
-- `checks.py owner <id>` fails (`verified_by` includes `you` and `owner_verified` is empty), or
-  `runs_as` is `you`. Once the owner has set `owner_verified`, the task is not parked for him
-  again;
-- finishing would need something from the never list.
+Park the task when one of these holds. Each case has a reason, in backticks. Before every park
+the manager runs `checks.py consult <id> <reason>`: for a case marked *always* it exits 1 and the
+task parks without the advisor; for any other case it exits 0 and the advisor (job b) is
+consulted first. A task whose `runs_as` is `you` always parks, whatever the reason.
+- `needs`, *always*: `checks.py needs <id>` fails, an outside need is not met. Park before any
+  branch or builder, with the script's reason as the question;
+- `owner-fact`: it needs a fact about the owner's product or an outside system that only he knows;
+- `protected`, *always*: the protected-path check fails;
+- `verification`: verification still fails after its one fresh retry (a review, an advisor
+  line, or the advisor's check of a builder's decision);
+- `never`, *always*: a blocking problem can be fixed only in a protected path the task's
+  `may_edit` does not name (park at once, with no retry, and name that path in the
+  recommendation), or finishing would need anything else from the never list;
+- `owner`, *always*: `checks.py owner <id>` fails, a line is verified by `you` and
+  `owner_verified` is empty. It parks after every other verifier, the advisor's lines included,
+  and its question names only the owner's lines. Once the owner has set `owner_verified`, the
+  task is not parked for him again;
+- `runs-as-you`, *always*: `runs_as` is `you`;
+- `money`, `owner-field`, `set-ready`, *always*: finishing would spend money or touch an account,
+  change an owner's field, or set a task to Ready;
+- `iterate`: an iterate task's result is not kept, or its *Needs you* holds an item;
+- `merge-limit`, `review`, `advice`: `checks.py merge-limit`, `review` or `advice` refuses the
+  merge.
 
 A parked task's `needs_you` holds the question, a recommended answer the owner can veto, and
 what changes if he vetoes.
@@ -86,7 +108,8 @@ All from the repo root, all with `python3`:
   In `tasks/`, a task branch may change only `status`, `finished`, `tokens`, `needs_you` and
   `decided_for_you` of its own task file, and add Proposed tasks; so it cannot set
   `owner_verified` or `for_retry`. The whole skill folder and
-  its three links in `.claude/` are protected.
+  its four links in `.claude/` are protected, and so is `tasks/advice/`: only the manager writes
+  there, on the working branch.
 - `scripts/checks.py merge-limit`: task merges since the latest review tag, against
   `limits.json`. At the limit the manager merges nothing more and ends the run.
 - `scripts/checks.py review <id>`: the task's highest-numbered reply in
@@ -99,8 +122,17 @@ All from the repo root, all with `python3`:
   builder would use; it costs under 0.01 USD and prints no credential.
 - `scripts/checks.py unmerged <branch> <path>...`: exits 0 when every path exists on the branch
   and not on the working branch (the findings go to the task's `for_retry`), 1 otherwise.
-- `scripts/checks.py owner <id>`: exits 1 while `verified_by` includes `you` and
-  `owner_verified` is empty on the working branch.
+- `scripts/checks.py owner <id>`: exits 1 while a line of `done_means` is verified by `you`
+  (`verified_by` and `verifier_of_line`) and `owner_verified` is empty on the working branch. Its
+  output names only the owner's lines.
+- `scripts/checks.py advice <id>`: for each line the advisor verifies, the highest-numbered
+  reply in `tasks/advice/<id>-<n>.md` whose second line is `JOB: a (<line>)`, in the working
+  tree during the merge. It refuses the merge when a line has none or the latest's first line is
+  not `RULING: HOLDS`.
+- `scripts/checks.py consult <id> <reason>`: exits 1 for an always-park case of the park list,
+  0 when the advisor is consulted first, 2 for a reason not in the list.
+- `scripts/checks.py drafts <id>`: the Proposed tasks that hard-depend on the task and have an
+  empty `done_means`, one id per line, for the advisor's job (d).
 - `scripts/checks.py run-start | run-end`: mark a run active with `.git/manage-run-active`.
   While it exists, the `PreToolUse` hook in `.claude/settings.json` refuses any Bash command
   whose text runs `git push`, for the main session and every subagent. It reads command text,
@@ -114,7 +146,8 @@ Every other rule here is prose until it is broken once.
 ## Commands and agents
 
 - `/manage [--dry-run]`: one run, `commands/manage.md`.
-- `manager-builder` (`agents/builder.md`) and `manager-reviewer` (`agents/reviewer.md`).
+- `manager-builder` (`agents/builder.md`), `manager-reviewer` (`agents/reviewer.md`) and
+  `manager-advisor` (`agents/advisor.md`).
 
 ## Installing in a repo
 
@@ -124,6 +157,7 @@ Link the command and agents (the skill folder stays the source), then open a new
 ln -s ../skills/manage/commands/manage.md   .claude/commands/manage.md
 ln -s ../skills/manage/agents/builder.md    .claude/agents/manager-builder.md
 ln -s ../skills/manage/agents/reviewer.md   .claude/agents/manager-reviewer.md
+ln -s ../skills/manage/agents/advisor.md    .claude/agents/manager-advisor.md
 ```
 
 ## Records
@@ -132,4 +166,6 @@ ln -s ../skills/manage/agents/reviewer.md   .claude/agents/manager-reviewer.md
   rejected, what would change it), `needs_you` when parked, `for_retry` when parked with
   findings on files only its branch has, `tokens`.
 - `tasks/reviews/<id>-<n>.md`: each reviewer reply verbatim, in the task's merge or park commit.
+- `tasks/advice/<id>-<n>.md`: each advisor reply verbatim, in the task's merge or park commit,
+  or for job (d) in the drafted task's commit.
 - `tasks/RUNS.md`: one report per run, newest first, in skill-iterate's three sections.

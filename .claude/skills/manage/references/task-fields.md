@@ -11,7 +11,8 @@ One JSON object per file, `tasks/<id>.json`, id zero-padded to 3 (`tasks/020.jso
 | `finished` | `YYYY-MM-DD` when Done or Dropped, else `""` | Manager |
 | `status` | Proposed, Backlog, Ready, In progress, Needs you, Done, Dropped | Owner sets Ready. Manager sets In progress, Needs you, Done, and creates Proposed |
 | `done_means` | the observable end state | Owner; manager may draft |
-| `verified_by` | list of `script`, `metrics`, `reviewer`, `you`. Never the agent that built the task | Owner; manager may draft |
+| `verified_by` | list of `script`, `metrics`, `reviewer`, `advisor`, `you`. Never the agent that built the task. Each verifies every line of `done_means` that `verifier_of_line` leaves out | Owner; manager may draft |
+| `verifier_of_line` | optional; object from the number of a `done_means` line, written `(n)` in the text, to one verifier from the list above: `{"3": "advisor"}`. That line is verified by that verifier alone; a line not in the object by every verifier in `verified_by`. `tasks.py lint` rejects a key not written `(n)` in `done_means` and a value that is not a verifier | Owner; manager may draft |
 | `may_edit` | protected paths this task may change; a trailing `/` names a folder. Empty for most | Owner; manager may draft |
 | `runs_as` | `build`, `iterate`, `measurement`, `you` | Owner; manager may draft |
 | `priority` | `high`, `medium`, `low` | Owner |
@@ -23,7 +24,12 @@ One JSON object per file, `tasks/<id>.json`, id zero-padded to 3 (`tasks/020.jso
 | `decided_for_you` | optional; list of `{"chosen", "rejected", "would_change"}` | Manager |
 | `outside_needs` | optional; list of distinct values from a fixed set, today only `claude-api`. `checks.py needs` runs one check per value before a builder starts; a failure parks the task | Owner; manager may draft |
 | `for_retry` | optional; list of findings, each quoted, on files that exist only on the task's branch (`checks.py unmerged`). Written when the task parks, on the working branch only; the retry builder's brief quotes it | Manager |
-| `owner_verified` | optional; `YYYY-MM-DD` the owner checked his lines of `verified_by`, or `""`. May be set while the task is Ready or Needs you. While `verified_by` includes `you` and this is empty, `checks.py owner` parks the task | Owner, or on his instruction; never the manager, never inferred from other text |
+| `owner_verified` | optional; `YYYY-MM-DD` the owner checked his lines of `verified_by`, or `""`. May be set while the task is Ready or Needs you. While a line is verified by `you` and this is empty, `checks.py owner` parks the task | Owner, or on his instruction; never the manager, never inferred from other text |
+
+A line of `done_means` is the text after `(n)`; a `done_means` that numbers no line is one
+line, line 1. `advisor` is the `manager-advisor` agent: for each of its lines the manager saves
+its reply in `tasks/advice/<id>-<n>.md`, and `checks.py advice` refuses the merge until the
+latest reply on each line starts `RULING: HOLDS`. A line for `you` waits for `owner_verified`.
 
 A Ready task must have `done_means`, `verified_by`, `runs_as` and `priority`. A draft counts
 only when the owner sets the task to Ready; after that the manager changes none of the owner's
