@@ -1,5 +1,30 @@
 # Manager runs
 
+## Run 2026-11-17 22:22
+
+Stopped because: no task to take.
+
+### Done
+- task 061: Manager runs up to N independent tasks at once, each builder in its own worktree; merge 08c4cdd; tokens 462518 (main session: not recorded). Drafting task 064 from it took 122189 more.
+- task 058: Manager: deletion decided by code (superseded branches deleted; file deletions checked at merge; git clean refused); merge 594883e; tokens 472669 (main session: not recorded). Drafting task 065 from it took 87348 more. Branch task/058 deleted with `git branch -d`; it was at d257edb7eefe09e658cd97a1a040bae317f30623.
+
+### Decided for you
+- run: task 61's new procedure (worktrees, batches, In progress on the working branch) merged mid-run; tasks 61 and 58 were run under the procedure this run started with, one at a time in the main folder. Would change if you wanted the run to switch to the new procedure at once.
+- task 056: the advisor ruled that the builder's choices keep line 2 valid (tasks/advice/056-1.md). One caveat: the no-R-03 prompt still holds the R-01 row "proposes the table and asks for a yes", so "(b) 0 of 3" says little. Would change if you meant rows to be dropped by meaning; then the three (b) runs are re-run.
+- task 061: chose manager-made worktrees under `build/worktrees/` with a `cd <worktree> &&` brief and a `checks.py main-folder` check over the Agent tool's `cwd` and `isolation` options, which let builders reach the main folder in the builder's experiments. Would change if a Claude Code version confines a subagent's Bash.
+- task 061: `main-folder` ends a run on any commit of yours on the working branch, or any edit of yours to a tracked file in the main folder, during a run. This cuts against task 35's aim, which task 61 replaces. Would change if you want to commit there during runs.
+- task 061: the builder spent about 0.59 USD on headless `claude -p` runs for the real two-agent experiment the notes require; the task had no `outside_needs` or money cap. Would change if you did not mean the first step to spend money; task 064 line 1 proposes a hook check for it.
+- task 058: the advisor first ruled FAILS (tasks/advice/058-1.md): the hook skipped any quoted `-m` message, so a command inside `$(...)` in a commit message passed. One fresh builder fixed it, and the second ruling is HOLDS (058-2). Three holes remain, each needing `-m` inside another quoting context. Would change if you want the hook to be proof rather than an early stop.
+- task 058: a forced deletion passes the hook whenever `checks.py superseded` confirms every branch it names, so a builder could also delete a superseded branch. Would change if builders must not delete even those.
+- Every other decision is in each task's `decided_for_you`.
+
+### Needs you
+- task 056 (parked): lines 1 to 3 wait for your check. Lines 1 and 2 passed: the judge answered 29 of the 29 cases not marked hard as expected (28 needed), with no differing repeats, and 12 runs are saved apart from their verdicts. For line 3, bring `runs/probe2/transcripts/` (on branch task/056, cafe folder) to chat for labelling. Then run `uv run python probe/agreement.py --runs runs/probe2 <labels.json>`, and set `owner_verified` if all three lines hold. Reported, not gated: by the checkers the agent broke a rule by itself in 3 of 12 runs, all in condition (a) (R-11, message half), and 0 of 3 in each of (b), (c) and (d). It spent 0.11 USD of the 2 USD cap. Recommended: label in chat, and ignore the `moment` field in each transcript, which names conditions (c) and (d). If you veto because (b) should drop the R-01 row: a fresh builder re-runs the three (b) runs first, for about 0.03 USD.
+- task 063 (Proposed): BDD café: small fixes left by task 056. The no-R-03 prompt row, the transcript `moment` field, a near-vacuous stray-value test, judge reply parsing ("Not sure" reads as No), and undecided verdicts counted as disagreements.
+- task 064 (Proposed, fields drafted by the advisor): Manager: small fixes left by task 061, plus a hook that refuses `claude -p` and `ant` while a run is active unless the task's `outside_needs` names `claude-api`. The reply lists eight owner's calls (tasks/advice/064-1.md).
+- task 065 (Proposed, fields drafted by the advisor): Manager: small fixes left by task 058. The main one: a forced deletion of a confirmed branch followed by `$(...)` also deletes whatever the substitution names. See tasks/advice/065-1.md for the owner's calls.
+- review tag: 5 task merges since review/2026-11-15-2; the limit is 10.
+
 ## Run 2026-11-17 21:40
 
 Stopped because: merge limit (3 task merges since review/2026-11-15-2).
