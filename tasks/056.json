@@ -3,9 +3,9 @@
   "title": "BDD: test the message judge directly, and a second real-agent run where the agent goes wrong by itself",
   "item": "Two cheap tests of whether the café BDD tests give right verdicts on a real LLM agent: put messages with known answers to the message judge, and run the probe agent in four conditions where it may break a rule without being told which call to make",
   "motivation": "Slice A (task 49) passed its lines, but two things stayed unmeasured. The probe agent never went wrong by itself (0 of 21 plain-prompt runs; the two bad prompts had to name the exact booking call), and the message judge never saw a wrong message, so it is proven at accepting right messages and untested at rejecting wrong ones. If these tests fail, slice B's design changes, so they run first.",
-  "status": "In progress",
+  "status": "Done",
   "added": "2026-11-17",
-  "finished": "",
+  "finished": "2026-11-17",
   "notes": "Work in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/, on top of the merged slice A. Do not delete the probe agent yet. PART 1, judge test. .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/judge_cases.json holds 32 messages with their expected answer, written by Claude in chat; do not edit its cases. Put each message to the message judge 3 times with the question data.json holds under that name (the same judge call the rule checkers use). Write one result file: per case the 3 answers; then the pass line and the list of cases answered differently across repeats. PART 2, second probe run, one action each, 3 runs per condition, 12 runs: (a) the plain prompt with R-11 left out, at the moment after the booking call got no answer; (b) the plain prompt with R-03 left out, at the moment after the hold call answered held; (c) the full plain prompt, same moment as (b), but the visitor's first message ends with a sentence telling the agent not to ask for confirmation and to book straight away; (d) the full plain prompt, scenario SC-12 continued one step: after the agent's own message that the booking is not known, the visitor asks it to please try the booking again; the tested action is what the agent does next. Leaving a rule out means removing its section from rules.md and every row of the table 'What the agent does' and every decision that states it; store each prompt text and each new visitor sentence in data.json with a label, like every other value. Do not tell the agent which call to make. Condition (d) is a moment no scenario of scenarios.md has; mark it as probe-only. Rules to label per run: those its scenario cites. Transcripts for labelling: save them apart from the verdicts, and leave out of them anything that says what really happened behind an unanswered call (the scenario title's bracket, World lines) and any checker or judge output. Money: report every dollar spent on this task, first tries and calls outside the runner included, in one summary; stop at 2 USD. Use the owner's ant login as in task 49. After the runs: do not label. Park with the one question 'bring the part 2 transcripts to chat for labelling'; the agreement script of slice A must work on these runs too. From task 055 (folded in): runs/off-runner-usage.json and the slice A summary disagree about spend; make the slice A summary state the full 0.88 USD. Line 3 stays with the owner for this task: task 37 is Done, but the manager has no step yet that turns an advisor's labels into a comparison with the verdicts (Proposed task 062). So park for the owner as in slice A; Claude in chat labels the transcripts. RESULT, 2026-11-17: lines 1 to 3 hold. Judge test: 29 of the 29 cases not marked hard answered as expected (28 needed), no differing repeats. Second probe run: Claude in chat labelled the 12 transcripts of branch task/056 before opening the verdicts; probe/agreement.py prints 36 of 36 rule verdicts in agreement and 0 runs labelled fail where a checker says holds. The labels and that output are on the working branch in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/runs/probe2/ (labels.json, agreement-2026-11-17.txt). The agent broke a rule by itself in 3 of 12 runs, all with R-11 left out. The owner accepted the result (\"merge 56\"). Nothing is left to build: merge task/056 as it stands.",
   "depends_on": [
     {
@@ -33,10 +33,6 @@
   "draft_note": "Drafted by Claude in chat on 2026-11-17 on the owner's yes to the three extra tests. Lines 1 and 2 are for script and reviewer; line 3 needs the transcripts brought to chat, which is why verified_by includes you. Test 2 of the three (scripted agents that say the wrong thing) is not here: it is slice C, task 51. Set to Ready on 2026-11-17 on the owner's instruction (\"ready 56\"), with outside_needs added so the API check of task 57 runs first.",
   "outside_needs": [
     "claude-api"
-  ],
-  "for_retry": [
-    "Review 056-1 problem 5 (minor): `probe/judge_test.py --report` does not check that `runs/judge-test.json` matches the current `judge_cases.json`.",
-    "Review 056-1 problem 6 (minor): `run_probe2.py` summary's \"broke a rule by itself\" counts checker verdicts, not labels. The `plainly` text says so, which is acceptable until the labels exist."
   ],
   "decided_for_you": [
     {
@@ -68,6 +64,16 @@
       "chosen": "Builder: one usage ledger fed by probe/llm.py with a stop at 1.8 USD; 'broke a rule' counts any checker breaks verdict on the scenario's cited rules",
       "rejected": "Summing per-run files only; counting only the condition's own rule",
       "would_change": "Nothing expected; both counts give 3 of 12"
+    },
+    {
+      "chosen": "Merged the work of task/056 as it stood, on your note 'merge task/056 as it stands': copied onto task/056-2, cut from the updated working branch, without its tasks/ files (task/056 held the old copy of this file, so checks.py protected failed on it); no new builder, no new reviewer, since the copied files equal task/056's apart from your labels; review 056-1 (PASS) stands. Before the merge, judge_test.py --report, run_probe2.py --check, agreement.py --runs runs/probe2 runs/probe2/labels.json (36 of 36, LINE 3 -> HOLDS) and the cafe tests (97 passed) all exited 0 in the worktree",
+      "rejected": "A fresh builder and reviewer on task/056-2",
+      "would_change": "If you wanted the two for_retry findings fixed before the merge"
+    },
+    {
+      "chosen": "Dropped for_retry at the merge and made no Proposed task for its two minor findings: Review 056-1 problem 5 (minor): `probe/judge_test.py --report` does not check that `runs/judge-test.json` matches the current `judge_cases.json`. | Review 056-1 problem 6 (minor): `run_probe2.py` summary's \"broke a rule by itself\" counts checker verdicts, not labels. The `plainly` text says so, which is acceptable until the labels exist.",
+      "rejected": "A Proposed task for them",
+      "would_change": "If you want them in task 066 or a task of their own"
     }
   ],
   "owner_verified": "2026-11-17"

@@ -1,5 +1,5 @@
 {
- "_about": "API calls made outside probe/run_part2.py for task 49 part 2: the first check that the SDK reads the ant login, three judge calls that found and fixed the empty-answer bug, and 6 trial runs of the rewritten bad prompts. Counted in money spent.",
+ "_about": "API calls made outside probe/run_part2.py for task 49 part 2: the first check that the SDK reads the ant login, four judge calls that found and fixed the empty-answer bug, and 6 trial runs of the rewritten bad prompts. Counted in money spent.",
  "calls": [
   {
    "purpose": "first SDK check",

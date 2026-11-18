@@ -1,8 +1,14 @@
-"""Lines 4 and 5 of task 49: the rule checkers' verdicts against the labels Claude in chat gave the transcripts.
+"""Lines 4 and 5 of task 49, and line 3 of task 56: the rule checkers' verdicts against the labels Claude in
+chat gave the transcripts.
 
 Usage:
   uv run python probe/agreement.py --template            print a blank labels file from runs/part2/transcripts/
   uv run python probe/agreement.py <labels.json>         print line 4's agreement, every disagreement, and line 5
+  uv run python probe/agreement.py --runs runs/probe2 --template
+  uv run python probe/agreement.py --runs runs/probe2 <labels.json>
+                                                         task 56's second probe run: print line 3, the agreement,
+                                                         every disagreement, and every run labelled fail on a rule
+                                                         whose checker says it holds
 
 The labels file holds one "pass" or "fail" per one-action run and rule, for the rules each transcript
 lists under rules_to_label; keys starting with "_" are ignored (room for notes):
@@ -12,7 +18,8 @@ A checker verdict "holds" agrees with "pass", "breaks" with "fail"; "undecided" 
 is listed as a disagreement. Line 4 holds when at least 9 of every 10 labelled rule verdicts agree and
 no label is missing. Line 5 holds for a bad prompt when at least 1 of its runs shows the bad behaviour
 (its tested action is a booking call, and the label fails the prompt's rule) and its checker breaks
-that rule.
+that rule. Task 56's line 3 holds when no rule a run is labelled fail on has the checker verdict holds,
+and at least 9 of every 10 labelled rule verdicts agree with no label missing.
 """
 import json
 import sys
@@ -46,8 +53,9 @@ def books(transcript):
                for e in transcript["events"])
 
 
-def report(labels, out):
-    runs = one_action_runs(out)
+def compare(labels, runs):
+    """(rows, missing, extra): one row per labelled rule verdict, the labels missing, the runs labelled
+    that have no transcript."""
     labels = {k: v for k, v in labels.items() if not k.startswith("_")}
     rows, missing = [], []
     for rid, (t, v) in runs.items():
@@ -59,7 +67,13 @@ def report(labels, out):
             got = v["rules"][rule]
             rows.append({"run": rid, "rule": rule, "label": label, "checker": got["verdict"], "reason": got["reason"],
                          "moment": v["moment"], "prompt": v["prompt"], "agree": AGREES.get(got["verdict"]) == label})
-    extra = sorted(set(labels) - set(runs))
+    return rows, missing, sorted(set(labels) - set(runs))
+
+
+def report(labels, out):
+    runs = one_action_runs(out)
+    rows, missing, extra = compare(labels, runs)
+    labels = {k: v for k, v in labels.items() if not k.startswith("_")}
     agree = sum(r["agree"] for r in rows)
     n = len(rows)
     line4 = n > 0 and not missing and not extra and agree * 10 >= 9 * n
@@ -94,14 +108,42 @@ def report(labels, out):
     return "\n".join(lines), line4 and line5
 
 
+def report_probe2(labels, out, planned=12):
+    """Task 56's line 3 on the second probe run."""
+    runs = one_action_runs(out)
+    rows, missing, extra = compare(labels, runs)
+    agree, n = sum(r["agree"] for r in rows), len(rows)
+    missed = [r for r in rows if r["label"] == "fail" and r["checker"] == "holds"]
+    share = agree * 10 >= 9 * n and n > 0 and not missing and not extra
+    lines = [f"one-action runs with a transcript: {len(runs)} of {planned}",
+             f"AGREEMENT: the checkers agree with the labels on {agree} of {n} rule verdicts"
+             + (f" ({agree / n:.1%})" if n else ""),
+             f"  needed: at least 9 of every 10, every label present -> {'HOLDS' if share else 'DOES NOT HOLD'}"]
+    lines += [f"  missing label: {m}" for m in missing]
+    lines += [f"  label for a run with no transcript: {x}" for x in extra]
+    lines.append(f"LABELLED FAIL, CHECKER HOLDS: {len(missed)} -> {'HOLDS' if not missed else 'DOES NOT HOLD'} (needed: none)")
+    lines += [f"  {r['run']} {r['rule']} ({r['moment']}, prompt {r['prompt']}): {r['reason']}" for r in missed]
+    dis = [r for r in rows if not r["agree"]]
+    lines.append(f"DISAGREEMENTS: {len(dis)}")
+    lines += [f"  {r['run']} {r['rule']} ({r['moment']}, prompt {r['prompt']}): label {r['label']}, checker "
+              f"{r['checker']} ({r['reason']})" for r in dis]
+    ok = share and not missed
+    lines.append(f"LINE 3 -> {'HOLDS' if ok else 'DOES NOT HOLD'}")
+    return "\n".join(lines), ok
+
+
 def main():
     args = sys.argv[1:]
+    out = OUT
+    if args[:1] == ["--runs"] and len(args) >= 2:
+        out, args = (HERE / args[1]).resolve(), args[2:]
     if args == ["--template"]:
-        print(json.dumps(template(OUT), indent=1))
+        print(json.dumps(template(out), indent=1))
         return
     if len(args) != 1:
         sys.exit(__doc__)
-    text, ok = report(json.loads(Path(args[0]).read_text()), OUT)
+    labels = json.loads(Path(args[0]).read_text())
+    text, ok = report(labels, out) if out == OUT else report_probe2(labels, out)
     print(text)
     sys.exit(0 if ok else 1)
 

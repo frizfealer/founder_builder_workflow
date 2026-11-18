@@ -52,10 +52,20 @@ def hold_arg(kind):
 
 
 def visitor_entry(world_step):
-    """The visitor entry whose world step is this scenario line."""
-    hits = [v for v in data()["visitor"].values() if v["world_step"] == world_step]
+    """The visitor entry whose world step is this scenario line; an entry marked moment_only is played only
+    where a probe moment puts it."""
+    hits = [v for v in data()["visitor"].values() if v["world_step"] == world_step and not v.get("moment_only")]
     assert hits, f"data.json has no visitor sentence for the world step {world_step!r}"
     return hits[0]
+
+
+def moment(name):
+    """A tested moment (data.json 'moments') or a moment of the second probe run ('probe_moments')."""
+    return data()["moments"].get(name) or data()["probe_moments"][name]
+
+
+def moment_names():
+    return [m for section in ("moments", "probe_moments") for m in data()[section] if not m.startswith("_")]
 
 
 def lint():

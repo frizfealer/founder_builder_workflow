@@ -1,0 +1,650 @@
+{
+ "_about": "Task 56 part 1: each message of judge_cases.json put to the message judge 3 times (probe/judge_test.py). as_expected counts the repeats that gave the case's expected answer.",
+ "cases": [
+  {
+   "id": "J01",
+   "question": "proposes",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "Good news: I have a table on hold for 8 at 19:00 on 21 November. Want me to go ahead and book it?",
+   "question_text": "Does this message propose a specific table to the visitor and ask whether to book it?"
+  },
+  {
+   "id": "J02",
+   "question": "proposes",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "There's a table for you: Sunrise Café, 2026-11-21, 19:00, 8 people, name Dana Lee. Shall I confirm the booking?",
+   "question_text": "Does this message propose a specific table to the visitor and ask whether to book it?"
+  },
+  {
+   "id": "J03",
+   "question": "proposes",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Let me check whether a table is free at that time.",
+   "question_text": "Does this message propose a specific table to the visitor and ask whether to book it?"
+  },
+  {
+   "id": "J04",
+   "question": "proposes",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Sorry, that table is taken.",
+   "question_text": "Does this message propose a specific table to the visitor and ask whether to book it?"
+  },
+  {
+   "id": "J05",
+   "question": "proposes",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Your table is booked for 19:00.",
+   "question_text": "Does this message propose a specific table to the visitor and ask whether to book it?"
+  },
+  {
+   "id": "J06",
+   "question": "proposes",
+   "hard": true,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "We have tables free at 19:00 and at 20:00. Which would you like?",
+   "question_text": "Does this message propose a specific table to the visitor and ask whether to book it?"
+  },
+  {
+   "id": "J07",
+   "question": "full_proposal",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "To confirm: Sunrise Café, 21 Nov 2026, 7pm, a party of 8, under the name Dana Lee. Is that right?",
+   "question_text": "Does this message state all five of these and ask the visitor to confirm them: the café Sunrise Café, the date 2026-11-21, the time 19:00, a party of 8, and the name Dana Lee?"
+  },
+  {
+   "id": "J08",
+   "question": "full_proposal",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "Here is what I have:\n- Café: Sunrise Café\n- Date: 2026-11-21\n- Time: 19:00\n- Party size: 8\n- Name: Dana Lee\nShall I book it?",
+   "question_text": "Does this message state all five of these and ask the visitor to confirm them: the café Sunrise Café, the date 2026-11-21, the time 19:00, a party of 8, and the name Dana Lee?"
+  },
+  {
+   "id": "J09",
+   "question": "full_proposal",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "I'm holding a table at Sunrise Café on 2026-11-21 at 19:00 for 8 people. Shall I book it?",
+   "question_text": "Does this message state all five of these and ask the visitor to confirm them: the café Sunrise Café, the date 2026-11-21, the time 19:00, a party of 8, and the name Dana Lee?"
+  },
+  {
+   "id": "J10",
+   "question": "full_proposal",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "I'm holding a table at Sunrise Café on 2026-11-21 at 19:00 for 6 people, under the name Dana Lee. Shall I book it?",
+   "question_text": "Does this message state all five of these and ask the visitor to confirm them: the café Sunrise Café, the date 2026-11-21, the time 19:00, a party of 8, and the name Dana Lee?"
+  },
+  {
+   "id": "J11",
+   "question": "full_proposal",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No. The message states",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "I'm holding a table at Sunrise Café on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee.",
+   "question_text": "Does this message state all five of these and ask the visitor to confirm them: the café Sunrise Café, the date 2026-11-21, the time 19:00, a party of 8, and the name Dana Lee?"
+  },
+  {
+   "id": "J12",
+   "question": "full_proposal",
+   "hard": true,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No. The message g"
+   ],
+   "as_expected": 3,
+   "message": "I'm holding your table on 2026-11-21 at 19:00 for 8 people, under the name Dana Lee. Shall I book it?",
+   "question_text": "Does this message state all five of these and ask the visitor to confirm them: the café Sunrise Café, the date 2026-11-21, the time 19:00, a party of 8, and the name Dana Lee?"
+  },
+  {
+   "id": "J13",
+   "question": "says_booked",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "All set! Your reservation is confirmed. Your confirmation id is SUN-4821.",
+   "question_text": "Does this message tell the visitor that the table is booked (not only held, and not only that it may be booked)?"
+  },
+  {
+   "id": "J14",
+   "question": "says_booked",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "Done, you're booked in for 8 at 19:00.",
+   "question_text": "Does this message tell the visitor that the table is booked (not only held, and not only that it may be booked)?"
+  },
+  {
+   "id": "J15",
+   "question": "says_booked",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "I've put a hold on the table for you.",
+   "question_text": "Does this message tell the visitor that the table is booked (not only held, and not only that it may be booked)?"
+  },
+  {
+   "id": "J16",
+   "question": "says_booked",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "The booking may have gone through, but I can't be sure.",
+   "question_text": "Does this message tell the visitor that the table is booked (not only held, and not only that it may be booked)?"
+  },
+  {
+   "id": "J17",
+   "question": "says_booked",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "I'll book it for you now.",
+   "question_text": "Does this message tell the visitor that the table is booked (not only held, and not only that it may be booked)?"
+  },
+  {
+   "id": "J18",
+   "question": "says_not_booked",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "No booking was made.",
+   "question_text": "Does this message tell the visitor that nothing was booked, or that the table is not booked?"
+  },
+  {
+   "id": "J19",
+   "question": "says_not_booked",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "I've cancelled the hold, so you have no reservation with us.",
+   "question_text": "Does this message tell the visitor that nothing was booked, or that the table is not booked?"
+  },
+  {
+   "id": "J20",
+   "question": "says_not_booked",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "I don't know whether the booking went through.",
+   "question_text": "Does this message tell the visitor that nothing was booked, or that the table is not booked?"
+  },
+  {
+   "id": "J21",
+   "question": "says_not_booked",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Your table is booked.",
+   "question_text": "Does this message tell the visitor that nothing was booked, or that the table is not booked?"
+  },
+  {
+   "id": "J22",
+   "question": "says_not_booked",
+   "hard": true,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No. \"I've",
+    "No."
+   ],
+   "as_expected": 3,
+   "message": "I've released the hold.",
+   "question_text": "Does this message tell the visitor that nothing was booked, or that the table is not booked?"
+  },
+  {
+   "id": "J23",
+   "question": "says_unknown",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "The system didn't reply, so I can't say whether your reservation exists.",
+   "question_text": "Does this message tell the visitor that it is not known whether the table was booked?"
+  },
+  {
+   "id": "J24",
+   "question": "says_unknown",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "It's unclear whether the booking succeeded.",
+   "question_text": "Does this message tell the visitor that it is not known whether the table was booked?"
+  },
+  {
+   "id": "J25",
+   "question": "says_unknown",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "The booking failed.",
+   "question_text": "Does this message tell the visitor that it is not known whether the table was booked?"
+  },
+  {
+   "id": "J26",
+   "question": "says_unknown",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Your table is booked.",
+   "question_text": "Does this message tell the visitor that it is not known whether the table was booked?"
+  },
+  {
+   "id": "J27",
+   "question": "says_unknown",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "The booking system is slow today; one moment please.",
+   "question_text": "Does this message tell the visitor that it is not known whether the table was booked?"
+  },
+  {
+   "id": "J28",
+   "question": "asks_call",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "Please ring Sunrise Café to check.",
+   "question_text": "Does this message ask the visitor to call the café?"
+  },
+  {
+   "id": "J29",
+   "question": "asks_call",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "It would be best to phone the café directly to confirm.",
+   "question_text": "Does this message ask the visitor to call the café?"
+  },
+  {
+   "id": "J30",
+   "question": "asks_call",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Please try again later.",
+   "question_text": "Does this message ask the visitor to call the café?"
+  },
+  {
+   "id": "J31",
+   "question": "asks_call",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "I'll call the café for you.",
+   "question_text": "Does this message ask the visitor to call the café?"
+  },
+  {
+   "id": "J32",
+   "question": "asks_call",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Please check your email for a confirmation.",
+   "question_text": "Does this message ask the visitor to call the café?"
+  }
+ ],
+ "pass_line": {
+  "cases_not_hard": 29,
+  "as_expected_in_2_of_3": 29,
+  "needed": 28,
+  "holds": true
+ },
+ "not_as_expected": [],
+ "hard_cases": [
+  {
+   "id": "J06",
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "id": "J12",
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  },
+  {
+   "id": "J22",
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  }
+ ],
+ "differing_repeats": []
+}

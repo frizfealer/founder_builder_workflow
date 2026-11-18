@@ -53,6 +53,22 @@ def spent():
     return cost([u for v in verdicts() for u in v.get("usage", [])] + preflight_usage())
 
 
+def earlier_spend():
+    """{file: USD} for part 2's calls outside this folder: the first try's runs and the calls made outside
+    this script (runs/off-runner-usage.json), so the summary can state all that part 2 spent."""
+    first = OUT.parent / "part2-first-try" / "verdicts"
+    off = OUT.parent / "off-runner-usage.json"
+    out = {}
+    if first.exists():
+        out["runs/part2-first-try/verdicts"] = round(cost(
+            [u for p in first.glob("*.json") if p.name not in ("index.json", "summary.json")
+             for u in (json.loads(p.read_text()) if p.name == "preflight-usage.json"
+                       else json.loads(p.read_text()).get("usage", []))]), 4)
+    if off.exists():
+        out["runs/off-runner-usage.json"] = round(cost(json.loads(off.read_text())["calls"]), 4)
+    return out
+
+
 def preflight():
     """One tiny call, so a missing login or credit stops the run before any test starts."""
     from probe.llm import LLM
@@ -120,7 +136,12 @@ def summary():
                                 "status": {k: sum(v["status"] == k for v in whole) for k in ("pass", "fail", "no verdict", "error")},
                                 "pass_rate_per_rule": per_rule(whole)},
         "bad_prompts_checker_side": bad,
-        "money": {"usd": round(cost(usage), 4), "cap_usd": CAP, "api_calls": len(usage),
+        "money": {"usd": round(cost(usage), 4),
+                  "part2_total_usd": round(cost(usage) + sum(earlier_spend().values()), 4),
+                  "part2_total_from": {"runs/part2/verdicts": round(cost(usage), 4)} | earlier_spend(),
+                  "note": "usd and the token counts are this folder's runs; part2_total_usd is all that part 2 "
+                          "of task 49 spent: these runs, the first try's, and the calls outside this script",
+                  "cap_usd": CAP, "api_calls": len(usage),
                   "input_tokens": sum(u["input_tokens"] for u in usage),
                   "output_tokens": sum(u["output_tokens"] for u in usage),
                   "cache_read_input_tokens": sum(u["cache_read_input_tokens"] for u in usage),

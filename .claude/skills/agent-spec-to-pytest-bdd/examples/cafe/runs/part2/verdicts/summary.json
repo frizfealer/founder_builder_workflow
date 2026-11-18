@@ -122,6 +122,13 @@
  },
  "money": {
   "usd": 0.417,
+  "part2_total_usd": 0.8829,
+  "part2_total_from": {
+   "runs/part2/verdicts": 0.417,
+   "runs/part2-first-try/verdicts": 0.4203,
+   "runs/off-runner-usage.json": 0.0456
+  },
+  "note": "usd and the token counts are this folder's runs; part2_total_usd is all that part 2 of task 49 spent: these runs, the first try's, and the calls outside this script",
   "cap_usd": 5.0,
   "api_calls": 127,
   "input_tokens": 179482,

@@ -11,8 +11,9 @@ The cited text of a claim is its row in the claims table plus the Systems row of
 (that row lists the system's owner and tools and has no id of its own). The cited text of a rule is
 its section in rules.md plus each row of "What the agent does" that names it.
 
-`problems()` lists what no longer holds, including the 7 histories against a reference run;
-conftest.py stops a test run on any, as it does for a feature file that differs from the spec.
+`problems()` lists what no longer holds, including the 7 histories and the 2 probe moments' histories
+against a reference run; conftest.py stops a test run on any, as it does for a feature file that differs
+from the spec.
 """
 import re
 
@@ -21,8 +22,10 @@ from harness.data import data, lint, rule_text, scenario, spec
 SCENARIOS = ["SC-08", "SC-12", "SC-10"]
 OWN = "builder's own"
 LABEL_KEYS = {"source", "ref", "quote", "note", "wording", "label", "world_step", "model_step", "means",
-              "situation", "scenario", "judge", "is_error"}
+              "situation", "scenario", "judge", "is_error", "moment_only", "probe_only", "visitor_sentences",
+              "world_after", "leaves_out", "instruction"}
 SECTIONS = ("values", "tools", "answers", "fake", "visitor", "agent", "judge_questions")
+MOMENT_SECTIONS = ("moments", "probe_moments", "probe_prompts")
 SINGLE = ("spec", "judge_instruction", "action_limit", "tool_use_id")
 
 
@@ -34,9 +37,10 @@ def entries(d=None):
     for section in SECTIONS:
         for key, e in d[section].items():
             yield f"{section}.{key}", e
-    for key, e in d["moments"].items():
-        if not key.startswith("_"):
-            yield f"moments.{key}", e
+    for section in MOMENT_SECTIONS:
+        for key, e in d[section].items():
+            if not key.startswith("_"):
+                yield f"{section}.{key}", e
 
 
 def norm(text):
@@ -136,32 +140,47 @@ def world_problems(d=None):
         if not o and line not in steps:
             out.append(f"World line {line!r}: no visitor sentence in data.json")
     out += [f"visitor.{k}: world step {v['world_step']!r} is in none of {', '.join(SCENARIOS)}"
-            for k, v in d["visitor"].items() if v["world_step"] not in lines]
+            for k, v in d["visitor"].items() if v["world_step"] not in lines and not v.get("moment_only")]
+    placed = {k for m in d["probe_moments"].values() if isinstance(m, dict)
+              for k in [*m.get("visitor_sentences", {}).values(), *m.get("world_after", [])]}
+    out += [f"visitor.{k}: moment_only, but no probe moment plays it" for k, v in d["visitor"].items()
+            if v.get("moment_only") and k not in placed]
     return out
 
 
 def history_problems():
-    """Moments whose history is not the reference agent's run of its scenario up to that turn."""
+    """Moments whose history is not the reference agent's run of its scenario up to that turn. A probe
+    moment's World is the one moment_world makes; at a probe-only moment the reference agent may have no
+    step, and its run then ends where the history does."""
     from harness.agents import ReferenceAgent
     from harness.fake import FakeBookingSystem
-    from harness.slot import Driver, world_line
+    from harness.slot import Driver, moment_world, world_line
     out = []
     keys = ("kind", "text", "tool", "args", "payload", "is_error")
-    for m, h in data()["moments"].items():
-        if m.startswith("_"):
-            continue
-        first, *rest = scenario(h["scenario"])["world"]
-        system = FakeBookingSystem()
-        system.start(table_free=first == "The table is free")
-        try:
-            run = Driver([world_line(line) for line in rest], system, ReferenceAgent()).run()
-        except Exception as e:  # a spec change the reference agent has no step for
-            out.append(f"moments.{m}: the reference run of {h['scenario']} raised {type(e).__name__}: {e}")
-            continue
-        got = [{k: e[k] for k in keys if k in e} for e in run.events[:len(h["history"])]]
-        want = [{k: e[k] for k in keys if k in e} for e in h["history"]]
-        if got != want or len(run.events) <= len(want):
-            out.append(f"moments.{m}: the history is not the reference agent's run of {h['scenario']} up to that turn")
+    for section in ("moments", "probe_moments"):
+        for m, h in data()[section].items():
+            if m.startswith("_"):
+                continue
+            first, *rest = scenario(h["scenario"])["world"]
+            system = FakeBookingSystem()
+            system.start(table_free=first == "The table is free")
+            world = [world_line(line) for line in rest]
+            driver = Driver(moment_world(world, h) if section == "probe_moments" else world, system, ReferenceAgent())
+            no_step = False
+            try:
+                events = driver.run().events
+            except NotImplementedError as e:  # the reference agent has no step here
+                events, no_step = driver.events, h.get("probe_only", False)
+                if not no_step:
+                    out.append(f"{section}.{m}: the reference run of {h['scenario']} raised NotImplementedError: {e}")
+                    continue
+            except Exception as e:  # a spec change the reference agent has no step for
+                out.append(f"{section}.{m}: the reference run of {h['scenario']} raised {type(e).__name__}: {e}")
+                continue
+            got = [{k: e[k] for k in keys if k in e} for e in events[:len(h["history"])]]
+            want = [{k: e[k] for k in keys if k in e} for e in h["history"]]
+            if got != want or (len(events) <= len(want) and not (no_step and len(events) == len(want))):
+                out.append(f"{section}.{m}: the history is not the reference agent's run of {h['scenario']} up to that turn")
     return out
 
 
