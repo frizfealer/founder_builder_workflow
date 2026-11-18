@@ -35,7 +35,8 @@ Those lines are not yours: give them no verdict, and read nothing to check them.
 Done when every part of `done_means` that is yours has a verdict with a citation.
 
 Return, first line exactly `VERDICT: PASS` or `VERDICT: FAIL`, then:
-- **Parts:** each part of `done_means`, holds or not, with its citation.
+- **Parts:** each part of `done_means` that is yours, holds or not, with its citation. Name each
+  line another verifier has as not yours, with no verdict.
 - **Problems:** each with its label, file, line and why it is wrong. FAIL when any problem is
   blocking.
 - **Commands:** for `script`, one per line.

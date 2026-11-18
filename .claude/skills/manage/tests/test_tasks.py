@@ -228,7 +228,28 @@ def test_lint_verifier_of_line_value_not_verifier():
 
 def test_line_verifiers_map_and_rest():
     """Should give a mapped line its one verifier, every other line all of verified_by, and an unnumbered done_means one line 1."""
-    t = task(1) | {"done_means": "(1) a (2) b (3) c", "verified_by": ["script", "you"],
+    t = task(1) | {"done_means": "(1) a. (2) b. (3) c.", "verified_by": ["script", "you"],
                    "verifier_of_line": {"3": "advisor"}}
     assert tasks.line_verifiers(t) == {"1": {"script", "you"}, "2": {"script", "you"}, "3": {"advisor"}}
     assert tasks.line_verifiers(task(1)) == {"1": {"script"}}
+
+
+def test_written_lines_only_where_a_line_starts():
+    """Should count a (n) at the start of the text, of a text line, or after the punctuation that ends a line, and not one inside a line."""
+    dm = "(1) A file. (2) The board shows (7) columns: (3) x; (4) 'y'. (5) z\n(6) w"
+    assert tasks.written_lines(dm) == ["1", "2", "3", "4", "5", "6"]
+    t = task(1) | {"done_means": "(1) The board shows (7) columns.", "verifier_of_line": {"7": "advisor"}}
+    assert any("verifier_of_line keys" in e for e in tasks.lint(as_files(t), TAGS))
+
+
+def test_lint_advisor_and_you_on_unmapped_line():
+    """Should fail a task whose verified_by holds advisor and you while a line is mapped to neither, and pass once every line is mapped."""
+    dm = "(1) A file exists. (2) Labels agree."
+    both = task(1) | {"done_means": dm, "verified_by": ["advisor", "you"], "verifier_of_line": {"2": "advisor"}}
+    errs = tasks.lint(as_files(both), TAGS)
+    assert any("advisor and you" in e and "['1']" in e for e in errs)
+    unnumbered = task(1) | {"verified_by": ["advisor", "you"]}
+    assert any("advisor and you" in e for e in tasks.lint(as_files(unnumbered), TAGS))
+    mapped = both | {"verifier_of_line": {"1": "you", "2": "advisor"}}
+    assert tasks.lint(as_files(mapped), TAGS) == []
+    assert tasks.lint(as_files(task(1) | {"verified_by": ["advisor", "reviewer"]}), TAGS) == []

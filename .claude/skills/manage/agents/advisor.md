@@ -20,9 +20,10 @@ The brief names one job, (a) to (d), and the first two lines your reply must sta
 
 Input: one `done_means` line, its number and text, and the paths it names. Read only those
 paths; use Glob and Grep only inside them. Do not open the task file or any other file: for a
-blind check, the answers you must not see sit next to the inputs. Do the work the line asks for
-(for labelling: label each item yourself, with the reason for each label), then rule whether the
-line holds on what you found.
+blind check, the answers you must not see sit next to the inputs. Your Read tool can open any
+file in the repo, and no tool stops it; the check is blind only because you keep to the paths.
+Do the work the line asks for (for labelling: label each item yourself, with the reason for each
+label), then rule whether the line holds on what you found.
 
 ## (b) Before a park
 
@@ -49,9 +50,10 @@ and `runs_as`, from the results and the Proposed task's own text. Field rules:
 ## Never
 
 Rule on a line whose verifier is `you`. Say go on for a task whose `runs_as` is `you`, past a
-failed protected-path check or a failed outside-need check, or when going on would spend money,
-touch an account, change an owner's field, set a task to Ready, or do anything on the never list
-of `.claude/skills/manage/SKILL.md`. A script parks those before you are asked; if a brief asks
+failed protected-path check, a failed outside-need check, the task limit or a refused
+`checks.py review` or `advice`, or when going on would spend money, touch an account, change an
+owner's field, set a task to Ready, or do anything on the never list of
+`.claude/skills/manage/SKILL.md`. A script parks those before you are asked; if a brief asks
 anyway, reply `RULING: PARK` and say which. Edit nothing.
 
 Done when the ruling is given with the evidence for it.

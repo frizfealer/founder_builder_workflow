@@ -17,12 +17,15 @@
   checks.py owner <task-id>                exit 1 while the task waits for the owner's check
                                            (a line verified by you, owner_verified is empty); the
                                            message names only the owner's lines
-  checks.py advice <task-id>               for each line the advisor verifies, the latest saved
-                                           advisor reply on it in the working tree; exit 1 when one
-                                           has none or its first line is not "RULING: HOLDS"
-  checks.py consult <task-id> <reason>     before a park: exit 0 when the advisor is consulted
-                                           first, 1 when the task always parks without it, 2 for a
-                                           reason not in the list
+  checks.py advice <task-id>               for each line the advisor verifies (and you do not), the
+                                           latest saved advisor reply on it in the working tree; exit 1
+                                           when one has none or its first line is not "RULING: HOLDS"
+  checks.py consult <task-id> <reason> [<branch>]
+                                           before a park: exit 0 when the advisor is consulted first,
+                                           1 when the task always parks without it, 2 for a reason not
+                                           in the list. The always-park conditions the repo shows are
+                                           checked, whatever the reason; <branch> is the task's branch,
+                                           left out when there is none
   checks.py drafts <task-id>               the Proposed tasks that hard-depend on the task and have
                                            an empty done_means, one id per line (the advisor drafts them)
   checks.py run-start | run-end            mark a manager run active / no longer active
@@ -35,7 +38,7 @@ A task merge is a merge commit on the working branch's first-parent line whose s
 "Merge task <id>:". A review tag is any tag named review/<anything>, e.g. review/2026-11-20.
 The protected-path list and the task's "may edit" are read from the working branch, never from
 the task's branch, so a branch cannot grant itself an edit. needs, owner and consult read the
-task file from the working branch too.
+task file from the working branch too; a task file the working branch does not hold is an error.
 """
 import fnmatch
 import json
@@ -245,10 +248,11 @@ def check_owner(repo, task_id, base=WORKING_BRANCH):
 
 def check_advice(repo, task_id):
     """(ok, message). ok only when, for every line the advisor verifies, the highest-numbered saved
-    reply whose second line is "JOB: a (<line>)" starts RULING: HOLDS. Read from the working tree,
-    during the merge, like check_review."""
+    reply whose second line is "JOB: a (<line>)" starts RULING: HOLDS. A line the owner verifies too
+    is his, never the advisor's, so it needs no reply. Read from the working tree, during the merge,
+    like check_review."""
     t = json.loads((Path(repo) / TASKS_DIR / f"{task_id:03d}.json").read_text())
-    lines = [n for n, v in line_verifiers(t).items() if "advisor" in v]
+    lines = [n for n, v in line_verifiers(t).items() if "advisor" in v and "you" not in v]
     if not lines:
         return True, f"task {task_id} has no line for the advisor"
     latest = {}  # line -> (n, file name, first line)
@@ -272,8 +276,9 @@ def check_advice(repo, task_id):
 
 
 # The reason of every park, the word commands/manage.md passes to checks.py consult. A reason in
-# ALWAYS_PARK parks without the advisor: the advisor never decides these (task 37). Any other
-# park consults the advisor first.
+# ALWAYS_PARK parks without the advisor: the advisor never decides these (task 37's notes), nor
+# the owner's own stop, the task limit, nor a merge check that refused after verification passed.
+# Any other park consults the advisor first.
 ALWAYS_PARK = {
     "owner": "a line whose verifier is you waits for the owner's check; the advisor never rules on it",
     "runs-as-you": "the task runs as you; the advisor never unparks it",
@@ -283,25 +288,50 @@ ALWAYS_PARK = {
     "owner-field": "finishing would change an owner's field",
     "set-ready": "finishing would set a task to Ready",
     "never": "finishing would need something from the never list",
+    "merge-limit": "the task limit is reached; it is the owner's own control",
+    "review": "checks.py review refused the merge; the advisor never overrides a merge check",
+    "advice": "checks.py advice refused the merge; the advisor never overrides a merge check",
 }
 CONSULT = {
     "owner-fact": "it needs a fact about the owner's product or an outside system",
     "verification": "verification still fails after its one retry",
     "iterate": "the iterate result is not kept, or its Needs you holds an item",
-    "merge-limit": "checks.py merge-limit refused the merge",
-    "review": "checks.py review refused the merge",
-    "advice": "checks.py advice refused the merge",
 }
 
 
-def check_consult(repo, task_id, reason, base=WORKING_BRANCH):
+def always_park_conditions(repo, task_id, branch=None, base=WORKING_BRANCH, commands=NEED_CHECKS):
+    """{reason: message} for each always-park condition the repo shows that holds now, read from
+    the task file on base, the task's branch when there is one, and the merges since the review tag.
+    Money, accounts, owner's fields, Ready and the never list have no state to read: label only."""
+    held = {}
+    if task_on(repo, task_id, base)["runs_as"] == "you":
+        held["runs-as-you"] = f"task {task_id} runs as you"
+    ok, msg = check_owner(repo, task_id, base)
+    if not ok:
+        held["owner"] = msg
+    if branch is not None:
+        fails = check_protected(repo, task_id, branch, base)
+        if fails:
+            held["protected"] = f"checks.py protected fails on {branch}: {fails[0]}"
+    ok, msg = check_needs(repo, task_id, base, commands)
+    if not ok:
+        held["needs"] = msg
+    ok, msg = check_merge_limit(repo, base)
+    if not ok:
+        held["merge-limit"] = msg
+    return held
+
+
+def check_consult(repo, task_id, reason, branch=None, base=WORKING_BRANCH, commands=NEED_CHECKS):
     """(ok, message). ok when the advisor is consulted before the park; False when the task always
-    parks without it. A task whose runs_as is you always parks, whatever the reason.
-    Raises ValueError for a reason in neither list."""
+    parks without it: the reason is an always-park one, or an always-park condition holds whatever
+    the reason. Raises ValueError for a reason in neither list, or a task file base does not hold."""
     if reason not in ALWAYS_PARK and reason not in CONSULT:
         raise ValueError(f"{reason!r} is not a park reason; use one of {sorted(ALWAYS_PARK | CONSULT)}")
-    if task_on(repo, task_id, base)["runs_as"] == "you":
-        reason = "runs-as-you"
+    held = always_park_conditions(repo, task_id, branch, base, commands)
+    if held:
+        why = "; ".join(f"{ALWAYS_PARK[r]} ({m})" for r, m in held.items())
+        return False, f"task {task_id}: always park, without the advisor: {why}"
     if reason in ALWAYS_PARK:
         return False, f"task {task_id}: always park, without the advisor: {ALWAYS_PARK[reason]}"
     return True, f"task {task_id}: consult the advisor (job b) before parking: {CONSULT[reason]}"
@@ -445,12 +475,11 @@ def main(argv):
         ok, msg = check_owner(".", int(argv[1]), base)
     elif cmd == "advice" and len(argv) == 2:
         ok, msg = check_advice(".", int(argv[1]))
-    elif cmd == "consult" and len(argv) == 3:
-        try:
-            ok, msg = check_consult(".", int(argv[1]), argv[2], base)
-        except ValueError as e:
-            print(e)
+    elif cmd == "consult" and len(argv) in (3, 4):
+        if argv[2] not in ALWAYS_PARK and argv[2] not in CONSULT:
+            print(f"{argv[2]!r} is not a park reason; use one of {sorted(ALWAYS_PARK | CONSULT)}")
             return 2
+        ok, msg = check_consult(".", int(argv[1]), argv[2], argv[3] if len(argv) == 4 else None, base)
     elif cmd == "drafts" and len(argv) == 2:
         ids = drafts(".", int(argv[1]))
         ok, msg = True, "\n".join(map(str, ids)) or f"no Proposed task to draft for task {argv[1]}"

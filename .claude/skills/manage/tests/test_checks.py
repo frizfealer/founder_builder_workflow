@@ -197,6 +197,7 @@ def test_protected_list_patterns_match_real_paths():
     assert rule_for(".claude/agents/manager-reviewer.md") == {"named"}
     assert rule_for(".claude/agents/manager-advisor.md") == {"named"}
     assert rule_for("tasks/advice/056-1.md") == {"named"}
+    assert rule_for("tasks/reviews/037-1.md") == {"named"}
     assert rule_for("eval/agent-spec/new-format/SWITCH-PLAN.md") == set()
     assert rule_for(".claude/skills/skill-iterate/commands/grade.md") == set()
 
@@ -514,6 +515,30 @@ def test_protected_advice_written_on_task_branch(repo):
     assert any("tasks/advice/001-1.md" in f for f in protected(repo, b))
 
 
+def test_protected_review_written_on_task_branch(repo):
+    """Should fail when a task branch adds a saved reviewer reply, since only the manager writes them on the working branch."""
+    b = on_branch(repo)
+    repo.write("tasks/reviews/001-1.md", "VERDICT: PASS\n")
+    repo.commit("plant a verdict")
+    assert any("tasks/reviews/001-1.md" in f for f in protected(repo, b))
+
+
+def test_protected_manager_merge_with_replies_not_checked(repo):
+    """Should pass a task branch after the manager's merge commit on the working branch saved a review and an advice reply."""
+    b = on_branch(repo)
+    repo.write("work.txt", "done\n")
+    repo.commit("task 1: work")
+    repo.git("switch", "-q", BASE)
+    repo.git("merge", "-q", "--no-ff", "--no-commit", b)
+    repo.write("tasks/reviews/001-1.md", "VERDICT: PASS\n")
+    advice(repo, 1, "RULING: HOLDS", "JOB: a (2)")
+    repo.commit("Merge task 1: Task 1")
+    retry = on_branch(repo, "task/1-2")
+    repo.write("work.txt", "done again\n")
+    repo.commit("task 1: retry")
+    assert protected(repo, retry) == []
+
+
 def test_advice_no_advisor_line(repo):
     """Should allow the merge with no saved reply when no line is the advisor's."""
     advisor_task(repo)
@@ -576,6 +601,16 @@ def test_advice_advisor_in_verified_by_covers_unmapped_lines(repo):
     assert checks.check_advice(repo.path, 1)[0]
 
 
+def test_advice_skips_line_the_owner_verifies(repo):
+    """Should need no advisor reply on a line verified_by gives to both the advisor and you, since the line is the owner's."""
+    advisor_task(repo, verified_by=["advisor", "you"], verifier_of_line={"3": "advisor"})
+    ok, msg = checks.check_advice(repo.path, 1)
+    assert not ok
+    assert "line (3)" in msg and "line (1)" not in msg and "line (2)" not in msg
+    advice(repo, 1, "RULING: HOLDS", "JOB: a (3)")
+    assert checks.check_advice(repo.path, 1)[0]
+
+
 def test_review_needed_for_line_mapped_to_reviewer(repo):
     """Should refuse the merge with no review reply when a line is mapped to the reviewer, though verified_by names only the advisor."""
     advisor_task(repo, verified_by=["advisor"], verifier_of_line={"1": "reviewer"})
@@ -608,16 +643,78 @@ ALWAYS_PARK_CASES = {
     "set Ready": "set-ready",
     "anything on the never list": "never",
 }
+# Added by the owner on 2026-11-17 (task 37's for_retry): the task limit is his own control, and
+# a merge check that refuses is decided the same way.
+OWNER_ALWAYS_PARK_CASES = {
+    "the task limit reached": "merge-limit",
+    "checks.py review refuses the merge": "review",
+    "checks.py advice refuses the merge": "advice",
+}
 
 
-@pytest.mark.parametrize("case", list(ALWAYS_PARK_CASES))
+@pytest.mark.parametrize("case", list(ALWAYS_PARK_CASES | OWNER_ALWAYS_PARK_CASES))
 def test_consult_always_park_case(repo, case, monkeypatch, capsys):
-    """Should always park, without the advisor, for each always-park case of the notes."""
-    ok, msg = checks.check_consult(repo.path, 1, ALWAYS_PARK_CASES[case], base=BASE)
+    """Should always park, without the advisor, for each always-park case of the notes and the owner's."""
+    reason = (ALWAYS_PARK_CASES | OWNER_ALWAYS_PARK_CASES)[case]
+    ok, msg = checks.check_consult(repo.path, 1, reason, base=BASE)
     assert not ok
     assert "always park" in msg
     monkeypatch.chdir(repo.path)
-    assert checks.main(["consult", "1", ALWAYS_PARK_CASES[case], "--base", BASE]) == 1
+    assert checks.main(["consult", "1", reason, "--base", BASE]) == 1
+
+
+def hold_condition(repo, condition):
+    """Make one always-park condition hold in the repo, the way the repo shows it; the task's branch."""
+    if condition == "owner":
+        repo.write_task(task(1) | {"verified_by": ["reviewer", "you"]})
+        repo.commit("task 1 has a line for the owner, owner_verified empty")
+    elif condition == "runs-as-you":
+        repo.write_task(task(1) | {"runs_as": "you"})
+        repo.commit("task 1 runs as you")
+    elif condition == "protected":
+        b = on_branch(repo)
+        repo.write("DECISIONS.md", "# Decisions, changed\n")
+        repo.commit("task 1 edits DECISIONS.md")
+        repo.git("switch", "-q", BASE)
+        return b
+    elif condition == "needs":
+        with_needs(repo, ["claude-api"])
+    elif condition == "merge-limit":
+        limit = json.loads((repo.path / checks.LIMITS).read_text())["task_merges_per_review"]
+        for i in range(3, 3 + limit):
+            repo.merge_task(i)
+    return None
+
+
+CONDITIONS = ["owner", "runs-as-you", "protected", "needs", "merge-limit"]
+
+
+@pytest.mark.parametrize("condition", CONDITIONS)
+def test_consult_condition_holds_always_parks(repo, condition, monkeypatch):
+    """Should always park when an always-park condition the repo shows holds, whatever reason the manager passed."""
+    branch = hold_condition(repo, condition)
+    for reason in sorted(checks.CONSULT):
+        ok, msg = checks.check_consult(repo.path, 1, reason, branch, base=BASE,
+                                       commands={"claude-api": stand_in(1)})
+        assert not ok, reason
+        assert checks.ALWAYS_PARK[condition] in msg, reason
+    if condition != "needs":  # the CLI runs the real outside-need check
+        monkeypatch.chdir(repo.path)
+        argv = ["consult", "1", "verification"] + ([branch] if branch else []) + ["--base", BASE]
+        assert checks.main(argv) == 1
+
+
+def test_consult_conditions_cleared_consults_advisor(repo):
+    """Should consult the advisor once the owner has set owner_verified, the needs pass and the branch touches no protected path."""
+    repo.write_task(task(1) | {"verified_by": ["reviewer", "you"], "owner_verified": "2026-11-17",
+                               "outside_needs": ["claude-api"]})
+    repo.commit("task 1: owner checked, needs the API")
+    b = on_branch(repo)
+    repo.write("work.txt", "done\n")
+    repo.commit("task 1: work")
+    ok, msg = checks.check_consult(repo.path, 1, "verification", b, base=BASE,
+                                   commands={"claude-api": stand_in(0)})
+    assert ok, msg
 
 
 @pytest.mark.parametrize("reason", sorted(checks.CONSULT))
@@ -638,15 +735,23 @@ def test_consult_other_park_consults_advisor(repo, reason):
     assert "consult the advisor" in msg
 
 
-def test_consult_always_park_list_is_the_notes_cases():
-    """Should hold exactly the notes' always-park cases, so no other park skips the advisor."""
-    assert set(checks.ALWAYS_PARK) == set(ALWAYS_PARK_CASES.values())
+def test_consult_always_park_list_is_the_notes_and_owner_cases():
+    """Should hold exactly the notes' always-park cases and the owner's three, so no other park skips the advisor."""
+    assert set(checks.ALWAYS_PARK) == set(ALWAYS_PARK_CASES.values()) | set(OWNER_ALWAYS_PARK_CASES.values())
+    assert not set(checks.ALWAYS_PARK) & set(checks.CONSULT)
 
 
 def test_consult_unknown_reason(repo, monkeypatch):
     """Should exit 2 for a reason in neither list."""
     monkeypatch.chdir(repo.path)
     assert checks.main(["consult", "1", "tired", "--base", BASE]) == 2
+
+
+def test_consult_missing_task_file_is_an_error(repo, monkeypatch):
+    """Should raise naming the missing task file, not exit 2 as if the reason were unknown."""
+    monkeypatch.chdir(repo.path)
+    with pytest.raises(ValueError, match="tasks/009.json does not exist"):
+        checks.main(["consult", "9", "verification", "--base", BASE])
 
 
 def test_park_reasons_in_docs_are_known():

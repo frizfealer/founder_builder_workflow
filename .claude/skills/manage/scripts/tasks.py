@@ -32,7 +32,9 @@ BOARD_TEMPLATE = Path(__file__).with_name("board.html")
 BOARD_OUT = "build/task-board.html"
 BOARD_PORT = 8765
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-LINE_NUMBER = re.compile(r"\((\d+)\)")  # a done_means line, written (n) in the text
+# A done_means line, written (n) where a line starts: at the start of the text or of a text line,
+# or after the . : ; ! or ? that ends the line before. A (n) inside a line is not a line number.
+LINE_NUMBER = re.compile(r"(?:^\s*|[.:;!?]['\")\]]*\s+)\((\d+)\)", re.M)
 
 # The owner's fields: set by the owner; the manager may draft them only before Ready.
 OWNER_FIELDS = ["done_means", "verified_by", "verifier_of_line", "may_edit", "runs_as", "priority",
@@ -144,6 +146,10 @@ def lint_task(name, t, allowed_tags):
             e(f"{name}: verifier_of_line keys {bad_keys} are not line numbers written (n) in done_means")
         if bad_values:
             e(f"{name}: verifier_of_line values {bad_values} are not verifiers; use one of {sorted(VERIFIERS)}")
+        unmapped = [n for n in written or ["1"] if n not in vol]
+        if unmapped and _is_str_list(t["verified_by"]) and {"advisor", "you"} <= set(t["verified_by"]):
+            e(f"{name}: verified_by has advisor and you, so line(s) {unmapped} would go to both, and the "
+              f"advisor never rules on a line of yours; map each of them to one verifier in verifier_of_line")
     if not _is_str_list(t["may_edit"]):
         e(f"{name}: may_edit must be a list of paths")
     if t["runs_as"] not in RUNS_AS | {""}:

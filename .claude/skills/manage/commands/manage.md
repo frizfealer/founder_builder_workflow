@@ -140,25 +140,26 @@ list it under Needs you in the run report.
 hard-depend on the merged task and have an empty `done_means`. For each, dispatch a fresh
 `manager-advisor` for job (d) with that task's file path, the merged task's file path, `git diff
 <merge>^1 <merge>`, and the paths of the results the merged task produced. Tell it to start its
-reply with `RULING: DRAFTED`, then `JOB: d`. Write the fields of its reply into that task's
-file, keep its status Proposed, set `draft_note` to who drafted it from which task and when,
-save the reply verbatim to `tasks/advice/<draft id>-<n>.md`, and log the draft under that
-task's `decided_for_you`. If `tasks.py lint` then fails, restore the task file, keep the saved
-reply, and list it under Needs you in the run report. Commit as `task <draft id>: drafted from
-task <id>`. Go to step 2.
+reply with `RULING: DRAFTED`, then `JOB: d`. Write the fields of its reply into that task's file,
+keep its status Proposed, add to the end of `draft_note` (or start it) a sentence saying who drafted
+the fields from which task and when, keeping what it held, save the reply verbatim to
+`tasks/advice/<draft id>-<n>.md`, and log the draft under that task's `decided_for_you`. If
+`tasks.py lint` then fails, restore the task file, keep the saved reply, and list it under Needs you
+in the run report. Commit as `task <draft id>: drafted from task <id>`. Go to step 2.
 
 ## 8. Park
 
-Every park names its reason from SKILL.md's park list. First `checks.py consult <id> <reason>`.
-If it exits 1, the task always parks: go on below without the advisor. If it exits 0, dispatch a
+Every park names its reason from SKILL.md's park list. First `checks.py consult <id> <reason>
+<branch>`, with the task's branch, or without it when there is none (a `needs` park). It also checks
+the always-park conditions the repo shows, whatever the reason. If it exits 1, the task always
+parks: go on below without the advisor, with its output in the question. If it exits 0, dispatch a
 fresh `manager-advisor` for job (b) with the task file's path, the reason and the question, the
-branch and `git diff <working branch>...<branch>` when there is one, and the reviewer and
-advisor replies so far. Tell it to start its reply with `RULING: GO ON` or `RULING: PARK`, then
-`JOB: b`. On `GO ON`, the first in this task run, do what its *How* says, through the steps of
-this command only (a fresh builder briefed with the reply, a choice logged under
-`decided_for_you`, a verifier run again), and carry on from that step. On `PARK`, or a
-`GO ON` after one was already followed in this task run, park below with the reply's points in
-the recommendation.
+branch and `git diff <working branch>...<branch>` when there is one, and the reviewer and advisor
+replies so far. Tell it to start its reply with `RULING: GO ON` or `RULING: PARK`, then `JOB: b`. On
+`GO ON`, the first in this task run, do what its *How* says, through the steps of this command only
+(a fresh builder briefed with the reply, a choice logged under `decided_for_you`, a verifier run
+again), and carry on from that step. On `PARK`, or a `GO ON` after one was already followed in this
+task run, park below with the reply's points in the recommendation.
 
 On the working branch, edit only this task's file: `status` Needs you, `needs_you`,
 `decided_for_you`, `tokens`, and `for_retry`: the findings step 5 sorted into it, replacing
