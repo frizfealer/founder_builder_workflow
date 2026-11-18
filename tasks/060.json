@@ -3,7 +3,7 @@
   "title": "Manager: fixes to the advisor left by the task 037 review",
   "item": "Fix the minor points of review 037-1 that name files on the working branch: lint rejects advisor and you together on an unmapped done_means line (or check_advice skips lines you verify); decide whether merge-limit, review and advice refusals always park instead of consulting the advisor; let consult check the condition, not only the reason label; consult's except ValueError hides a missing task file; job (d) appends to draft_note instead of overwriting it; LINE_NUMBER matches only a (n) that starts a line; SKILL.md rule 3 mentions the job (b) GO ON retry; reviewer.md Return wording for lines owned by another verifier; protect tasks/reviews/ the way tasks/advice/ is",
   "motivation": "Review 037-1 minors 1, 3 to 8 and 10, and the task 037 builder's note that tasks/reviews/ is unprotected. Minor 1 can make a task impossible to merge.",
-  "notes": "Also from review 037-1, left for the owner: task 56 line 3 compares labels against checker verdicts the advisor must not see, so as written the advisor cannot rule on it; split it into labelling by the advisor and comparison by a script, or reword it, before task 56 is Ready. Also seen in this run: checks.py unmerged decides by whole files, so a finding about new code in a file that already exists on the working branch goes to a Proposed task, as all but one of 037's did; the task-49 case may have been the same.",
+  "notes": "Also from review 037-1, left for the owner: task 56 line 3 compares labels against checker verdicts the advisor must not see, so as written the advisor cannot rule on it; split it into labelling by the advisor and comparison by a script, or reword it, before task 56 is Ready. Also seen in this run: checks.py unmerged decides by whole files, so a finding about new code in a file that already exists on the working branch goes to a Proposed task, as all but one of 037's did; the task-49 case may have been the same. Dropped 2026-11-17 on the owner's instruction: every point is about lines task 037 added, so they went into task 037's for_retry and are fixed before it merges.",
   "done_means": "",
   "draft_note": "Drafted by the manager on 2026-11-17 from review 037-1. Priority, done_means and may_edit left for the owner; every change is under .claude/skills/manage/, which is protected.",
   "depends_on": [
@@ -19,9 +19,9 @@
   "may_edit": [
     ".claude/skills/manage/"
   ],
-  "status": "Proposed",
+  "status": "Dropped",
   "added": "2026-11-17",
-  "finished": "",
+  "finished": "2026-11-17",
   "source_chat": "",
   "runs_as": "build",
   "priority": "",
