@@ -5,6 +5,9 @@ Usage, from the repo root:
   tasks.py lint    every field valid, every dependency exists, Ready tasks complete; exit 1 on a problem
   tasks.py list    all tasks as one table
   tasks.py next    the task the manager should take, or why there is none; exit 1 when there is none
+  tasks.py batch [<n>]   up to n takeable tasks that can run at the same time, one per line, in
+                   the order next would take them; n defaults to tasks_at_once in limits.json;
+                   exit 1 when there is none
   tasks.py board [--open]   write build/task-board.html and print the number of tasks per status;
                             --open opens it in the browser
   tasks.py board --serve [--open]   serve the board at http://127.0.0.1:8765/ until Ctrl-C; it
@@ -15,6 +18,7 @@ Run with --root <dir> to read <dir>/tasks/ instead of ./tasks/.
 import json
 import re
 import sys
+from fnmatch import fnmatchcase
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -31,6 +35,8 @@ OUTSIDE_NEEDS = ["claude-api"]  # the fixed set; checks.py NEED_CHECKS holds the
 BOARD_TEMPLATE = Path(__file__).with_name("board.html")
 BOARD_OUT = "build/task-board.html"
 BOARD_PORT = 8765
+LIMITS = ".claude/skills/manage/limits.json"  # tasks_at_once: the n of batch
+SKILLS_DIR = ".claude/skills"  # one folder per skill; an iterate task names one of them
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 # A done_means line, written (n) where a line starts: at the start of the text or of a text line,
 # or after the . : ; ! or ? that ends the line before. A (n) inside a line is not a line number.
@@ -219,28 +225,105 @@ def lint(tasks, allowed_tags):
     return errs
 
 
-def pick_next(tasks):
-    """(task, None) for the task to take, or (None, reason). Assumes the tasks lint clean."""
+def ranked(tasks):
+    """(takeable tasks in the order to take them, None), or ([], reason). Takeable: Ready, every
+    hard dependency Done. Order: priority, then most open dependents, then lowest id. Assumes the
+    tasks lint clean."""
     by_id = {t["id"]: t for t in tasks.values()}
     ready = [t for t in by_id.values() if t["status"] == "Ready"]
     if not ready:
-        return None, "no task is Ready"
+        return [], "no task is Ready"
     takeable, blocked = [], []
     for t in ready:
         waiting = [d["id"] for d in t["depends_on"] if not d["soft"] and by_id[d["id"]]["status"] != "Done"]
         (blocked if waiting else takeable).append((t, waiting))
     if not takeable:
         lines = [f"task {t['id']} waits on {', '.join(map(str, w))}" for t, w in blocked]
-        return None, "every Ready task has a hard dependency that is not Done: " + "; ".join(lines)
-    open_tasks = [t for t in by_id.values() if t["status"] not in CLOSED]
+        return [], "every Ready task has a hard dependency that is not Done: " + "; ".join(lines)
+    takeable = [t for t, _ in takeable]
+    takeable.sort(key=lambda t: (PRIORITIES.index(t["priority"]), -dependents(tasks, t), t["id"]))
+    return takeable, None
 
-    def dependents(t):
-        return sum(1 for o in open_tasks if any(d["id"] == t["id"] for d in o["depends_on"]))
 
-    takeable.sort(key=lambda tw: (PRIORITIES.index(tw[0]["priority"]), -dependents(tw[0]), tw[0]["id"]))
-    t = takeable[0][0]
+def dependents(tasks, t):
+    """How many open tasks depend on t, hard or soft."""
+    return sum(1 for o in tasks.values() if o["status"] not in CLOSED
+               and any(d["id"] == t["id"] for d in o["depends_on"]))
+
+
+def pick_next(tasks):
+    """(task, None) for the task to take, or (None, reason). Assumes the tasks lint clean."""
+    takeable, why = ranked(tasks)
+    if not takeable:
+        return None, why
+    t = takeable[0]
     return t, (f"Ready, every hard dependency Done, priority {t['priority']}, "
-               f"{dependents(t)} open task(s) depend on it; {len(takeable)} task(s) could be taken")
+               f"{dependents(tasks, t)} open task(s) depend on it; {len(takeable)} task(s) could be taken")
+
+
+def overlaps(p, q):
+    """Whether two may_edit patterns can name one path. Matched one segment at a time, either
+    pattern's * against the other's segment; a pattern ending in / covers everything under it."""
+    a, b = p.rstrip("/").split("/"), q.rstrip("/").split("/")
+    if not all(fnmatchcase(x, y) or fnmatchcase(y, x) for x, y in zip(a, b)):
+        return False
+    if len(a) == len(b):
+        return True
+    return (p if len(a) < len(b) else q).endswith("/")
+
+
+def iterate_skill(t, skills):
+    """The one skill an iterate task's title or item names, as a whole name; None when it names
+    none or more than one, and then the task counts as iterating every skill."""
+    text = f"{t['title']} {t['item']}"
+    found = {s for s in skills if re.search(rf"(?<![\w-]){re.escape(s)}(?![\w-])", text)}
+    return found.pop() if len(found) == 1 else None
+
+
+def conflict(a, b, skills):
+    """Why tasks a and b cannot run at the same time, or None when they are independent: no hard
+    dependency between them either way, no protected path named in both may_edit, and not two
+    iterate tasks on one skill. Tags are not part of the test."""
+    for x, y in ((a, b), (b, a)):
+        if any(d["id"] == y["id"] and not d["soft"] for d in x["depends_on"]):
+            return f"task {x['id']} hard-depends on task {y['id']}"
+    shared = sorted({p for p in a["may_edit"] for q in b["may_edit"] if overlaps(p, q)})
+    if shared:
+        return f"tasks {a['id']} and {b['id']} both may edit {', '.join(shared)}"
+    if a["runs_as"] == b["runs_as"] == "iterate":
+        sa, sb = iterate_skill(a, skills), iterate_skill(b, skills)
+        if sa is None or sb is None or sa == sb:
+            which = sa if sa == sb else "one skill, as far as the script can tell"
+            return f"tasks {a['id']} and {b['id']} both iterate {which}"
+    return None
+
+
+def pick_batch(tasks, n, skills):
+    """(tasks to take now, why). Goes down ranked(): a task joins when it conflicts with none
+    already taken, up to n. Assumes the tasks lint clean."""
+    takeable, why = ranked(tasks)
+    if not takeable:
+        return [], why
+    taken, left = [], []
+    for t in takeable:
+        if len(taken) == n:
+            left.append(f"task {t['id']}: {n} task(s) at once is the limit")
+            continue
+        clash = next((c for c in (conflict(t, o, skills) for o in taken) if c), None)
+        if clash:
+            left.append(f"task {t['id']}: {clash}")
+        else:
+            taken.append(t)
+    return taken, (f"{len(taken)} of {len(takeable)} takeable task(s), at most {n} at once"
+                   + ("; left for later: " + "; ".join(left) if left else ""))
+
+
+def skill_names(root):
+    return sorted(p.name for p in (Path(root) / SKILLS_DIR).iterdir() if p.is_dir())
+
+
+def tasks_at_once(root):
+    return json.loads((Path(root) / LIMITS).read_text())["tasks_at_once"]
 
 
 def _cell(v):
@@ -331,7 +414,10 @@ def main(argv):
         argv = argv[:1]
     else:
         flags = set()
-    if len(argv) != 1 or argv[0] not in {"lint", "list", "next", "board"}:
+    n = None
+    if argv[:1] == ["batch"] and len(argv) == 2 and argv[1].isdigit() and int(argv[1]) > 0:
+        n, argv = int(argv[1]), argv[:1]
+    if len(argv) != 1 or argv[0] not in {"lint", "list", "next", "batch", "board"}:
         print(__doc__)
         return 2
     if "--serve" in flags:
@@ -376,6 +462,12 @@ def main(argv):
         if "--open" in flags:
             webbrowser.open(out.resolve().as_uri())
         return 0
+    if argv[0] == "batch":
+        taken, why = pick_batch(tasks, n or tasks_at_once(root), skill_names(root))
+        for t in taken:
+            print(f"task {t['id']}: {t['title']}")
+        print(f"why: {why}" if taken else f"no task to take: {why}")
+        return 0 if taken else 1
     t, why = pick_next(tasks)
     if t is None:
         print(f"no task to take: {why}")

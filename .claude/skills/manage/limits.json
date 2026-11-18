@@ -1,3 +1,4 @@
 {
-  "task_merges_per_review": 10
+  "task_merges_per_review": 10,
+  "tasks_at_once": 2
 }

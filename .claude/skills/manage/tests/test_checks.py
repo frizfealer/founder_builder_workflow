@@ -218,7 +218,7 @@ def hook(repo, command):
                                      "git -C /x push", "/usr/bin/git push --force"])
 def test_push_hook_refuses_while_run_active(repo, command):
     """Should refuse a git push with exit 2 and a message saying the owner pushes, while a run is active."""
-    assert checks.run_start(repo.path)[0]
+    assert checks.run_start(repo.path, base=BASE)[0]
     code, err = hook(repo, command)
     assert code == 2
     assert "owner pushes" in err
@@ -231,7 +231,7 @@ def test_push_hook_allows_push_outside_run(repo):
 
 def test_push_hook_allows_after_run_end(repo):
     """Should allow a git push again once the run is marked ended."""
-    checks.run_start(repo.path)
+    checks.run_start(repo.path, base=BASE)
     checks.run_end(repo.path)
     assert hook(repo, "git push")[0] == 0
 
@@ -239,20 +239,27 @@ def test_push_hook_allows_after_run_end(repo):
 @pytest.mark.parametrize("command", ["git stash push -m wip", "git status", "echo push"])
 def test_push_hook_allows_non_push_while_run_active(repo, command):
     """Should allow a command that is not a git push while a run is active."""
-    checks.run_start(repo.path)
+    checks.run_start(repo.path, base=BASE)
     assert hook(repo, command)[0] == 0
 
 
 def test_run_start_twice(repo):
     """Should refuse to mark a second run active while one is marked."""
-    assert checks.run_start(repo.path)[0]
-    assert not checks.run_start(repo.path)[0]
+    assert checks.run_start(repo.path, base=BASE)[0]
+    assert not checks.run_start(repo.path, base=BASE)[0]
 
 
 # --- merge limit -----------------------------------------------------------------------------
 
+def limit_of_three(repo):
+    """Set the test repo's task limit to 3, whatever the owner's limits.json holds."""
+    p = repo.path / checks.LIMITS
+    p.write_text(json.dumps(json.loads(p.read_text()) | {"task_merges_per_review": 3}))
+
+
 def test_merge_limit_three_since_review_tag(repo):
-    """Should refuse a fourth merge when three task merges follow the review tag."""
+    """Should refuse a fourth merge when three task merges follow the review tag and the limit is 3."""
+    limit_of_three(repo)
     repo.merge_task(1)
     repo.git("tag", "review/2026-11-15")
     for i in (2, 3, 4):
@@ -276,6 +283,7 @@ def test_merge_limit_two_since_review_tag(repo):
 
 def test_merge_limit_no_review_tag(repo):
     """Should count every task merge on the working branch when no review tag exists."""
+    limit_of_three(repo)
     for i in (1, 2, 3):
         repo.merge_task(i)
     assert checks.task_merges_since_review(repo.path, base=BASE) == (3, None)
@@ -650,12 +658,18 @@ OWNER_ALWAYS_PARK_CASES = {
     "checks.py review refuses the merge": "review",
     "checks.py advice refuses the merge": "advice",
 }
+# Task 61's notes: a second merge failure parks it; an iterate result measured on an older version
+# of its skill parks for the owner.
+TASK_61_ALWAYS_PARK_CASES = {
+    "a second try-merge failure in the run": "conflict",
+    "an iterate result measured on an older skill": "stale",
+}
 
 
-@pytest.mark.parametrize("case", list(ALWAYS_PARK_CASES | OWNER_ALWAYS_PARK_CASES))
+@pytest.mark.parametrize("case", list(ALWAYS_PARK_CASES | OWNER_ALWAYS_PARK_CASES | TASK_61_ALWAYS_PARK_CASES))
 def test_consult_always_park_case(repo, case, monkeypatch, capsys):
     """Should always park, without the advisor, for each always-park case of the notes and the owner's."""
-    reason = (ALWAYS_PARK_CASES | OWNER_ALWAYS_PARK_CASES)[case]
+    reason = (ALWAYS_PARK_CASES | OWNER_ALWAYS_PARK_CASES | TASK_61_ALWAYS_PARK_CASES)[case]
     ok, msg = checks.check_consult(repo.path, 1, reason, base=BASE)
     assert not ok
     assert "always park" in msg
@@ -736,8 +750,9 @@ def test_consult_other_park_consults_advisor(repo, reason):
 
 
 def test_consult_always_park_list_is_the_notes_and_owner_cases():
-    """Should hold exactly the notes' always-park cases and the owner's three, so no other park skips the advisor."""
-    assert set(checks.ALWAYS_PARK) == set(ALWAYS_PARK_CASES.values()) | set(OWNER_ALWAYS_PARK_CASES.values())
+    """Should hold exactly the notes' always-park cases, the owner's three and task 61's two, so no other park skips the advisor."""
+    assert set(checks.ALWAYS_PARK) == (set(ALWAYS_PARK_CASES.values()) | set(OWNER_ALWAYS_PARK_CASES.values())
+                                       | set(TASK_61_ALWAYS_PARK_CASES.values()))
     assert not set(checks.ALWAYS_PARK) & set(checks.CONSULT)
 
 

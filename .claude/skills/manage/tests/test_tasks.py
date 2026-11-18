@@ -6,6 +6,8 @@ import urllib.request
 from collections import Counter
 from pathlib import Path
 
+import pytest
+
 import tasks
 from conftest import TAGS, task
 
@@ -253,3 +255,112 @@ def test_lint_advisor_and_you_on_unmapped_line():
     mapped = both | {"verifier_of_line": {"1": "you", "2": "advisor"}}
     assert tasks.lint(as_files(mapped), TAGS) == []
     assert tasks.lint(as_files(task(1) | {"verified_by": ["advisor", "reviewer"]}), TAGS) == []
+
+
+# --- tasks at once (task 61) -----------------------------------------------------------------
+
+SKILLS = ["agent-spec", "agent-spec-to-pytest-bdd", "manage"]
+
+
+def iterate(task_id, skill):
+    return task(task_id) | {"runs_as": "iterate", "title": f"Iterate {skill}: one change"}
+
+
+def batch_ids(*ts, n=2):
+    return [t["id"] for t in tasks.pick_batch(as_files(*ts), n, SKILLS)[0]]
+
+
+def test_batch_independent_tasks_taken_together():
+    """Should take two Ready tasks with no shared protected path, no hard dependency and the same tag."""
+    assert batch_ids(task(1, may_edit=["DECISIONS.md"]), task(2, may_edit=[".claude/skills/manage/"])) == [1, 2]
+
+
+def test_batch_hard_dependency_between_tasks():
+    """Should never take two tasks one of which hard-depends on the other, in either direction."""
+    a, b = task(1), task(2, depends_on=[{"id": 1, "soft": False}])
+    assert tasks.conflict(a, b, SKILLS) == "task 2 hard-depends on task 1"
+    assert tasks.conflict(b, a, SKILLS) == "task 2 hard-depends on task 1"
+    assert batch_ids(a, b) == [1]
+    assert tasks.conflict(a, task(2, depends_on=[{"id": 1, "soft": True}]), SKILLS) is None
+
+
+@pytest.mark.parametrize("mine, theirs", [
+    (["DECISIONS.md"], ["DECISIONS.md"]),
+    ([".claude/skills/manage/"], [".claude/skills/manage/SKILL.md"]),
+    (["eval/*/grading*.json"], ["eval/agent-spec/grading.json"]),
+])
+def test_batch_shared_protected_path(mine, theirs):
+    """Should take only the first of two tasks whose may_edit name one protected path, also through a folder or a *."""
+    a, b = task(1, may_edit=mine), task(2, may_edit=theirs)
+    assert "both may edit" in tasks.conflict(a, b, SKILLS)
+    assert batch_ids(a, b) == [1]
+
+
+def test_batch_protected_paths_that_do_not_meet():
+    """Should take both tasks when their may_edit name different paths, even a sibling of a named folder."""
+    a = task(1, may_edit=[".claude/skills/manage/"])
+    b = task(2, may_edit=[".claude/skills/manage-extra/x.md", "eval/agent-spec/calibration/"])
+    assert batch_ids(a, b) == [1, 2]
+
+
+def test_batch_two_iterate_tasks_on_one_skill():
+    """Should take one iterate task per skill: a second on the same skill waits, one on another skill joins."""
+    assert batch_ids(iterate(1, "agent-spec"), iterate(2, "agent-spec")) == [1]
+    assert batch_ids(iterate(1, "agent-spec"), iterate(2, "agent-spec-to-pytest-bdd")) == [1, 2]
+
+
+def test_batch_iterate_task_beside_other_task():
+    """Should take a build task beside an iterate task, even one that may edit that skill."""
+    assert batch_ids(iterate(1, "agent-spec"), task(2, may_edit=[".claude/skills/agent-spec/"])) == [1, 2]
+
+
+def test_batch_iterate_task_naming_no_skill():
+    """Should count an iterate task that names no skill, or two, as iterating every skill."""
+    unnamed = task(2) | {"runs_as": "iterate", "title": "One change", "item": ""}
+    assert batch_ids(iterate(1, "manage"), unnamed) == [1]
+    both = task(2) | {"runs_as": "iterate", "title": "Iterate agent-spec and manage"}
+    assert batch_ids(iterate(1, "manage"), both) == [1]
+
+
+def test_batch_n_caps_the_batch():
+    """Should take at most n tasks, in the order next would take them, and n = 1 is one at a time."""
+    ts = [task(1), task(2, priority="high"), task(3), task(4)]
+    assert batch_ids(*ts, n=3) == [2, 1, 3]
+    assert batch_ids(*ts, n=1) == [tasks.pick_next(as_files(*ts))[0]["id"]] == [2]
+    _, why = tasks.pick_batch(as_files(*ts), 3, SKILLS)
+    assert "task 4: 3 task(s) at once is the limit" in why
+
+
+def test_batch_skips_conflict_and_fills_from_later_tasks():
+    """Should leave out a task that conflicts with one taken and take the next independent one instead."""
+    ts = [task(1, may_edit=["DECISIONS.md"]), task(2, may_edit=["DECISIONS.md"]), task(3)]
+    assert batch_ids(*ts) == [1, 3]
+
+
+def test_batch_none_takeable():
+    """Should say why when no task can be taken, as next does."""
+    assert tasks.pick_batch(as_files(task(1, status="Backlog")), 2, SKILLS) == ([], "no task is Ready")
+
+
+def test_batch_cli_reads_n_from_limits(tmp_path, capsys):
+    """Should take tasks_at_once from limits.json when no n is given, and an n given on the command line over it."""
+    root = Path(__file__).resolve().parents[4]
+    shutil.copytree(root / "tasks", tmp_path / "tasks", ignore=shutil.ignore_patterns("*.json"))
+    for t in (task(1), task(2), task(3)):
+        (tmp_path / "tasks" / f"{t['id']:03d}.json").write_text(json.dumps(t))
+    (tmp_path / "tasks/tags.txt").write_text("\n".join(TAGS) + "\n")
+    limits = tmp_path / tasks.LIMITS
+    limits.parent.mkdir(parents=True)
+    limits.write_text(json.dumps({"task_merges_per_review": 10, "tasks_at_once": 2}))
+    assert tasks.main(["--root", str(tmp_path), "batch"]) == 0
+    lines = capsys.readouterr().out.splitlines()
+    assert lines[:2] == ["task 1: Task 1", "task 2: Task 2"] and lines[2].startswith("why: ")
+    assert tasks.main(["--root", str(tmp_path), "batch", "3"]) == 0
+    assert capsys.readouterr().out.startswith("task 1: Task 1\ntask 2: Task 2\ntask 3: Task 3\n")
+
+
+def test_limits_tasks_at_once_starts_at_2():
+    """Should ship tasks_at_once = 2 beside task_merges_per_review in limits.json."""
+    limits = json.loads((Path(__file__).resolve().parents[1] / "limits.json").read_text())
+    assert limits["tasks_at_once"] == 2
+    assert "task_merges_per_review" in limits
