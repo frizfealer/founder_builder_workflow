@@ -1,0 +1,30 @@
+{
+  "id": 63,
+  "title": "BDD café: small fixes left by task 056 (no-R-03 prompt row, transcript moment field, stray-value test, judge reply parsing, undecided verdicts)",
+  "item": "Fix the minor problems review 056-1 and the task 056 builder left in the café example: the no-R-03 prompt keeps the R-01 row that asks for a yes; transcripts keep a `moment` field that names conditions (c) and (d) to the labeller; tests/test_part1.py allowed() takes in every string of probe_prompts and probe_moments, so the new stray-value check is near vacuous; the usage ledger counts only calls made with CAFE_USAGE_LEDGER set; harness/judge.py reads any reply starting 'no' (such as 'Not sure') as No; a checker 'undecided' counts as a disagreement in probe/agreement.py; R-11's checker needs both 'not known' and 'call the café' in one message",
+  "motivation": "Review 056-1 minor 1-4 and outside 7, and what the task 056 builder noticed. None blocked task 56, but the moment field and the no-R-03 row weaken what the second probe run shows, and the judge parsing and undecided count can move line 3 of a later run.",
+  "notes": "Review 056-1 outside problem 7: book_held_table's tool description in data.json ('a call with no answer may or may not have booked the table') and R-09 still hint at R-11's substance under the no-R-11 prompt. Some items may be the owner's call (whether no-R-03 should drop the R-01 row; how R-11's checker should read the rule).",
+  "done_means": "",
+  "draft_note": "Drafted by the manager on 2026-11-17 from review 056-1 and the task 056 builder's notes. Priority and done_means left for the owner.",
+  "depends_on": [
+    {
+      "id": 56,
+      "soft": false
+    }
+  ],
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [],
+  "status": "Proposed",
+  "added": "2026-11-17",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tags": [
+    "bdd"
+  ],
+  "tokens": null
+}
