@@ -43,8 +43,8 @@ DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 LINE_NUMBER = re.compile(r"(?:^\s*|[.:;!?]['\")\]]*\s+)\((\d+)\)", re.M)
 
 # The owner's fields: set by the owner; the manager may draft them only before Ready.
-OWNER_FIELDS = ["done_means", "verified_by", "verifier_of_line", "may_edit", "runs_as", "priority",
-                "depends_on", "tags"]
+OWNER_FIELDS = ["done_means", "verified_by", "verifier_of_line", "may_edit", "may_delete", "runs_as",
+                "priority", "depends_on", "tags"]
 REQUIRED = ["id", "title", "item", "motivation", "status", "added", "finished", "notes",
             "depends_on", "source_chat", "done_means", "verified_by", "may_edit", "runs_as",
             "priority", "tags", "tokens"]
@@ -52,8 +52,9 @@ REQUIRED = ["id", "title", "item", "motivation", "status", "added", "finished", 
 # outside_needs: what the task needs from outside systems, checked before a builder starts.
 # for_retry: findings on files only the task's branch has. owner_verified: the date the owner checked.
 # verifier_of_line: the one verifier of a done_means line, keyed by the line's number.
+# may_delete: the paths a task branch may delete or rename that existed when it left the working branch.
 OPTIONAL = ["draft_note", "needs_you", "decided_for_you", "outside_needs", "for_retry", "owner_verified",
-            "verifier_of_line"]
+            "verifier_of_line", "may_delete"]
 NEEDS_YOU_KEYS = ["question", "recommendation", "if_vetoed"]
 DECIDED_KEYS = ["chosen", "rejected", "would_change"]
 
@@ -158,6 +159,8 @@ def lint_task(name, t, allowed_tags):
               f"advisor never rules on a line of yours; map each of them to one verifier in verifier_of_line")
     if not _is_str_list(t["may_edit"]):
         e(f"{name}: may_edit must be a list of paths")
+    if not _is_str_list(t.get("may_delete", [])):
+        e(f"{name}: may_delete must be a list of paths")
     if t["runs_as"] not in RUNS_AS | {""}:
         e(f"{name}: runs_as {t['runs_as']!r} is not one of {sorted(RUNS_AS)}")
     if t["priority"] not in PRIORITIES + [""]:

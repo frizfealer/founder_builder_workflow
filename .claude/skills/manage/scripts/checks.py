@@ -2,7 +2,9 @@
 """The manager's mechanical checks. Run from inside the repo.
 
   checks.py protected <task-id> <branch>   files <branch> changes against the working branch,
-                                           checked against protected-paths.txt; exit 1 on a failure
+                                           checked against protected-paths.txt, and each file it
+                                           deletes or renames against the task's may_delete; exit 1
+                                           on a failure
   checks.py merge-limit                    task merges on the working branch since the latest
                                            review tag, against limits.json; exit 1 at the limit
   checks.py review <task-id>               the task's latest saved review reply in the working
@@ -14,6 +16,12 @@
   checks.py unmerged <branch> <path>...    whether every path exists on <branch> and not on the
                                            working branch, so findings about them go to the task's
                                            for_retry; exit 1 when any path does not
+  checks.py superseded <branch>            exit 0 when the branch is superseded, so the manager may
+                                           delete it with git branch -D: named task/<id> or
+                                           task/<id>-<n>, task <id> Done and merged on the working
+                                           branch, checked out in no worktree; prints its last commit.
+                                           Exit 1 otherwise, with the conditions that failed, the
+                                           files that differ, and a recommendation; 2 for no branch
   checks.py owner <task-id>                exit 1 while the task waits for the owner's check
                                            (a line verified by you, owner_verified is empty); the
                                            message names only the owner's lines
@@ -47,8 +55,10 @@
                                            or its eval folder since <branch> left it
   checks.py tokens [<task-id> <n>]         during a run: add n agent tokens to the task's count; with
                                            no arguments, print each task's count and the total
-  checks.py push-hook                      Claude Code PreToolUse hook: refuse git push while a run
-                                           is active (reads the hook's JSON on stdin)
+  checks.py push-hook                      Claude Code PreToolUse hook: while a run is active, refuse
+                                           git push, git clean, and a forced branch deletion unless
+                                           superseded passes for each branch it names (reads the
+                                           hook's JSON on stdin)
 
 --base <branch> replaces the working branch (the tests use it).
 
@@ -140,6 +150,7 @@ def check_protected(repo, task_id, branch, base=WORKING_BRANCH):
     if task_text is None:
         return [f"{own} does not exist on {base}"]
     may_edit = json.loads(task_text)["may_edit"]
+    may_delete = json.loads(task_text).get("may_delete", [])
     list_text = show(repo, base, PROTECTED_LIST)
     if list_text is None:
         return [f"{PROTECTED_LIST} does not exist on {base}"]
@@ -151,6 +162,11 @@ def check_protected(repo, task_id, branch, base=WORKING_BRANCH):
 
     fails = []
     for status, path in changes:
+        # With --no-renames a rename is a D of the old path and an A of the new one. D means the
+        # file existed at the fork point, so one the branch added and then removed never shows.
+        if status == "D" and not any(matches(e, path) for e in may_delete):
+            fails.append(f"{path}: deleted or renamed, though it existed on {base} when the branch "
+                         f"left it; the task's may_delete does not name it")
         if path.startswith(f"{TASKS_DIR}/") and path.endswith(".json"):
             if path == own and status == "M":
                 try:
@@ -252,6 +268,89 @@ def check_unmerged(repo, branch, paths, base=WORKING_BRANCH):
     verdict = (f"every path is only on {branch}: the findings go to the task's for_retry" if ok
                else f"not every path is only on {branch}: the findings go to the Proposed task")
     return ok, "\n".join(lines + [verdict])
+
+
+# --- leftover task branches ------------------------------------------------------------------
+
+TASK_BRANCH = re.compile(r"^task/(\d+)(?:-\d+)?$")  # task/<id> or task/<id>-<n>, id padded or not
+TASK_MERGE_ID = re.compile(r"^Merge task (\d+):")
+
+
+def checked_out(repo, branch):
+    """The path of each worktree, the main folder included, that has branch checked out."""
+    paths, path = [], None
+    for line in git(repo, "worktree", "list", "--porcelain").stdout.splitlines():
+        if line.startswith("worktree "):
+            path = line[len("worktree "):]
+        elif line == f"branch refs/heads/{branch}":
+            paths.append(path)
+    return paths
+
+
+def task_merge(repo, task_id, base):
+    """The newest merge of task_id on base's first-parent line, or None."""
+    for line in git(repo, "log", "--merges", "--first-parent", "--format=%H %s", base).stdout.splitlines():
+        commit, subject = line.split(" ", 1)
+        m = TASK_MERGE_ID.match(subject)
+        if m and int(m.group(1)) == task_id:
+            return commit
+    return None
+
+
+def check_superseded(repo, branch, base=WORKING_BRANCH):
+    """(ok, one-line message). ok only when all three hold: the branch is named task/<id> or
+    task/<id>-<n>; task <id> is Done on base and its merge is on base; no worktree has the branch
+    checked out. Then the manager may delete it with git branch -D, and the message gives its last
+    commit. Otherwise the message makes the case for the owner: each condition that failed, how
+    many files differ from base and how many exist only on the branch, and a recommendation with
+    its reason. Raises ValueError when branch is not a branch."""
+    tip = git(repo, "rev-parse", "-q", "--verify", f"refs/heads/{branch}^{{commit}}", check=False).stdout.strip()
+    if not tip:
+        raise ValueError(f"{branch} is not a branch")
+    failed, rec = [], None
+    m = TASK_BRANCH.match(branch)
+    task_id = int(m.group(1)) if m else None
+    if m is None:
+        failed.append("(1) its name is not task/<id> or task/<id>-<n>")
+        rec = "keep: it is not named for a task, so the manager never deletes it; it is yours to keep or delete"
+    else:
+        text = show(repo, base, f"{TASKS_DIR}/{task_id:03d}.json")
+        status = json.loads(text)["status"] if text is not None else None
+        merge = task_merge(repo, task_id, base)
+        if status is None:
+            failed.append(f"(2) no task {task_id} exists on {base}")
+            rec = f"keep: no task {task_id} on {base} says the branch's work is done"
+        elif status != "Done":
+            failed.append(f"(2) task {task_id} is {status} on {base}, not Done")
+            rec = f"keep: task {task_id} is not merged, and the branch may hold the work its next run builds on"
+        elif merge is None:
+            failed.append(f"(2) task {task_id} is Done on {base}, but no merge 'Merge task {task_id}:' is on it")
+            rec = (f"keep: without the task's merge on {base}, the branch's work may not have reached it; "
+                   f"check where it went")
+        else:
+            merged = f"task {task_id} is Done and merged in {merge[:7]} on {base}"
+    worktrees = checked_out(repo, branch)
+    if worktrees:
+        failed.append(f"(3) it is checked out in {', '.join(worktrees)}")
+    if not failed:
+        return True, (f"branch {branch} is superseded: {merged}, and no worktree has it checked out. "
+                      f"Last commit {tip}. Delete it with git branch -D {branch}; "
+                      f"restore it with git branch {branch} {tip}")
+
+    def files(*flags):
+        out = git(repo, "diff", "--name-only", "--no-renames", "-z", *flags, base, branch).stdout
+        return [p for p in out.split("\0") if p]
+
+    differ, only = len(files()), len(files("--diff-filter=A"))
+    if rec is None:  # only (3) failed: the task merged
+        rec = (f"delete, once git worktree remove {worktrees[0]} has removed its worktree (git refuses "
+               f"while it holds uncommitted changes; look at those first): {merged}, and no file exists "
+               f"only on the branch" if only == 0 else
+               f"keep until you have looked at the {only} file(s) only on the branch: {merged}, "
+               f"but those files never reached {base}")
+    return False, (f"branch {branch} (last commit {tip[:7]}) is not confirmed superseded, so it is not "
+                   f"deleted. Failed: {'; '.join(failed)}. {differ} file(s) differ from {base}, "
+                   f"{only} exist only on the branch. Recommended: {rec}")
 
 
 # --- the owner's check -----------------------------------------------------------------------
@@ -418,7 +517,7 @@ def check_review(repo, task_id):
     return True, f"{rel}: {REVIEW_PASS}"
 
 
-# --- active run and the push hook ------------------------------------------------------------
+# --- active run and the hook -------------------------------------------------------------------
 
 def marker_path(cwd):
     r = git(cwd, "rev-parse", "--path-format=absolute", "--git-common-dir", check=False)
@@ -589,8 +688,10 @@ def tokens(repo):
 GIT_OPTS_WITH_ARG = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
 
 
-def pushes(command):
-    """True when the command text runs `git ... push`. Text only: an alias or a script is missed."""
+def git_calls(command):
+    """(subcommand, the words after it) for each `git ...` the command text runs. Text only: an
+    alias or a script is missed."""
+    calls = []
     for part in re.split(r"[;&|\n()`]+|\$\(", command):
         toks = [t.strip("'\"") for t in part.split()]
         for i, t in enumerate(toks):
@@ -599,23 +700,67 @@ def pushes(command):
             j = i + 1
             while j < len(toks) and toks[j].startswith("-"):
                 j += 2 if toks[j] in GIT_OPTS_WITH_ARG else 1
-            if j < len(toks) and toks[j] == "push":
-                return True
-    return False
+            if j < len(toks):
+                calls.append((toks[j], toks[j + 1:]))
+    return calls
 
 
-def push_hook(event):
-    """(exit code, stderr message) for one PreToolUse event. 2 blocks the call."""
+def pushes(command):
+    """True when the command text runs `git ... push`."""
+    return any(sub == "push" for sub, _ in git_calls(command))
+
+
+def forced_deletions(command):
+    """The branches each `git branch` of the command text deletes with force (-D, --delete with
+    --force, -d with -f, also as one word like -df), or None when it deletes none with force."""
+    names = None
+    for sub, words in git_calls(command):
+        if sub != "branch":
+            continue
+        flags = set()
+        for w in words:
+            if w.startswith("--"):
+                flags.add(w)
+            elif w.startswith("-"):
+                flags.update(f"-{c}" for c in w[1:])
+        if "-D" in flags or ({"-d", "--delete"} & flags and {"-f", "--force"} & flags):
+            names = (names or []) + [w for w in words if not w.startswith("-")]
+    return names
+
+
+def push_hook(event, base=WORKING_BRANCH):
+    """(exit code, stderr message) for one PreToolUse event. 2 blocks the call. While a run is
+    active it refuses git push, git clean, and a forced branch deletion unless checks.py
+    superseded passes for every branch it names, which is the manager's cleanup step."""
     command = (event.get("tool_input") or {}).get("command", "")
-    if not pushes(command):
+    subs = {sub for sub, _ in git_calls(command)}
+    deleting = forced_deletions(command)
+    if not {"push", "clean"} & subs and deleting is None:
         return 0, ""
     for where in (event.get("cwd"), os.environ.get("CLAUDE_PROJECT_DIR")):
         m = marker_path(where) if where else None
         if m is not None:
             break
-    if m is not None and m.exists():
+    if m is None or not m.exists():
+        return 0, ""
+    if "push" in subs:
         return 2, ("Refused: a manager run is active, and the owner pushes. "
                    "Leave the push for the owner's review and carry on with the run.")
+    if "clean" in subs:
+        return 2, ("Refused: a manager run is active, and git clean removes untracked files git "
+                   "cannot restore. Delete only your own temporary files, by name.")
+    why = []
+    for name in deleting or ["(no branch named)"]:
+        try:
+            ok, msg = check_superseded(where, name, base)
+        except (ValueError, RuntimeError) as e:
+            ok, msg = False, str(e)
+        if not ok:
+            why.append(msg)
+    if why:
+        return 2, ("Refused: a manager run is active, and a branch is deleted with force only in the "
+                   "manager's cleanup step, git branch -D <name> once checks.py superseded <name> "
+                   "passes. " + " ".join(why))
     return 0, ""
 
 
@@ -627,7 +772,7 @@ def main(argv):
         argv = argv[:i] + argv[i + 2:]
     cmd = argv[0] if argv else ""
     if cmd == "push-hook":
-        code, msg = push_hook(json.load(sys.stdin))
+        code, msg = push_hook(json.load(sys.stdin), base)
         if msg:
             print(msg, file=sys.stderr)
         return code
@@ -645,6 +790,12 @@ def main(argv):
         ok, msg = check_needs(".", int(argv[1]), base)
     elif cmd == "unmerged" and len(argv) >= 3:
         ok, msg = check_unmerged(".", argv[1], argv[2:], base)
+    elif cmd == "superseded" and len(argv) == 2:
+        try:
+            ok, msg = check_superseded(".", argv[1], base)
+        except (ValueError, RuntimeError) as e:
+            print(f"FAIL {e}")
+            return 2
     elif cmd == "owner" and len(argv) == 2:
         ok, msg = check_owner(".", int(argv[1]), base)
     elif cmd == "advice" and len(argv) == 2:
