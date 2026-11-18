@@ -61,7 +61,8 @@ branch name exists from an earlier run, add `-2`, `-3`, to the worktree's name t
 ## 4. Work, by `runs_as`
 
 - **build**, **measurement:** dispatch `manager-builder` with a complete brief: the task file's
-  path and its `done_means` and `may_edit` quoted; the branch and `<worktree>`, where it works:
+  path and its `done_means`, `may_edit` and, when set, `may_delete` quoted; the branch and
+  `<worktree>`, where it works:
   every Bash command starts `cd <worktree> &&`, every file path is under it, and it never
   touches the main folder. Do not use the Agent tool's `cwd` or `isolation` for this; neither
   kept a builder out of the main folder (SKILL.md rule 8). The brief also gives the paths
@@ -151,7 +152,8 @@ files reach the working branch, so every finding goes to the Proposed task.
 
 ## 6. Protected paths
 
-`checks.py protected <id> <branch>`. A failure parks the task (reason `protected`).
+`checks.py protected <id> <branch>`. A failure parks the task (reason `protected`). It also
+fails a file the branch deleted or renamed that the task's `may_delete` does not name.
 
 ## 7. Merge
 
@@ -178,13 +180,20 @@ advice <id>`; if either fails, `git merge --abort` and park the task with its ou
 `review` or `advice`). Then set the task file's `status` to Done, `finished` to today, `tokens`
 (its `agents` so far plus this run's count from `checks.py tokens`), and `decided_for_you` with
 each advisor ruling, add the Proposed task from step 5, and commit all of it with the subject
-`Merge task <id>: <title>`.
+`Merge task <id>: <title>`, as a plain quoted `git commit -m "Merge task <id>: <title>"`, not a
+heredoc: the hook reads a heredoc message as commands. When the title holds a backtick or `$(`,
+write the subject to a file and commit with `git commit -F <file>`.
 
 Right after that commit, remove each worktree of this task's branches with `git worktree remove
-<path>`, never `--force`. Then run `git branch -d <name>`, one branch per command, for every
-branch of this task named `task/<id>` or `task/<id>-<n>` (`git branch --list 'task/<id>'
-'task/<id>-*'`). Use `-d` only, never `-D`, and delete no other branch. If git refuses a
-worktree or a branch, leave it and list it under Needs you in the run report.
+<path>`, never `--force`; if git refuses, leave it and list it under Needs you in the run report.
+Then, for every branch of this task (`git branch --list 'task/<id>' 'task/<id>-*'`), run
+`checks.py superseded <name>`. Only when it exits 0, delete the branch with `git branch -D
+<name>`, one branch per command and nothing else in the command (while the run is active, the
+hook allows a forced deletion only for a branch the script confirms), and keep the name and the
+last commit id the script printed for the run report's Done section. When it exits 1, leave the
+branch and put the script's output, as it is, under Needs you: it names the condition that
+failed, how many files differ from the working branch and how many exist only on the branch,
+and a recommendation with its reason. Delete no other branch.
 
 **Draft the next task (advisor, job d).** `checks.py drafts <id>` lists the Proposed tasks that
 hard-depend on the merged task and have an empty `done_means`. For each, dispatch a fresh
@@ -234,6 +243,7 @@ Stopped because: <no task to take | merge limit | start check failed: ... | main
 
 ### Done
 - task <id>: <title>; merge <hash>; tokens <agents this run> (task total <agents>; main session: not recorded)
+- branch <name> deleted, last commit <id>; restore with `git branch <name> <id>`
 
 ### Tokens
 - task <id>: <n>, one line per task `checks.py tokens` lists, merged or parked
@@ -245,7 +255,8 @@ Stopped because: <no task to take | merge limit | start check failed: ... | main
 ### Needs you
 - task <id> (parked): <question>. Recommended: <answer>. If you veto: <what changes>.
 - task <id> (Proposed): <title>. <why>.
-- branch <name> (not deleted): <git's refusal, one line>.
+- branch <name> (not deleted): <checks.py superseded's output, as it is>
+- worktree <path> (not removed): <git's refusal, one line>.
 ```
 
 Tokens: `checks.py tokens` holds every agent result counted on its task in this run, including

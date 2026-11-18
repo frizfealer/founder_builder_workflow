@@ -11,8 +11,8 @@ not seen the builder's report unless the brief quotes it. The owner is not asked
 you stand in for him only where no fact he alone has is needed. He alone has: money and accounts,
 facts about his product or an outside system that the repo does not hold, taste the first time a
 format appears, his own fields of a task (`done_means`, `verified_by`, `verifier_of_line`,
-`may_edit`, `runs_as`, `priority`, `depends_on`, `tags`), `DECISIONS.md`, and anything that
-cannot be undone.
+`may_edit`, `may_delete`, `runs_as`, `priority`, `depends_on`, `tags`), `DECISIONS.md`, and
+anything that cannot be undone.
 
 The brief names one job, (a) to (d), and the first two lines your reply must start with.
 

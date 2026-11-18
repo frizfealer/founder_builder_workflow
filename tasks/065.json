@@ -1,0 +1,32 @@
+{
+  "id": 65,
+  "title": "Manager: small fixes left by task 058 (substitution inside a forced deletion, main-folder recommendation, orphaned pushes(), commit-message advice for builders)",
+  "item": "Fix the minor problems review 058-1, review 058-2 and advisor 058-2 left in the deletion checks and the hook",
+  "motivation": "None blocked task 58, but one lets a forced deletion of an unconfirmed branch through the hook, and one gives wrong advice in the run report.",
+  "notes": "Review 058-2: (2) a forced deletion of a confirmed branch followed by $(echo owner-idea) is allowed, and bash also deletes owner-idea; refuse a forced deletion whose text holds $(, a backtick or $; (3) when the main folder has the branch checked out, superseded recommends git worktree remove on the main folder, which git refuses; it should say switch the main folder back (test_deletion.py asserts the wrong text); (4) pushes() in checks.py is now called by nothing; (5) commands/manage.md step 7 prescribes a double-quoted merge -m, so a title holding $ changes the subject; (6) the heredoc and -F advice is not in agents/builder.md, so builders' heredoc commits naming refused commands are refused mid-run; (7) the docs test checks only that strings appear; (8) SKILL.md rule 6 says two cases so far but lists four. Review 058-1: forced-deletion match misses abbreviated long options (--del --forc); the hook checks superseded in the event's cwd repo. Advisor 058-2: known holes needing -m inside another quoting context (echo ' -m \" ...', bash -c with a single-quoted message inside double quotes, bash -cm); consider a refusal hint to use a plain quoted -m or -F. Outside: step 7 cleanup looks only at task/<id>* branches, never iterate branches or parked tasks' branches.",
+  "done_means": "",
+  "draft_note": "Drafted by the manager on 2026-11-17 from reviews 058-1 and 058-2 and advisor 058-2.",
+  "depends_on": [
+    {
+      "id": 58,
+      "soft": false
+    }
+  ],
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "status": "Proposed",
+  "added": "2026-11-17",
+  "finished": "",
+  "source_chat": "",
+  "runs_as": "build",
+  "priority": "",
+  "tags": [
+    "manager"
+  ],
+  "tokens": null
+}

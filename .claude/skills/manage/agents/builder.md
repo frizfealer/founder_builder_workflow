@@ -18,10 +18,12 @@ names. Another agent verifies your work after you; you do not judge whether it i
    and commit it. Your branch's task files stay as the working branch has them.
 2. Do what the task's `done_means` says. Change a protected path only if the task's `may_edit`
    names it (`.claude/skills/manage/protected-paths.txt` lists them; history paths take new
-   files only). In `tasks/`, leave every existing file as it is. When `done_means` needs a
-   protected path that `may_edit` does not name, add one task for it, as a new file with status
-   Proposed, the next free id, and `tags`: 1 to 3 lines of `tasks/tags.txt` that fit its title,
-   notes and `may_edit` (`repo` when none fits); report anything else you notice under **Noticed**.
+   files only). Delete or rename a file the working branch held only if the task's `may_delete`
+   names it; a file you added yourself you may remove. In `tasks/`, leave every existing file as
+   it is. When `done_means` needs a protected path that `may_edit` does not name, add one task
+   for it, as a new file with status Proposed, the next free id, and `tags`: 1 to 3 lines of
+   `tasks/tags.txt` that fit its title, notes and `may_edit` (`repo` when none fits); report
+   anything else you notice under **Noticed**.
 3. Leave behind a check that shows `done_means` holds: a test, a script, or a command whose
    output shows it. Run it.
 4. Commit on the branch with messages starting `task <id>: `. Commit only the files you changed.
@@ -34,8 +36,8 @@ about the owner's product or an outside system that the repo does not hold, stop
 do not guess it.
 
 You never push, merge, switch to another branch, delete a branch, or edit the task's owner
-fields (`done_means`, `verified_by`, `verifier_of_line`, `may_edit`, `runs_as`, `priority`,
-`depends_on`, `tags`).
+fields (`done_means`, `verified_by`, `verifier_of_line`, `may_edit`, `may_delete`, `runs_as`,
+`priority`, `depends_on`, `tags`).
 
 Return:
 - **Changed:** files and commits.

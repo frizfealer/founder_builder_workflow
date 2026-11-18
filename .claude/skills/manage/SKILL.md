@@ -33,8 +33,8 @@ report at his review.
 ## Rules
 
 1. Only the owner sets Ready. Once a task is Ready its `done_means`, `verified_by`,
-   `verifier_of_line`, `may_edit`, `runs_as`, `priority`, `depends_on` and `tags` are his; the
-   manager drafts them only before then.
+   `verifier_of_line`, `may_edit`, `may_delete`, `runs_as`, `priority`, `depends_on` and `tags`
+   are his; the manager drafts them only before then.
 2. The manager adds at most one Proposed task per task run, bundling the review findings worth
    doing. The builder proposes a task only when `done_means` needs a protected path its
    `may_edit` does not name. When a rule in this skill is broken and no script checks it, the
@@ -59,7 +59,9 @@ report at his review.
    name exist only on the task's branch, is decided from the paths (`checks.py unmerged`), so
    they go into that task's `for_retry` and not into a Proposed task. Whether the owner has done
    his check is a field the owner sets, `owner_verified`, read by `checks.py owner`; the manager
-   never sets it and never infers it from other text.
+   never sets it and never infers it from other text. Whether a task's leftover branch may be
+   deleted is decided by `checks.py superseded`, not by git's `-d`, which refuses an earlier
+   attempt whose work the retry copied as a new commit (tasks 28, 36 and 49).
 7. The advisor (`agents/advisor.md`) gets a fresh context and read-only tools, like the reviewer,
    and has four jobs: (a) verify the `done_means` lines assigned to it, given only the paths the
    line names (its Read tool can open any file in the repo, so only the brief keeps a blind check
@@ -128,8 +130,10 @@ what changes if he vetoes.
 
 ## Never
 
-Push. Delete a branch, except the merged task's own branches with `git branch -d` (step 7 of
-`commands/manage.md`). Delete anything outside the task's own branch. Change a protected path the
+Push. Delete a branch, except with `git branch -D` a branch of the merged task that `checks.py
+superseded` has just confirmed (step 7 of `commands/manage.md`). Run `git clean`. Delete or
+rename a file the working branch held when the task's branch left it, unless the task's
+`may_delete` names it. Delete anything outside the task's own branch. Change a protected path the
 task's `may_edit` does not name. Set a task to Ready, or change the owner's fields on a Ready
 task. Start a task whose hard dependency is not Done. Let the builder verify its own work.
 Switch the main folder to another branch during a run. Remove a worktree with `--force`, or one
@@ -152,7 +156,19 @@ All from the repo root, all with `python3`:
   `decided_for_you` of its own task file, and add Proposed tasks; so it cannot set
   `owner_verified` or `for_retry`. The whole skill folder and
   its four links in `.claude/` are protected, and so are `tasks/reviews/` and `tasks/advice/`:
-  only the manager writes there, on the working branch.
+  only the manager writes there, on the working branch. It also fails each file the branch
+  deletes or renames that existed on the working branch at the fork point, unless the working
+  branch's copy of the task's `may_delete` names it; it reads git's record of the change, so it
+  does not matter which command deleted it. A file the branch added itself may go freely.
+- `scripts/checks.py superseded <branch>`: exits 0 when the branch is superseded, so the manager
+  may delete it with `git branch -D`: its name is `task/<id>` or `task/<id>-<n>`; task `<id>` is
+  Done on the working branch and its task merge is on it; and no worktree, the main folder
+  included, has it checked out. It prints the branch's last commit id, which restores it with
+  `git branch <name> <id>` while git still holds the commit. Otherwise it exits 1 with one line
+  for the run report: each condition that failed, how many files differ from the working branch
+  and how many exist only on the branch, and a recommendation, delete or keep, with its reason.
+  Exit 2 when the name is not a branch. A branch of a task that is not Done, or one not named
+  for a task, never passes.
 - `scripts/checks.py merge-limit`: task merges since the latest review tag, against
   `limits.json`. At the limit the manager merges nothing more and ends the run.
 - `scripts/checks.py review <id>`: the task's highest-numbered reply in
@@ -179,9 +195,17 @@ All from the repo root, all with `python3`:
 - `scripts/checks.py drafts <id>`: the Proposed tasks that hard-depend on the task and have an
   empty `done_means`, one id per line, for the advisor's job (d).
 - `scripts/checks.py run-start | run-end`: mark a run active with `.git/manage-run-active`.
-  While it exists, the `PreToolUse` hook in `.claude/settings.json` refuses any Bash command
-  whose text runs `git push`, for the main session and every subagent. It reads command text,
-  so it is an early stop, not proof: an alias, a script or `gh` can still push. If a run
+  While it exists, the `PreToolUse` hook in `.claude/settings.json` (`checks.py push-hook`)
+  refuses any Bash command whose text runs `git push` or `git clean`, or deletes a branch with
+  force (`git branch -D`, `--delete --force`) unless `checks.py superseded` passes for every
+  branch it names, which is the manager's cleanup step; for the main session and every
+  subagent. It reads command text, so it is an early stop, not proof: an alias, a script or
+  `gh` can still push, and it does not try to stop `rm`, which builders use on their own
+  temporary files. A `-m` or `--message` argument that bash runs nothing in is a message, not
+  commands, so a task merge whose title names one of these still commits: a single-quoted
+  argument, or a double-quoted one with no backtick and no `$(`. Any other message, a heredoc's
+  included, is read as commands like the rest; write such a message to a file and commit with
+  `git commit -F <file>`. If a run
   crashed and left the marker, the owner deletes the file. The marker also holds the run's
   state: the working branch's commit at the start, each failed `try-merge`, each agent's tokens.
   `run-start` then removes each worktree under `build/worktrees/` that holds no uncommitted
@@ -231,4 +255,6 @@ ln -s ../skills/manage/agents/advisor.md    .claude/agents/manager-advisor.md
 - `tasks/reviews/<id>-<n>.md`: each reviewer reply verbatim, in the task's merge or park commit.
 - `tasks/advice/<id>-<n>.md`: each advisor reply verbatim, in the task's merge or park commit,
   or for job (d) in the drafted task's commit.
-- `tasks/RUNS.md`: one report per run, newest first, in skill-iterate's three sections.
+- `tasks/RUNS.md`: one report per run, newest first, in skill-iterate's three sections. It lists
+  each branch the manager deleted with its last commit id, and makes the case for each leftover
+  task branch it kept.
