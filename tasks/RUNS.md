@@ -1,5 +1,28 @@
 # Manager runs
 
+## Run 2026-11-18 08:25
+
+Stopped because: no task to take.
+
+### Done
+- task 056: BDD: test the message judge directly, and a second real-agent run where the agent goes wrong by itself; merge d497352; tokens 0 this run (task total 439517; main session: not recorded)
+- branch task/056 deleted, last commit 12c2f511e0a446e6e561a29892c83a259b5e0899; restore with `git branch task/056 12c2f511e0a446e6e561a29892c83a259b5e0899`
+- branch task/056-2 deleted, last commit 1be480b3324d774b2efdb15cb29af2f81667bad2; restore with `git branch task/056-2 1be480b3324d774b2efdb15cb29af2f81667bad2`
+
+### Tokens
+- task 056: 0 (no agent ran on it)
+- task 063: 105889 (advisor job d, drafting its fields; not counted with `checks.py tokens`, because its result came back after `run-end`)
+- total: 105889
+
+### Decided for you
+- task 056: merged task/056's work as it stood, on your note. `checks.py protected` failed on task/056 itself, because that branch held the copy of `tasks/056.json` from before your labels. So the manager copied the branch's files, without `tasks/`, onto task/056-2, cut from the updated working branch, and merged that. There was no new builder or reviewer: the files equal task/056's apart from your labels, and review 056-1 (PASS) stands. In the worktree, the judge report, `run_probe2.py --check`, the agreement script on your labels (36 of 36, LINE 3 -> HOLDS) and the café tests (97 passed) all exited 0. Would change if you wanted a fresh review of the merged branch.
+- task 056: dropped `for_retry` at the merge and made no Proposed task for its two minor findings (judge_test `--report` does not compare against judge_cases.json; the summary counts breaks by checker verdicts). Both are logged in its `decided_for_you`, and task 063 line 7 picks up the first. Would change if you want them elsewhere.
+- task 063: drafted by the advisor under the current job (d), which writes drafts. Task 066's rule (f), not built yet, would have the advisor review the manager's draft instead.
+
+### Needs you
+- task 063 (Proposed, fields drafted): BDD café: small fixes left by task 056. Eight lines, none paid. By task 066's rule (b), lines 2, 3, 4, 6 and 7 concern task 56's own lines, so you may cut it to lines 1, 5 and 8 (tasks/advice/063-1.md).
+- review tag: 6 task merges since review/2026-11-15-2; the limit is 10.
+
 ## Run 2026-11-17 22:22
 
 Stopped because: no task to take.
