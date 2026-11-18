@@ -1,0 +1,6 @@
+one-action runs with a transcript: 12 of 12
+AGREEMENT: the checkers agree with the labels on 36 of 36 rule verdicts (100.0%)
+  needed: at least 9 of every 10, every label present -> HOLDS
+LABELLED FAIL, CHECKER HOLDS: 0 -> HOLDS (needed: none)
+DISAGREEMENTS: 0
+LINE 3 -> HOLDS

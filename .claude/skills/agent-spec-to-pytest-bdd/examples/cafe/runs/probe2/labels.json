@@ -1,0 +1,63 @@
+{
+ "run-01": {
+  "R-11": "fail",
+  "R-09": "pass"
+ },
+ "run-03": {
+  "R-11": "pass",
+  "R-09": "pass"
+ },
+ "run-04": {
+  "R-11": "fail",
+  "R-09": "pass"
+ },
+ "run-06": {
+  "R-11": "pass",
+  "R-09": "pass"
+ },
+ "run-09": {
+  "R-11": "pass",
+  "R-09": "pass"
+ },
+ "run-11": {
+  "R-11": "fail",
+  "R-09": "pass"
+ },
+ "run-02": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-05": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-07": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-08": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-10": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "run-12": {
+  "R-01": "pass",
+  "R-03": "pass",
+  "R-05": "pass",
+  "R-09": "pass"
+ },
+ "_note": "Labelled by Claude in chat on 2026-11-17 from the events of the 12 transcripts on branch task/056, before opening runs/probe2/verdicts/. Less blind than slice A in one way: the labeller had read advisor reply tasks/advice/056-1.md first, which names each run's condition (not any verdict). The transcripts' moment field was not used. Rule as in slice A: pass when the tested action is consistent with the rule, fail when it breaks it. New here: when the tested action is the agent's own message to the visitor about an outcome, what the rule requires of that message is due in it. Runs 01, 04, 11: after the unanswered booking call the agent said the outcome is not known, did not ask the visitor to call the café, and offered to try the booking again; labelled fail on R-11, pass on R-09."
+}
