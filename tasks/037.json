@@ -21,7 +21,7 @@
     ".claude/agents/manager-advisor.md"
   ],
   "draft_note": "First drafted by Claude on 2026-11-15; rewritten by Claude in chat on 2026-11-17 on the owner's go, after task 49. Changed from the first draft: the advisor has four jobs, not one; 'verified by you' blocks it per pass line, not per task; the always-park cases are decided by a script. It widens what merges without the owner; he approves that by setting it to Ready. If it parks twice, stop and go on with the BDD path, with Claude in chat as labeller. The owner asked on 2026-11-17 to read the changed manager rules before this task merges (\"read 37\"), so verified_by includes you. Set to Ready the same day on his instruction.",
-  "status": "Ready",
+  "status": "Needs you",
   "added": "2026-11-15",
   "finished": "",
   "source_chat": "",
@@ -30,5 +30,73 @@
   "tags": [
     "manager"
   ],
-  "tokens": null
+  "tokens": {
+    "agents": 235182,
+    "main_session": "not recorded"
+  },
+  "for_retry": [
+    "Review 037-1, minor: `advisor.md` line 20. The blindness of job (a) rests only on the brief; the Read tool can open the verdicts. This is inherent to the tools, but worth knowing."
+  ],
+  "needs_you": {
+    "question": "task 37 waits for the owner's check: verified_by includes you and owner_verified is empty. You asked to read the changed manager rules before this merges. The build is on branch task/037 (commit 6603a3b); the review passed (tasks/reviews/037-1.md) and every command it named exits 0, 119 tests pass. Read `git diff re-create-from-scratch...task/037`, mainly SKILL.md rule 7, commands/manage.md and agents/advisor.md.",
+    "recommendation": "Before setting owner_verified, decide on review minor 1: if verified_by has both advisor and you, an unmapped done_means line belongs to both, check_advice demands a HOLDS reply the manager is told never to request, and the task can never merge. No task has that today. I recommend merging as is and fixing it in Proposed task 60, with lint rejecting advisor and you together on an unmapped line. If you agree, set owner_verified to the date and Ready again; the next run merges task/037 with no further park.",
+    "if_vetoed": "If you want minor 1 fixed first, add it to for_retry (or the notes) and set Ready; the next run sends a builder to fix it on the task's branch, reviews again, and still needs your owner_verified. If you reject the design, set the task to Backlog or Dropped; task/037 stays unmerged and task 56's line 3 keeps going to you."
+  },
+  "decided_for_you": [
+    {
+      "chosen": "advisor reply files numbered like tasks/reviews/, with a `JOB: a (<n>)` second line tying a reply to its line",
+      "rejected": "n as the line number, which would overwrite earlier rulings",
+      "would_change": "if you read <id>-<n> as line n"
+    },
+    {
+      "chosen": "the latest advisor reply on a line counts at merge",
+      "rejected": "any HOLDS reply passing",
+      "would_change": "if you want the literal 'any'"
+    },
+    {
+      "chosen": "tasks/advice/ is a named protected path, so a task branch cannot plant a HOLDS ruling",
+      "rejected": "unprotected like tasks/reviews/, or append-only",
+      "would_change": "if a task ever needs to write advice on its branch"
+    },
+    {
+      "chosen": "verifier_of_line accepts any verifier, not only those in verified_by",
+      "rejected": "requiring the two fields to agree, which would make an advisor-only line pull the advisor onto every unmapped line",
+      "would_change": "if you want the two fields to agree"
+    },
+    {
+      "chosen": "owner lines worked out per line: verified_by with you but every line mapped elsewhere has no owner line",
+      "rejected": "parking whenever you is in verified_by",
+      "would_change": "if you want the stricter reading"
+    },
+    {
+      "chosen": "verifier_of_line is an owner field, locked once Ready",
+      "rejected": "a manager field, which would let the manager move a you line to the advisor",
+      "would_change": "if you want the manager to map lines"
+    },
+    {
+      "chosen": "park reasons are a fixed word list in checks.py consult; always-park is exactly the eight cases in the notes; merge-limit, review and advice refusals consult the advisor",
+      "rejected": "adding those three to always-park",
+      "would_change": "if you add them to always-park (review minor 3 argues for it)"
+    },
+    {
+      "chosen": "at most one advisor GO ON is followed per task run; a later park parks with the advisor's reply in the recommendation",
+      "rejected": "no bound, which can loop",
+      "would_change": "if you want more retries per run"
+    },
+    {
+      "chosen": "the manager judges which builder decisions change what a line proves (job c)",
+      "rejected": "asking the advisor about every decision, or having the builder tag them",
+      "would_change": "if job c misses a decision that mattered"
+    },
+    {
+      "chosen": "job (d) picks the tasks to draft with checks.py drafts and commits the draft as `task <Y>: drafted from task <X>` after the merge",
+      "rejected": "the manager picking them by reading",
+      "would_change": "if drafting manager-made findings tasks (like 59) is unwanted"
+    },
+    {
+      "chosen": "review findings sorted by checks.py unmerged: only the advisor.md one went to for_retry; the rest name files that also exist on the working branch, so they went to Proposed task 60 even though the code they fault is new on task/037",
+      "rejected": "overriding the script",
+      "would_change": "if checks.py unmerged is changed to look at changed lines, not whole files"
+    }
+  ]
 }
