@@ -1,5 +1,25 @@
 # Manager runs
 
+## Run 2026-11-17 19:19
+
+Stopped because: no task to take.
+
+### Done
+- task 057: Manager: decide mechanical stops by code (outside needs first; unmerged findings to the retry; the owner's check as a field); merge c57c6b7; tokens 150045 (main session: not recorded)
+
+### Decided for you
+- task 057: chose a claude-api check that runs `ant messages create --model claude-haiku-5-5 --max-tokens 1` over the Python SDK; would change if builders stop using the `ant auth login` credentials or that model is retired. The builder made three real 1-token calls to confirm it (about 0.00001 USD each).
+- task 057: chose to read the task file from the working branch for `needs` and `owner` over the working tree; would change if you set fields without committing them.
+- task 057: chose to sort findings into `for_retry` only when a task parks over at every review; would change if you want `for_retry` kept on merged tasks.
+- task 057: the other six decisions are in its `decided_for_you`.
+- task 037: chose to leave the review's findings where `checks.py unmerged` put them (one in `for_retry`, the rest in Proposed task 60) over overriding the script; would change if `unmerged` looks at changed lines, not whole files.
+- task 037: the builder's ten design decisions are in its `decided_for_you`.
+
+### Needs you
+- task 037 (parked): you asked to read the changed manager rules before the advisor merges; the build is on task/037, the review passed and 119 tests pass. Recommended: read `git diff re-create-from-scratch...task/037`, merge as is, fix review minor 1 (a task verified by both advisor and you can never merge) in task 60, and set `owner_verified` and Ready. If you veto: put minor 1 in `for_retry` and set Ready, and the next run fixes it on the branch first.
+- task 059 (Proposed): Manager: loose ends left by task 057. A step-3 park erases an earlier `for_retry`, a merge leaves `for_retry` on a Done task, and `checks.py protected` compares against the working branch's current copy, not the fork point.
+- task 060 (Proposed): Manager: fixes to the advisor left by the task 037 review. Minor 1 can make a task impossible to merge; its notes also say task 56 line 3 must be split before the advisor can verify it.
+
 ## Run 2026-11-17 18:32
 
 Stopped because: no task to take.
