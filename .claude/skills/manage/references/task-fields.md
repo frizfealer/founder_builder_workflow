@@ -39,5 +39,7 @@ only when the owner sets the task to Ready; after that the manager changes none 
 fields.
 
 `tokens.agents` is the sum of what Claude Code reports for each agent run on the task
-(`subagent_tokens` in the Agent result). The main session's own use is not available yet
+(`subagent_tokens` in the Agent result, or `total_tokens` in a background agent's notice). During
+a run the manager counts each one on its task with `checks.py tokens`, and adds the run's count to
+the field when the task merges or parks. The main session's own use is not available yet
 (task 30); write `"not recorded"` until it is.

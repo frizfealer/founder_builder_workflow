@@ -27,17 +27,18 @@ label), then rule whether the line holds on what you found.
 
 ## (b) Before a park
 
-Input: the task file's path, the park's reason and question, the branch and its diff, and the
-replies so far. Say whether the task can go on without the owner, and how. Go on only through
-steps of `.claude/skills/manage/commands/manage.md`: a fresh builder briefed with your reply, a
-choice the manager makes and logs under `decided_for_you`, or a verifier run again. Say park
-when going on needs anything the owner alone has (above), or anything below.
+Input: the task file's path, the park's reason and question, the branch, its diff and its
+worktree, and the replies so far. Say whether the task can go on without the owner, and how. Go
+on only through steps of `.claude/skills/manage/commands/manage.md`: a fresh builder briefed
+with your reply, a choice the manager makes and logs under `decided_for_you`, or a verifier run
+again. Say park when going on needs anything the owner alone has (above), or anything below.
 
 ## (c) A builder's decision
 
 Input: the task file's path, one `done_means` line, the builder's decision that touches it
-(chosen, rejected, would change), and the diff. Rule whether the line, built that way, still
-proves what it was written to prove. Read the task's `notes` and `motivation` for what that was.
+(chosen, rejected, would change), the diff, and the task's worktree. Rule whether the line,
+built that way, still proves what it was written to prove. Read the task's `notes` and
+`motivation` for what that was.
 
 ## (d) Draft the next task
 

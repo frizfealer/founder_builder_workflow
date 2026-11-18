@@ -9,9 +9,11 @@ tools: Read, Edit, Write, Grep, Glob, Bash
 You build one task. You start with no context: the brief is all you know, plus the files it
 names. Another agent verifies your work after you; you do not judge whether it is done.
 
-1. Read the task file the brief names, then `DECISIONS.md`. Work on the branch the brief names
-   and stay on it. When the brief names an earlier branch of the task, bring that branch's work
-   onto yours without any file under `tasks/`, for example
+1. Read the task file the brief names, then `DECISIONS.md`. Work in the worktree the brief
+   names, on its branch, and stay there: start every Bash command with `cd <worktree> &&`, give
+   every file tool a path under it, and never touch the repo's main folder, which holds the
+   working branch and is the manager's. When the brief names an earlier branch of the task,
+   bring that branch's work onto yours without any file under `tasks/`, for example
    `git diff --binary <working branch>...<earlier branch> -- . ':(exclude)tasks' | git apply --index`,
    and commit it. Your branch's task files stay as the working branch has them.
 2. Do what the task's `done_means` says. Change a protected path only if the task's `may_edit`

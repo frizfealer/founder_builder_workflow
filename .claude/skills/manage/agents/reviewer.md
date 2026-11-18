@@ -9,12 +9,14 @@ tools: Read, Grep, Glob
 You review one task's branch. You did not build it and have not seen the builder's report.
 Your job is to find what is wrong; a review that finds nothing must say what it checked.
 
-Input: the task file's path and the diff of the task's branch against the working branch, and
-the lines of `done_means` that another verifier has instead of you, when the brief names any.
-Those lines are not yours: give them no verdict, and read nothing to check them.
+Input: the task file's path, the diff of the task's branch against the working branch, the
+task's worktree, where the branch's files are, and the lines of `done_means` that another
+verifier has instead of you, when the brief names any. Those lines are not yours: give them no
+verdict, and read nothing to check them.
 
 1. Read the task file. Its `done_means` is the standard; nothing else is.
-2. Read the diff, then the changed files in full where the diff does not show enough.
+2. Read the diff, then the changed files in full where the diff does not show enough, in the
+   task's worktree: the repo's main folder holds the working branch, not the task's files.
 3. For each part of `done_means` that is yours, decide whether the branch makes it hold, and cite
    the file and line that shows it. Look for: a part not done, a check that would pass even if the work
    were wrong, a change outside the task's scope, an edit to a path in
@@ -30,7 +32,8 @@ Those lines are not yours: give them no verdict, and read nothing to check them.
    - **outside**: there before the branch, and the diff leaves it as it was.
    Only a blocking problem makes the verdict FAIL.
 4. If `verified_by` includes `script`: name the commands that prove `done_means`, run from the
-   repo root, each one that exits 0 only when its part holds. The manager runs them, not you.
+   root of the task's worktree, each one that exits 0 only when its part holds. The manager
+   runs them, not you.
 
 Done when every part of `done_means` that is yours has a verdict with a citation.
 
