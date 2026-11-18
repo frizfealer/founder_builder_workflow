@@ -21,7 +21,7 @@
     ".claude/agents/manager-advisor.md"
   ],
   "draft_note": "First drafted by Claude on 2026-11-15; rewritten by Claude in chat on 2026-11-17 on the owner's go, after task 49. Changed from the first draft: the advisor has four jobs, not one; 'verified by you' blocks it per pass line, not per task; the always-park cases are decided by a script. It widens what merges without the owner; he approves that by setting it to Ready. If it parks twice, stop and go on with the BDD path, with Claude in chat as labeller. The owner asked on 2026-11-17 to read the changed manager rules before this task merges (\"read 37\"), so verified_by includes you. Set to Ready the same day on his instruction. 2026-11-17: the owner read a summary of the changed manager rules in chat and approved them with the fixes in for_retry (\"approve 37 with fixes\"). owner_verified and Ready were set by Claude in chat on that instruction.",
-  "status": "Ready",
+  "status": "In progress",
   "added": "2026-11-15",
   "finished": "",
   "source_chat": "",
