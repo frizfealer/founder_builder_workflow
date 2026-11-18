@@ -1,5 +1,25 @@
 # Manager runs
 
+## Run 2026-11-17 21:40
+
+Stopped because: merge limit (3 task merges since review/2026-11-15-2).
+
+### Done
+- task 037: Advisor: a fourth verifier, for judgement that needs no fact only the owner has; merge 642aa86; tokens 443850 (main session: not recorded). This run used 208668 of those; the rest is the first build.
+
+### Decided for you
+- task 037: chose to make review and advice refusals always park, like merge-limit, over consulting the advisor; would change if you want the advisor to try re-saving or re-running a verifier first.
+- task 037: chose to have `checks.py consult` run the real outside-need check (one 1-token call, under 0.01 USD) on every park of a task with `outside_needs`, over reading only the reason label; would change if you don't want that cost on each park.
+- task 037: chose that any park of a task with an unchecked `you` line skips the advisor, whatever the reason, as the literal reading of your fix; would change if you want job (b) to still run for those tasks.
+- task 037: chose to remove `for_retry` at the merge, since every item in it is fixed, and to rewrite the two `decided_for_you` entries your fixes made stale; would change if you want them kept as a record.
+- task 037: the other decisions (consult's branch argument, where a `(n)` counts as a line number, consult's exit code on a missing file) are in its `decided_for_you`.
+
+### Needs you
+- review tag: the merge limit is reached. Review and set a tag, e.g. `git tag review/2026-11-17 re-create-from-scratch`, before task 058 can run.
+- task 062 (Proposed): Manager: small fixes left by task 037. A consult crash and a real always-park both exit 1, consult's paid check is undocumented, a `(n)` after "e.g." counts as a line, and nothing compares the advisor's blind labels with the verdicts, which task 56 line 3 needs.
+- task 060 (Dropped) is now fully covered: its fixes were made on task/037-2.
+- branch task/037 (not deleted): `error: the branch 'task/037' is not fully merged`. Its work was brought over to task/037-2 without the task files, so git sees its own commits as unmerged. Delete it with `git branch -D task/037` if you agree.
+
 ## Run 2026-11-17 19:19
 
 Stopped because: no task to take.
