@@ -3,10 +3,10 @@
   "title": "BDD slice B: all of the café",
   "item": "Extend the slice A tests to all 17 café scenarios and 11 rule checkers",
   "motivation": "Second slice of task 1. Slice A proved the test design on 3 scenarios and 6 rules; a gate needs every scenario and every rule of the spec.",
-  "status": "Backlog",
+  "status": "Ready",
   "added": "2026-11-17",
   "finished": "",
-  "notes": "Work in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/, on top of slice A and task 56. Read tasks/plans/001.md first. Extend the data file for the new World steps (a party of 9 for 'more than 8', a changed party size, and so on), under the same script checks as slice A. Write the missing rule checkers (R-02, R-04, R-06, R-10, and R-08 if SC-17 gets a test) and complete R-01, whose second sentence slice A left unchecked. Each checker's first sentence says exactly what it checks. The feature-file script adds one closing sentence to every scenario, 'And no other rule is broken', which runs the checkers of the rules the scenario does not cite. SC-17 has no World steps and its rule R-08 is cited nowhere else: give it a test from its rule if the spec holds enough to run one, else write it up as a finding for agent-spec (which spec line is missing) and leave it out; say which in the report. If task 56 failed a line, stop and park: this task is then rewritten.",
+  "notes": "Work in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/, on top of slice A and task 56. Read tasks/plans/001.md first. Extend the data file for the new World steps (a party of 9 for 'more than 8', a changed party size, and so on), under the same script checks as slice A. Write the missing rule checkers (R-02, R-04, R-06, R-10, and R-08 if SC-17 gets a test) and complete R-01, whose second sentence slice A left unchecked. Each checker's first sentence says exactly what it checks. The feature-file script adds one closing sentence to every scenario, 'And no other rule is broken', which runs the checkers of the rules the scenario does not cite. SC-17 has no World steps and its rule R-08 is cited nowhere else: give it a test from its rule if the spec holds enough to run one, else write it up as a finding for agent-spec (which spec line is missing) and leave it out; say which in the report. If task 56 failed a line, stop and park: this task is then rewritten. Folded in on 2026-11-19 on the owner's instruction: task 063, the small fixes task 56 left in this folder. Its file stays as the list; its eight pass lines are line (6) below. The one that matters most here: harness/judge.py reads any reply starting with 'no', such as 'Not sure', as a No. Not decided, do not change: whether the no-R-03 prompt should drop the R-01 row, whether R-11's checker should accept 'not known' and 'call the café' in two messages, the tool description that hints at R-11, and whether an undecided verdict counts against 9 in 10 (tasks/advice/063-1.md). Also add the direct judge test to the suite as it grows: when a new rule checker asks the message judge a new question, add cases for that question to judge_cases.json in the same form (some that should get yes in free wording, more that should get no), and do not run them; say in the report how many were added, so the owner can decide on the paid run.",
   "depends_on": [
     {
       "id": 49,
@@ -18,7 +18,7 @@
     }
   ],
   "source_chat": "founder_and_builder project chat, 2026-11-16 and 2026-11-17",
-  "done_means": "(1) Every café scenario that has World steps passes with the reference agent, with 0 LLM calls: 16 of 16, plus SC-17 or a written finding for it. (2) The feature files equal the script's output and every scenario ends with 'And no other rule is broken'; the drift check and the data-file script checks of slice A pass with the new entries. (3) Every rule of rules.md that a scenario cites has a checker, and one file lists, per rule, any sentence of the rule the checker does not check, with the reason; R-01 is not on that list. (4) The two broken variants of slice A still fail the Then sentence of their own rule, and a failing test's message quotes the rule's full text and says what the agent did. (5) Slice A's tests still pass.",
+  "done_means": "(1) Every café scenario that has World steps passes with the reference agent, with 0 LLM calls: 16 of 16, plus SC-17 or a written finding for it. (2) The feature files equal the script's output and every scenario ends with 'And no other rule is broken'; the drift check and the data-file script checks of slice A pass with the new entries. (3) Every rule of rules.md that a scenario cites has a checker, and one file lists, per rule, any sentence of the rule the checker does not check, with the reason; R-01 is not on that list. (4) The two broken variants of slice A still fail the Then sentence of their own rule, and a failing test's message quotes the rule's full text and says what the agent did. (5) Slice A's tests still pass. (6) Lines (1) to (8) of the done_means in tasks/063.json hold as written there.",
   "verified_by": [
     "script",
     "reviewer"
@@ -30,5 +30,5 @@
     "bdd"
   ],
   "tokens": null,
-  "draft_note": "Written out by Claude in chat on 2026-11-17 from slice A's results. The owner approves it by setting it to Ready, after task 56."
+  "draft_note": "Written out by Claude in chat on 2026-11-17 from slice A's results. The owner approves it by setting it to Ready, after task 56. Task 063 folded in and set to Ready on 2026-11-19 on the owner's instruction."
 }
