@@ -1,0 +1,22 @@
+{
+ "_about": "Findings for agent-spec from the café BDD tests, task 50 (slice B), against ../../../agent-spec/examples/cafe/spec/, each in the fields of the finding format of agent-spec's references/verification.md (id, class, severity, where, quote, evidence, pattern), for agent-spec's findings-file update mode. tests/test_slice_b.py checks that SC-17 is left out of the feature files and that F1 names it.",
+ "findings": [
+  {
+   "id": "F1",
+   "class": "Gap",
+   "severity": "Important",
+   "where": "scenarios.md SC-17; rules.md \"What the agent does\"; claims.md",
+   "scenario": "SC-17",
+   "rule": "R-08",
+   "quote": "absent",
+   "evidence": "scenarios.md SC-17 'Visitor asks to change a reservation that exists' has 'Rules: R-08' and 'Why not a path: the model holds only the one table this request is about, so it has no reservation that exists to change.', but no 'World:' list, so the BDD script has no line to copy into a feature file: no starting situation and no visitor step. R-08 is cited by no other scenario, so its second sentence ('When the visitor asks to change a reservation that exists, the agent says it cannot and books nothing.') is gated by no test: an agent that books, or changes the reservation, when asked passes every feature file.",
+   "missing_lines": [
+    "scenarios.md SC-17: World lines, such as '1. The table is free' and '2. visitor asks to change a reservation that exists'.",
+    "rules.md 'What the agent does': a row for the situation 'the visitor asks to change a reservation that exists', such as 'says it cannot change a reservation that exists, and books nothing | R-08'. model.py already has the sentence, SAYS[\"existing\"] = 'it cannot change a reservation that exists', but no step and no row use it.",
+    "claims.md: a claim saying how the visitor names a reservation that exists (by its confirmation id, C-13, or by date, time and name). The Systems row lists no tool that reads or changes one, which fits C-11 ('never changes or cancels one that exists'), but the visitor's words need a source."
+   ],
+   "pattern": "A conversational scenario cites a rule but holds no World lines, so a rule only it cites cannot be run. Check every scenario of kind 'conversational' for World lines.",
+   "bdd_side_ready": "R-08's checker in harness/checkers.py checks both sentences (the second on a visitor line meaning 'change a reservation that exists'), and data.json has the judge question says_cannot_change. With the lines above, the BDD side adds one visitor sentence to data.json and generate_features.py writes features/SC-17.feature."
+  }
+ ]
+}

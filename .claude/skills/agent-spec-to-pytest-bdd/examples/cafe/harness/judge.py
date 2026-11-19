@@ -12,7 +12,7 @@ class NoLLM(Exception):
 
 
 class Unclear(Exception):
-    """The LLM answered neither yes nor no."""
+    """The LLM's reply does not start with the word yes or no."""
 
 
 def known_sentences():
@@ -22,6 +22,13 @@ def known_sentences():
         for cid in values()["confirmation_ids"]:
             out[render(entry["value"], confirmation_id=cid)] = entry["judge"]
     return out
+
+
+def first_word(reply):
+    """The reply's first word, case and the punctuation closing it aside: 'No, it does not.' gives 'no', and
+    'Not sure' gives 'not', which is neither yes nor no."""
+    words = reply.split()
+    return words[0].lower().rstrip(".,;:!?") if words else ""
 
 
 def question_text(question):
@@ -52,8 +59,7 @@ class MessageJudge:
         if self.ask_llm is None:
             raise NoLLM(f"no LLM judge for a message the data file does not hold: {message!r}")
         reply = self.ask_llm(message, question_text(question))
-        word = reply.strip().lower().rstrip(".")
-        answer = True if word.startswith("yes") else False if word.startswith("no") else None
+        answer = {"yes": True, "no": False}.get(first_word(reply))
         self.asked.append({"message": message, "question": question, "answer": answer, "source": "llm",
                            "reply": reply})
         if answer is None:

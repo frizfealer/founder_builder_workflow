@@ -17,13 +17,13 @@ from the spec.
 """
 import re
 
-from harness.data import data, lint, rule_text, scenario, spec
+from harness.data import data, lint, rule_text, scenario, spec, world_scenarios
 
-SCENARIOS = ["SC-08", "SC-12", "SC-10"]
+SCENARIOS = world_scenarios()  # every scenario with World lines: SC-01 to SC-16
 OWN = "builder's own"
 LABEL_KEYS = {"source", "ref", "quote", "note", "wording", "label", "world_step", "model_step", "means",
               "situation", "scenario", "judge", "is_error", "moment_only", "probe_only", "visitor_sentences",
-              "world_after", "leaves_out", "instruction"}
+              "world_after", "leaves_out", "instruction", "change"}
 SECTIONS = ("values", "tools", "answers", "fake", "visitor", "agent", "judge_questions")
 MOMENT_SECTIONS = ("moments", "probe_moments", "probe_prompts")
 SINGLE = ("spec", "judge_instruction", "action_limit", "tool_use_id")
@@ -127,7 +127,7 @@ def entry_problems(d=None):
 
 
 def world_problems(d=None):
-    """World lines of the 3 scenarios that no data entry plays, and visitor entries for lines no scenario has."""
+    """World lines of the scenarios that no data entry plays, and visitor entries for lines no scenario has."""
     from harness.fake import outcome_of
     d = d or data()
     out = []

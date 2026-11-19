@@ -4,7 +4,9 @@ The world is the scenario's World lines after the starting situation, in order: 
 system lines. The visitor speaks when the agent has handed the turn back and the next World line is
 the visitor's. A tool call is answered as the next World line says when that line is about the
 same tool; otherwise the fake answers from its own state. The conversation is over when the agent
-sends a message and the next World line is not the visitor's (or there is none).
+sends a message and the next World line is not the visitor's (or there is none), or is the visitor
+stopping answering. A visitor line that changes the proposal carries the change in its event ('change',
+from data.json), as it carries 'means'.
 
 - from the start: the agent in the slot plays every turn, up to data.json's action limit.
 - from a tested moment: the moment's history from data.json is replayed through the fake (each
@@ -19,6 +21,8 @@ from dataclasses import dataclass, field
 
 from harness.data import data, moment as moment_entry, render, tool_kind, visitor_entry
 from harness.fake import outcome_of
+
+LEAVES = "leave"  # the 'means' of the World line 'visitor stops answering'
 
 
 @dataclass
@@ -67,7 +71,11 @@ class Driver:
     def visitor_speaks(self):
         line = self.next_line()
         assert line and line.visitor, f"the visitor has no line here (next World line: {line and line.label})"
-        self.events.append({"kind": "visitor", "text": render(line.visitor["value"]), "means": line.visitor["means"]})
+        assert line.visitor["means"] != LEAVES, "a visitor who stops answering says nothing"
+        event = {"kind": "visitor", "text": render(line.visitor["value"]), "means": line.visitor["means"]}
+        if "change" in line.visitor:
+            event["change"] = render(line.visitor["change"])
+        self.events.append(event)
         self.i += 1
 
     def execute(self, call):
@@ -81,10 +89,14 @@ class Driver:
         return result
 
     def hands_back(self, action):
-        """After a message-only action: the visitor speaks if the World says so; else the conversation is over."""
+        """After a message-only action: the visitor speaks if the World says so; else the conversation is over.
+        A visitor line that stops answering is played here: the visitor sends nothing and the conversation is over."""
         if any(e["kind"] == "call" for e in action):
             return False
         line = self.next_line()
+        if line and line.visitor and line.visitor["means"] == LEAVES:
+            self.i += 1
+            return True
         return not (line and line.visitor)
 
     def run(self, moment=None):

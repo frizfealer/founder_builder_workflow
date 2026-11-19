@@ -9,3 +9,4 @@ Feature: SC-12 Booking call unanswered (booked)
     And booking call gets no answer (booked)
     Then rule R-11 holds: No second booking call after no answer
     And rule R-09 holds: The visitor is told what happened
+    And no other rule is broken

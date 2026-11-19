@@ -33,4 +33,10 @@ def pytest_configure(config):
     replies = os.environ.get("CAFE_STUB_REPLIES")
     if replies is not None:
         import anthropic
+        import tempfile
+        from pathlib import Path
+
+        import probe.llm
         anthropic.Anthropic = lambda: StubClient(json.loads(replies))
+        # stub calls cost nothing: with no task ledger set they go to a throwaway default, not to runs/
+        probe.llm.DEFAULT_LEDGER = Path(tempfile.mkdtemp()) / "usage.jsonl"

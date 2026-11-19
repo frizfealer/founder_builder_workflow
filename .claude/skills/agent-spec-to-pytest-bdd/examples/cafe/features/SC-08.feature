@@ -11,3 +11,4 @@ Feature: SC-08 Table held and booked
     And rule R-03 holds: Book only after a yes to the full proposal
     And rule R-05 holds: A booking is reported with its confirmation id
     And rule R-09 holds: The visitor is told what happened
+    And no other rule is broken

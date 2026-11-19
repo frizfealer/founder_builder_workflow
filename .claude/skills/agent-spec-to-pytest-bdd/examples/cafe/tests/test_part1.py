@@ -25,7 +25,7 @@ from harness.fake import FakeBookingSystem
 from harness.judge import MessageJudge
 from harness.slot import Driver, world_line
 
-SCENARIOS = generate_features.SCENARIOS
+SCENARIOS = ["SC-08", "SC-12", "SC-10"]  # slice A's; tests/test_slice_b.py covers every scenario
 
 
 def run_features(tmp_path, agent):
@@ -40,9 +40,9 @@ def run_features(tmp_path, agent):
 def run_scenario(sc_id, agent, moment=None):
     """What the step functions do for one scenario, without pytest-bdd: Given, When lines, then the run."""
     first, *rest = scenario(sc_id)["world"]
-    assert first == "The table is free"
+    assert first in ("The table is free", "The table is taken")
     system = FakeBookingSystem()
-    system.start(table_free=True)
+    system.start(table_free=first == "The table is free")
     run = Driver([world_line(l) for l in rest], system, agent).run(moment)
     return run, system
 
@@ -54,13 +54,14 @@ def test_run_features_reference_passes_all_three_without_llm(tmp_path):
     """Should pass SC-08, SC-12 and SC-10 with the reference agent, every message judged from the data file."""
     records, proc = run_features(tmp_path, "reference")
     assert proc.returncode == 0, proc.stdout
-    assert sorted(records) == sorted(SCENARIOS)
+    assert set(SCENARIOS) <= set(records)
+    records = {sc: records[sc] for sc in SCENARIOS}
     for r in records.values():
         assert r["status"] == "pass", r
         assert r["llm_calls"] == 0
         assert all(q["source"] == "data file" for q in r["judge"])
     transcripts = {p.stem: p.read_text() for p in (tmp_path / "transcripts").glob("*.json")}
-    assert sorted(transcripts) == [f"reference-{sc}" for sc in sorted(SCENARIOS)]
+    assert set(transcripts) >= {f"reference-{sc}" for sc in SCENARIOS}
     first_id = values()["confirmation_ids"][0]
     assert first_id in transcripts["reference-SC-08"]  # sent: the booked answer and the agent's message
     assert first_id not in transcripts["reference-SC-12"]  # issued by the unanswered booking call, never sent
@@ -197,8 +198,8 @@ NOT_VALUES = {"_about", "source", "ref", "quote", "note", "wording", "label", "s
 
 
 def allowed():
-    """Every key and value data.json gives outside its moments and its labels, each template filled with
-    every id the fake can issue: the only values a run may contain."""
+    """Every key and value data.json gives outside its moments, its probe moments, its probe prompts and its
+    labels, each template filled with every id the fake can issue: the only values a run may contain."""
     v = values()
     ids = [dict(hold_id=h, confirmation_id=c, free_tables=[]) for h, c in zip(v["hold_ids"], v["confirmation_ids"])]
     out = set()
@@ -221,7 +222,7 @@ def allowed():
         else:
             out.add(x)
 
-    d = {k: x for k, x in data().items() if k != "moments"}
+    d = {k: x for k, x in data().items() if k not in ("moments", "probe_moments", "probe_prompts")}
     walk(d)
     return out
 

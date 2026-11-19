@@ -1,9 +1,9 @@
 """The reference agent and its broken variants: plain Python that fills the agent slot, no LLM.
 
-The reference agent follows the table "What the agent does" in rules.md for the situations of
-SC-08, SC-12 and SC-10, and says only the sentences of data.json. In any other situation it stops
-the test: slice A gives it no step there. Each broken variant is the reference agent with exactly
-one rule broken.
+The reference agent follows the table "What the agent does" in rules.md (as model.py's agent steps
+state it) for the situations of SC-01 to SC-16, and says only the sentences of data.json. In any
+other situation it stops the test: no scenario gives it a step there. Each broken variant is the
+reference agent with exactly one rule broken.
 """
 from harness.data import data, render, tool, tool_kind, values
 
@@ -16,6 +16,10 @@ def call(kind, **ids):
     t = tool(kind)
     v = values() | ids
     return {"kind": "call", "tool": t["name"], "args": {a: v[key] for a, key in t["args"].items()}}
+
+
+def last_visitor(events):
+    return next(e for e in reversed(events) if e["kind"] == "visitor")
 
 
 def held_id(events):
@@ -35,25 +39,40 @@ class ReferenceAgent:
         return [self.on_result(events, tool_kind(last["tool"]), last)]
 
     def on_visitor(self, events, means):
-        if means == "request":
+        if means in ("request", "new party size"):
             return call("hold")
+        if means == "request more than 8":
+            return say("max8")
         if means == "yes":
             return call("book", hold_id=held_id(events))
-        if means == "withdraw":
+        if means in ("withdraw", "yes and change"):
             return call("release", hold_id=held_id(events))
-        raise NotImplementedError(f"slice A: no reference step after the visitor's {means!r}")
+        raise NotImplementedError(f"no reference step after the visitor's {means!r}")
 
     def on_result(self, events, kind, result):
         answer = result["answer"]
+        visitor = last_visitor(events)
         if (kind, answer) == ("hold", "held"):
+            if visitor["means"] == "yes and change":
+                raise NotImplementedError("no scenario proposes a changed table, so data.json has no sentence for it")
             return say("propose")
+        if (kind, answer) == ("hold", "taken"):
+            return say("taken")
+        if (kind, answer) == ("hold", "no answer"):
+            return say("not_held")
         if (kind, answer) == ("book", "booked"):
             return say("booked", confirmation_id=result["ids"]["confirmation_id"])
         if (kind, answer) == ("book", "no answer"):
             return say("unknown")
-        if (kind, answer) == ("release", "released"):
+        if (kind, answer) == ("book", "hold expired"):
+            expiries = sum(1 for e in events if e["kind"] == "result" and tool_kind(e["tool"]) == "book"
+                           and e["answer"] == "hold expired")
+            return say("not_booked") if expiries >= 2 else call("hold")
+        if kind == "release" and visitor["means"] == "withdraw":
             return say("nothing")
-        raise NotImplementedError(f"slice A: no reference step after a {kind} call answered {answer!r}")
+        if kind == "release" and visitor["means"] == "yes and change":
+            return call("hold", **visitor["change"]) if answer == "released" else say("release_failed")
+        raise NotImplementedError(f"no reference step after a {kind} call answered {answer!r}")
 
 
 class BooksWithoutYes(ReferenceAgent):

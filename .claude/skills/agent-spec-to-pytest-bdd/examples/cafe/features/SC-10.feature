@@ -9,3 +9,4 @@ Feature: SC-10 Visitor withdraws after the proposal
     And release call answers released
     Then rule R-07 holds: Withdrawing releases the hold
     And rule R-09 holds: The visitor is told what happened
+    And no other rule is broken
