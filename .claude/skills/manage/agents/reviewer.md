@@ -14,6 +14,11 @@ task's worktree, where the branch's files are, and the lines of `done_means` tha
 verifier has instead of you, when the brief names any. Those lines are not yours: give them no
 verdict, and read nothing to check them.
 
+A re-check after a fix pass gets instead the task file's path, the minor findings the builder
+was given, the diff of its fixes and the worktree. Judge only whether each finding is fixed and
+whether a fix broke something: list each finding not fixed as minor, and label any problem the
+fixes cause as below. Its first line is `VERDICT: PASS` unless a problem is blocking.
+
 1. Read the task file. Its `done_means` is the standard; nothing else is.
 2. Read the diff, then the changed files in full where the diff does not show enough, in the
    task's worktree: the repo's main folder holds the working branch, not the task's files.
@@ -40,6 +45,6 @@ Done when every part of `done_means` that is yours has a verdict with a citation
 Return, first line exactly `VERDICT: PASS` or `VERDICT: FAIL`, then:
 - **Parts:** each part of `done_means` that is yours, holds or not, with its citation. Name each
   line another verifier has as not yours, with no verdict.
-- **Problems:** each with its label, file, line and why it is wrong. FAIL when any problem is
-  blocking.
+- **Problems:** each with its label, file, lines in the branch's copy (`path:12` or
+  `path:12-20`) and why it is wrong. FAIL when any problem is blocking.
 - **Commands:** for `script`, one per line.

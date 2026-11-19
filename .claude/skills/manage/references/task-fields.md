@@ -24,12 +24,14 @@ One JSON object per file, `tasks/<id>.json`, id zero-padded to 3 (`tasks/020.jso
 | `needs_you` | optional; `{"question", "recommendation", "if_vetoed"}`, required when status is Needs you | Manager |
 | `decided_for_you` | optional; list of `{"chosen", "rejected", "would_change"}` | Manager |
 | `outside_needs` | optional; list of distinct values from a fixed set, today only `claude-api`. `checks.py needs` runs one check per value before a builder starts; a failure parks the task | Owner; manager may draft |
-| `for_retry` | optional; list of findings, each quoted, on files that exist only on the task's branch (`checks.py unmerged`). Written when the task parks, on the working branch only; the retry builder's brief quotes it | Manager |
+| `outside_problems` | optional; for a Proposed task, a non-empty list of `{"file", "problem"}`: each file that existed before the branch that adds the task, and the problem in it the task is about. A task branch adds a Proposed task only with it (`checks.py protected`) | Whoever proposes the task, builder or manager |
+| `for_retry` | optional; list of findings, each quoted, on files that exist only on the task's branch or on lines it added or changed (`checks.py unmerged`). Written when the task parks, on the working branch only; the retry builder's brief quotes it | Manager |
 | `owner_verified` | optional; `YYYY-MM-DD` the owner checked his lines of `verified_by`, or `""`. May be set while the task is Ready or Needs you. While a line is verified by `you` and this is empty, `checks.py owner` parks the task | Owner, or on his instruction; never the manager, never inferred from other text |
 
 A line of `done_means` is the text after `(n)`, where `(n)` starts a line: at the start of the
 text or of a text line, or after the `.`, `:`, `;`, `!` or `?` that ends the line before. A
-`(n)` inside a line is text, not a line number. A `done_means` that numbers no line is one
+`(n)` inside a line is text, not a line number, and so is one after an abbreviation that never
+ends a sentence (`e.g.`, `i.e.`, `cf.`, `vs.`, `viz.`). A `done_means` that numbers no line is one
 line, line 1. `advisor` is the `manager-advisor` agent: for each of its lines the manager saves
 its reply in `tasks/advice/<id>-<n>.md`, and `checks.py advice` refuses the merge until the
 latest reply on each line starts `RULING: HOLDS`; a line `you` verifies too is the owner's and

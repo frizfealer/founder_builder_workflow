@@ -113,6 +113,19 @@ def test_main_folder_fails_when_a_builder_works_there(run):
     assert "'task 1: work': not a commit the manager makes" in msg
 
 
+def test_main_folder_failure_says_what_ends_and_what_stays(run):
+    """Should say, on a failure, that nothing more is dispatched, merged or parked, that a task whose agent still runs stays In progress for the next run-start, and that the run report is committed only on the working branch and alone."""
+    run.write("shared.txt", "changed\n")
+    ok, msg = checks.check_main_folder(run.path, base=BASE)
+    assert not ok
+    last = msg.splitlines()[-1]
+    assert "dispatch, merge and park nothing more" in last
+    assert "stays In progress, with its branch and worktree, for the next run-start to report" in last
+    assert f"only while the main folder is on {BASE}, and then only tasks/RUNS.md" in last
+    assert "never together with a file an agent changed" in last
+    assert "change nothing" not in msg
+
+
 def test_main_folder_fails_on_other_branch_or_tracked_change(run):
     """Should fail the main-folder check when the main folder leaves the working branch, or a tracked file changes."""
     run.write("shared.txt", "changed\n")

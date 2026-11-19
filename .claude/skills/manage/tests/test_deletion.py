@@ -148,7 +148,7 @@ def test_superseded_done_without_merge_kept(run):
 
 @pytest.mark.parametrize("where", ["worktree", "main folder"])
 def test_superseded_checked_out_branch_kept(run, where):
-    """Should keep a branch of a merged task while a worktree, or the main folder, has it checked out, and recommend deleting it once the worktree is gone."""
+    """Should keep a branch of a merged task while a worktree, or the main folder, has it checked out, and recommend deleting it once the worktree is gone, or once the main folder is back on the working branch."""
     retried_and_merged(run)
     if where == "worktree":
         path = run.path / checks.WORKTREES / "task-001"
@@ -160,7 +160,11 @@ def test_superseded_checked_out_branch_kept(run, where):
     assert code == 1 and "task/001" in branches(run)
     assert f"Failed: (3) it is checked out in {path}." in out
     assert f"2 file(s) differ from {BASE}, 0 exist only on the branch" in out  # work-1.txt, tasks/001.json
-    assert f"Recommended: delete, once git worktree remove {path} has removed its worktree" in out
+    if where == "worktree":
+        assert f"Recommended: delete, once git worktree remove {path} has removed its worktree" in out
+    else:  # git never removes the main folder
+        assert f"Recommended: delete, once the main folder {path} is switched back to {BASE}" in out
+        assert "git worktree remove" not in out
     assert "task 1 is Done and merged" in out
 
 
@@ -297,6 +301,109 @@ def test_hook_refuses_command_bash_runs_inside_commit_message(run, command):
     """Should refuse a git clean, push or forced deletion that bash runs inside a double-quoted message, a heredoc message, or after a -m that does not start a word."""
     run.git("branch", "owner-idea", BASE)
     assert hook(run, command)[0] == 2
+
+
+# --- the hook: only the cleanup step's own form (task 66, from task 65) ------------------------
+
+def confirmed_and_not(repo):
+    """task/001 confirmed superseded; task/002 an existing branch that is not; a clone of the repo."""
+    retried_and_merged(repo)
+    repo.git("branch", "task/002", BASE)
+    repo.git("branch", "owner-idea", BASE)
+    clone = repo.path.parent / "other-clone"
+    subprocess.run(["git", "clone", "-q", str(repo.path), str(clone)], check=True, capture_output=True)
+    assert cli(repo, "superseded", "task/001")[0] == 0 and cli(repo, "superseded", "task/002")[0] == 1
+    return clone
+
+
+REFUSED_FORMS = [
+    "git branch -D {b} $(echo owner-idea)",
+    "git branch -D {b} `echo owner-idea`",
+    "git branch -D {b} $B",
+    "cd {clone} && git branch -D {b}",
+    "git -C {clone} branch -D {b}",
+    "git --git-dir={clone}/.git branch -D {b}",
+    "GIT_DIR={clone}/.git git branch -D {b}",
+]
+
+
+@pytest.mark.parametrize("form", REFUSED_FORMS)
+@pytest.mark.parametrize("branch", ["task/001", "task/002"])
+def test_hook_refuses_deletion_beyond_its_text(run, form, branch):
+    """Should refuse with exit 2 a forced deletion whose text holds $ or a backtick, runs anything besides the one git branch call, or points git at another repository, for a confirmed branch as well as an unconfirmed one, and name the allowed form."""
+    clone = confirmed_and_not(run)
+    code, err = hook(run, form.format(b=branch, clone=clone))
+    assert code == 2
+    assert "git branch -D <name> alone in its command, once checks.py superseded <name> passes" in err
+
+
+def test_hook_reads_abbreviated_long_options(run):
+    """Should read --del --forc as --delete --force: refused for a branch that is not confirmed, allowed for one that is."""
+    confirmed_and_not(run)
+    assert hook(run, "git branch --del --forc task/002")[0] == 2
+    assert hook(run, "git branch --delete --forc task/002")[0] == 2
+    assert hook(run, "git branch --del --forc task/001") == (0, "")
+
+
+@pytest.mark.parametrize("flags", ["-D", "--delete --force", "-d -f", "-df"])
+def test_hook_allows_cleanup_form_from_main_folder_and_worktree(run, flags):
+    """Should allow git branch -D <name> alone in its command for a confirmed branch, written with -D, --delete --force, -d -f or -df, from the main folder and from a worktree of the same repository."""
+    confirmed_and_not(run)
+    other = run.path / checks.WORKTREES / "task-003"
+    run.git("worktree", "add", "-q", "-b", "task/003", str(other), BASE)
+    assert hook(run, f"git branch {flags} task/001") == (0, "")
+    assert hook(run, f"git branch {flags} task/001-2", cwd=other) == (0, "")
+
+
+# --- the task merge's commit: bash expands nothing in the title (task 66, from task 65) --------
+
+TITLES = ["costs $HOME", "dated $(date)", "a `pair` of backticks", 'a "double" quote', "it's quoted",
+          "says git clean -fd and git push"]
+
+
+@pytest.mark.parametrize("title", TITLES)
+def test_task_merge_commit_subject_is_the_title(run, title):
+    """Should, following step 7 as written (the subject written to a file with the Write tool, then git commit -F), let the hook allow the commit and give it the subject Merge task <id>: <title> character for character."""
+    run.write(".gitignore", "build/\n")
+    run.commit("ignore build/")
+    run.git("switch", "-q", "-c", "task/003", BASE)
+    run.write("work-3.txt", "done\n")
+    run.commit("task 3: work")
+    run.git("switch", "-q", BASE)
+    run.git("merge", "-q", "--no-ff", "--no-commit", "task/003")
+    subject = f"Merge task 3: {title}"
+    run.write("build/merge-message-3.txt", subject + "\n")  # what the Write tool does
+    command = "git commit -F build/merge-message-3.txt"
+    assert hook(run, command) == (0, "")
+    subprocess.run(["bash", "-c", command], cwd=run.path, check=True, capture_output=True)
+    assert run.git("log", "-1", "--format=%s") == subject + "\n"
+    assert len(run.git("rev-list", "--parents", "-n", "1", "HEAD").split()) == 3  # a merge commit
+
+
+# --- the refusal says how to write a message that names a refused command ----------------------
+
+HINT = "A message that only names the refused command goes in single quotes or in a file given with -F."
+
+
+def test_hook_refusal_of_heredoc_commit_ends_with_message_hint(run):
+    """Should end the refusal of a heredoc commit whose message names git push with the hint to use single quotes or -F."""
+    code, err = hook(run, 'git commit -m "$(cat <<\'EOF\'\ntask 1: the hook refuses git push\nEOF\n)"')
+    assert code == 2 and err.endswith(HINT)
+
+
+@pytest.mark.parametrize("command", ["git push", "git clean -fd"])
+def test_hook_refusal_without_commit_has_no_message_hint(run, command):
+    """Should leave the hint out of the refusal of a bare git push or git clean."""
+    code, err = hook(run, command)
+    assert code == 2 and HINT not in err
+
+
+def test_pushes_helper_removed():
+    """Should no longer define pushes() in checks.py, and no file of the skill calls it."""
+    assert not hasattr(checks, "pushes")
+    for p in SKILL.rglob("*.py"):
+        if p.name != "test_deletion.py":
+            assert "pushes(" not in p.read_text(), p
 
 
 # --- protected: file deletions checked at merge ----------------------------------------------

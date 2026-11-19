@@ -22,9 +22,14 @@ builder`), so each result, and each notice of a background agent finishing, belo
 After each agent returns, `checks.py tokens <id> <n>` with its tokens: `subagent_tokens` in the
 result, or `total_tokens` in a background agent's notice. After each agent that can write
 returns (a builder, or an agent of an iterate task with Edit, Write or Bash), run
-`checks.py main-folder`. If it fails, an agent worked in the main folder: end the run at once
-(step 9, "main folder check failed"), change nothing on the working branch, and put its output
-under Needs you.
+`checks.py main-folder`. Never run it while step 7's merge is open in the main folder, from its
+`git merge --no-commit` until that merge is committed or aborted: for an agent that returns
+meanwhile, run it right after. If it fails, an agent or the owner worked in the main folder: end
+the run at once. Dispatch, merge and park nothing more. A task whose agent is still running
+stays In progress, with its branch and worktree, for the next run-start to report. Go to step 9
+with "main folder check failed" and the check's output under Needs you; step 9 commits the run
+report only while the main folder is on the working branch, and then only `tasks/RUNS.md`, never
+together with a file an agent changed.
 
 ## 1. Start
 
@@ -61,8 +66,9 @@ branch name exists from an earlier run, add `-2`, `-3`, to the worktree's name t
 ## 4. Work, by `runs_as`
 
 - **build**, **measurement:** dispatch `manager-builder` with a complete brief: the task file's
-  path and its `done_means`, `may_edit` and, when set, `may_delete` quoted; the branch and
-  `<worktree>`, where it works:
+  path and its `done_means`, `may_edit`, and, when set, `may_delete` and `outside_needs` quoted
+  (with no `outside_needs`, say that it runs no paid command); the branch and `<worktree>`, where
+  it works:
   every Bash command starts `cd <worktree> &&`, every file path is under it, and it never
   touches the main folder. Do not use the Agent tool's `cwd` or `isolation` for this; neither
   kept a builder out of the main folder (SKILL.md rule 8). The brief also gives the paths
@@ -70,10 +76,13 @@ branch name exists from an earlier run, add `-2`, `-3`, to the worktree's name t
   without any file under `tasks/`, so the new branch's task files stay as the working branch has
   them; the task's `for_retry`, when set, quoted in full as faults this run fixes;
   `DECISIONS.md` as the direction. It commits on the branch, in `<worktree>`, and returns what
-  it changed, the check it wrote or ran for `done_means`, its decisions, a Proposed task only
-  when `done_means` needs a protected path outside `may_edit`, and what it noticed outside the
-  task. When it stops on a fact about the owner's product or an outside system, park (reason
-  `owner-fact`) with its question.
+  it changed, the check it wrote or ran for `done_means`, its decisions, at most one Proposed
+  task, only for a problem that existed before its branch and lies outside its change
+  (SKILL.md rule 2), and what it noticed outside the task. When it stops on a fact about the
+  owner's product or an outside system, park (reason `owner-fact`) with its question. When it
+  stops because `done_means` needs a protected path `may_edit` does not name, park (reason
+  `never`) with that path in the question; it proposes no task for it. When it stops because
+  finishing needs money the task's `outside_needs` does not name, park (reason `money`).
 - **iterate:** follow `.claude/commands/iterate.md` for the skill the task names, with the
   task's problem, all of it in the task's worktree: every brief names `<worktree>` as for a
   builder, and its trials and grades run there. Its preconditions and stop list apply. The
@@ -101,11 +110,18 @@ Never by the builder. Each line of `done_means` is verified by the one verifier
 `verifier_of_line` names for it, or else by every verifier in `verified_by`
 (`references/task-fields.md`). Run every verifier that has a line, `you` last. An empty or
 failed review is a fail, and so is a reply whose first line is not `VERDICT: PASS`, and so is a
-reply with any problem labelled blocking. Minor and outside problems never fail it. Keep every reviewer reply verbatim, in order; step 7 or 8 saves
-them. From the minor and outside problems and what the builder noticed, add at most one Proposed
-task for this task run, bundling the ones worth doing, or none; step 7 or 8 commits it. Give it
-`tags`: 1 to 3 lines of `tasks/tags.txt` that fit its title, notes and `may_edit` (`repo` when
-none fits).
+reply with any problem labelled blocking. Minor and outside problems never fail it. Keep every
+reviewer reply verbatim, in order; step 7 or 8 saves them.
+
+An agent creates a task in one case only (SKILL.md rule 2): a problem that existed before the
+task's branch and lies outside its change. From the outside problems, the minor ones that
+`checks.py unmerged` does not give the task (step 5a), and what the builder noticed, add at most
+one Proposed task for this task run, bundling the earlier problems worth doing, or none; step 7
+or 8 commits it. A finding on lines the branch added or changed never goes there. Its
+`outside_problems` names each earlier file and the problem in it; give it `tags`: 1 to 3 lines
+of `tasks/tags.txt` that fit its title, notes and `may_edit` (`repo` when none fits). When the
+branch already adds a Proposed task, add none: in the merge or park commit, put the earlier
+problems into that task's `outside_problems` and `notes`.
 
 - **reviewer**, **script:** dispatch `manager-reviewer` with the task file's path, the
   output of `git diff <working branch>...<branch>`, `<worktree>` as the place to read the
@@ -122,11 +138,21 @@ none fits).
   list under `decided_for_you`. Tell it to start its reply with `RULING: HOLDS` or
   `RULING: FAILS`, then `JOB: a (<n>)`. Any reply that does not start `RULING: HOLDS` is a fail.
   Never give the advisor a line whose verifier is `you`.
+- **advisor, labels against verdicts:** when an advisor line compares labels with verdicts the
+  advisor must not see (task 56 line 3), the line names the comparison command and the form of
+  its labels file. Brief job (a) as above, with only the inputs to label and that form quoted,
+  and tell it to give its labels under **Labels:** as one JSON object in that form, starting
+  `RULING: HOLDS` when it labelled every item and `RULING: FAILS` when it could not. Write the
+  object as it stands to `<worktree>/build/labels/<id>-<line>.json` with the Write tool (`build/`
+  is git-ignored, so the branch stays as its builder left it), and run the command in the
+  worktree with that file as its labels: `cd <worktree> && <command>`. The line holds only when
+  the reply starts `RULING: HOLDS` and the command exits 0; anything else is a failed advisor
+  line. Add the command to the task's check commands for step 7's `try-merge`.
 - **metrics:** `python3 .claude/skills/skill-iterate/scripts/grade.py eval/<skill> --set <set>
   --gate` exits 0, run in the task's worktree.
-- **you:** last, once every other verifier has passed, the advisor's lines included:
-  `checks.py owner <id>`. If it fails, park (reason `owner`) with its output, which names only
-  the owner's lines, as the question. Once the owner has set `owner_verified` it passes, and the
+- **you:** last, once every other verifier has passed, the advisor's lines included, and after
+  step 5a's fix pass: `checks.py owner <id>`. If it fails, park (reason `owner`) with its
+  output, which names only the owner's lines, as the question. Once the owner has set `owner_verified` it passes, and the
   task goes on to step 6 and merges with no further park for the owner. Never set
   `owner_verified`, and never read it from other text.
 
@@ -142,13 +168,43 @@ the blocking problems and each advisor reply that did not hold, told to fix thos
 nothing else, then a new `manager-reviewer` and a new `manager-advisor` for each advisor line.
 If it still fails, park (reason `verification`).
 
-Whenever the task parks, at this step or a later one, sort the findings first: the minor and
-outside problems, what the builder noticed, and any blocking problem still open. For each, run
-`checks.py unmerged <branch> <path>...` with the task's branch and the files the finding
-names. When it exits 0, the files exist only on the task's branch: the finding goes, quoted,
-into the task's `for_retry` (step 8) and not into the Proposed task. A finding that names no
-file, or whose check exits 1, goes to the Proposed task as above. When the task merges, its
-files reach the working branch, so every finding goes to the Proposed task.
+Whenever the task parks, at this step or a later one, sort the findings first. A blocking
+problem still open is the task's own, by its label: it goes, quoted, into the task's `for_retry`
+(step 8). For each minor and outside problem and each point the builder noticed, run `checks.py
+unmerged <branch> <path>:<lines>...` with the task's branch and the file and lines the finding
+names. When it exits 0, the finding is on a file only the branch has or on lines the branch
+added or changed: it goes, quoted, into `for_retry`, and not into the Proposed task. When it
+exits 1, it is an earlier problem, for the Proposed task as above; a finding that names no file
+stays in the review file. When the task merges, a finding the fix pass left open stays in the
+review file and creates no task.
+
+## 5a. One fix pass
+
+Fix it here (SKILL.md rule 3), between the review and the merge. Once every verifier of step 5
+but `you` has passed, sort the minor problems of the latest review: for each, `checks.py
+unmerged <branch> <path>:<lines>...` with the file and lines it names. Exit 0 puts it on the fix
+list; exit 1 makes it an earlier problem, for step 5's Proposed task. With an empty fix list, go
+on to the `you` check and step 6.
+
+Otherwise run one fix pass, with its three limits:
+- The builder gets only that list. Note the branch's last commit as `<before>`, then dispatch a
+  fresh `manager-builder` in the same worktree and branch with the minor findings of the fix
+  list quoted, each as the review wrote it, and nothing else of the review: not the blocking
+  problems, not the outside problems, not the verdict. Tell it to fix those, change nothing
+  else, and commit.
+- The re-check looks only at those fixes. Dispatch a fresh `manager-reviewer` with the task
+  file's path, the fix list, `git diff <before> <branch>` and `<worktree>`, told to judge only
+  whether each finding is fixed and whether a fix broke something, and to start its reply
+  `VERDICT: PASS` or `VERDICT: FAIL`. Run the `script` commands of step 5 again in the worktree;
+  each must exit 0.
+- Whatever is still open after the one pass, a finding not fixed or a new minor problem, stays
+  in the review file and creates no task, no second pass and no `for_retry`. A blocking problem
+  stays the only reason a review fails: a blocking problem in the fixes, or a failing command,
+  fails step 5 (its one fresh retry when the task has not had it, else park, reason
+  `verification`).
+
+Keep the re-check's reply with the other reviewer replies; step 7 saves it last, so it is the
+reply `checks.py review` reads.
 
 ## 6. Protected paths
 
@@ -172,69 +228,91 @@ there, and undoes the merge. On exit 1 the task goes back to its builder once: c
 the script's output quoted as the fault to fix, then steps 4 to 7 for it again. On exit 3, or
 2, park (reason `conflict`) with its output.
 
-Then, on the working branch in the main folder: `git merge --no-ff --no-commit <branch>`. Write
-each reviewer reply from step 5 verbatim to `tasks/reviews/<id>-<n>.md` and each advisor reply
-verbatim to `tasks/advice/<id>-<n>.md` (id zero-padded to 3; `n` counts on from the task's
-highest existing number in that folder, from 1). Run `checks.py review <id>` and `checks.py
-advice <id>`; if either fails, `git merge --abort` and park the task with its output (reason
-`review` or `advice`). Then set the task file's `status` to Done, `finished` to today, `tokens`
-(its `agents` so far plus this run's count from `checks.py tokens`), and `decided_for_you` with
-each advisor ruling, add the Proposed task from step 5, and commit all of it with the subject
-`Merge task <id>: <title>`, as a plain quoted `git commit -m "Merge task <id>: <title>"`, not a
-heredoc: the hook reads a heredoc message as commands. When the title holds a backtick or `$(`,
-write the subject to a file and commit with `git commit -F <file>`.
+Then, on the working branch in the main folder, write each reviewer reply from steps 5 and 5a
+verbatim to `tasks/reviews/<id>-<n>.md` and each advisor reply verbatim to
+`tasks/advice/<id>-<n>.md` (id zero-padded to 3; `n` counts on from the task's highest existing
+number in that folder, from 1). They stay uncommitted until the merge commit. Run `checks.py
+review <id>` and `checks.py advice <id>`; if either fails, park the task with its output (reason
+`review` or `advice`).
+
+Then `git merge --no-ff --no-commit <branch>`, alone in its command. While the run is active the
+hook refuses it unless `checks.py protected`, `owner`, `review`, `advice` and `merge-limit` all
+pass for the task; if it refuses, park the task (reason `protected`, `owner`, `review`, `advice`
+or `merge-limit`, the check its output names) with that output. Then set the task file's
+`status` to Done, `finished` to today, `tokens` (its `agents` so far plus this run's count from
+`checks.py tokens`), and `decided_for_you` with each advisor ruling, remove its `for_retry`, add
+the Proposed task from step 5, and commit all of it with the subject `Merge task <id>: <title>`.
+Write that subject with the Write tool to `build/merge-message-<id>.txt` in the main folder
+(git-ignored), not with echo or a heredoc, and commit with `git commit -F
+build/merge-message-<id>.txt`: bash then expands nothing in the title, whatever it holds, and the
+hook reads no title as commands.
 
 Right after that commit, remove each worktree of this task's branches with `git worktree remove
 <path>`, never `--force`; if git refuses, leave it and list it under Needs you in the run report.
 Then, for every branch of this task (`git branch --list 'task/<id>' 'task/<id>-*'`), run
 `checks.py superseded <name>`. Only when it exits 0, delete the branch with `git branch -D
-<name>`, one branch per command and nothing else in the command (while the run is active, the
-hook allows a forced deletion only for a branch the script confirms), and keep the name and the
+<name>` alone in its command: one branch, no other command, no `$` or backtick, and no `-C`,
+`--git-dir` or `GIT_DIR=`. While the run is active, the hook allows a forced deletion only in
+that form and only for a branch the script confirms. Keep the name and the
 last commit id the script printed for the run report's Done section. When it exits 1, leave the
 branch and put the script's output, as it is, under Needs you: it names the condition that
 failed, how many files differ from the working branch and how many exist only on the branch,
 and a recommendation with its reason. Delete no other branch.
 
-**Draft the next task (advisor, job d).** `checks.py drafts <id>` lists the Proposed tasks that
-hard-depend on the merged task and have an empty `done_means`. For each, dispatch a fresh
-`manager-advisor` for job (d) with that task's file path, the merged task's file path, `git diff
-<merge>^1 <merge>`, and the paths of the results the merged task produced. Tell it to start its
-reply with `RULING: DRAFTED`, then `JOB: d`. Write the fields of its reply into that task's file,
-keep its status Proposed, add to the end of `draft_note` (or start it) a sentence saying who drafted
-the fields from which task and when, keeping what it held, save the reply verbatim to
-`tasks/advice/<draft id>-<n>.md`, and log the draft under that task's `decided_for_you`. If
-`tasks.py lint` then fails, restore the task file, keep the saved reply, and list it under Needs you
-in the run report. Commit as `task <draft id>: drafted from task <id>`. Then the next task of the
-batch that reaches this step; when the batch is done, step 2.
+**Draft the next task (manager; advisor, job d).** `checks.py drafts <id>` lists the Proposed
+tasks that hard-depend on the merged task and have an empty `done_means`. For each, draft its
+`done_means` (numbered `(1)`, `(2)`, ...), `verified_by`, `verifier_of_line` if a line needs one
+verifier, `may_edit` and `runs_as` yourself, from that task's own text and the merged task's
+results and findings, following `references/task-fields.md`: each pass line one a verifier can
+check, and each traced to a finding or a result. Then dispatch a fresh `manager-advisor` for job
+(d) to review the draft, with the draft quoted as one JSON object, that task's file path, the
+merged task's file path, `git diff <merge>^1 <merge>`, and the paths of the results the merged
+task produced. Tell it to start its reply with `RULING: HOLDS` or `RULING: FAILS`, then `JOB: d`.
+On `HOLDS`, write the draft into that task's file. On `FAILS`, write only the lines it holds,
+numbered again from `(1)`, with none of what it names as new scope, or no `done_means` when none
+is left; add nothing it suggests. Keep the status Proposed, add to the end of `draft_note` (or
+start it) a sentence saying that the manager drafted the fields from which task, the advisor's
+ruling and the date, keeping what it held, save the reply verbatim to `tasks/advice/<draft
+id>-<n>.md`, and log the ruling under that task's `decided_for_you`. If `tasks.py lint` then
+fails, restore the task file, keep the saved reply, and list it under Needs you in the run
+report. Commit as `task <draft id>: drafted from task <id>`. Then the next task of the batch that
+reaches this step; when the batch is done, step 2.
 
 ## 8. Park
 
 Every park names its reason from SKILL.md's park list. First `checks.py consult <id> <reason>
 <branch>`, with the task's branch, or without it when there is none (a `needs` park). It also checks
 the always-park conditions the repo shows, whatever the reason. If it exits 1, the task always
-parks: go on below without the advisor, with its output in the question. If it exits 0, dispatch a
-fresh `manager-advisor` for job (b) with the task file's path, the reason and the question, the
-branch and `git diff <working branch>...<branch>` when there is one, and the reviewer and advisor
-replies so far. Tell it to start its reply with `RULING: GO ON` or `RULING: PARK`, then `JOB: b`. On
-`GO ON`, the first in this task run, do what its *How* says, through the steps of this command only
+parks: go on below without the advisor, with its output in the question. If it exits 3, it
+could not decide: park without the advisor, with its output in the question. If it exits 0,
+dispatch a fresh `manager-advisor` for job (b) with the task file's path, the reason and the
+question, the branch, `git diff <working branch>...<branch>` and `<worktree>` as the place to
+read the branch's files when there is one, and the reviewer and advisor replies so far. Tell it
+to start its reply with `RULING: GO ON` or `RULING: PARK`, then `JOB: b`. On `GO ON`, the first in this task run, do what its *How* says, through the steps of this command only
 (a fresh builder briefed with the reply, a choice logged under `decided_for_you`, a verifier run
 again), and carry on from that step. On `PARK`, or a `GO ON` after one was already followed in this
 task run, park below with the reply's points in the recommendation.
 
 On the working branch, edit only this task's file: `status` Needs you, `needs_you`,
-`decided_for_you`, `tokens` (as in step 7), and `for_retry`: the findings step 5 sorted into it,
-replacing any earlier list; remove the field when step 5 sorted none. Write each reviewer reply
+`decided_for_you`, `tokens` (as in step 7), and `for_retry`. When step 5 ran in this task run,
+`for_retry` is the findings step 5 sorted into it, replacing any earlier list, and the field is
+removed when step 5 sorted none. A park before step 5 (a `needs` park at step 3) leaves
+`for_retry` as it is, so an earlier list is not lost. Write each reviewer reply
 from step 5 verbatim to `tasks/reviews/<id>-<n>.md` and each advisor reply, the job (b) one
 included, to `tasks/advice/<id>-<n>.md`, numbered as in step 7, log each advisor ruling under
 `decided_for_you`, and add the Proposed task from step 5. Commit all of it as `task <id>:
-parked`. The task's branch stays. Remove its worktree with `git worktree remove <path>`, never
-`--force`; if git refuses, leave it and list it under Needs you. Go on with the batch's other
-tasks; when every one has merged or parked, go to step 2.
+parked`. The task's branches stay, when it has any. Remove every worktree of the task's branches
+(`git worktree list` shows them; a task rebuilt after `try-merge` has two) with `git worktree
+remove <path>`, never `--force`; if git refuses, leave it and list it under Needs you. Go on with
+the batch's other tasks; when every one has merged or parked, go to step 2.
 
 ## 9. End
 
 `checks.py tokens` for the Tokens lines, then `checks.py run-end`. Prepend this run to
-`tasks/RUNS.md` and commit it on the working branch as `manage: run report <date>`:
+`tasks/RUNS.md` and commit only that file on the working branch: `git commit -m 'manage: run
+report <date>' -- tasks/RUNS.md`, which leaves out any other change in the main folder, a file an
+agent changed included. When the run ended on a failed main-folder check with the main folder on
+another branch, commit nothing and give the report in your final message only.
 
 ```markdown
 ## Run <date> <time>
