@@ -24,7 +24,7 @@ from harness.judge import known_sentences
 
 SLICE_A = {"break-R-03", "break-R-11"}
 TWO_HALVES = {"R-02", "R-04", "R-10", "R-11"}  # rules whose text asks for a tool call and a message
-OUTCOMES = {"caught", "caught only by another rule", "survived", "not caught, no verdict"}
+OUTCOMES = {"caught", "caught only by another rule", "survived"}  # line 4's three
 
 
 def squash(text):
@@ -121,7 +121,9 @@ def test_check_new_sentences_are_labelled_entries():
     """Should find each sentence only a variant says labelled in data.json, with a recorded judge answer."""
     from harness.data import data
     new = ("propose_no_name", "booked_no_id", "unknown_no_call", "max8_no_ask")
-    reference = {render(e["value"]) for k, e in data()["agent"].items() if k not in (*new, "booked")}
+    reference = {render(e["value"], confirmation_id=c) for k, e in data()["agent"].items() if k not in new
+                 for c in values()["confirmation_ids"]}
+    assert any(text.startswith("Your table is booked.") for text in reference)  # "booked" is compared too
     for key in new:
         e = data()["agent"][key]
         assert e["source"] == "free choice" and e["note"] and set(e["judge"]) == set(data()["judge_questions"])
@@ -157,6 +159,30 @@ def test_check_results_one_outcome_each():
         else:
             assert v["unchecked"]["words"] == c.breaks
             assert v["unchecked"]["listed_in_unchecked_sentences"].split(":")[0] in ("yes", "no")
+
+
+def test_check_results_listed_answer_for_todays_variant():
+    """Should record "no" for the one variant not caught, break-R-04-message, whose words task 51's review
+    found unlisted in unchecked_sentences.json, and say that R-04's "asks again" is reached in no scenario."""
+    not_caught = {n: v for n, v in saved()["variants"].items() if v["outcome"] != "caught"}
+    assert list(not_caught) == ["break-R-04-message"]
+    v = not_caught["break-R-04-message"]
+    assert v["unchecked"]["listed_in_unchecked_sentences"] == "no"
+    assert "reached in no scenario" in v["note"] and "release_failed" in v["note"]
+
+
+def test_listed_answers_from_fixture_file(tmp_path, monkeypatch):
+    """Should answer yes when the words are inside a string of the file or a string of 3 or more words is inside
+    them, and no otherwise, quotes and spaces aside."""
+    fixture = tmp_path / "unchecked.json"
+    fixture.write_text(json.dumps({"rows": [{"clause": "It holds the  “changed table”, and then"}, "asks again"],
+                                   "short": ["the table"]}), encoding="utf-8")
+    monkeypatch.setattr(variant_results, "UNCHECKED", fixture)
+    assert variant_results.listed('Holds the "changed table"').startswith("yes: the words are inside")
+    assert variant_results.listed('so it holds the "changed table", and then asks again') \
+        .startswith("yes: a string of the file")
+    assert variant_results.listed("gives the confirmation id") == "no"
+    assert variant_results.listed("says asks again") == "no"  # "asks again" has 2 words, too short to count
 
 
 # ---------------------------------------------------------------------- line 5
@@ -207,6 +233,16 @@ def test_judge_test_b_stops_at_the_given_spend(tmp_path, monkeypatch):
     monkeypatch.setattr(judge_test.money, "spent", lambda path=None: 0.45 if path == ledger else 0.0)
     with pytest.raises(SystemExit, match="stopped before J33"):
         judge_test.run(object(), HERE / "judge_cases_b.json", tmp_path / "b.json", 17, ledger, 0.45)
+
+
+def test_judge_test_b_without_ledger_refuses(monkeypatch, capsys):
+    """Should refuse, before any call, to run a cases file other than judge_cases.json without --ledger, so its
+    calls never go to task 56's ledger."""
+    from probe import judge_test
+    monkeypatch.setattr(judge_test, "run", lambda **kw: pytest.fail("ran without a ledger"))
+    with pytest.raises(SystemExit) as e:
+        judge_test.main(["--cases", "judge_cases_b.json", "--out", "runs/judge-test-b.json", "--needed", "17"])
+    assert e.value.code == 2 and "--ledger is required" in capsys.readouterr().err
 
 
 def test_judge_test_b_report_on_saved_file_holds(capsys):

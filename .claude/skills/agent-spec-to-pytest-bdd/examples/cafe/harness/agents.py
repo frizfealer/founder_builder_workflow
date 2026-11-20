@@ -173,7 +173,11 @@ class HoldsUnchangedTable(ReferenceAgent):
 class AsksAgainUnchanged(ReferenceAgent):
     """Breaks R-04, a message fault: "holds the changed table, and asks again". When the release call of a
     change gets no answer, it asks again for the table as first proposed, as if the visitor had changed
-    nothing, instead of saying it could not release the earlier hold."""
+    nothing, instead of saying it could not release the earlier hold.
+    It breaks those words only loosely: at a failed release the reference agent does not ask again either,
+    it says release_failed (the R-06 row). What changes is that it re-proposes the unchanged table instead
+    of saying the release failed. R-04's "asks again" is reached in no scenario: none has a changed table
+    held, and there the reference agent stops the test (ReferenceAgent.on_result)."""
     name, rule, fault = "break-R-04-message", "R-04", "message"
     breaks = "holds the changed table, and asks again"
 
@@ -211,7 +215,7 @@ class HoldsBeforeRelease(ReferenceAgent):
         since = events[visitor_index(events):]
         if kind == "hold" and since[0]["means"] == "yes and change" and \
                 not any(e["kind"] == "call" and tool_kind(e["tool"]) == "release" for e in since):
-            return call("release", hold_id=held_id(events))
+            return call("release", hold_id=held_id(events[:visitor_index(events)]))  # the old hold, held before the change
         return super().on_result(events, kind, result)
 
 

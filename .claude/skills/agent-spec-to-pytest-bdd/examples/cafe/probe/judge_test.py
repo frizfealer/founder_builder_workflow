@@ -130,10 +130,15 @@ def main(args):
     p.add_argument("--cases", type=Path, default=CASES, help="the cases file (default judge_cases.json)")
     p.add_argument("--out", type=Path, default=OUT, help="the result file (default runs/judge-test.json)")
     p.add_argument("--needed", type=int, default=NEEDED, help="cases not marked hard that must pass the 2 of 3")
-    p.add_argument("--ledger", type=Path, default=money.LEDGER, help="the usage ledger the calls are counted in")
+    p.add_argument("--ledger", type=Path, help="the usage ledger the calls are counted in (default task 56's, "
+                                               "only with the default cases file; required with another)")
     p.add_argument("--stop-at", type=float, default=money.STOP_AT, help="USD in the ledger at which no case starts")
     a = p.parse_args(args)
-    cases_file, out, ledger = (x if x.is_absolute() else HERE / x for x in (a.cases, a.out, a.ledger))
+    cases_file, out = (x if x.is_absolute() else HERE / x for x in (a.cases, a.out))
+    if a.ledger is None and cases_file != CASES and not a.report:
+        p.error("--ledger is required with a cases file other than judge_cases.json, so its calls stay out of "
+                "task 56's ledger")
+    ledger = money.LEDGER if a.ledger is None else a.ledger if a.ledger.is_absolute() else HERE / a.ledger
     if a.report:
         res = json.loads(out.read_text(encoding="utf-8"))
         bad = mismatches(json.loads(cases_file.read_text(encoding="utf-8"))["cases"], res)

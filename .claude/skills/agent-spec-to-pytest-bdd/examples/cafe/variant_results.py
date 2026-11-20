@@ -11,9 +11,11 @@ scenario's test would get. Each variant then gets one outcome:
   caught                          its own rule's verdict is a break in at least one scenario
   caught only by another rule     no break of its own rule, a break of another rule somewhere
   survived                        every scenario's test passes
-  not caught, no verdict          no rule breaks anywhere, yet a test fails without a verdict
+A variant with none of these three (no rule breaks anywhere, yet a test ends without a verdict) stops the
+script: task 51's done_means line 4 names no outcome for it, and no variant has it.
 For a variant not caught, the words of its rule that went unchecked, and whether unchecked_sentences.json
-already lists them: a string-search of that file, made here so that its content need not be read.
+already lists them: a heuristic string-search of that file, made here so that its content need not be read.
+A variant with a note below gets it in the file.
 """
 import json
 import re
@@ -29,6 +31,14 @@ from harness.slot import Driver, world_line
 RESULTS = HERE / "variant_results.json"
 UNCHECKED = HERE / "unchecked_sentences.json"
 SCENARIOS = world_scenarios()
+OUTCOMES = ("caught", "caught only by another rule", "survived")
+NOTES = {
+    "break-R-04-message": "R-04's message half is reached in no scenario: R-04's 'asks again' follows a changed "
+                          "table held, no scenario has one, and there the reference agent stops the test. This "
+                          "variant sits at a failed release instead, where the reference agent does not ask again "
+                          "either but says release_failed (rules.md's R-06 row). What it changes is that it "
+                          "re-proposes the unchanged table instead of saying the release failed; R-01 caught that.",
+}
 
 
 def run(sc_id, agent):
@@ -102,18 +112,19 @@ def results():
             outcome = "caught"
         elif broken:
             outcome = "caught only by another rule"
-        elif all(s["status"] == "pass" for s in per.values()):
-            outcome = "survived"
         else:
-            outcome = "not caught, no verdict"
+            assert all(s["status"] == "pass" for s in per.values()), \
+                f"{cls.name}: no rule breaks, yet a test ends without a verdict; line 4 has no outcome for it"
+            outcome = "survived"
         v = {"rule": cls.rule, "fault": cls.fault, "breaks": cls.breaks, "outcome": outcome, "broken_rules": broken,
              "differs_in": [sc for sc, s in per.items() if s["differs"]],
              "failing_tests": [sc for sc, s in per.items() if s["status"] != "pass"]}
         if outcome != "caught":
             v["unchecked"] = {"rule": cls.rule, "words": cls.breaks, "listed_in_unchecked_sentences": listed(cls.breaks)}
+        if cls.name in NOTES:
+            v["note"] = NOTES[cls.name]
         variants[cls.name] = v | {"scenarios": per}
-    counts = {o: sum(1 for v in variants.values() if v["outcome"] == o)
-              for o in ("caught", "caught only by another rule", "survived", "not caught, no verdict")}
+    counts = {o: sum(1 for v in variants.values() if v["outcome"] == o) for o in OUTCOMES}
     return {"_about": "Written by variant_results.py; tests/test_slice_c.py fails when a rerun differs. "
                       "Per slice C variant and scenario: whether its events differ from the reference agent's, "
                       "every rule's verdict, the test's status; per variant its outcome.",

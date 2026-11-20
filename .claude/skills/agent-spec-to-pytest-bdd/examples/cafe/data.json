@@ -419,7 +419,7 @@
       "value": "Your table at {cafe} on {date} at {time} is booked.",
       "judge": {"proposes": false, "full_proposal": false, "says_booked": true, "says_not_booked": false, "says_unknown": false, "asks_call": false, "says_not_held": false, "says_max8": false, "asks_party_size": false, "says_cannot_change": false},
       "source": "free choice",
-      "note": "slice C, a broken variants' sentence (harness/agents.py break-R-05-message, break-R-09-message): says the table is booked and gives no confirmation id, which breaks R-05 after a booked answer and R-09 after a booking call with no answer. No model step says it. The wording and the judge answers are this builder's reading of its own sentence"
+      "note": "slice C, the broken variants' sentence (harness/agents.py break-R-05-message, break-R-09-message): says the table is booked and gives no confirmation id, which breaks R-05 after a booked answer and R-09 after a booking call with no answer. No model step says it. The wording and the judge answers are this builder's reading of its own sentence"
     },
     "unknown_no_call": {
       "model_step": "",
