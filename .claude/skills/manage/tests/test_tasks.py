@@ -202,6 +202,63 @@ def test_lint_decided_for_you_with_or_without_why():
     assert any("decided_for_you" in e for e in errs)
 
 
+# --- task 71: the four-part summary -------------------------------------------------------------
+
+SUMMARY = {"outcome": "The board shows every task.", "scope": "Changes the board page only.",
+           "risk": "A task missing from the board; the board test guards it.",
+           "cost": "One builder run; task 66 used 455,419 agent tokens."}
+
+
+def test_lint_summary_with_four_parts():
+    """Should accept a summary holding outcome, scope, risk and cost, each non-empty text."""
+    assert tasks.lint(as_files(task(72) | {"summary": SUMMARY}, task(5) | {"summary": SUMMARY}), TAGS) == []
+
+
+@pytest.mark.parametrize("part", tasks.SUMMARY_PARTS)
+def test_lint_summary_lacking_a_part(part):
+    """Should reject a summary that lacks one of its four parts, whatever the task's id or status."""
+    for t in (task(72), task(5), task(5, status="Done") | {"finished": "2026-11-20"}):
+        errs = tasks.lint(as_files(t | {"summary": {k: v for k, v in SUMMARY.items() if k != part}}), TAGS)
+        assert any(f"summary lacks the part(s) ['{part}']" in e for e in errs), (t["id"], part)
+
+
+@pytest.mark.parametrize("part", tasks.SUMMARY_PARTS)
+@pytest.mark.parametrize("empty", ["", "   ", None, 3, ["text"]])
+def test_lint_summary_with_an_empty_part(part, empty):
+    """Should reject a summary one of whose parts is empty or not text."""
+    errs = tasks.lint(as_files(task(5) | {"summary": SUMMARY | {part: empty}}), TAGS)
+    assert any(f"summary part(s) ['{part}'] must be non-empty text" in e for e in errs)
+
+
+@pytest.mark.parametrize("bad", ["Outcome: x. Scope: y.", ["x"], {}, None, SUMMARY | {"why": "x"}])
+def test_lint_summary_not_an_object_of_the_four_parts(bad):
+    """Should reject a summary that is not an object, and one with a part outside the four."""
+    assert any("summary" in e for e in tasks.lint(as_files(task(5) | {"summary": bad}), TAGS))
+
+
+@pytest.mark.parametrize("status", ["Proposed", "Ready"])
+def test_lint_new_proposed_or_ready_task_needs_summary(status):
+    """Should reject a Proposed or Ready task with an id above 71 that has no summary."""
+    errs = tasks.lint(as_files(task(72, status=status)), TAGS)
+    assert any(f"a {status} task with an id above 71 needs a summary" in e for e in errs)
+    assert tasks.lint(as_files(task(72, status=status) | {"summary": SUMMARY}), TAGS) == []
+
+
+@pytest.mark.parametrize("status", ["Backlog", "In progress", "Done", "Dropped"])
+def test_lint_new_task_of_other_status_passes_without_summary(status):
+    """Should not ask a task above 71 for a summary unless it is Proposed or Ready."""
+    t = task(72, status=status) | ({"finished": "2026-11-20"} if status in tasks.CLOSED else {})
+    assert tasks.lint(as_files(t), TAGS) == []
+
+
+@pytest.mark.parametrize("task_id", [1, 70, 71])
+@pytest.mark.parametrize("status", ["Proposed", "Ready"])
+def test_lint_task_up_to_71_passes_with_or_without_summary(task_id, status):
+    """Should pass a Proposed or Ready task with an id of 71 or below, with a summary or without one."""
+    assert tasks.lint(as_files(task(task_id, status=status)), TAGS) == []
+    assert tasks.lint(as_files(task(task_id, status=status) | {"summary": SUMMARY}), TAGS) == []
+
+
 def test_lint_for_retry_strings():
     """Should accept for_retry as a list of strings and fail anything else."""
     assert tasks.lint(as_files(task(1) | {"for_retry": ["probe/fake.py: IndexError on a 4th hold"]}), TAGS) == []

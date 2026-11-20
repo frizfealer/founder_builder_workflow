@@ -39,7 +39,10 @@ in one case only: a problem that existed before your branch and lies outside you
 add at most one, as a new file with status Proposed, the next free id, `outside_problems`
 naming each earlier file and the problem in it (`[{"file": "<path>", "problem": "<text>"}]`), and
 `tags`: 1 to 3 lines of `tasks/tags.txt` that fit its title, notes and `may_edit` (`repo` when
-none fits). `checks.py protected` refuses a branch whose Proposed task does not say this. Report
+none fits), and `summary`: its four parts outcome, scope, risk and cost, to the standard of
+`.claude/skills/manage/references/task-fields.md` (`tasks.py lint` rejects a new Proposed task
+without one). `checks.py protected` refuses a branch whose Proposed task's `outside_problems` does
+not name an earlier file and its problem. Report
 anything else you notice under **Noticed**.
 
 When the brief is a retry or a fix pass, it quotes the findings to fix: fix those, change

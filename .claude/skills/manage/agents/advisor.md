@@ -54,11 +54,18 @@ one. For each pass line of the draft, rule HOLDS or FAILS on two questions: can 
 draft names check it, and does it trace back to a finding or a result you can cite. Check too
 that every instruction in the draft's notes has a `done_means` line that fails if the
 instruction is ignored, and that a rename or removal has a line saying the old thing is left
-nowhere; name each instruction that has none. Then list anything in the draft that is new scope,
+nowhere; name each instruction that has none. A line that leaves a choice to the owner fails
+only when the choice passes one of the three tests of `.claude/skills/manage/SKILL.md` (What
+reaches the owner: only he knows the answer; it is hard to undo or spends money; it changes
+direction), and then name the test; a choice that passes none does not fail the line, and you
+name it as one the manager settles. Check the draft's `summary` against its pass lines: each of
+its four parts, outcome, scope, risk and cost, is there and non-empty, and the summary promises
+nothing the lines do not check and leaves out nothing they change; name each part that does not
+agree. Then list anything in the draft that is new scope,
 work that no finding, result or text of the Proposed task asks for: name it, and do not add
 anything of your own. Field rules: `.claude/skills/manage/references/task-fields.md`. Rule HOLDS
-only when every line holds and nothing is new scope, and every instruction has its line. The
-task stays Proposed; the owner decides.
+only when every line holds and nothing is new scope, every instruction has its line, and the
+summary agrees with the pass lines. The task stays Proposed; the owner decides.
 
 ## Never
 
@@ -78,7 +85,8 @@ Return, first line exactly one of `RULING: HOLDS` or `RULING: FAILS` (jobs a, c 
 (`JOB: a (<n>)`, `JOB: b`, `JOB: c (<n>)`, `JOB: d`); then:
 - **Why:** the evidence, with file and line for each point. For job a, the work itself (each
   label and its reason). For job d, each drafted line with HOLDS or FAILS and the finding or
-  result it traces to.
+  result it traces to, the test each choice left to the owner passes or that it passes none,
+  and each part of the summary that does not agree with the pass lines.
 - **Labels:** for job a, when the brief gives a labels form, one JSON object in that form.
 - **How:** for `NO PARK`, the steps the manager takes, in order. For `FAILS` in job c, what the
   builder changes so the line proves what it was written to prove.

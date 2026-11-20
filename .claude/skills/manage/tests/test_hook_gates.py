@@ -113,6 +113,23 @@ def test_merge_refused_when_a_check_cannot_run(run):
     assert code == 2 and "checks.py protected fails: KeyError" in err
 
 
+def test_merge_refused_when_the_merge_checks_could_not_run_names_failed(run, monkeypatch):
+    """Should refuse the merge when the merge checks could not run at all, and name the park reason failed for it (task 71, line 5)."""
+    ready_to_merge(run)
+
+    def cannot_run(where):
+        raise RuntimeError("git worktree list failed")
+
+    monkeypatch.setattr(checks, "main_folder", cannot_run)
+    monkeypatch.delenv("CLAUDE_PROJECT_DIR", raising=False)
+    event = {"hook_event_name": "PreToolUse", "tool_name": "Bash", "cwd": str(run.path),
+             "tool_input": {"command": MERGE}}
+    code, err = checks.push_hook(event, base=BASE)
+    assert code == 2
+    assert "the merge checks could not run (RuntimeError: git worktree list failed)" in err
+    assert "park the task under failed." in err
+
+
 def test_merge_of_rebuilt_branch_reads_its_task(run):
     """Should read task/001-2 as task 1's branch and refuse it while task 1 has no review reply."""
     run.git("branch", "task/001-2", BASE)

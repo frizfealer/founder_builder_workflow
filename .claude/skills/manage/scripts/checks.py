@@ -964,7 +964,8 @@ def push_hook(event, base=WORKING_BRANCH):
                 why = [f"task {int(TASK_BRANCH.match(b).group(1))} ({b}): {f}" for b in merging
                        for f in merge_check_fails(repo, int(TASK_BRANCH.match(b).group(1)), b, base)]
             except Exception as e:  # the gate could not run: refuse, never let the merge through
-                why = [f"the merge checks could not run ({type(e).__name__}: {e})."]
+                why = [f"the merge checks could not run ({type(e).__name__}: {e}), so none has passed: "
+                       f"park the task under failed."]
         if why:
             code, msg = 2, ("Refused: a manager run is active, and a task branch merges only when "
                             "checks.py protected, owner, review, advice and merge-limit pass for its "

@@ -23,10 +23,39 @@
       "soft": false
     }
   ],
-  "status": "In progress",
+  "status": "Done",
   "added": "2026-11-20",
-  "finished": "",
-  "tokens": null,
+  "finished": "2026-11-20",
+  "tokens": {
+    "agents": 304562,
+    "main_session": "not recorded"
+  },
   "source_chat": "founder_and_builder project chat, 2026-11-19 and 2026-11-20",
-  "draft_note": "Drafted by Claude in chat on 2026-11-20 and set Ready on the owner's word (\"add\") after he read its four-part summary. No line is his to verify: he approved the summary, and the reviewer checks the lines."
+  "draft_note": "Drafted by Claude in chat on 2026-11-20 and set Ready on the owner's word (\"add\") after he read its four-part summary. No line is his to verify: he approved the summary, and the reviewer checks the lines.",
+  "decided_for_you": [
+    {
+      "chosen": "RULING: HOLDS (advisor job c), tasks/advice/071-1.md: line (4) still proves what it was written to prove with parked tasks in a Parked section of their own and a fixed test for each kind of run-level item.",
+      "rejected": "RULING: FAILS",
+      "why": "The items line (4) was written to filter were draft choices and Proposed tasks, not parks, and the task says the park list and when a task parks stay unchanged.",
+      "would_change": "The owner wants parked tasks under Needs you with a test each, or reads a run-level kind (most likely a draft not written after a lint failure) as passing no test."
+    },
+    {
+      "chosen": "Builder: parked tasks get their own Parked section in the run report; Proposed tasks stay under Needs you as test 3; run-level items carry a fixed test (test 2 for a branch or worktree kept, test 3 for a task left In progress or a draft lint failure, test 1 for a failed main-folder check).",
+      "rejected": "Mapping each of the four park reasons to a test; a separate Proposed section.",
+      "why": "The park reasons do not map onto the three tests (your-action for the task limit passes none), and forcing a mapping would change what a park means.",
+      "would_change": "The owner wants parked tasks under Needs you, or does not count Ready, change or drop as a change of direction."
+    },
+    {
+      "chosen": "Builder: agents/builder.md tells the builder to write a summary for its own Proposed task; lint rejects a summary with a part missing, empty or extra, and, after the fix pass, a summary of null.",
+      "rejected": "Leaving the summary to the manager alone; allowing extra parts.",
+      "why": "A builder's Proposed task above id 71 without a summary would fail lint, and the owner wants the worker close to the work to keep writing follow-on tasks.",
+      "would_change": "The owner wants only the manager to write summaries."
+    },
+    {
+      "chosen": "Manager: no Proposed task from this run. The builder noticed that scripts/board.html does not show the new summary field.",
+      "rejected": "A Proposed task to show the summary on the board.",
+      "why": "The board still works without it, and the run report already shows each Proposed task's summary.",
+      "would_change": "The owner reads Proposed tasks on the board rather than in the run report."
+    }
+  ]
 }

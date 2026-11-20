@@ -387,3 +387,122 @@ def test_job_d_checks_every_instruction_has_a_line():
     d = step("agents/advisor.md", "## (d)", "## Never")
     assert ("every instruction in the draft's notes has a `done_means` line that fails if the instruction is "
             "ignored, and that a rename or removal has a line saying the old thing is left nowhere") in d
+
+
+# --- task 71: the three tests, the four-part summary, and the could-not-run refusal --------------
+
+THREE_TESTS = ["1. **Only he knows the answer:** a fact about his product or what he wants.",
+               "2. **It is hard to undo or spends money,** a deletion included.",
+               "3. **It changes direction,** what gets built next, which includes a task growing past its stated scope."]
+
+
+def report_template():
+    return (SKILL / "commands/manage.md").read_text().split("```markdown")[1].split("```")[0]
+
+
+def test_skill_states_the_three_tests_under_their_own_heading():
+    """Should state the three tests under a heading of their own in SKILL.md, and say an open choice or a finding reaches the owner only when one holds, named with the item."""
+    s = step("SKILL.md", "## What reaches the owner: three tests", "## Park, never ask")
+    for t in THREE_TESTS:
+        assert t in s, t
+    assert ("An open choice or a finding reaches the owner only when one of these three tests holds, and it "
+            "reaches him named with the test it passes") in s
+    assert "takes the option that is cheapest to undo and logs it in the task's `decided_for_you` with its why" in s
+
+
+def test_park_list_is_unchanged():
+    """Should leave SKILL.md's park list and its four reasons as task 68 left them: the section from 'Park, never ask' to 'Never', whitespace folded, hashes to its value on the working branch before task 71."""
+    import hashlib
+    s = step("SKILL.md", "## Park, never ask", "## Never")
+    assert hashlib.sha256(s.encode()).hexdigest() == "050efe47680b2cc6dedfe039adb0baae1f038731b4417cd883556b61c6b179db"
+    for reason in ["`permission`, *always*", "`your-action`, *always*", "`owner-fact`:", "`failed`:"]:
+        assert reason in s, reason
+
+
+def test_manage_puts_each_open_choice_of_a_draft_to_the_three_tests():
+    """Should say in commands/manage.md, for every task the manager drafts, after a merge and for an earlier problem, that an open choice goes to the three tests: none holds, the option cheapest to undo is logged with its why; one holds, it goes under Needs you with the test named."""
+    d = step("commands/manage.md", "**Every task you draft.**", "## 1. Start")
+    assert "the fields of a Proposed task drafted after a merge (step 7), and a Proposed task for an earlier problem (step 5)" in d
+    assert "Put each choice the draft would leave open to the three tests of SKILL.md (What reaches the owner)." in d
+    assert ("When none holds, take the option that is cheapest to undo, write the draft with it, and log it in "
+            "that task's `decided_for_you` with its why.") in d
+    assert "When one holds, leave the choice open" in d and "under Needs you in the run report with the test named" in d
+    five = step("commands/manage.md", "## 5. Verify", "## 5a. One fix pass")
+    seven = step("commands/manage.md", "**Draft the next task (manager; advisor, job d).**", "## 8. Park")
+    for s in (five, seven):
+        assert "put to the three tests (Every task you draft, above)" in s
+
+
+def test_manage_writes_the_summary_in_every_draft():
+    """Should have the manager write the four-part summary in every draft: the Proposed task of step 5, the builder's, and the fields drafted after a merge."""
+    d = step("commands/manage.md", "**Every task you draft.**", "## 1. Start")
+    assert "Write its `summary`, the four parts outcome, scope, risk and cost, to the standard of `references/task-fields.md`" in d
+    five = step("commands/manage.md", "## 5. Verify", "## 5a. One fix pass")
+    assert "and its `summary`" in five and "write its `summary` the same way" in five
+    seven = step("commands/manage.md", "**Draft the next task (manager; advisor, job d).**", "## 8. Park")
+    assert "`may_edit`, `runs_as` and `summary` yourself" in seven
+    assert "the `summary` rewritten to say what those lines say" in seven
+    assert "`summary`: its four parts outcome, scope, risk and cost" in text("agents/builder.md")
+
+
+def test_advisor_job_d_fails_an_owner_choice_only_on_a_test_and_checks_the_summary():
+    """Should say in agents/advisor.md that in job (d) a line leaving a choice to the owner fails only when the choice passes one of the three tests, and that it checks the summary against the pass lines."""
+    d = step("agents/advisor.md", "## (d)", "## Never")
+    assert ("A line that leaves a choice to the owner fails only when the choice passes one of the three tests of "
+            "`.claude/skills/manage/SKILL.md`") in d
+    assert "a choice that passes none does not fail the line" in d
+    assert "Check the draft's `summary` against its pass lines" in d
+    assert "and the summary agrees with the pass lines" in d
+
+
+def test_task_fields_documents_the_summary_with_the_standard_of_each_part():
+    """Should document summary in references/task-fields.md with the notes' standard for outcome, scope, risk and cost, and what lint rejects."""
+    t = text("references/task-fields.md")
+    assert '| `summary` | optional; `{"outcome", "scope", "risk", "cost"}`, each non-empty text' in t
+    assert ("rejects a summary that lacks a part or holds an empty one, and a Proposed or Ready task with an id "
+            "above 71 that has none; a task up to 71 passes with or without one") in t
+    for part in ["- **Outcome:** what is true when the task is done.",
+                 "- **Scope:** what it changes and what it leaves alone, in words the owner already knows, with no "
+                 "file name or field name unless the same sentence explains it; a scope line that needs explaining "
+                 "is badly written.",
+                 "- **Risk:** the worst outcome if it goes wrong, and what guards against it.",
+                 "- **Cost:** builder runs, and the agent tokens of a named earlier task of similar size."]:
+        assert part in t, part
+    assert "each one or two sentences" in t
+
+
+def test_run_report_shows_proposed_by_summary_and_names_a_test_under_needs_you():
+    """Should have the report template show each Proposed task by its four-part summary and no pass line, name a test on every Needs you line, and keep parked tasks out of Needs you."""
+    report = report_template()
+    needs = report[report.index("### Needs you"):]
+    for part in ["Outcome: <summary's outcome>", "Scope: <summary's scope>", "Risk: <summary's risk>",
+                 "Cost: <summary's cost>"]:
+        assert part in needs, part
+    for gone in ["done_means", "pass line", "<why>"]:
+        assert gone not in needs, gone
+    items = [line for line in needs.splitlines() if line.startswith("- ")]
+    assert len(items) >= 6 and all(re.search(r"Test (\d|<n>): ", line) for line in items), items
+    assert "(parked)" not in needs
+    parked = report[report.index("### Parked"):report.index("### Needs you")]
+    assert "- task <id> (<park reason>): <question>." in parked
+    t = text("commands/manage.md")
+    assert ("Under Needs you goes only an item that passes one of the three tests of SKILL.md (What reaches the "
+            "owner), each with the test named") in t
+    assert "A Proposed task is shown by its four-part `summary` and no pass line." in t
+
+
+def test_closing_message_uses_the_split_and_calls_nothing_decided_his_call():
+    """Should say the closing message to the owner uses the report's split and calls nothing his call that sits under Decided for you."""
+    t = text("commands/manage.md")
+    closing = t[t.index("Report in one message, the closing message to the owner"):]
+    assert "with the same split as the report" in closing
+    assert "each Proposed task by its four-part summary and each other item that passes a test, with the test named" in closing
+    assert "Call nothing his call that sits under Decided for you" in closing
+
+
+def test_merge_checks_could_not_run_parks_as_failed():
+    """Should name the park reason failed for a merge the hook refuses because the merge checks could not run, in step 7 and in the hook's message."""
+    merge = step("commands/manage.md", "## 7. Merge", "## 8. Park")
+    assert "and `failed` when its output says the merge checks could not run" in merge
+    src = " ".join((SKILL / "scripts/checks.py").read_text().replace('"\n', "").replace('f"', "").replace('"', "").split())
+    assert "the merge checks could not run ({type(e).__name__}: {e}), so none has passed: park the task under failed." in src
