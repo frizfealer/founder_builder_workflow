@@ -14,16 +14,21 @@
     }
   ],
   "source_chat": "",
-  "done_means": "",
-  "verified_by": [],
-  "may_edit": [],
-  "runs_as": "",
+  "done_means": "(1) commands/manage.md step 7 names one of the four park reasons (permission, your-action, owner-fact, failed) for a task merge the hook refuses because the merge checks could not run, and the hook's refusal message in scripts/checks.py names the same reason for that case. (2) The hook refuses and allows the same commands as before: no assertion in tests/test_hook_gates.py about which commands are refused or allowed changes, and they pass. (3) The manager tests pass, all of them, and tasks.py lint passes.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "runs_as": "build",
   "priority": "",
   "tags": [
     "manager"
   ],
   "tokens": null,
-  "draft_note": "Proposed by the manager on 2026-11-20 in task 68's merge, from the reviewer's outside finding on earlier files (SKILL.md rule 2).",
+  "draft_note": "Proposed by the manager on 2026-11-20 in task 68's merge, from the reviewer's outside finding on earlier files (SKILL.md rule 2). On 2026-11-20 the manager drafted done_means, verified_by, may_edit and runs_as from task 68's results; the advisor ruled FAILS (tasks/advice/070-1.md) on a line about a test of a merge whose checks raise, which names the per-check case and not the 'could not run' one, so only the three lines it held are kept. No line covers the owner's choice of reason: the owner names the reason before setting Ready, or adds a line for it.",
   "outside_problems": [
     {
       "file": ".claude/skills/manage/scripts/checks.py",
@@ -32,6 +37,14 @@
     {
       "file": ".claude/skills/manage/commands/manage.md",
       "problem": "Step 7's mapping of hook refusals to park reasons has no case for 'the merge checks could not run'."
+    }
+  ],
+  "decided_for_you": [
+    {
+      "chosen": "RULING: FAILS, saved in tasks/advice/070-1.md; kept the three lines it held, renumbered.",
+      "rejected": "RULING: HOLDS.",
+      "why": "The dropped line tested the per-check error case, not the 'merge checks could not run' refusal, and the owner's choice of reason has no line.",
+      "would_change": "A line that names the 'could not run' refusal and cannot pass on today's message, and the reason the owner chooses."
     }
   ]
 }
