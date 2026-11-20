@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 Turn the scenarios of an agent spec (the folder the agent-spec skill writes: `claims.md`, `rules.md`, `model.py`, `scenarios.md`) into executable tests. Every sentence of a feature file is **copied** from `scenarios.md` or `rules.md`, never reworded, and a **drift** check stops the tests the moment the spec and the files disagree.
 
-This is lane 1 of testing the built agent: it runs on every commit and makes no model call. It proves the rig: a scripted **reference agent** that follows the spec must pass every feature file, and **broken variants**, each the reference agent with one rule broken, must fail. A real agent plugs into the same agent slot later; measuring it is agent eval's work, not this skill's.
+This is lane 1 of testing the built agent: it runs on every commit and makes no model call. It proves the rig: a scripted **reference agent** that follows the spec must pass every feature file, and **broken variants**, each the reference agent with one rule broken, must fail. A real agent plugs into the same agent slot later, and its free wording needs an LLM given to the message judge in the `judge` fixture of `tests/conftest.py` (step 7); measuring it is agent eval's work, not this skill's.
 
 [The café example](examples/cafe/) is a finished test folder, built from [the café spec](../agent-spec/examples/cafe/spec/). Match its shape and detail; each step below names the café files it produced, and copying them is the fastest start. Its `probe/` folder, `runs/`, `judge_cases*.json` and the tests `test_probe*.py` and `test_agreement.py` are the café's one-off measurement of the verdicts on a real LLM; this skill does not build them.
 

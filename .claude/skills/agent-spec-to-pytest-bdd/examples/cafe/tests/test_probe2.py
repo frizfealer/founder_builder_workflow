@@ -203,12 +203,24 @@ def values_of(x):
     return [x]
 
 
-def test_write_run_transcript_holds_no_probe_moment_name(tmp_path):
+def run_moment_with_stand_in(tmp_path, moment, call):
+    """run_moment_with_out with OneAction(call=call) in the reference agent's place, since no scripted agent
+    has a step at a probe-only moment."""
+    code = ("import sys, pytest; sys.path.insert(0, 'tests'); from harness.agents import AGENTS; "
+            f"from test_probe import OneAction; AGENTS['reference'] = lambda: OneAction(call={call!r}); "
+            "sys.exit(pytest.main(sys.argv[1:]))")
+    return subprocess.run([sys.executable, "-c", code, "tests/test_scenarios.py", "-q", "-p", "no:cacheprovider",
+                           "--from", moment, "--out", str(tmp_path), "--run-id", "run-x"],
+                          cwd=HERE, capture_output=True, text=True)
+
+
+@pytest.mark.parametrize("moment", ["M2-book-now", "M5-try-again"])
+def test_write_run_transcript_holds_no_probe_moment_name(tmp_path, moment):
     """Should write the transcript of a run from a probe moment with no value equal to the moment's name, which
-    says its condition; the verdict file keeps it. M2-book-now only: at the probe-only M5-try-again no scripted
-    agent has a step, so a run there writes no transcript."""
-    moment = "M2-book-now"
-    proc = run_moment_with_out(tmp_path, "reference", moment)
+    says its condition; the verdict file keeps it. At the probe-only M5-try-again no scripted agent has a step,
+    so a one-action stand-in that books takes the reference agent's place."""
+    proc = run_moment_with_out(tmp_path, "reference", moment) if moment == "M2-book-now" else \
+        run_moment_with_stand_in(tmp_path, moment, BOOK_H1001)
     t = json.loads((tmp_path / "transcripts" / "run-x.json").read_text())
     assert moment not in values_of(t) and t["moment"] is None, proc.stdout
     assert json.loads((tmp_path / "verdicts" / "run-x.json").read_text())["moment"] == moment

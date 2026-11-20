@@ -7,7 +7,8 @@ probe/run_probe2.py no longer run; their saved runs under runs/ stay. Its system
 probe_prompts, each named by its key: "plain", slice A's two bad prompts "retry" (R-11) and "book-when-held"
 (R-03), and task 56's "no-R-11" and "no-R-03", the plain prompt with one rule left out. build_prompt is how
 each text is made from rules.md; tests/test_probe2.py keeps the stored texts equal to it. tools and
-to_messages are the tools and the Messages API turns it was sent. judge_llm is the message judge's LLM
+to_messages are the tools and the Messages API turns it was sent; tools is unused since ProbeAgent, its
+only caller, was deleted, and is kept for the owner to delete. judge_llm is the message judge's LLM
 call, which probe/judge_test.py uses.
 """
 import json
@@ -58,6 +59,7 @@ def system_prompt(prompt):
 
 
 def tools():
+    """The tools the probe agent was sent. Unused: its only caller, ProbeAgent, was deleted in task 52."""
     return [{"name": t["name"], "description": t["description"], "input_schema": t["input_schema"]}
             for t in data()["tools"].values()]
 

@@ -26,11 +26,12 @@ def verify_commands():
             for line in block.splitlines() if line.strip()]
 
 
-def local(cmd):
-    """A verify command as this interpreter runs it: 'uv run python x' as python x, 'uv run pytest' as python -m pytest."""
-    uv, run, tool, *rest = cmd.split()
-    assert (uv, run) == ("uv", "run") and tool in ("python", "pytest"), cmd
-    return [sys.executable, *rest] if tool == "python" else [sys.executable, "-m", "pytest", *rest]
+@pytest.fixture(scope="module")
+def verify_runs():
+    """{command: finished process} for each command of the verify step but the whole suite, run once each, as
+    written, in the café folder."""
+    return {cmd: subprocess.run(cmd.split(), cwd=HERE, capture_output=True, text=True)
+            for cmd in verify_commands() if cmd != WHOLE_SUITE}
 
 
 def test_check_skill_verify_step_names_the_three_commands_in_order():
@@ -43,19 +44,17 @@ def test_check_skill_verify_step_names_the_three_commands_in_order():
 
 
 @pytest.mark.parametrize("cmd", [c for c in verify_commands() if c != WHOLE_SUITE])
-def test_run_skill_verify_command_in_cafe_exits_0(cmd):
+def test_run_skill_verify_command_in_cafe_exits_0(verify_runs, cmd):
     """Should exit 0 for each command of the verify step run in the café folder."""
-    proc = subprocess.run(local(cmd) + (["-p", "no:cacheprovider"] if "pytest" in cmd else []),
-                          cwd=HERE, capture_output=True, text=True)
+    proc = verify_runs[cmd]
     assert proc.returncode == 0, proc.stdout + proc.stderr
 
 
-def test_run_reference_agent_passes_all_16_feature_files():
+def test_run_reference_agent_passes_all_16_feature_files(verify_runs):
     """Should pass each of the 16 feature files with the reference agent, the default of --agent."""
     assert len(list((HERE / "features").glob("*.feature"))) == 16
-    proc = subprocess.run(local("uv run pytest tests/test_scenarios.py") + ["-q", "-p", "no:cacheprovider"],
-                          cwd=HERE, capture_output=True, text=True)
-    assert proc.returncode == 0 and re.search(r"^16 passed\b", proc.stdout, re.M), proc.stdout
+    proc = verify_runs["uv run pytest tests/test_scenarios.py"]
+    assert proc.returncode == 0 and re.search(r"\b16 passed\b", proc.stdout), proc.stdout
 
 
 def test_check_probe_agent_deleted():
