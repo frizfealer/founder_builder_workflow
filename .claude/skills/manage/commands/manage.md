@@ -296,7 +296,8 @@ of the script that failed or of `checks.py consult`, or the name of the check th
 what the owner must decide or do. First `checks.py consult <id> <reason> <branch>`, with the
 task's branch, or without it when there is none (the outside-need park at step 3). It also
 checks the always-park conditions the repo shows, whatever the reason; when one holds, the task
-parks under the reason its output names. If it exits 1, the task always parks: go on below
+parks under the one reason its output names, `permission` when a permission condition holds
+beside a your-action one, and the question gives every cause it names. If it exits 1, the task always parks: go on below
 without the advisor, with its output in the question. If it exits 3, it could not decide: park
 without the advisor, with its output in the question. If it exits 0, dispatch a fresh
 `manager-advisor` for job (b) with the task file's path, the reason and the question, the branch,

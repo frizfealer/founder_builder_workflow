@@ -284,8 +284,9 @@ _OLD = "|".join(re.escape(r) for r in sorted(OLD_REASONS, key=len, reverse=True)
 # bracket between). `checks.py review`, `owner_verified`, `runs_as` and owner-fact are other words.
 OLD_IN_BACKTICKS = re.compile(rf"`({_OLD})`")
 OLD_AFTER_REASON = re.compile(rf"\breasons?[\s`'\"(:]*({_OLD})(?![\w-])", re.IGNORECASE)
-# A row of the fields table (`| \`runs_as\` | \`build\`, \`iterate\`, ...`) holds a field and its values.
-FIELD_ROW = re.compile(r"^\|\s*`[a-z_]+`\s*\|.*$", re.MULTILINE)
+# The runs_as row of the fields table (`| \`runs_as\` | \`build\`, \`iterate\`, ...`) holds the field's
+# values, `iterate` among them; no other row is exempt.
+FIELD_ROW = re.compile(r"^\|\s*`runs_as`\s*\|.*$", re.MULTILINE)
 
 
 def old_reason_uses(raw):
@@ -297,7 +298,8 @@ def old_reason_uses(raw):
 
 @pytest.mark.parametrize("sample", ["park (reason `review`) with its output", "the task parks (reason money).",
                                     "it parks (`stale`)", "under the reason merge-limit", "reason: owner",
-                                    "parks it as `runs-as-you`", "Reason `iterate`"])
+                                    "parks it as `runs-as-you`", "Reason `iterate`",
+                                    "| `needs_you` | the task parks (reason `review`) |"])
 def test_old_reason_check_catches_a_park_reason(sample):
     """Should flag an old reason in backticks or right after the word reason, so the folder check below can fail."""
     assert old_reason_uses(sample)
@@ -313,13 +315,36 @@ def test_old_reason_check_passes_script_and_field_names(sample):
     assert old_reason_uses(sample) == []
 
 
+def old_reasons_in_folder(root):
+    """{path: uses} for each file under root outside tests/ and the caches; a binary file is read as
+    the text it holds, so it neither crashes the check nor hides a use."""
+    files = [p for p in root.rglob("*") if p.is_file()
+             and not {"tests", "__pycache__", ".pytest_cache"} & set(p.relative_to(root).parts)]
+    return len(files), {str(p.relative_to(root)): old_reason_uses(p.read_text(errors="ignore")) for p in files}
+
+
 def test_no_file_outside_tests_uses_an_old_park_reason():
     """Should leave no file of the skill folder outside tests/ using one of the old reasons as a park reason."""
-    files = [p for p in SKILL.rglob("*") if p.is_file()
-             and not {"tests", "__pycache__", ".pytest_cache"} & set(p.relative_to(SKILL).parts)]
-    assert len(files) > 5
-    found = {str(p.relative_to(SKILL)): old_reason_uses(p.read_text()) for p in files}
+    n, found = old_reasons_in_folder(SKILL)
+    assert n > 5
     assert {k: v for k, v in found.items() if v} == {}
+
+
+def test_old_reason_folder_check_reads_a_binary_file(tmp_path):
+    """Should read a binary file such as a .DS_Store without a UnicodeDecodeError, and still flag an old reason in it."""
+    (tmp_path / ".DS_Store").write_bytes(b"\x00\x87\xff Bud1 \xfe")
+    (tmp_path / "blob.bin").write_bytes(b"\xff\xfe parks (reason `review`) \x80")
+    n, found = old_reasons_in_folder(tmp_path)
+    assert n == 2 and found[".DS_Store"] == [] and found["blob.bin"]
+
+
+def test_merge_refusal_maps_each_check_to_its_reason():
+    """Should have the hook's merge refusal say which reason each failing check parks under, since no reason is named after its check."""
+    checks = " ".join((SKILL / "scripts/checks.py").read_text().replace('"\n', "").replace('"', "").split())
+    assert ("Park the task with this output, under the reason for the check that failed: permission for "
+            "checks.py protected, your-action for checks.py owner or merge-limit, failed for checks.py "
+            "review or advice.") in checks
+    assert "the reason of the check that fails" not in checks
 
 
 def test_hook_paid_refusal_names_permission():

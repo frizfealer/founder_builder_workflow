@@ -89,12 +89,14 @@ alone.
    blind; no tool enforces it); for a line that compares labels with verdicts it must not see, it
    gives the labels, and the manager writes them to a labels file and runs the comparison command
    the line names; (b) before a park, say whether the task can go on without the owner,
-   and how, ruling `RULING: PARK` or `RULING: NO PARK`; (c) when a builder's decision changes what a line proves, say whether the line still
+   and how, ruling `RULING: PARK` or `RULING: NO PARK`; (c) when a builder's decision changes
+   what a line proves, say whether the line still
    proves what it was written to prove; (d) after a merge, review the manager's draft of the
    fields of a Proposed task that hard-depends on the merged one and has an empty `done_means`:
    it rules HOLDS or FAILS on whether each pass line can be checked and traces back to a finding
-   or a result, and whether every instruction in the draft's notes has a line that fails if the
-   instruction is ignored, and lists anything in the draft that is new scope, which it names and
+   or a result, whether every instruction in the draft's notes has a line that fails if the
+   instruction is ignored, and whether a rename or removal has a line saying the old thing is
+   left nowhere, and lists anything in the draft that is new scope, which it names and
    does not add. The advisor writes no field; the task stays Proposed. What it never
    decides is decided by a script, `checks.py consult`: the always-park cases below. Every advisor
    reply is saved verbatim in `tasks/advice/<id>-<n>.md` and its ruling is logged under

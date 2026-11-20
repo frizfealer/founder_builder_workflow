@@ -849,6 +849,18 @@ def test_consult_condition_holds_always_parks(repo, condition, monkeypatch, caps
         assert cause in capsys.readouterr().out
 
 
+def test_consult_two_conditions_park_as_permission(repo):
+    """Should name one reason, permission, when a protected-path failure and an empty owner_verified hold at once, and give both causes."""
+    repo.write_task(task(1) | {"verified_by": ["reviewer", "you"]})
+    repo.commit("task 1 has a line for the owner, owner_verified empty")
+    branch = hold_condition(repo, "protected")
+    ok, msg = checks.check_consult(repo.path, 1, "failed", branch, base=BASE)
+    assert not ok
+    assert "always park, without the advisor, as permission: the protected-path check failed" in msg
+    assert "as your-action" not in msg
+    assert CONDITIONS["protected"][1] in msg and CONDITIONS["owner"][1] in msg
+
+
 def test_consult_conditions_cleared_consults_advisor(repo):
     """Should consult the advisor once the owner has set owner_verified, the needs pass and the branch touches no protected path."""
     repo.write_task(task(1) | {"verified_by": ["reviewer", "you"], "owner_verified": "2026-11-17",

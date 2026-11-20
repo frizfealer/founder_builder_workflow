@@ -523,14 +523,17 @@ def always_park_conditions(repo, task_id, branch=None, base=WORKING_BRANCH, comm
 def check_consult(repo, task_id, reason, branch=None, base=WORKING_BRANCH, commands=NEED_CHECKS):
     """(ok, message). ok when the advisor is consulted before the park; False when the task always
     parks without it: the reason is an always-park one, or an always-park condition holds whatever
-    the reason, and then it parks under the condition's reason and the message names its cause.
+    the reason, and then it parks under the condition's reason, permission when two conditions'
+    reasons differ, and the message names each condition's cause.
     Raises ValueError for a reason in neither list, or a task file base does not hold."""
     if reason not in ALWAYS_PARK and reason not in CONSULT:
         raise ValueError(f"{reason!r} is not a park reason; use one of {sorted(ALWAYS_PARK | CONSULT)}")
     held = always_park_conditions(repo, task_id, branch, base, commands)
     if held:
-        why = "; ".join(f"as {CONDITIONS[c][0]}: {CONDITIONS[c][1]} ({m})" for c, m in held.items())
-        return False, f"task {task_id}: always park, without the advisor, {why}"
+        # One reason, permission before your-action: the owner first allows or refuses the task.
+        held = sorted(held.items(), key=lambda cm: CONDITIONS[cm[0]][0] != "permission")
+        why = "; ".join(f"{CONDITIONS[c][1]} ({m})" for c, m in held)
+        return False, f"task {task_id}: always park, without the advisor, as {CONDITIONS[held[0][0]][0]}: {why}"
     if reason in ALWAYS_PARK:
         return False, f"task {task_id}: always park, without the advisor, as {reason}: {ALWAYS_PARK[reason]}"
     return True, f"task {task_id}: consult the advisor (job b) before parking as {reason}: {CONSULT[reason]}"
@@ -965,7 +968,10 @@ def push_hook(event, base=WORKING_BRANCH):
         if why:
             code, msg = 2, ("Refused: a manager run is active, and a task branch merges only when "
                             "checks.py protected, owner, review, advice and merge-limit pass for its "
-                            "task. Park the task with the reason of the check that fails. " + " ".join(why))
+                            "task. Park the task with this output, under the reason for the check "
+                            "that failed: permission for checks.py protected, your-action for "
+                            "checks.py owner or merge-limit, failed for checks.py review or advice. "
+                            + " ".join(why))
     if code == 0 and paid:
         ok, why = spend_allowed(where, command, event.get("cwd"), base)
         if not ok:

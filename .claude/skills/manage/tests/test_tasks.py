@@ -427,6 +427,16 @@ def test_batch_counts_every_task_merge_with_no_review_tag(repo, capsys):
     assert "task 2: the task limit leaves room for 1 more task merge(s) before the next review tag" in lines[-1]
 
 
+@pytest.mark.parametrize("command", [["lint"], ["list"], ["next"], ["board"]])
+def test_base_refused_outside_batch(repo, capsys, command):
+    """Should exit 2 with the usage, not ignore --base, for every subcommand but batch."""
+    repo.write("tasks/tags.txt", "\n".join(TAGS) + "\n")
+    repo.commit("tags")
+    assert tasks.main(["--root", str(repo.path), "--base", BASE, *command]) == 2
+    assert "Usage" in capsys.readouterr().out
+    assert tasks.main(["--root", str(repo.path), *command]) in (0, 1)
+
+
 def test_batch_cli_fails_when_git_cannot_count(tmp_path, capsys, monkeypatch):
     """Should exit 2 with one FAIL line, not a traceback, when the root is not a git repo, so the task merges cannot be counted."""
     monkeypatch.setenv("GIT_CEILING_DIRECTORIES", str(tmp_path.parent))  # no repo found above tmp_path

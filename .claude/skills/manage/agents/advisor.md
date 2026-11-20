@@ -57,7 +57,8 @@ instruction is ignored, and that a rename or removal has a line saying the old t
 nowhere; name each instruction that has none. Then list anything in the draft that is new scope,
 work that no finding, result or text of the Proposed task asks for: name it, and do not add
 anything of your own. Field rules: `.claude/skills/manage/references/task-fields.md`. Rule HOLDS
-only when every line holds and nothing is new scope, and every instruction has its line. The task stays Proposed; the owner decides.
+only when every line holds and nothing is new scope, and every instruction has its line. The
+task stays Proposed; the owner decides.
 
 ## Never
 

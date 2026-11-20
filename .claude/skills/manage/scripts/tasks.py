@@ -16,7 +16,8 @@ Usage, from the repo root:
                             reads tasks/ on every request and the page re-checks every few seconds
 
 Run with --root <dir> to read <dir>/tasks/ instead of ./tasks/, and with --base <branch> to count
-batch's task merges on <branch> instead of the working branch (the tests use it).
+batch's task merges on <branch> instead of the working branch (the tests use it); any other
+subcommand refuses --base with exit 2.
 """
 import json
 import re
@@ -473,7 +474,8 @@ def main(argv):
     n = None
     if argv[:1] == ["batch"] and len(argv) == 2 and argv[1].isdigit() and int(argv[1]) > 0:
         n, argv = int(argv[1]), argv[:1]
-    if len(argv) != 1 or argv[0] not in {"lint", "list", "next", "batch", "board"}:
+    if (len(argv) != 1 or argv[0] not in {"lint", "list", "next", "batch", "board"}
+            or (base is not None and argv[0] != "batch")):
         print(__doc__)
         return 2
     if "--serve" in flags:
