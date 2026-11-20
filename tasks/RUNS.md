@@ -1,5 +1,49 @@
 # Manager runs
 
+## Run 2026-11-20 09:18
+
+Stopped because: no task to take.
+
+### Done
+- task 67: Slice C findings: R-04's unchecked case and small café tooling gaps; merge 2fe0982; tokens 212320 (task total 212320; main session: not recorded). Review 067-1 PASS, one fix pass of one minor finding re-checked PASS (067-2); 596 café tests pass, both --check scripts exit 0.
+- task 71: Manager: three tests for what reaches the owner, and a four-part summary on every drafted task; merge eef85a7; tokens 304562 (task total 304562; main session: not recorded). Advisor job c HOLDS (071-1) on the Parked section; review 071-1 PASS, one fix pass of two minor findings re-checked PASS (071-2); 445 manager tests pass, lint passes.
+- task 52: BDD slice D: write the skill; merge c07dda2; tokens 684905 (task total 684905; main session: not recorded). Advisor job c FAILS (052-2) on a dropped check of a run that raised, fixed by one added test, then HOLDS (052-3); review 052-1 PASS, one fix pass of ten minor findings re-checked PASS (052-2); 602 café tests pass, every verify command exits 0.
+- branch task/067 deleted, last commit 74854b25a3e82da69cf7546932bec5052eccbb08
+- branch task/071 deleted, last commit 7e4f8a97e5d748e25baef0c9b6fe806a0e60ee2b
+- branch task/052 deleted, last commit 0062f20f8e784b6c898438ace08bd2bf7e9e1f9b
+- task 53 (Proposed): fields drafted from task 52, commit 95726ab; advisor ruled FAILS (tasks/advice/053-1.md), 2 of 5 lines kept.
+
+A deleted branch is restored with `git branch <name> <id>` while git still holds the commit.
+
+### Tokens
+- task 067: 212320
+- task 071: 304562
+- task 052: 684905
+- task 053: 108719
+- total: 1310506
+
+### Decided for you
+- task 67 (builder): chose "absent" for finding F2's scenario and quote, with SC-09, SC-14 and SC-15 named in its evidence, over quoting R-04's sentence, because verification.md has a Gap quote "absent"; would change if the spec owner reads quote as the rule text that goes unrun.
+- task 67 (builder): chose to name the task from a ledger file named task-<id>-usage.jsonl and keep task 56's text word for word over one generic sentence, because a generic one would change runs/task-056-money.json on a rerun; would change if you want money.py to summarize any ledger into its own file.
+- task 67: chose no Proposed task for money.py's two earlier problems (summary() with no output file writes task 56's file; the cap is always task 56's 2.0) over one, because nothing summarizes another ledger that way today; would change if a task does.
+- task 71 (builder): chose a Parked section of its own in the run report over mapping each park reason to a test, because the reasons do not map onto the three tests and forcing one would change what a park means; would change if you want parked tasks under Needs you. The advisor ruled this keeps line 4 true (tasks/advice/071-1.md).
+- task 71 (builder): chose to have the builder write the summary of its own Proposed task over leaving it to the manager, because one above id 71 without a summary fails lint; would change if only the manager should write summaries.
+- task 71: chose no Proposed task for the board not showing the summary over one, because the run report shows it; would change if you read Proposed tasks on the board.
+- task 52 (builder): chose to delete only the class ProbeAgent, the --agent probe choice and the conftest code only it used, keeping tools() (marked unused) and the prompt builder, over deleting the whole probe, because the line names the class and the option; would change if you say the whole probe goes. probe/run_part2.py and probe/run_probe2.py no longer run; their saved runs stay readable.
+- task 52 (builder): chose bdd/ beside the spec folder, or the folder you name, as the skill's output, and tested moments as optional, over a fixed path and a required step, because nothing fixes the folder and tested moments wait on your ruling; would change on that ruling.
+- task 52: chose to leave the re-check's three minor points in tasks/reviews/052-2.md over a second pass, because rule 3 allows one fix pass; would change if you want them fixed (one more always-true llm_calls assert, an ambiguous "(step 7)" in SKILL.md, checkers.md calling judge_llm an ask_llm function).
+- task 53: chose eval/agent-spec-to-pytest-bdd/blind-1/ for the blind run's tests over bdd/ beside the spec, because a new folder is cheapest to undo and the spec's folder is append-only history; would change if you want the tests kept beside the spec or in the skill's examples.
+
+### Parked
+- none.
+
+### Needs you
+- task 53 (Proposed): BDD slice E: blind run on a Harbor Goods spec. Ready, change or drop, and name the spec. Test 3: changes direction, what gets built next. The spec choice also passes test 2 (a new spec is one paid agent-spec trial, 3.42 to 4.06 USD) and test 1 (only you know whether a suite on your superseded answers is worth having). Recommended, as in the task's notes: build one new spec from the updated packet. Once you name it, the manager can draft the lines the advisor held back: one feature file per scenario, a broken variant per rule, a report of where the skill left the builder on its own.
+  - Outcome: A new test folder for a Harbor Goods spec passes every check of the BDD skill's verify step.
+  - Scope: Adds one new folder of tests; changes neither the BDD skill, its café example, nor any spec. Which spec it is built from is not yet written into the task.
+  - Risk: The worst outcome is a folder that passes the checks without showing the skill works on a new spec, since these two lines would also pass on a copy of the café tests; the lines that would guard against that wait for the spec to be named.
+  - Cost: One builder run; task 52, which wrote the skill, used 684,905 agent tokens.
+
 ## Run 2026-11-20 07:56
 
 Stopped because: no task to take.
