@@ -57,7 +57,8 @@ class Repo:
 
 @pytest.fixture
 def repo(tmp_path, monkeypatch):
-    """Working branch with the real protected-path list and limits, two tasks, a results folder."""
+    """Working branch with the real protected-path list, its own limits (10 merges per review, 2
+    tasks at once, whatever the owner's limits.json holds), two tasks, a results folder."""
     empty = tmp_path / "gitconfig"
     empty.write_text("")
     monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(empty))
@@ -71,7 +72,7 @@ def repo(tmp_path, monkeypatch):
     dst = r.path / ".claude/skills/manage"
     dst.mkdir(parents=True)
     shutil.copy(SKILL / "protected-paths.txt", dst)
-    shutil.copy(SKILL / "limits.json", dst)
+    (dst / "limits.json").write_text(json.dumps({"task_merges_per_review": 10, "tasks_at_once": 2}))
     r.write("DECISIONS.md", "# Decisions\n")
     r.write("eval/agent-spec/results/run-1/trial.json", '{"score": 1}\n')
     r.write("eval/agent-spec/EXPERIMENTS.md", "# Experiments\n")

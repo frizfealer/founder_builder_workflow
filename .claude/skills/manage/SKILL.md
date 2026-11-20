@@ -13,6 +13,13 @@ It never interrupts the owner during a run. What needs him is *parked*: the task
 "Needs you" with the question in its file, and the manager goes on to another task. He reads one
 report at his review.
 
+While a run is active, your own commit on the working branch, or your edit to a tracked file in
+the main folder, ends that run at the next `checks.py main-folder`: the manager dispatches,
+merges and parks nothing more. Nothing is lost: every task branch and worktree stays, and the
+next run reports them. To work meanwhile, use a worktree of your own on another branch, outside
+`build/worktrees/` (`git worktree add ../my-work -b my-work`), or another clone; a run leaves both
+alone.
+
 ## Terms
 
 - **Task:** one file `tasks/<id>.json` (id zero-padded to 3). Field meanings and who sets each:
@@ -35,10 +42,16 @@ report at his review.
 1. Only the owner sets Ready. Once a task is Ready its `done_means`, `verified_by`,
    `verifier_of_line`, `may_edit`, `may_delete`, `runs_as`, `priority`, `depends_on` and `tags`
    are his; the manager drafts them only before then.
-2. The manager adds at most one Proposed task per task run, bundling the review findings worth
-   doing. The builder proposes a task only when `done_means` needs a protected path its
-   `may_edit` does not name. When a rule in this skill is broken and no script checks it, the
-   manager proposes a task to build that check.
+2. An agent creates a task in one case only: a problem that existed before the task's branch and
+   lies outside its change. Such a task is Proposed, and its `outside_problems` names each
+   earlier file and the problem in it. A task run adds at most one, the builder's and the
+   manager's together; `checks.py protected` fails a branch that adds one without
+   `outside_problems` naming a file that existed when the branch left, or adds two. A problem in
+   lines the task's own branch added or changed is the task's to fix (rule 3), in its fix pass
+   or, when it parks, through its `for_retry`, and never becomes a task. A builder that needs a
+   protected path its task may not edit does not propose a task either: the task parks
+   (`never`) with that path in the question. A rule of this skill that is broken with no script
+   to check it is an earlier problem too, and the manager proposes a task to build that check.
 3. The builder never verifies its own work. The reviewer gets a fresh context, read-only tools,
    and a brief written from the task file and the diff, not from the builder's report. It
    labels each problem blocking, minor or outside the change; `agents/reviewer.md` defines the
@@ -46,18 +59,23 @@ report at his review.
    gets one fresh retry, whose builder fixes the blocking problems and changes nothing else.
    If the retry fails too, the park that follows consults the advisor (rule 7, job b), and one
    `GO ON` from it per task run can send one more fresh builder briefed with its reply.
-   Minor and outside problems stay in the review file. Every reviewer reply is saved verbatim
-   in `tasks/reviews/`, in the task's merge commit or, when the task is parked, its park commit.
+   Fix it here: the minor problems on lines the task's own branch added or changed
+   (`checks.py unmerged`) are fixed before the merge, in one fix pass. Its builder gets only
+   that list, and its re-check looks only at those fixes. A blocking problem stays the only
+   reason a review fails, and whatever is still open after the one pass stays in the review
+   file and creates no task. Every reviewer reply is saved verbatim in `tasks/reviews/`, in the
+   task's merge commit or, when the task is parked, its park commit.
 4. One merge commit per task. The task file shows Done, `finished` and `tokens` in that merge.
 5. Inside an iterate task, skill-iterate's `references/escalation.md` applies as well. Outside
    it, this skill's stop list is the only one. `DECISIONS.md` is the direction every brief
    points to; the manager does not restate it.
 6. A stop or choice that can be decided mechanically is decided by a script, not by the
-   manager reading text. Two cases so far, both from task 49: whether a task's outside needs
-   are met is checked before its builder starts (`checks.py needs`), not found after the build;
-   and whether review or builder findings belong to the task's own retry, because the files they
-   name exist only on the task's branch, is decided from the paths (`checks.py unmerged`), so
-   they go into that task's `for_retry` and not into a Proposed task. Whether the owner has done
+   manager reading text. Two cases came from task 49: whether a task's outside needs are met is
+   checked before its builder starts (`checks.py needs`), not found after the build; and whether
+   a review or builder finding belongs to the task itself is decided from the file and lines it
+   names (`checks.py unmerged`): a finding on a file only the branch has, or on lines the branch
+   added or changed since it left the working branch, is the task's own, for its fix pass or its
+   `for_retry`, and not for a Proposed task. Whether the owner has done
    his check is a field the owner sets, `owner_verified`, read by `checks.py owner`; the manager
    never sets it and never infers it from other text. Whether a task's leftover branch may be
    deleted is decided by `checks.py superseded`, not by git's `-d`, which refuses an earlier
@@ -65,10 +83,15 @@ report at his review.
 7. The advisor (`agents/advisor.md`) gets a fresh context and read-only tools, like the reviewer,
    and has four jobs: (a) verify the `done_means` lines assigned to it, given only the paths the
    line names (its Read tool can open any file in the repo, so only the brief keeps a blind check
-   blind; no tool enforces it); (b) before a park, say whether the task can go on without the owner,
+   blind; no tool enforces it); for a line that compares labels with verdicts it must not see, it
+   gives the labels, and the manager writes them to a labels file and runs the comparison command
+   the line names; (b) before a park, say whether the task can go on without the owner,
    and how; (c) when a builder's decision changes what a line proves, say whether the line still
-   proves what it was written to prove; (d) after a merge, draft the fields of a Proposed task that
-   hard-depends on the merged one and has an empty `done_means`, which stays Proposed. What it never
+   proves what it was written to prove; (d) after a merge, review the manager's draft of the
+   fields of a Proposed task that hard-depends on the merged one and has an empty `done_means`:
+   it rules HOLDS or FAILS on whether each pass line can be checked and traces back to a finding
+   or a result, and lists anything in the draft that is new scope, which it names and does not
+   add. The advisor writes no field; the task stays Proposed. What it never
    decides is decided by a script, `checks.py consult`: the always-park cases below. Every advisor
    reply is saved verbatim in `tasks/advice/<id>-<n>.md` and its ruling is logged under
    `decided_for_you` with what would change it.
@@ -85,9 +108,10 @@ report at his review.
    failure parks it. An iterate result parks when a task that merged meanwhile changed its
    skill's folder or its eval folder (`checks.py stale`), since it was measured on an older
    version. Claude Code's Agent `cwd` parameter and `isolation: "worktree"` do not keep a
-   subagent's Bash in a folder: on 2026-11-17 builders given either one wrote to the main folder.
-   So the manager makes each worktree itself, and the brief and `checks.py main-folder` keep the
-   builder in it.
+   subagent's Bash in a folder. On 2026-11-17 (`tasks/advice/061-1.md`), with `cwd` the
+   builders' Bash ran in the main folder; with `isolation: worktree` the builders worked in their
+   own worktree, and their Bash still wrote to the main folder when told to. So the manager makes
+   each worktree itself, and the brief and `checks.py main-folder` keep the builder in it.
 
 ## Park, never ask
 
@@ -107,14 +131,17 @@ read, so for them the reason alone decides.
   line, or the advisor's check of a builder's decision);
 - `never`, *always*: a blocking problem can be fixed only in a protected path the task's
   `may_edit` does not name (park at once, with no retry, and name that path in the
-  recommendation), or finishing would need anything else from the never list;
+  recommendation), the builder stops because `done_means` needs such a path, or finishing would
+  need anything else from the never list;
 - `owner`, *always*: `checks.py owner <id>` fails, a line is verified by `you` and
   `owner_verified` is empty. It parks after every other verifier, the advisor's lines included,
   and its question names only the owner's lines. Once the owner has set `owner_verified`, the
   task is not parked for him again;
 - `runs-as-you`, *always*: `runs_as` is `you`;
 - `money`, `owner-field`, `set-ready`, *always*: finishing would spend money or touch an account,
-  change an owner's field, or set a task to Ready;
+  change an owner's field, or set a task to Ready. A builder spends money (`claude -p`, `ant`, a
+  paid API call) only when its task's `outside_needs` names the need (`claude-api`); otherwise it
+  stops, and the task parks (`money`);
 - `iterate`: an iterate task's result is not kept, or its *Needs you* holds an item;
 - `merge-limit`, *always*: `checks.py merge-limit` refuses the merge; the task limit is the
   owner's own control;
@@ -153,8 +180,11 @@ All from the repo root, all with `python3`:
 - `scripts/checks.py protected <id> <branch>`: the branch's changes since it left the working
   branch, against `protected-paths.txt` and the working branch's copy of the task's `may_edit`.
   In `tasks/`, a task branch may change only `status`, `finished`, `tokens`, `needs_you` and
-  `decided_for_you` of its own task file, and add Proposed tasks; so it cannot set
-  `owner_verified` or `for_retry`. The whole skill folder and
+  `decided_for_you` of its own task file, read against that file's copy at the fork point, so a
+  field the owner set on the working branch since then is not the branch's change; it cannot set
+  `owner_verified` or `for_retry`. It may add one Proposed task, whose `outside_problems` names,
+  for each problem, a file that existed when the branch left and the problem (rule 2). The whole
+  skill folder and
   its four links in `.claude/` are protected, and so are `tasks/reviews/` and `tasks/advice/`:
   only the manager writes there, on the working branch. It also fails each file the branch
   deletes or renames that existed on the working branch at the fork point, unless the working
@@ -179,8 +209,13 @@ All from the repo root, all with `python3`:
   exits 1 with a one-line reason at the first that fails. For `claude-api` the check is one
   call with one output token to the smallest model through the ant CLI, with the credentials a
   builder would use; it costs under 0.01 USD and prints no credential.
-- `scripts/checks.py unmerged <branch> <path>...`: exits 0 when every path exists on the branch
-  and not on the working branch (the findings go to the task's `for_retry`), 1 otherwise.
+- `scripts/checks.py unmerged <branch> <path>[:<line>[-<line>]]...`: one argument per finding,
+  with the lines it names in the branch's copy. Exits 0 when every finding is the task's own: its
+  file did not exist when the branch left the working branch, or a line it names is one the
+  branch added or changed (its diff against the fork point; a deletion counts the lines on either
+  side). Those go to the task's fix pass, or its `for_retry` when it parks. Exits 1 otherwise: a
+  finding on lines the branch left as they were, or on an earlier file with no line named, is an
+  earlier problem.
 - `scripts/checks.py owner <id>`: exits 1 while a line of `done_means` is verified by `you`
   (`verified_by` and `verifier_of_line`) and `owner_verified` is empty on the working branch. Its
   output names only the owner's lines.
@@ -190,22 +225,49 @@ All from the repo root, all with `python3`:
   first line is not `RULING: HOLDS`.
 - `scripts/checks.py consult <id> <reason> [<branch>]`: exits 1 for an always-park case of the
   park list, or when an always-park condition the repo shows holds, whatever the reason; 0 when
-  the advisor is consulted first; 2 for a reason not in the list. `<branch>` is the task's
-  branch, left out when there is none.
+  the advisor is consulted first; 2 for a reason not in the list; 3 when it cannot decide, because
+  the working branch holds no file for the task or the branch does not exist. `<branch>` is the
+  task's branch, left out when there is none. For a task whose `outside_needs` names
+  `claude-api`, it re-runs the paid check of `checks.py needs` on every park, under 0.01 USD each.
 - `scripts/checks.py drafts <id>`: the Proposed tasks that hard-depend on the task and have an
-  empty `done_means`, one id per line, for the advisor's job (d).
+  empty `done_means`, one id per line, whose fields the manager drafts and the advisor reviews
+  (job d).
 - `scripts/checks.py run-start | run-end`: mark a run active with `.git/manage-run-active`.
   While it exists, the `PreToolUse` hook in `.claude/settings.json` (`checks.py push-hook`)
-  refuses any Bash command whose text runs `git push` or `git clean`, or deletes a branch with
-  force (`git branch -D`, `--delete --force`) unless `checks.py superseded` passes for every
-  branch it names, which is the manager's cleanup step; for the main session and every
-  subagent. It reads command text, so it is an early stop, not proof: an alias, a script or
-  `gh` can still push, and it does not try to stop `rm`, which builders use on their own
-  temporary files. A `-m` or `--message` argument that bash runs nothing in is a message, not
-  commands, so a task merge whose title names one of these still commits: a single-quoted
-  argument, or a double-quoted one with no backtick and no `$(`. Any other message, a heredoc's
-  included, is read as commands like the rest; write such a message to a file and commit with
-  `git commit -F <file>`. If a run
+  reads the text of every Bash command, for the main session and every subagent, and refuses
+  with exit 2:
+  - a command that runs `git push` or `git clean`;
+  - a forced branch deletion (`git branch -D`, `--delete --force`, `-d -f`, `-df`, and git's
+    abbreviations of the long options, such as `--del --forc`), except the manager's cleanup
+    step: `git branch -D <name>` alone in its command, once `checks.py superseded <name>`
+    passes. So it refuses one whose text holds `$` or a backtick, that runs anything besides the
+    one `git branch` call, or that points git at another repository (`-C`, `--git-dir`, a
+    `GIT_DIR=` prefix), even for a confirmed branch;
+  - a `git merge` of a task branch (`task/<id>`, `task/<id>-<n>`) unless `checks.py protected`,
+    `owner`, `review`, `advice` and `merge-limit` all pass for its task, read in the main folder,
+    and any `git merge` whose text holds `$` or a backtick;
+  - `claude -p` (`--print`) or `ant`, unless the command's text or its folder names the worktree
+    of a task (`build/worktrees/task-<id>`, a rebuild's `-<n>` included) whose file on the
+    working branch has `claude-api` in `outside_needs`. The refusal tells the agent to stop and
+    report it, and the task parks (`money`).
+
+  When a refused command also runs `git commit`, the refusal ends by saying that a message that
+  only names the refused command goes in single quotes or in a file given with `-F`.
+  It reads command text, so it is an early stop, not proof. It misses an alias, a script, an SDK
+  call or `gh`, any of which can push, merge or spend money; a program that another program
+  starts (`find -exec`); a merge written as a commit id or as `git pull`, and the merge of an
+  iterate branch, whose name holds no task id; and a `-m` that sits inside another quoted string,
+  a heredoc body or a comment, or `bash -cm`, the three forms recorded in
+  `tasks/advice/058-2.md`, which can hide a command after them. It does not try to stop `rm`,
+  which builders use on their own temporary files. It over-refuses too: a heredoc or other text
+  that only quotes a push or a paid command is refused like the command itself, and so is
+  `claude -p` or `ant` in an iterate worktree. A `-m` or `--message` argument that bash runs
+  nothing in is a message, not commands: a single-quoted argument, or a double-quoted one with no
+  backtick and no `$(`. Any other message, a heredoc's included, is read as commands like the
+  rest; write such a message to a file and commit with `git commit -F <file>`. The task merge's
+  commit always takes that form: its subject, `Merge task <id>: <title>`, is written with the
+  Write tool to `build/merge-message-<id>.txt` and committed with `git commit -F
+  build/merge-message-<id>.txt`, so bash expands nothing in the title. If a run
   crashed and left the marker, the owner deletes the file. The marker also holds the run's
   state: the working branch's commit at the start, each failed `try-merge`, each agent's tokens.
   `run-start` then removes each worktree under `build/worktrees/` that holds no uncommitted
@@ -249,7 +311,7 @@ ln -s ../skills/manage/agents/advisor.md    .claude/agents/manager-advisor.md
 
 - Each task's file: `decided_for_you` (one entry per decision made without the owner: chosen,
   rejected, what would change it), `needs_you` when parked, `for_retry` when parked with
-  findings on files only its branch has, `tokens`. With tasks side by side, every agent's
+  findings on files or lines only its branch has, `tokens`. With tasks side by side, every agent's
   description starts `task <id>:`, so each result, its tokens and its decisions belong to one
   task; `checks.py tokens` counts the tokens per task.
 - `tasks/reviews/<id>-<n>.md`: each reviewer reply verbatim, in the task's merge or park commit.

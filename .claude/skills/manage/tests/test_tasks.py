@@ -244,6 +244,21 @@ def test_written_lines_only_where_a_line_starts():
     assert any("verifier_of_line keys" in e for e in tasks.lint(as_files(t), TAGS))
 
 
+def test_written_lines_not_after_abbreviation():
+    """Should not count a (n) after an abbreviation that never ends a sentence, such as e.g. or i.e., and still count one after etc."""
+    dm = "(1) A case, e.g. (2) items, i.e. (3) pairs, cf. (4) x vs. (5) y. (2) Two, etc. (3) Three. E.g. (9) z"
+    assert tasks.written_lines(dm) == ["1", "2", "3"]
+
+
+def test_lint_outside_problems():
+    """Should accept outside_problems as a non-empty list of a file and its problem, and fail anything else."""
+    good = [{"file": "DECISIONS.md", "problem": "names no owner for monitoring"}]
+    assert tasks.lint(as_files(task(1, status="Proposed") | {"outside_problems": good}), TAGS) == []
+    for bad in ([], "DECISIONS.md", [{"file": "DECISIONS.md"}], [{"file": "", "problem": "x"}]):
+        errs = tasks.lint(as_files(task(1, status="Proposed") | {"outside_problems": bad}), TAGS)
+        assert any("outside_problems" in e for e in errs), bad
+
+
 def test_lint_advisor_and_you_on_unmapped_line():
     """Should fail a task whose verified_by holds advisor and you while a line is mapped to neither, and pass once every line is mapped."""
     dm = "(1) A file exists. (2) Labels agree."
@@ -280,8 +295,13 @@ def test_batch_hard_dependency_between_tasks():
     a, b = task(1), task(2, depends_on=[{"id": 1, "soft": False}])
     assert tasks.conflict(a, b, SKILLS) == "task 2 hard-depends on task 1"
     assert tasks.conflict(b, a, SKILLS) == "task 2 hard-depends on task 1"
-    assert batch_ids(a, b) == [1]
-    assert tasks.conflict(a, task(2, depends_on=[{"id": 1, "soft": True}]), SKILLS) is None
+
+
+def test_batch_soft_dependency_between_tasks():
+    """Should take two tasks one of which only soft-depends on the other."""
+    a, b = task(1), task(2, depends_on=[{"id": 1, "soft": True}])
+    assert tasks.conflict(a, b, SKILLS) is None
+    assert batch_ids(a, b) == [1, 2]
 
 
 @pytest.mark.parametrize("mine, theirs", [
@@ -359,8 +379,23 @@ def test_batch_cli_reads_n_from_limits(tmp_path, capsys):
     assert capsys.readouterr().out.startswith("task 1: Task 1\ntask 2: Task 2\ntask 3: Task 3\n")
 
 
-def test_limits_tasks_at_once_starts_at_2():
-    """Should ship tasks_at_once = 2 beside task_merges_per_review in limits.json."""
+def test_limits_keys_hold_integers_of_1_or_more():
+    """Should ship tasks_at_once and task_merges_per_review in limits.json, each an integer of 1 or more, whatever values the owner sets."""
     limits = json.loads((Path(__file__).resolve().parents[1] / "limits.json").read_text())
-    assert limits["tasks_at_once"] == 2
-    assert "task_merges_per_review" in limits
+    for key in ("tasks_at_once", "task_merges_per_review"):
+        assert isinstance(limits[key], int) and not isinstance(limits[key], bool) and limits[key] >= 1, key
+
+
+@pytest.mark.parametrize("limits, said", [({"task_merges_per_review": 10}, "it is missing"),
+                                          ({"task_merges_per_review": 10, "tasks_at_once": 0}, "it is 0")])
+def test_batch_cli_tasks_at_once_missing_or_zero(tmp_path, capsys, limits, said):
+    """Should exit 2 with one line naming tasks_at_once and limits.json, with no traceback and not as no task to take, when tasks_at_once is missing or 0."""
+    (tmp_path / "tasks").mkdir()
+    (tmp_path / "tasks/tags.txt").write_text("\n".join(TAGS) + "\n")
+    tasks.write(tmp_path, task(1))
+    (tmp_path / ".claude/skills/manage").mkdir(parents=True)
+    (tmp_path / tasks.LIMITS).write_text(json.dumps(limits))
+    assert tasks.main(["--root", str(tmp_path), "batch"]) == 2
+    out = capsys.readouterr().out.splitlines()
+    assert len(out) == 1 and out[0].startswith("FAIL tasks_at_once in .claude/skills/manage/limits.json")
+    assert said in out[0] and "no task to take" not in out[0]

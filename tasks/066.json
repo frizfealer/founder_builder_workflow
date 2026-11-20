@@ -3,9 +3,9 @@
   "title": "Manager: one loose-ends task, and the rules that stop loose ends becoming tasks",
   "item": "Fix the small problems the reviews of tasks 57, 37, 61 and 58 left in the manager, and change the rules so that a task's own small problems are fixed before it merges and the advisor reviews drafts and does not write them",
   "motivation": "In two days agents created 18 tasks. Two were built as their own task, 5 were dropped (4 folded back into the task that produced them) and the rest wait. Each manager task merged on 2026-11-17 left one more 'small fixes' task behind (59, 62, 64, 65), and the advisor spent 122,189 and 87,348 agent tokens writing pass lines for two of them, one of which grew a new mechanism nobody had asked for. The owner's rulings of 2026-11-17: fix it here; an agent may create a task in one case only; the advisor is a reviewer, not an author.",
-  "status": "In progress",
+  "status": "Done",
   "added": "2026-11-17",
-  "finished": "",
+  "finished": "2026-11-19",
   "notes": "This task replaces tasks 59, 62, 64 and 65, which are Dropped as folded in. Their files stay as the lists of what to fix; read all four, with tasks/advice/064-1.md and 065-1.md. NEW RULES (owner, 2026-11-17). (a) An agent creates a task in one case only: a problem that existed before the task's branch and lies outside its change. Still at most one Proposed task per task run. (b) Fix it here: minor findings about lines the task's own branch added or changed are fixed before the merge, in one fix pass. The builder gets only that list; the re-check looks only at those fixes; a blocking problem stays the only reason a review fails; anything still open after the one pass is recorded in the review file and creates no task. (c) A builder that needs a protected path its task may not edit does not propose a task: the task parks with that question, as the park list already says. (d) checks.py unmerged sorts a finding by the lines the branch changed against its fork point, not by whole file. (e) A hook of the same kind as the push hook: while a run is active it refuses a Bash command that merges a task branch unless checks.py protected, owner, review, advice and merge-limit pass for that task. (f) The advisor's job (d) changes from writing to reviewing. The manager drafts the fields of a Proposed task; the advisor rules on the draft: can each pass line be checked, does each trace back to a finding or a result, and is anything in it new scope, which it names and does not add. FROM TASK 62: a distinct exit code for checks.py consult when the task file is missing; SKILL.md says consult re-runs the paid claude-api check; LINE_NUMBER does not count a (n) after an abbreviation; a step that turns the advisor's blind labels (job a) into a labels file and runs the comparison command the line names, so a line like task 56 line 3 can be the advisor's. FROM TASK 59: the points in its item, and its note on comparing a task file with the copy at the fork point. FROM TASKS 64 AND 65: the advisor's drafted pass lines, as named in done_means below. THE SPENDING HOOK (owner, 2026-11-19: yes): while a run is active the hook refuses `claude -p` and `ant` unless the task's outside_needs names claude-api, as lines (1) and (2) of task 064's done_means describe; the task 61 builder spent about 0.59 USD with no need declared. NOT IN THIS TASK: the owner's own commit in the main folder during a run still ends the run; he has said that is good as it is. Do not change it.",
   "depends_on": [
     {
@@ -31,6 +31,56 @@
   "tags": [
     "manager"
   ],
-  "tokens": null,
-  "draft_note": "Drafted by Claude in chat on 2026-11-17 on the owner's yes to one loose-ends task and to the one-case rule, and on his statement that the advisor should review and not write. Task 65 appeared after his yes and is folded in on the same reasoning; say so if it should stand alone. Lines (8) and (9) point at the advisor's drafts in the dropped tasks' files so nothing is retyped. The spending hook added and the task set to Ready on 2026-11-19 on the owner's instruction (\"hook yes\")."
+  "tokens": {
+    "agents": 455419,
+    "main_session": "not recorded"
+  },
+  "draft_note": "Drafted by Claude in chat on 2026-11-17 on the owner's yes to one loose-ends task and to the one-case rule, and on his statement that the advisor should review and not write. Task 65 appeared after his yes and is folded in on the same reasoning; say so if it should stand alone. Lines (8) and (9) point at the advisor's drafts in the dropped tasks' files so nothing is retyped. The spending hook added and the task set to Ready on 2026-11-19 on the owner's instruction (\"hook yes\").",
+  "decided_for_you": [
+    {
+      "chosen": "A Proposed task added by a branch names its earlier problem in a new optional field outside_problems, a list of {file, problem} whose file must exist at the fork point.",
+      "rejected": "Free text in notes.",
+      "would_change": "The owner wants it also to prove the problem's lines are untouched by the branch."
+    },
+    {
+      "chosen": "checks.py unmerged counts a finding as the task's own when any line it names was added or changed (or the file is new); a deletion counts the lines on either side; a finding naming an earlier file but no line counts as earlier.",
+      "rejected": "Requiring all named lines to be changed.",
+      "would_change": "The owner wants 'all'."
+    },
+    {
+      "chosen": "The fix pass is a new step 5a after every verifier but you, so the owner checks the fixed branch; its re-check also re-runs the script commands.",
+      "rejected": "Renumbering the steps, which tasks 064 and 065 cite by number.",
+      "would_change": "The owner prefers renumbered steps."
+    },
+    {
+      "chosen": "Step 7 writes the reply files before git merge, because the hook's review and advice checks read them at merge time; the merge gate also refuses any git merge whose text holds $ or a backtick; the merge commit always goes through git commit -F build/merge-message-<id>.txt.",
+      "rejected": "Writing replies after the merge; leaving the $ and backtick hole open; quoting rules that vary by title.",
+      "would_change": "The owner wants the old order or quoting rules."
+    },
+    {
+      "chosen": "The spending gate counts a program only when only VAR=, wrapper words, options or numbers come before it, so grep ant passes and bash -c \"ant ...\" is refused.",
+      "rejected": "Refusing any word ant.",
+      "would_change": "Over-refusals such as ant --version prove a nuisance (review 066-1 minor 4)."
+    },
+    {
+      "chosen": "On a job (d) FAILS the manager writes only the lines the advisor holds, renumbered, with none of the named new scope.",
+      "rejected": "A second advisor round.",
+      "would_change": "The owner wants a second round."
+    },
+    {
+      "chosen": "No new script for the advisor's blind labels: the manager writes its Labels object to <worktree>/build/labels/<id>-<line>.json and runs the line's command, which is also added to the try-merge checks.",
+      "rejected": "A dedicated script.",
+      "would_change": "The manager gets that step wrong once."
+    },
+    {
+      "chosen": "checks.py consult exits 3 for a missing task file and a missing branch; LINE_NUMBER skips e.g., i.e., cf., vs. and viz.; tasks.py batch exits 2 on an invalid tasks_at_once or unreadable limits.json.",
+      "rejected": "Distinct codes per case; skipping after etc., which can end a sentence.",
+      "would_change": "The owner wants them told apart."
+    },
+    {
+      "chosen": "No Proposed task from this task run. Review 066-1's minor problems are on lines this branch added, and rule (a), which this task writes in, makes a task only for a problem that existed before the branch; they stay in tasks/reviews/066-1.md and are listed in the run report.",
+      "rejected": "One Proposed task bundling them.",
+      "would_change": "The owner wants them as a task."
+    }
+  ]
 }

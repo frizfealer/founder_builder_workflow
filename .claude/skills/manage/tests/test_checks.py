@@ -152,12 +152,57 @@ def test_protected_manager_skill_edited(repo, path):
     assert any(path in f for f in protected(repo, b))
 
 
+EARLIER = [{"file": "DECISIONS.md", "problem": "the direction names no owner for monitoring"}]
+
+
 def test_protected_new_proposed_task(repo):
-    """Should pass when the branch adds a new task file with status Proposed."""
+    """Should pass when the branch adds one Proposed task whose outside_problems names a file that existed before the branch and its problem."""
     b = on_branch(repo)
-    repo.write_task(task(3, status="Proposed"))
+    repo.write_task(task(3, status="Proposed") | {"outside_problems": EARLIER})
     repo.commit("propose")
     assert protected(repo, b) == []
+
+
+@pytest.mark.parametrize("outside_problems", [
+    None, [], [{"file": "DECISIONS.md", "problem": ""}], [{"file": "DECISIONS.md"}],
+    [{"file": "probe/new.py", "problem": "the branch's own new file crashes"}],
+])
+def test_protected_new_proposed_task_without_earlier_file_and_problem(repo, outside_problems):
+    """Should fail a branch that adds a Proposed task unless its file names, for each problem, a file that existed when the branch left the working branch, and the problem."""
+    b = on_branch(repo)
+    repo.write("probe/new.py", "x\n")
+    extra = {} if outside_problems is None else {"outside_problems": outside_problems}
+    repo.write_task(task(3, status="Proposed") | extra)
+    repo.commit("propose")
+    fails = protected(repo, b)
+    assert len(fails) == 1 and fails[0].startswith("tasks/003.json: a task branch adds a Proposed task only")
+    assert "outside_problems" in fails[0]
+
+
+def test_protected_two_new_proposed_tasks(repo):
+    """Should fail a branch that adds two Proposed tasks, since a task run adds at most one."""
+    b = on_branch(repo)
+    repo.write_task(task(3, status="Proposed") | {"outside_problems": EARLIER})
+    repo.write_task(task(4, status="Proposed") | {"outside_problems": EARLIER})
+    repo.commit("propose two")
+    assert protected(repo, b) == ["tasks/003.json, tasks/004.json: a task run adds at most one Proposed "
+                                  "task; the branch adds 2"]
+
+
+def test_protected_own_task_read_against_fork_point(repo):
+    """Should pass a branch that changed only its task's status after the owner set owner_verified on the working branch, and still fail one that changed an owner's field since the fork."""
+    b = on_branch(repo)
+    repo.write_task(task(1, status="In progress"))
+    repo.commit("task 1: status on the branch")
+    repo.git("switch", "-q", BASE)
+    repo.write_task(task(1) | {"owner_verified": "2026-11-19"})
+    repo.commit("owner checked task 1")
+    assert protected(repo, b) == []
+    repo.git("switch", "-q", b)
+    repo.write_task(task(1, status="In progress", priority="high"))
+    repo.commit("task 1: raise its own priority")
+    fails = protected(repo, b)
+    assert len(fails) == 1 and "it changed ['priority']" in fails[0]
 
 
 def test_protected_new_ready_task(repo):
@@ -432,6 +477,67 @@ def test_unmerged_path_on_neither_branch(repo):
     ok, msg = checks.check_unmerged(repo.path, b, ["probe/missing.py"], base=BASE)
     assert not ok
     assert "on neither" in msg
+
+
+def branch_adds_lines(repo):
+    """A file on the working branch with lines 1-5; the task branch inserts two lines after line 2
+    (its lines 3 and 4) and leaves the rest as it was (its lines 1-2 and 5-7)."""
+    repo.write("notes/plan.md", "".join(f"old {i}\n" for i in range(1, 6)))
+    repo.commit("plan on the working branch")
+    b = on_branch(repo)
+    repo.write("notes/plan.md", "old 1\nold 2\nnew a\nnew b\nold 3\nold 4\nold 5\n")
+    repo.commit("task 1: two new lines")
+    return b
+
+
+@pytest.mark.parametrize("finding", ["notes/plan.md:3", "notes/plan.md:4", "notes/plan.md:2-3",
+                                     "notes/plan.md:4-7"])
+def test_unmerged_finding_on_lines_the_branch_added(repo, finding, monkeypatch):
+    """Should give the task a finding that names a line the branch added to a file the working branch holds, and exit 0."""
+    b = branch_adds_lines(repo)
+    ok, msg = checks.check_unmerged(repo.path, b, [finding], base=BASE)
+    assert ok, msg
+    assert f"{finding}: on lines {b} added or changed" in msg and "fix pass" in msg
+    monkeypatch.chdir(repo.path)
+    assert checks.main(["unmerged", b, finding, "--base", BASE]) == 0
+
+
+@pytest.mark.parametrize("finding", ["notes/plan.md:1", "notes/plan.md:5-7", "notes/plan.md:1-2"])
+def test_unmerged_finding_on_untouched_lines(repo, finding, monkeypatch):
+    """Should not give the task a finding on lines of that file the branch left as they were, and exit 1."""
+    b = branch_adds_lines(repo)
+    ok, msg = checks.check_unmerged(repo.path, b, [finding], base=BASE)
+    assert not ok
+    assert f"{finding}: on lines {b} did not change" in msg and "Proposed task" in msg
+    monkeypatch.chdir(repo.path)
+    assert checks.main(["unmerged", b, finding, "--base", BASE]) == 1
+
+
+def test_unmerged_finding_on_existing_file_without_lines(repo):
+    """Should not give the task a finding that names a file the working branch held and no line, since its lines cannot be told."""
+    b = branch_adds_lines(repo)
+    ok, msg = checks.check_unmerged(repo.path, b, ["notes/plan.md"], base=BASE)
+    assert not ok and "names no line" in msg
+
+
+def test_unmerged_finding_next_to_a_deletion(repo):
+    """Should give the task a finding on a line next to lines the branch deleted, and not one further away."""
+    repo.write("notes/plan.md", "".join(f"old {i}\n" for i in range(1, 6)))
+    repo.commit("plan on the working branch")
+    b = on_branch(repo)
+    repo.write("notes/plan.md", "old 1\nold 2\nold 5\n")
+    repo.commit("task 1: drop lines 3 and 4")
+    assert checks.check_unmerged(repo.path, b, ["notes/plan.md:3"], base=BASE)[0]
+    assert not checks.check_unmerged(repo.path, b, ["notes/plan.md:1"], base=BASE)[0]
+
+
+def test_unmerged_finding_on_new_file_with_lines(repo):
+    """Should give the task a finding on any line of a file the branch added."""
+    b = on_branch(repo)
+    repo.write("probe/fake.py", "x\ny\n")
+    repo.commit("new code")
+    ok, msg = checks.check_unmerged(repo.path, b, ["probe/fake.py:2"], base=BASE)
+    assert ok and "the file is new on" in msg
 
 
 # --- the owner's check -----------------------------------------------------------------------
@@ -762,11 +868,15 @@ def test_consult_unknown_reason(repo, monkeypatch):
     assert checks.main(["consult", "1", "tired", "--base", BASE]) == 2
 
 
-def test_consult_missing_task_file_is_an_error(repo, monkeypatch):
-    """Should raise naming the missing task file, not exit 2 as if the reason were unknown."""
+def test_consult_missing_task_file_is_an_error(repo, monkeypatch, capsys):
+    """Should exit 3 naming the missing task file, not 1 as if the task always parked, nor 2 as if the reason were unknown."""
     monkeypatch.chdir(repo.path)
-    with pytest.raises(ValueError, match="tasks/009.json does not exist"):
-        checks.main(["consult", "9", "verification", "--base", BASE])
+    assert checks.main(["consult", "9", "verification", "--base", BASE]) == 3
+    out = capsys.readouterr().out
+    assert out.startswith("FAIL consult cannot decide") and "tasks/009.json does not exist" in out
+    r = subprocess.run([sys.executable, str(SKILL / "scripts/checks.py"), "consult", "9", "owner", "--base", BASE],
+                       cwd=repo.path, capture_output=True, text=True)
+    assert r.returncode == 3 and "Traceback" not in r.stderr
 
 
 def test_park_reasons_in_docs_are_known():

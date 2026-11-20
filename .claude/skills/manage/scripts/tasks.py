@@ -7,7 +7,7 @@ Usage, from the repo root:
   tasks.py next    the task the manager should take, or why there is none; exit 1 when there is none
   tasks.py batch [<n>]   up to n takeable tasks that can run at the same time, one per line, in
                    the order next would take them; n defaults to tasks_at_once in limits.json;
-                   exit 1 when there is none
+                   exit 1 when there is none, 2 when tasks_at_once is missing or not 1 or more
   tasks.py board [--open]   write build/task-board.html and print the number of tasks per status;
                             --open opens it in the browser
   tasks.py board --serve [--open]   serve the board at http://127.0.0.1:8765/ until Ctrl-C; it
@@ -39,8 +39,11 @@ LIMITS = ".claude/skills/manage/limits.json"  # tasks_at_once: the n of batch
 SKILLS_DIR = ".claude/skills"  # one folder per skill; an iterate task names one of them
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 # A done_means line, written (n) where a line starts: at the start of the text or of a text line,
-# or after the . : ; ! or ? that ends the line before. A (n) inside a line is not a line number.
-LINE_NUMBER = re.compile(r"(?:^\s*|[.:;!?]['\")\]]*\s+)\((\d+)\)", re.M)
+# or after the . : ; ! or ? that ends the line before. A (n) inside a line is not a line number,
+# nor one after an abbreviation that never ends a sentence: e.g., i.e., cf., vs., viz. ("etc."
+# can end one, so a (n) after it still counts).
+LINE_NUMBER = re.compile(r"(?:^\s*|(?:(?<!\b[eE]\.g)(?<!\b[iI]\.e)(?<!\b[cC]f)(?<!\b[vV]s)(?<!\b[vV]iz)\."
+                         r"|[:;!?])['\")\]]*\s+)\((\d+)\)", re.M)
 
 # The owner's fields: set by the owner; the manager may draft them only before Ready.
 OWNER_FIELDS = ["done_means", "verified_by", "verifier_of_line", "may_edit", "may_delete", "runs_as",
@@ -53,8 +56,9 @@ REQUIRED = ["id", "title", "item", "motivation", "status", "added", "finished", 
 # for_retry: findings on files only the task's branch has. owner_verified: the date the owner checked.
 # verifier_of_line: the one verifier of a done_means line, keyed by the line's number.
 # may_delete: the paths a task branch may delete or rename that existed when it left the working branch.
+# outside_problems: for a Proposed task, each earlier file and the problem in it the task is about.
 OPTIONAL = ["draft_note", "needs_you", "decided_for_you", "outside_needs", "for_retry", "owner_verified",
-            "verifier_of_line", "may_delete"]
+            "verifier_of_line", "may_delete", "outside_problems"]
 NEEDS_YOU_KEYS = ["question", "recommendation", "if_vetoed"]
 DECIDED_KEYS = ["chosen", "rejected", "would_change"]
 
@@ -206,6 +210,12 @@ def lint_task(name, t, allowed_tags):
         e(f"{name}: outside_needs must be a list of distinct values from {OUTSIDE_NEEDS}")
     if not _is_str_list(t.get("for_retry", [])):
         e(f"{name}: for_retry must be a list of strings")
+    op = t.get("outside_problems")
+    if op is not None and not (isinstance(op, list) and op and all(
+        isinstance(p, dict) and set(p) == {"file", "problem"}
+        and all(isinstance(p[k], str) and p[k].strip() for k in p) for p in op
+    )):
+        e(f"{name}: outside_problems must be a non-empty list of {{\"file\": <path>, \"problem\": <text>}}")
     ov = t.get("owner_verified", "")
     if not (isinstance(ov, str) and (ov == "" or DATE.match(ov))):
         e(f"{name}: owner_verified must be YYYY-MM-DD, or empty")
@@ -326,7 +336,16 @@ def skill_names(root):
 
 
 def tasks_at_once(root):
-    return json.loads((Path(root) / LIMITS).read_text())["tasks_at_once"]
+    """tasks_at_once in limits.json. Raises ValueError, with one line naming both, when the file
+    cannot be read or the key is missing or not an integer of 1 or more."""
+    try:
+        n = json.loads((Path(root) / LIMITS).read_text()).get("tasks_at_once")
+    except (OSError, ValueError, AttributeError) as e:
+        raise ValueError(f"tasks_at_once cannot be read from {LIMITS}: {' '.join(str(e).split())}")
+    if not isinstance(n, int) or isinstance(n, bool) or n < 1:
+        raise ValueError(f"tasks_at_once in {LIMITS} must be an integer of 1 or more; it is "
+                         f"{'missing' if n is None else repr(n)}")
+    return n
 
 
 def _cell(v):
@@ -466,7 +485,12 @@ def main(argv):
             webbrowser.open(out.resolve().as_uri())
         return 0
     if argv[0] == "batch":
-        taken, why = pick_batch(tasks, n or tasks_at_once(root), skill_names(root))
+        try:
+            n = n or tasks_at_once(root)
+        except ValueError as e:
+            print(f"FAIL {e}")
+            return 2
+        taken, why = pick_batch(tasks, n, skill_names(root))
         for t in taken:
             print(f"task {t['id']}: {t['title']}")
         print(f"why: {why}" if taken else f"no task to take: {why}")
