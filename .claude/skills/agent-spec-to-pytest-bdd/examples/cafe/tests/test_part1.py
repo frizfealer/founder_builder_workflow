@@ -58,7 +58,6 @@ def test_run_features_reference_passes_all_three_without_llm(tmp_path):
     records = {sc: records[sc] for sc in SCENARIOS}
     for r in records.values():
         assert r["status"] == "pass", r
-        assert r["llm_calls"] == 0
         assert all(q["source"] == "data file" for q in r["judge"])
     transcripts = {p.stem: p.read_text() for p in (tmp_path / "transcripts").glob("*.json")}
     assert set(transcripts) >= {f"reference-{sc}" for sc in SCENARIOS}
@@ -85,7 +84,7 @@ def test_run_features_variant_fails_its_own_rule_sentence(tmp_path, agent, sc_id
     assert r["status"] == "fail"
     assert r["failed_step"]["step"].endswith(f"rule {rule} holds: {r['titles'][rule]}")
     assert r["rules"][rule]["verdict"] == "breaks"
-    assert r["llm_calls"] == 0
+    assert all(q["source"] == "data file" for q in r["judge"])
 
 
 @pytest.mark.parametrize("agent, moment, rule", [("break-R-03", "M2", "R-03"), ("break-R-11", "M5", "R-11")])

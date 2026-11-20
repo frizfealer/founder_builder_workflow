@@ -2,9 +2,10 @@
 
   uv run pytest                                    every test, reference agent, no LLM call
   uv run pytest tests/test_scenarios.py --agent break-R-03
-  uv run pytest tests/test_scenarios.py --agent probe --from M5 --prompt retry --out runs/x --run-id run-01
+  uv run pytest tests/test_scenarios.py --agent break-R-11 --from M5 --out runs/x --run-id run-01
 
---from start runs each scenario from the start; --from M1..M7 replays that tested moment's history
+--agent names a scripted agent of harness/agents.py; slice A's probe agent, an LLM agent, was deleted in
+task 52. --from start runs each scenario from the start; --from M1..M7 replays that tested moment's history
 (data.json) in its scenario and lets the agent take one action, as does a moment of the second probe run
 (data.json probe_moments). --out writes one transcript file and one verdict file per run, in separate
 folders, so transcripts can be labelled blind: a transcript holds what the agent saw and did, and nothing
@@ -28,16 +29,13 @@ from harness.slot import Driver
 CITED = pytest.StashKey[list]()
 OUTCOME = pytest.StashKey[dict]()
 FAILED = pytest.StashKey[dict]()
-LLM_FIRST = pytest.StashKey[int]()  # how many LLM calls the session had made when this scenario began
 
 
 def pytest_addoption(parser):
     g = parser.getgroup("cafe")
-    g.addoption("--agent", default="reference", choices=[*AGENTS, "probe"], help="what fills the agent slot")
+    g.addoption("--agent", default="reference", choices=[*AGENTS], help="what fills the agent slot")
     g.addoption("--from", dest="start", default="start", choices=["start", *moment_names()],
                 help="run from the start, or one action from a tested moment")
-    g.addoption("--prompt", default="plain", choices=[p for p in data()["probe_prompts"] if not p.startswith("_")],
-                help="probe only: the name of a data.json probe prompt")
     g.addoption("--out", default=None, help="folder for transcripts/ and verdicts/")
     g.addoption("--run-id", default="run", help="file name of this run's transcript and verdict")
 
@@ -65,11 +63,10 @@ def moment(request):
 
 @pytest.fixture(autouse=True)
 def stub_calls_ledger(request, tmp_path_factory, monkeypatch):
-    """Outside a probe run, a call made with no task ledger set (a test's stub client) is recorded in a
-    temporary default ledger, so the suite leaves no file under runs/."""
-    if request.config.getoption("agent") != "probe":
-        import probe.llm
-        monkeypatch.setattr(probe.llm, "DEFAULT_LEDGER", tmp_path_factory.mktemp("ledger") / "usage.jsonl")
+    """A call made with no task ledger set (a test's stub client) is recorded in a temporary default ledger,
+    so the suite leaves no file under runs/."""
+    import probe.llm
+    monkeypatch.setattr(probe.llm, "DEFAULT_LEDGER", tmp_path_factory.mktemp("ledger") / "usage.jsonl")
 
 
 @pytest.fixture
@@ -83,36 +80,21 @@ def world():
     return []
 
 
-@pytest.fixture(scope="session")
-def llm(request):
-    if request.config.getoption("agent") != "probe":
-        return None
-    from probe.llm import LLM
-    return LLM()
+@pytest.fixture
+def agent(request):
+    return AGENTS[request.config.getoption("agent")]()
 
 
 @pytest.fixture
-def agent(request, llm):
-    name = request.config.getoption("agent")
-    if name == "probe":
-        from probe.agent import ProbeAgent
-        return ProbeAgent(llm, request.config.getoption("prompt"))
-    return AGENTS[name]()
-
-
-@pytest.fixture
-def judge(llm):
-    if llm is None:
-        return MessageJudge()
-    from probe.agent import judge_llm
-    return MessageJudge(judge_llm(llm))
+def judge():
+    """The message judge with no LLM: it answers the data file's sentences and raises on any other."""
+    return MessageJudge()
 
 
 @pytest.fixture
 def outcome(request, world, system, agent, judge, moment):
     """Run the scenario once, at the first Then step, and judge every rule it cites and, for the closing
-    sentence 'no other rule is broken', every other rule that has a checker. The LLM calls it makes are
-    recorded by write_run, so a run that raises keeps them."""
+    sentence 'no other rule is broken', every other rule that has a checker."""
     run = Driver(world, system, agent).run(moment)
     cited = request.node.stash[CITED]
     rules = {r: verdict(r, run.events, run.over, judge) for r in cited}
@@ -140,8 +122,6 @@ def pytest_bdd_before_scenario(request, feature, scenario):
     if m != "start" and moment_entry(m)["scenario"] != sc_id:
         pytest.skip(f"{m} is tested in {moment_entry(m)['scenario']}")
     request.node.stash[CITED] = [s.name.split()[1] for s in scenario.steps if s.type == "then" and s.name.startswith("rule ")]
-    llm = request.getfixturevalue("llm")
-    request.node.stash[LLM_FIRST] = len(llm.calls) if llm else 0
 
 
 def pytest_bdd_step_error(request, feature, scenario, step, step_func, step_func_args, exception):
@@ -163,8 +143,6 @@ def write_run(out_dir, request, scenario):
     out = request.node.stash.get(OUTCOME, None)
     failed = request.node.stash.get(FAILED, None)
     rules = request.node.stash.get(CITED, [])
-    llm = request.getfixturevalue("llm")
-    usage = llm.calls[request.node.stash.get(LLM_FIRST, len(llm.calls)):] if llm else []
     (out_dir / "transcripts").mkdir(parents=True, exist_ok=True)
     (out_dir / "verdicts").mkdir(parents=True, exist_ok=True)
     if out:
@@ -180,10 +158,10 @@ def write_run(out_dir, request, scenario):
             "readable": readable(run),
         }
         (out_dir / "transcripts" / f"{run_id}.json").write_text(json.dumps(transcript, indent=1, ensure_ascii=False))
-    record = {"run_id": run_id, "scenario": sc_id, "agent": cfg("agent"), "prompt": cfg("prompt"), "moment": m,
+    record = {"run_id": run_id, "scenario": sc_id, "agent": cfg("agent"), "moment": m,
               "status": out["status"] if out else "error", "failed_step": failed,
               "rules": out["rules"] if out else {r: {"verdict": UNDECIDED, "reason": "the run raised"} for r in rules},
-              "titles": {r: rule_titles()[r] for r in rules}, "llm_calls": len(usage), "usage": usage}
+              "titles": {r: rule_titles()[r] for r in rules}, "llm_calls": request.getfixturevalue("judge").llm_calls()}
     if out:
         run = out["run"]
         record |= {"over": run.over, "played": run.played, "lines": run.lines, "stopped": run.stopped,

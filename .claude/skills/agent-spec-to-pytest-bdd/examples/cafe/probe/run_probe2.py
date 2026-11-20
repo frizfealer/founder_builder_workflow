@@ -12,6 +12,9 @@ slice A. Transcripts go to runs/probe2/transcripts/, verdicts to runs/probe2/ver
 shuffled, and verdicts/index.json maps each back to its condition. Every API call goes to task 56's ledger
 (probe/money.py); the run stops before a run once the task has spent money.STOP_AT, and at the first run
 that raises.
+
+Task 52 deleted the probe agent, so pytest has no --agent probe and a run not yet saved fails at once;
+--summary and --check read the saved runs and still work.
 """
 import json
 import random

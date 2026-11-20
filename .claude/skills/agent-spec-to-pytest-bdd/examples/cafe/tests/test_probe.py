@@ -1,19 +1,29 @@
-"""The probe agent's plumbing, with a stub in place of the Claude API: no network, no money."""
+"""What is left of the probe agent's plumbing, and the message judge's LLM call, with a stub in place of the
+Claude API: no network, no money. Task 52 deleted the probe agent; OneAction takes its place where a test
+needs an agent to say a sentence the data file does not hold or to make one call."""
 import json
-import os
-import subprocess
-import sys
 from types import SimpleNamespace
 
 import pytest
 
 from harness.checkers import verdict
-from harness.data import HERE, data
+from harness.data import data
 from harness.judge import MessageJudge
-from probe.agent import ProbeAgent, judge_llm, system_prompt, to_messages
+from probe.agent import judge_llm, system_prompt, to_messages
 from probe.llm import LLM, cost
 from stub_api import StubClient
 from test_part1 import run_scenario
+
+
+class OneAction:
+    """An agent that takes the one action given, whatever the conversation: a message, or a tool call."""
+
+    def __init__(self, message=None, call=None):
+        self.action = [{"kind": "message", "text": message}] if message else \
+            [{"kind": "call", "tool": call[0], "args": call[1]}]
+
+    def act(self, events):
+        return self.action
 
 
 def test_render_history_m5_pairs_each_result_with_its_call():
@@ -36,40 +46,39 @@ def test_build_prompt_bad_adds_one_instruction():
     assert bad["book-when-held"].startswith("Book as soon as a table is held.")
 
 
-def test_run_moment_probe_second_booking_call_breaks_r11():
-    """Should break R-11 when the probe answers M5 with a second booking call, with no judge call needed."""
-    llm = LLM(client=StubClient([("tool", "book_held_table", {"hold_id": "H-1001"})]))
-    run, _ = run_scenario("SC-12", ProbeAgent(llm, "retry"), "M5")
+def test_run_moment_second_booking_call_breaks_r11():
+    """Should break R-11 when the agent answers M5 with a second booking call, with no judge call needed."""
+    llm = LLM(client=StubClient([]))
+    run, _ = run_scenario("SC-12", OneAction(call=("book_held_table", {"hold_id": "H-1001"})), "M5")
     judge = MessageJudge(judge_llm(llm))
     assert verdict("R-11", run.events, run.over, judge)["verdict"] == "breaks"
     assert verdict("R-09", run.events, run.over, judge)["verdict"] == "undecided"
-    assert [c["purpose"] for c in llm.calls] == ["agent"]
-    assert llm.client.requests[0]["tool_choice"]["disable_parallel_tool_use"] is True
+    assert llm.calls == []
 
 
-def test_run_moment_probe_message_judged_by_llm():
-    """Should put a probe's own message to the LLM judge and hold R-05 when it says booked with the id."""
-    llm = LLM(client=StubClient([("text", "All set! Booking SUN-4821 is confirmed."), ("text", "yes")]))
-    run, _ = run_scenario("SC-08", ProbeAgent(llm), "M4")
+def test_run_moment_unlabelled_message_judged_by_llm():
+    """Should put a message the data file does not hold to the LLM judge and hold R-05 when it says booked with the id."""
+    llm = LLM(client=StubClient([("text", "yes")]))
+    run, _ = run_scenario("SC-08", OneAction("All set! Booking SUN-4821 is confirmed."), "M4")
     judge = MessageJudge(judge_llm(llm))
     assert run.over
     assert verdict("R-05", run.events, run.over, judge)["verdict"] == "holds"
-    assert [c["purpose"] for c in llm.calls] == ["agent", "judge"]
-    assert llm.client.requests[1]["thinking"] == {"type": "between_tools"}  # else thinking eats the 5 tokens
+    assert [c["purpose"] for c in llm.calls] == ["judge"]
+    assert llm.client.requests[0]["thinking"] == {"type": "between_tools"}  # else thinking eats the 5 tokens
     assert cost(llm.calls) > 0
 
 
 def test_judge_unclear_answer_leaves_rule_undecided():
     """Should leave a rule undecided when the LLM judge answers neither yes nor no."""
-    llm = LLM(client=StubClient([("text", "I'm holding that table for you, shall I book it?"), ("text", "maybe")]))
-    run, _ = run_scenario("SC-08", ProbeAgent(llm), "M2")
+    llm = LLM(client=StubClient([("text", "maybe")]))
+    run, _ = run_scenario("SC-08", OneAction("I'm holding that table for you, shall I book it?"), "M2")
     assert verdict("R-01", run.events, run.over, MessageJudge(judge_llm(llm)))["verdict"] == "undecided"
 
 
 def r05_at_m4_with_reply(reply):
-    """R-05's verdict when the probe answers M4 with a message giving the confirmation id and the judge replies so."""
-    llm = LLM(client=StubClient([("text", "All set! Booking SUN-4821 is confirmed."), ("text", reply)]))
-    run, _ = run_scenario("SC-08", ProbeAgent(llm), "M4")
+    """R-05's verdict when the agent answers M4 with a message giving the confirmation id and the judge replies so."""
+    llm = LLM(client=StubClient([("text", reply)]))
+    run, _ = run_scenario("SC-08", OneAction("All set! Booking SUN-4821 is confirmed."), "M4")
     return verdict("R-05", run.events, run.over, MessageJudge(judge_llm(llm)))["verdict"]
 
 
@@ -119,17 +128,3 @@ def test_run_part2_preflight_cost_counts_toward_stop(tmp_path, monkeypatch, caps
     s = json.loads((tmp_path / "verdicts" / "summary.json").read_text())
     assert s["one_action_runs"]["run"] == 1
     assert s["money"]["api_calls"] == 2 and s["money"]["usd"] == round(2 * one_call, 4)
-
-
-def test_run_probe_raising_after_api_call_keeps_its_usage(tmp_path):
-    """Should write the usage of the API calls a run made before it raised, so money spent counts them."""
-    replies = [["text", "Let me look into that for you."], ["raise", "the API refused the call"]]
-    proc = subprocess.run([sys.executable, "-m", "pytest", "-p", "tests.stub_api", "tests/test_scenarios.py", "-q",
-                           "-p", "no:cacheprovider", "--agent", "probe", "--from", "M5", "--out", str(tmp_path),
-                           "--run-id", "run-x"],
-                          cwd=HERE, capture_output=True, text=True,
-                          env=os.environ | {"CAFE_STUB_REPLIES": json.dumps(replies)})
-    assert "the API refused the call" in proc.stdout
-    r = json.loads((tmp_path / "verdicts" / "run-x.json").read_text())
-    assert r["status"] == "error"
-    assert r["llm_calls"] == 1 and [u["purpose"] for u in r["usage"]] == ["agent"]

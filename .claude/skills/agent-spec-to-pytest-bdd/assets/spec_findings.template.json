@@ -1,0 +1,20 @@
+{
+ "_about": "Findings for agent-spec from these BDD tests, against <path of the spec folder, relative to this file>, each in the fields of the finding format of agent-spec's references/verification.md (id, class, severity, where, quote, evidence, pattern), for agent-spec's findings-file update mode. A test checks that each finding is here and names its rule.",
+ "findings": [
+  {
+   "id": "F1",
+   "class": "<Lies | Gap | Unclear>",
+   "severity": "<Important | Nit>",
+   "where": "<file and id: scenarios.md SC-17; rules.md R-08>",
+   "scenario": "<the scenario id, or 'absent' when no scenario has the case>",
+   "rule": "<the rule id>",
+   "quote": "<the exact line of the spec, or 'absent' for a Gap>",
+   "evidence": "<what the tests show: the scenario that has no World lines, the reference agent's stop, the variant that was not caught>",
+   "missing_lines": [
+    "<file and the line the spec is missing, written out, such as World lines of the missing scenario>"
+   ],
+   "pattern": "<the general form of the defect, so every instance can be fixed>",
+   "bdd_side_ready": "<what the test side already has, and what it adds once the spec has the lines above>"
+  }
+ ]
+}

@@ -1,4 +1,4 @@
-"""The one doorway to the Claude API for the probe agent and the message judge, with every call's tokens.
+"""The one doorway to the Claude API, for the message judge and probe/run_part2.py's preflight, with every call's tokens.
 
 anthropic>=2.9 reads the owner's `ant auth login` by itself; no key is read or written here.
 Every call's usage is also appended as one JSON line, tagged with CAFE_USAGE_SOURCE, to the file

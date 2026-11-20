@@ -3,9 +3,9 @@
   "title": "BDD slice D: write the skill",
   "item": "Write the agent-spec-to-pytest-bdd skill from the café work, with its verify step",
   "motivation": "A slice of task 1, the BDD skill. Its content depends on what the slice before it shows.",
-  "status": "In progress",
+  "status": "Done",
   "added": "2026-11-17",
-  "finished": "",
+  "finished": "2026-11-20",
   "notes": "Verify step: script checks, the reference agent passes, then the mutation test of slice C. The probe agent of slice A is deleted. FOR THE BUILDER'S BRIEF (tasks/advice/052-1.md): tests/test_probe.py and tests/test_probe2.py use ProbeAgent and are edited, not deleted; probe/run_part2.py and probe/run_probe2.py stop working once it is gone, and the report says so. The old untracked file pytest-bdd-skill-notes.md is not part of this task: the owner had it deleted on 2026-11-20, since it described the spec format the café work replaced.",
   "depends_on": [
     {
@@ -29,13 +29,46 @@
   "tags": [
     "bdd"
   ],
-  "tokens": null,
+  "tokens": {
+    "agents": 684905,
+    "main_session": "not recorded"
+  },
   "draft_note": "Placeholder written by Claude in chat on 2026-11-17 so the whole path of task 1 shows in the task list. done_means, verified_by and priority are left empty on purpose: Claude writes them from the results of the task this one depends on, and only then is it offered to the owner. Outline in tasks/plans/001.md, section 'Slices B to E'. On 2026-11-19 the manager drafted done_means, verified_by, may_edit and runs_as from task 51's results; the advisor ruled FAILS (tasks/advice/052-1.md) on a line retiring pytest-bdd-skill-notes.md, which no verifier can check while that file is untracked, so only the three lines it held are kept. On 2026-11-20 Claude in chat set priority and Ready on the owner's word of 2026-11-19 (\"go\"), and added the hard dependency on task 67, since both tasks edit the probe folder.",
   "decided_for_you": [
     {
       "chosen": "RULING: FAILS (advisor job d), tasks/advice/052-1.md: lines on the skill's verify step, its commands passing, and deleting the probe agent hold; the line retiring pytest-bdd-skill-notes.md fails, since the file is untracked (no branch has it) and the builder's point-by-point account has no verifier. Kept the three lines it held.",
       "rejected": "RULING: HOLDS with all four lines",
       "would_change": "The owner commits pytest-bdd-skill-notes.md, names it in may_delete, and puts the point-by-point account in a file on the branch or gives the line a verifier that sees the builder's report; or the owner means the whole probe (prompt builder, runners, probe/agent.py) by 'the probe agent'; or 'script checks' includes the plan's clause map."
+    },
+    {
+      "chosen": "RULING: FAILS (advisor job c), tasks/advice/052-2.md: with the probe-only tests cut, nothing tested that a run which raises still writes a verdict file with status error, so line (3)'s passing suite no longer proved that. A fresh builder added that test (commit c88df57).",
+      "rejected": "RULING: HOLDS",
+      "why": "The removed test's usage check was probe-only, but its error-record check covered write_run code the branch rewrote.",
+      "would_change": "A test already asserting the error record, or the owner saying the error record existed only for the probe's money accounting."
+    },
+    {
+      "chosen": "RULING: HOLDS (advisor job c), tasks/advice/052-3.md: with the new test, line (3) proves again that deleting the probe agent broke nothing else the suite checked.",
+      "rejected": "RULING: FAILS",
+      "why": "The new test checks every point the first ruling found unchecked, and the rest of the builder's decision was already sound.",
+      "would_change": "The new test failing or being weakened, or the owner meaning the whole probe by the probe agent."
+    },
+    {
+      "chosen": "Builder: deleted the class ProbeAgent, the --agent probe choice and the conftest code that ran only for it; kept tools() (marked unused), to_messages(), the prompt builder and data.json's probe entries. probe/run_part2.py and probe/run_probe2.py no longer run, and their docstrings say so.",
+      "rejected": "Deleting the whole probe.",
+      "why": "The line names the class and the option, and DECISIONS.md has an agent propose rather than delete.",
+      "would_change": "The owner says the whole probe goes."
+    },
+    {
+      "chosen": "Builder: the skill writes its output to bdd/ beside the spec folder or a folder the user names; tested moments are optional; the verify step is done_means' three commands, then the whole suite; judge cases are written but not run, since running them costs money.",
+      "rejected": "A fixed repo path; tested moments as a required step; the plan's clause map and fresh reader in the verify step; a paid step in the skill.",
+      "why": "Nothing in the repo fixes the output folder, and whether a real agent is gated from a tested moment is an open ruling of the owner's.",
+      "would_change": "The owner rules on tested moments, or slice E's blind run shows another output folder works better."
+    },
+    {
+      "chosen": "Manager: the job (c) fix and the fix pass ran on the first review; the re-check (tasks/reviews/052-2.md) left three minor points open in that file: one more always-true llm_calls assert (tests/test_probe2.py:237), an ambiguous \"(step 7)\" pointer at SKILL.md:9, and checkers.md:38 calling judge_llm an ask_llm function when it builds one. No Proposed task from this run.",
+      "rejected": "A second fix pass; a Proposed task for the plain assert in variant_results.py (review 051-2) or for tasks/plans/001.md still listing the clause map in slice D.",
+      "why": "Rule 3 allows one fix pass, and the two earlier points change nothing the café suite or the skill does.",
+      "would_change": "The owner wants the three open points fixed, or the plan kept in step with done_means."
     }
   ]
 }

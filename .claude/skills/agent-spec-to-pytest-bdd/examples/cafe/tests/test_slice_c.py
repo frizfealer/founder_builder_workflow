@@ -103,7 +103,7 @@ def test_run_features_variant_all_scenarios_without_llm(tmp_path, name):
     assert sorted(records) == world_scenarios() and len(records) == 16
     want = saved()["variants"][name]
     for sc, r in records.items():
-        assert r["llm_calls"] == 0 and all(q["source"] == "data file" for q in r["judge"]), sc
+        assert all(q["source"] == "data file" for q in r["judge"]), sc
         assert r["status"] == want["scenarios"][sc]["status"], sc
     assert (proc.returncode == 0) == (want["outcome"] == "survived"), proc.stdout[-2000:]
 
@@ -114,7 +114,7 @@ def test_run_variants_say_only_labelled_sentences():
     for name, v in saved()["variants"].items():
         for sc, s in v["scenarios"].items():
             assert s["status"] != "error", (name, sc, s.get("error"))
-            assert s["unlabelled_sentences"] == [] and s["llm_calls"] == 0, (name, sc)
+            assert s["unlabelled_sentences"] == [], (name, sc)
 
 
 def test_check_new_sentences_are_labelled_entries():
