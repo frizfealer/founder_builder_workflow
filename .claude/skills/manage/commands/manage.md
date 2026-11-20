@@ -34,6 +34,18 @@ together with a file an agent changed.
 **Decided for you.** Every entry you add to a task's `decided_for_you` holds `chosen`,
 `rejected`, `why` (one sentence, the reason for the choice) and `would_change`.
 
+**Every task you draft.** This holds for every task the manager drafts: the fields of a Proposed
+task drafted after a merge (step 7), and a Proposed task for an earlier problem (step 5),
+including one the builder added, which you complete in the merge or park commit.
+- Write its `summary`, the four parts outcome, scope, risk and cost, to the standard of
+  `references/task-fields.md`; after a merge, rewrite it so it says what the drafted pass lines
+  say, no more and no less.
+- Put each choice the draft would leave open to the three tests of SKILL.md (What reaches the
+  owner). When none holds, take the option that is cheapest to undo, write the draft with it, and
+  log it in that task's `decided_for_you` with its why. When one holds, leave the choice open,
+  say so in the task's `draft_note`, and put the choice under Needs you in the run report with
+  the test named.
+
 ## 1. Start
 
 On the working branch, with no uncommitted changes to tracked files. Run `tasks.py lint` and
@@ -42,7 +54,7 @@ Then `checks.py run-start`; if it fails, end the run the same way. It records th
 branch's commit, removes each worktree an earlier run left under `build/worktrees/` with no
 uncommitted change (its branch stays), and prints a line for each worktree that holds one, left
 as it is, and for each task left In progress, with a recommendation. Each of those lines goes
-under Needs you in the run report as it is.
+under Needs you in the run report as it is, with the test it passes (step 9).
 
 ## 2. Take
 
@@ -122,9 +134,11 @@ task's branch and lies outside its change. From the outside problems, the minor 
 one Proposed task for this task run, bundling the earlier problems worth doing, or none; step 7
 or 8 commits it. A finding on lines the branch added or changed never goes there. Its
 `outside_problems` names each earlier file and the problem in it; give it `tags`: 1 to 3 lines
-of `tasks/tags.txt` that fit its title, notes and `may_edit` (`repo` when none fits). When the
+of `tasks/tags.txt` that fit its title, notes and `may_edit` (`repo` when none fits), and its
+`summary`, with each open choice put to the three tests (Every task you draft, above). When the
 branch already adds a Proposed task, add none: in the merge or park commit, put the earlier
-problems into that task's `outside_problems` and `notes`.
+problems into that task's `outside_problems` and `notes`, and write its `summary` the same way,
+or check the builder's against that standard.
 
 - **reviewer**, **script:** dispatch `manager-reviewer` with the task file's path, the
   output of `git diff <working branch>...<branch>`, `<worktree>` as the place to read the
@@ -247,8 +261,8 @@ hook refuses it unless `checks.py protected`, `checks.py owner`, `checks.py revi
 advice` and `checks.py merge-limit` all pass for the task; if it refuses, park the task with that
 output, under the reason for the check its output names: `permission` for `checks.py protected`,
 `your-action` for `checks.py owner` or `checks.py merge-limit`, `failed` for `checks.py review` or
-`checks.py advice`. Then set the task file's `status` to Done, `finished` to
-today, `tokens` (its `agents` so far plus this run's count from `checks.py tokens`), and
+`checks.py advice`, and `failed` when its output says the merge checks could not run. Then set
+the task file's `status` to Done, `finished` to today, `tokens` (its `agents` so far plus this run's count from `checks.py tokens`), and
 `decided_for_you` with each advisor ruling, remove its `for_retry`, add the Proposed task from
 step 5, and commit all of it with the subject `Merge task <id>: <title>`.
 Write that subject with the Write tool to `build/merge-message-<id>.txt` in the main folder
@@ -272,16 +286,18 @@ and a recommendation with its reason. Delete no other branch.
 **Draft the next task (manager; advisor, job d).** `checks.py drafts <id>` lists the Proposed
 tasks that hard-depend on the merged task and have an empty `done_means`. For each, draft its
 `done_means` (numbered `(1)`, `(2)`, ...), `verified_by`, `verifier_of_line` if a line needs one
-verifier, `may_edit` and `runs_as` yourself, from that task's own text and the merged task's
-results and findings, following `references/task-fields.md`: each pass line one a verifier can
-check, and each traced to a finding or a result. Then dispatch a fresh `manager-advisor` for job
-(d) to review the draft, with the draft quoted as one JSON object, that task's file path, the
-merged task's file path, `git diff <merge>^1 <merge>`, and the paths of the results the merged
-task produced. Tell it to start its reply with `RULING: HOLDS` or `RULING: FAILS`, then `JOB: d`.
-On `HOLDS`, write the draft into that task's file. On `FAILS`, write only the lines it holds,
-numbered again from `(1)`, with none of what it names as new scope, or no `done_means` when none
-is left; add nothing it suggests. Keep the status Proposed, add to the end of `draft_note` (or
-start it) a sentence saying that the manager drafted the fields from which task, the advisor's
+verifier, `may_edit`, `runs_as` and `summary` yourself, from that task's own text and the merged
+task's results and findings, following `references/task-fields.md`: each pass line one a
+verifier can check, and each traced to a finding or a result; each choice the draft would leave
+open put to the three tests (Every task you draft, above). Then dispatch a fresh
+`manager-advisor` for job (d) to review the draft, with the draft quoted as one JSON object, that
+task's file path, the merged task's file path, `git diff <merge>^1 <merge>`, and the paths of the
+results the merged task produced. Tell it to start its reply with `RULING: HOLDS` or `RULING:
+FAILS`, then `JOB: d`. On `HOLDS`, write the draft into that task's file. On `FAILS`, write only
+the lines it holds, numbered again from `(1)`, with none of what it names as new scope, or no
+`done_means` when none is left, and the `summary` rewritten to say what those lines say; add
+nothing it suggests. Keep the status Proposed, add to the end of `draft_note` (or start it) a
+sentence saying that the manager drafted the fields from which task, the advisor's
 ruling and the date, keeping what it held, save the reply verbatim to `tasks/advice/<draft
 id>-<n>.md`, and log the ruling under that task's `decided_for_you`. If `tasks.py lint` then
 fails, restore the task file, keep the saved reply, and list it under Needs you in the run
@@ -353,16 +369,36 @@ A deleted branch is restored with `git branch <name> <id>` while git still holds
 ### Decided for you
 - task <id>: chose <x> over <y>, because <why>; would change if <z>
 
+### Parked
+- task <id> (<park reason>): <question>. Recommended: <answer>. If you veto: <what changes>.
+
 ### Needs you
-- task <id> (parked): <question>. Recommended: <answer>. If you veto: <what changes>.
-- task <id> (Proposed): <title>. <why>.
-- branch <name> (not deleted): <checks.py superseded's output, as it is>
-- worktree <path> (not removed): <git's refusal, one line>. Recommended: <remove or keep, with its reason>.
+- task <id> (Proposed): <title>. Ready, change or drop. Test 3: changes direction, what gets built next.
+  - Outcome: <summary's outcome>
+  - Scope: <summary's scope>
+  - Risk: <summary's risk>
+  - Cost: <summary's cost>
+- task <id> (draft): <the choice the draft leaves open>. Recommended: <option>. Test <n>: <the test>.
+- branch <name> (not deleted): <checks.py superseded's output, as it is>. Test 2: hard to undo, a deletion.
+- worktree <path> (not removed): <git's refusal, one line>. Recommended: <remove or keep, with its reason>. Test 2: hard to undo, a deletion.
+- <a line of checks.py run-start, as it is>. Test 2: hard to undo, for a worktree that holds uncommitted changes; test 3: changes direction, for a task left In progress.
+- main folder check failed: <its output>. Test 1: only you know whose change it is and what to keep.
+- task <draft id> (draft not written): <tasks.py lint's output>. Test 3: changes direction, what the task builds is still open.
 ```
 
 The restore sentence appears once, under Done, when the report lists a deleted branch.
 
+Under Needs you goes only an item that passes one of the three tests of SKILL.md (What reaches the
+owner), each with the test named: 1, only you know; 2, hard to undo or spends money; 3, changes
+direction. An item that passes none is not there: you settled it, and it sits under Decided for
+you. A Proposed task is shown by its four-part `summary` and no pass line. A parked task sits
+under Parked with its park reason: the park list of SKILL.md decides it, not the three tests.
+
 Tokens: `checks.py tokens` holds every agent result counted on its task in this run, including
 judges and trials inside an iterate task.
 
-Report in one message: tasks merged, tasks parked, Proposed tasks, and the path of `tasks/RUNS.md`.
+Report in one message, the closing message to the owner, with the same split as the report:
+tasks merged; tasks parked; Needs you, each Proposed task by its four-part summary and each other
+item that passes a test, with the test named; Decided for you; and the path of `tasks/RUNS.md`.
+Call nothing his call that sits under Decided for you: you made that choice, and he can reverse
+it.

@@ -21,6 +21,7 @@ One JSON object per file, `tasks/<id>.json`, id zero-padded to 3 (`tasks/020.jso
 | `depends_on` | list of `{"id": <int>, "soft": <bool>}`; hard unless `soft` is true | Owner; manager may draft |
 | `tokens` | `null`, or `{"agents": <int>, "main_session": "not recorded"}` | Manager |
 | `draft_note` | text, optional | Whoever drafted the fields |
+| `summary` | optional; `{"outcome", "scope", "risk", "cost"}`, each non-empty text, what the owner reads to say Ready, change or drop. The standard of each part is below the table. `tasks.py lint` rejects a summary that lacks a part or holds an empty one, and a Proposed or Ready task with an id above 71 that has none; a task up to 71 passes with or without one | Whoever drafts the task: the owner, the manager or the builder for a Proposed task |
 | `needs_you` | optional; `{"question", "recommendation", "if_vetoed"}`, required when status is Needs you | Manager |
 | `decided_for_you` | optional; list of `{"chosen", "rejected", "why", "would_change"}`, each text; `why` is one sentence, the reason for the choice. The manager writes `why` in every new entry; an entry written before task 68 has none, so `tasks.py lint` accepts an entry without it and rejects a `why` that is not non-empty text | Manager |
 | `outside_needs` | optional; list of distinct values from a fixed set, today only `claude-api`. `checks.py needs` runs one check per value before a builder starts; a failure parks the task | Owner; manager may draft |
@@ -36,6 +37,15 @@ line, line 1. `advisor` is the `manager-advisor` agent: for each of its lines th
 its reply in `tasks/advice/<id>-<n>.md`, and `checks.py advice` refuses the merge until the
 latest reply on each line starts `RULING: HOLDS`; a line `you` verifies too is the owner's and
 needs no reply. A line for `you` waits for `owner_verified`.
+
+`summary` has four parts, each one or two sentences (owner, 2026-11-20):
+
+- **Outcome:** what is true when the task is done.
+- **Scope:** what it changes and what it leaves alone, in words the owner already knows, with no
+  file name or field name unless the same sentence explains it; a scope line that needs
+  explaining is badly written.
+- **Risk:** the worst outcome if it goes wrong, and what guards against it.
+- **Cost:** builder runs, and the agent tokens of a named earlier task of similar size.
 
 A Ready task must have `done_means`, `verified_by`, `runs_as` and `priority`. A draft counts
 only when the owner sets the task to Ready; after that the manager changes none of the owner's

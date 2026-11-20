@@ -95,8 +95,10 @@ alone.
    fields of a Proposed task that hard-depends on the merged one and has an empty `done_means`:
    it rules HOLDS or FAILS on whether each pass line can be checked and traces back to a finding
    or a result, whether every instruction in the draft's notes has a line that fails if the
-   instruction is ignored, and whether a rename or removal has a line saying the old thing is
-   left nowhere, and lists anything in the draft that is new scope, which it names and
+   instruction is ignored, whether a rename or removal has a line saying the old thing is
+   left nowhere, and whether the summary agrees with the pass lines; a line that leaves a choice
+   to the owner fails only when the choice passes one of the three tests (What reaches the
+   owner); and it lists anything in the draft that is new scope, which it names and
    does not add. The advisor writes no field; the task stays Proposed. What it never
    decides is decided by a script, `checks.py consult`: the always-park cases below. Every advisor
    reply is saved verbatim in `tasks/advice/<id>-<n>.md` and its ruling is logged under
@@ -118,6 +120,24 @@ alone.
    builders' Bash ran in the main folder; with `isolation: worktree` the builders worked in their
    own worktree, and their Bash still wrote to the main folder when told to. So the manager makes
    each worktree itself, and the brief and `checks.py main-folder` keep the builder in it.
+
+## What reaches the owner: three tests
+
+An open choice or a finding reaches the owner only when one of these three tests holds, and it
+reaches him named with the test it passes (owner, 2026-11-19 and 2026-11-20):
+
+1. **Only he knows the answer:** a fact about his product or what he wants.
+2. **It is hard to undo or spends money,** a deletion included.
+3. **It changes direction,** what gets built next, which includes a task growing past its stated
+   scope.
+
+When none holds, the manager settles the choice itself: it takes the option that is cheapest to
+undo and logs it in the task's `decided_for_you` with its why, and the run report shows it under
+Decided for you, never as his call. This decides what goes under Needs you in the run report; it
+does not change when a task parks, which the park list below decides as before. Every task the
+manager drafts carries a `summary` in four parts, outcome, scope, risk and cost
+(`references/task-fields.md`), and the run report shows a Proposed task by that summary, not by
+its pass lines.
 
 ## Park, never ask
 

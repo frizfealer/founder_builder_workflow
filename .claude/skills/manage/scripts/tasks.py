@@ -61,12 +61,17 @@ REQUIRED = ["id", "title", "item", "motivation", "status", "added", "finished", 
 # verifier_of_line: the one verifier of a done_means line, keyed by the line's number.
 # may_delete: the paths a task branch may delete or rename that existed when it left the working branch.
 # outside_problems: for a Proposed task, each earlier file and the problem in it the task is about.
+# summary: the four parts the owner reads to say Ready, change or drop (task 71).
 OPTIONAL = ["draft_note", "needs_you", "decided_for_you", "outside_needs", "for_retry", "owner_verified",
-            "verifier_of_line", "may_delete", "outside_problems"]
+            "verifier_of_line", "may_delete", "outside_problems", "summary"]
 NEEDS_YOU_KEYS = ["question", "recommendation", "if_vetoed"]
 DECIDED_KEYS = ["chosen", "rejected", "would_change"]
 # why: one sentence, the reason for the choice. Optional, since entries written before task 68 have none.
 DECIDED_WHY = "why"
+SUMMARY_PARTS = ["outcome", "scope", "risk", "cost"]
+# A Proposed or Ready task with an id from this one on needs a summary; tasks up to 71 were written
+# before task 71 and pass with or without one.
+SUMMARY_FROM_ID = 72
 
 
 def task_path(root, task_id):
@@ -225,6 +230,24 @@ def lint_task(name, t, allowed_tags):
         and all(isinstance(p[k], str) and p[k].strip() for k in p) for p in op
     )):
         e(f"{name}: outside_problems must be a non-empty list of {{\"file\": <path>, \"problem\": <text>}}")
+    sm = t.get("summary")
+    if sm is not None:
+        if not isinstance(sm, dict):
+            e(f"{name}: summary must be an object with the parts {SUMMARY_PARTS}")
+        else:
+            lacking = [k for k in SUMMARY_PARTS if k not in sm]
+            empty = [k for k in SUMMARY_PARTS if k in sm and not (isinstance(sm[k], str) and sm[k].strip())]
+            extra = [k for k in sm if k not in SUMMARY_PARTS]
+            if lacking:
+                e(f"{name}: summary lacks the part(s) {lacking}")
+            if empty:
+                e(f"{name}: summary part(s) {empty} must be non-empty text")
+            if extra:
+                e(f"{name}: summary has part(s) {extra}; its parts are {SUMMARY_PARTS}")
+    elif (status in {"Proposed", "Ready"} and isinstance(t["id"], int) and not isinstance(t["id"], bool)
+          and t["id"] >= SUMMARY_FROM_ID):
+        e(f"{name}: a {status} task with an id above {SUMMARY_FROM_ID - 1} needs a summary "
+          f"({', '.join(SUMMARY_PARTS)})")
     ov = t.get("owner_verified", "")
     if not (isinstance(ov, str) and (ov == "" or DATE.match(ov))):
         e(f"{name}: owner_verified must be YYYY-MM-DD, or empty")
