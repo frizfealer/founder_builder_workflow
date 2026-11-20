@@ -74,7 +74,7 @@ Items the assistant marked as its own derivations, all confirmed:
 
 ### Tool confirmation turn
 
-Proposed set shown to the user: list_orders() (returns each order with its refund or null), cancel_order(order_number), issue_refund(order_number) (supplied), request_staff_followup(order_number, reason) with reasons refund_not_issued, refund_status_unknown, cancellation_unknown; terminal refund error returns a refund with status failed, transient error creates none; handoff timeout not retried; SG-02 (store staff work every follow-up task) added.
+Proposed set shown to the user: list_orders() (returns each order with its refund or null), cancel_order(order_number), issue_refund(order_number) (supplied), request_staff_followup(order_number, reason) with reasons refund_not_issued, refund_status_unknown, cancellation_unknown; terminal refund error returns a refund with status failed, transient error creates none; handoff timeout not retried [replaced by the user's change 3 below and Round 4, row 9: retry once]; SG-02 (store staff work every follow-up task) added.
 
 User answer (verbatim):
 
@@ -83,23 +83,12 @@ User answer (verbatim):
 > 2. issue_refund adds outcome OrderNotCancelled.
 > 3. request_staff_followup is idempotent on (order_number, reason) — add as SG-03. On timeout, retry once; if it times out again, tell the customer to contact Harbor Goods support.
 > 4. list_orders includes cancelled orders. Reads may be retried on timeout without limit; only commit calls are bounded.
+>
+> [Replaced on 2026-11-19: "Reads may be retried on timeout without limit" no longer counts. See Round 4, rows 1 and 2: 3 tries in total.]
 
-## Tool set as confirmed
+### Round 4: the owner's later answers, 2026-11-19 (task 29)
 
-| Tool | Effect | Source |
-|---|---|---|
-| list_orders() | read-only | proposed, confirmed (includes cancelled orders; a timeout or an error is a failed try, 3 tries in total: owner answers of 2026-11-19, rows 1 and 2, which replace "reads retried without limit") |
-| cancel_order(order_number) | state-changing | proposed, confirmed with the user's change 1 |
-| issue_refund(order_number) | state-changing | supplied by the user; outcome OrderNotCancelled added by the user |
-| request_staff_followup(order_number, reason) | state-changing | proposed, confirmed with the user's change 3 |
-
-Supporting-actor guarantees: SG-01 refund idempotent (user), SG-02 staff work tasks (proposed, confirmed), SG-03 follow-up idempotent (user), SG-04 cancellation idempotent (user's change 1).
-
-Default trial count 5, message cap 12; no metric changes requested.
-
-## Owner answers, 2026-11-19 (task 29)
-
-The owner answered the open product questions in the founder_and_builder project chat on 2026-11-19, each as a recommendation he accepted or changed, and closed with "yes to all". Where a row differs from the interview above, the row is his answer now: row 1 replaces "Reads may be retried on timeout without limit" (tool confirmation turn, change 4), and row 9 settles "handoff timeout not retried" against "On timeout, retry once" in favour of the retry. A lookup is a list_orders call. A hand-off is a request_staff_followup call.
+The owner answered the open product questions in the founder_and_builder project chat on 2026-11-19, each as a recommendation he accepted or changed, and closed with "yes to all". These are the owner's recorded answers like the rounds above, and they are later: where a row differs from an earlier passage, the row is his answer and the earlier passage no longer counts. Two earlier passages are replaced: row 1 replaces "Reads may be retried on timeout without limit" (tool confirmation turn, change 4), and row 9 settles "handoff timeout not retried" against "On timeout, retry once" in favour of the retry. A lookup is a list_orders call. A hand-off is a request_staff_followup call.
 
 1. The lookup keeps timing out. The agent tries 3 times in total. Then it tells the customer the order cannot be checked right now, changes nothing, and asks the customer to try later or contact Harbor Goods support. If a cancel or refund call is already unanswered, it hands off instead.
 2. The lookup returns an error. An error counts as a failed try under the same limit of 3.
@@ -113,3 +102,16 @@ The owner answered the open product questions in the founder_and_builder project
 10. A rule of its own, from the discussion of row 6: when two answers from the order system contradict each other (for example the cancel call answered cancelled and a lookup shows the order shipped), the agent makes no further cancel or refund call, tells the customer the order's state is not confirmed, and hands off as cancellation_unknown.
 
 Not a decision: a customer with three or more open orders. The rule already says "more than one".
+
+## Tool set as confirmed
+
+| Tool | Effect | Source |
+|---|---|---|
+| list_orders() | read-only | proposed, confirmed (includes cancelled orders; a timeout or an error is a failed try, 3 tries in total: Round 4, rows 1 and 2, which replace "reads retried without limit") |
+| cancel_order(order_number) | state-changing | proposed, confirmed with the user's change 1 |
+| issue_refund(order_number) | state-changing | supplied by the user; outcome OrderNotCancelled added by the user |
+| request_staff_followup(order_number, reason) | state-changing | proposed, confirmed with the user's change 3 |
+
+Supporting-actor guarantees: SG-01 refund idempotent (user), SG-02 staff work tasks (proposed, confirmed), SG-03 follow-up idempotent (user), SG-04 cancellation idempotent (user's change 1).
+
+Default trial count 5, message cap 12; no metric changes requested.
