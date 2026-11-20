@@ -14,8 +14,11 @@
     }
   ],
   "source_chat": "founder_and_builder project chat, 2026-11-16 and 2026-11-17",
-  "done_means": "",
-  "verified_by": [],
+  "done_means": "(1) .claude/skills/agent-spec-to-pytest-bdd/SKILL.md exists, written from the café example in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/, and its verify step names, in this order, the commands for: the drift check and the data-file checks (generate_features.py --check), the reference agent passing all 16 feature files, and the mutation test (variant_results.py --check, which reruns slice C's broken variants and compares each one's outcome with variant_results.json). (2) Each command the verify step names, run in the café folder, exits 0, and the whole café test suite passes. (3) The probe agent of slice A (class ProbeAgent in probe/agent.py and the --agent probe choice) is deleted, and the café suite and the commands of line 2 still pass without it.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
   "may_edit": [],
   "runs_as": "build",
   "priority": "",
@@ -23,5 +26,12 @@
     "bdd"
   ],
   "tokens": null,
-  "draft_note": "Placeholder written by Claude in chat on 2026-11-17 so the whole path of task 1 shows in the task list. done_means, verified_by and priority are left empty on purpose: Claude writes them from the results of the task this one depends on, and only then is it offered to the owner. Outline in tasks/plans/001.md, section 'Slices B to E'."
+  "draft_note": "Placeholder written by Claude in chat on 2026-11-17 so the whole path of task 1 shows in the task list. done_means, verified_by and priority are left empty on purpose: Claude writes them from the results of the task this one depends on, and only then is it offered to the owner. Outline in tasks/plans/001.md, section 'Slices B to E'. On 2026-11-19 the manager drafted done_means, verified_by, may_edit and runs_as from task 51's results; the advisor ruled FAILS (tasks/advice/052-1.md) on a line retiring pytest-bdd-skill-notes.md, which no verifier can check while that file is untracked, so only the three lines it held are kept.",
+  "decided_for_you": [
+    {
+      "chosen": "RULING: FAILS (advisor job d), tasks/advice/052-1.md: lines on the skill's verify step, its commands passing, and deleting the probe agent hold; the line retiring pytest-bdd-skill-notes.md fails, since the file is untracked (no branch has it) and the builder's point-by-point account has no verifier. Kept the three lines it held.",
+      "rejected": "RULING: HOLDS with all four lines",
+      "would_change": "The owner commits pytest-bdd-skill-notes.md, names it in may_delete, and puts the point-by-point account in a file on the branch or gives the line a verifier that sees the builder's report; or the owner means the whole probe (prompt builder, runners, probe/agent.py) by 'the probe agent'; or 'script checks' includes the plan's clause map."
+    }
+  ]
 }
