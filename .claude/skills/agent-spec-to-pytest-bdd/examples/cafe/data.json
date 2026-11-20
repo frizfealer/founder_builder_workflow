@@ -406,6 +406,34 @@
       "quote": ["says it could not release the earlier hold, and proposes nothing new"],
       "wording": "builder's own",
       "note": "slice B: the model_step is model.py's SAYS['release_failed']; the wording is a free choice; so are the judge answers"
+    },
+    "propose_no_name": {
+      "model_step": "",
+      "value": "I'm holding a table for you at {cafe} on {date} at {time} for {party_size} people. Shall I book it?",
+      "judge": {"proposes": true, "full_proposal": false, "says_booked": false, "says_not_booked": false, "says_unknown": false, "asks_call": false, "says_not_held": false, "says_max8": false, "asks_party_size": false, "says_cannot_change": false},
+      "source": "free choice",
+      "note": "slice C, a broken variant's sentence (harness/agents.py break-R-03-message): the proposal without the name, so it breaks R-03's 'the full proposal: café, date, time, party size and name'. No model step says it. The wording and the judge answers are this builder's reading of its own sentence"
+    },
+    "booked_no_id": {
+      "model_step": "",
+      "value": "Your table at {cafe} on {date} at {time} is booked.",
+      "judge": {"proposes": false, "full_proposal": false, "says_booked": true, "says_not_booked": false, "says_unknown": false, "asks_call": false, "says_not_held": false, "says_max8": false, "asks_party_size": false, "says_cannot_change": false},
+      "source": "free choice",
+      "note": "slice C, a broken variants' sentence (harness/agents.py break-R-05-message, break-R-09-message): says the table is booked and gives no confirmation id, which breaks R-05 after a booked answer and R-09 after a booking call with no answer. No model step says it. The wording and the judge answers are this builder's reading of its own sentence"
+    },
+    "unknown_no_call": {
+      "model_step": "",
+      "value": "The booking system did not answer, so I don't know whether your table was booked.",
+      "judge": {"proposes": false, "full_proposal": false, "says_booked": false, "says_not_booked": false, "says_unknown": true, "asks_call": false, "says_not_held": false, "says_max8": false, "asks_party_size": false, "says_cannot_change": false},
+      "source": "free choice",
+      "note": "slice C, a broken variant's sentence (harness/agents.py break-R-11-message): says it is not known whether the table was booked and does not ask the visitor to call the café, which breaks R-11. No model step says it. The wording and the judge answers are this builder's reading of its own sentence"
+    },
+    "max8_no_ask": {
+      "model_step": "",
+      "value": "I'm sorry, the largest party I can book is {max_party} people.",
+      "judge": {"proposes": false, "full_proposal": false, "says_booked": false, "says_not_booked": false, "says_unknown": false, "asks_call": false, "says_not_held": false, "says_max8": true, "asks_party_size": false, "says_cannot_change": false},
+      "source": "free choice",
+      "note": "slice C, a broken variant's sentence (harness/agents.py break-R-02-message): says the maximum is 8 and does not ask for a new party size, which breaks R-02. No model step says it. The wording and the judge answers are this builder's reading of its own sentence"
     }
   },
   "judge_instruction": {

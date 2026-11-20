@@ -1,0 +1,4780 @@
+{
+ "_about": "Written by variant_results.py; tests/test_slice_c.py fails when a rerun differs. Per slice C variant and scenario: whether its events differ from the reference agent's, every rule's verdict, the test's status; per variant its outcome.",
+ "counts": {
+  "caught": 13,
+  "caught only by another rule": 1,
+  "survived": 0,
+  "not caught, no verdict": 0
+ },
+ "variants": {
+  "break-R-01-message": {
+   "rule": "R-01",
+   "fault": "message",
+   "breaks": "or the hold call gets no answer, it tells the visitor and proposes nothing for that table",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-01"
+   ],
+   "differs_in": [
+    "SC-03",
+    "SC-05",
+    "SC-06",
+    "SC-11",
+    "SC-15"
+   ],
+   "failing_tests": [
+    "SC-03",
+    "SC-05",
+    "SC-06",
+    "SC-11",
+    "SC-15"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "breaks",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "breaks",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "breaks",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "breaks",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "breaks",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-02-call": {
+   "rule": "R-02",
+   "fault": "call",
+   "breaks": "The agent holds and proposes a table for at most 8 people.",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-02"
+   ],
+   "differs_in": [
+    "SC-01",
+    "SC-02",
+    "SC-06"
+   ],
+   "failing_tests": [
+    "SC-01",
+    "SC-02",
+    "SC-06"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "breaks",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "breaks",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "breaks",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-02-message": {
+   "rule": "R-02",
+   "fault": "message",
+   "breaks": "asks for a new party size",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-02"
+   ],
+   "differs_in": [
+    "SC-01",
+    "SC-02",
+    "SC-06"
+   ],
+   "failing_tests": [
+    "SC-01",
+    "SC-02",
+    "SC-06"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "breaks",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "breaks",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "breaks",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-03-message": {
+   "rule": "R-03",
+   "fault": "message",
+   "breaks": "the full proposal: café, date, time, party size and name",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-03"
+   ],
+   "differs_in": [
+    "SC-04",
+    "SC-08",
+    "SC-09",
+    "SC-10",
+    "SC-11",
+    "SC-12",
+    "SC-13",
+    "SC-14",
+    "SC-15",
+    "SC-16"
+   ],
+   "failing_tests": [
+    "SC-08",
+    "SC-11",
+    "SC-12",
+    "SC-13",
+    "SC-16"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": true,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "breaks",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": true,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": true,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "breaks",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "breaks",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "breaks",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": true,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": true,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "breaks",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-04-call": {
+   "rule": "R-04",
+   "fault": "call",
+   "breaks": "holds the changed table",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-04"
+   ],
+   "differs_in": [
+    "SC-15"
+   ],
+   "failing_tests": [
+    "SC-15"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "breaks",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-04-message": {
+   "rule": "R-04",
+   "fault": "message",
+   "breaks": "holds the changed table, and asks again",
+   "outcome": "caught only by another rule",
+   "broken_rules": [
+    "R-01"
+   ],
+   "differs_in": [
+    "SC-09",
+    "SC-14"
+   ],
+   "failing_tests": [
+    "SC-09",
+    "SC-14"
+   ],
+   "unchecked": {
+    "rule": "R-04",
+    "words": "holds the changed table, and asks again",
+    "listed_in_unchecked_sentences": "no"
+   },
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "breaks",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "breaks",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-05-message": {
+   "rule": "R-05",
+   "fault": "message",
+   "breaks": "gives the confirmation id",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-05"
+   ],
+   "differs_in": [
+    "SC-08"
+   ],
+   "failing_tests": [
+    "SC-08"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "breaks",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-06-call": {
+   "rule": "R-06",
+   "fault": "call",
+   "breaks": "it releases the old hold before it holds the new table",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-01",
+    "R-04",
+    "R-06"
+   ],
+   "differs_in": [
+    "SC-09",
+    "SC-14",
+    "SC-15"
+   ],
+   "failing_tests": [
+    "SC-09",
+    "SC-14",
+    "SC-15"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "breaks",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "breaks",
+      "R-05": "holds",
+      "R-06": "breaks",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "breaks",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "breaks",
+      "R-05": "holds",
+      "R-06": "breaks",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "breaks",
+      "R-05": "holds",
+      "R-06": "breaks",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-07-call": {
+   "rule": "R-07",
+   "fault": "call",
+   "breaks": "the agent releases its hold",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-07"
+   ],
+   "differs_in": [
+    "SC-10"
+   ],
+   "failing_tests": [
+    "SC-10"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "breaks",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": false,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-09-message": {
+   "rule": "R-09",
+   "fault": "message",
+   "breaks": "says the table is booked only when the booking call answered \"booked\"",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-09",
+    "R-11"
+   ],
+   "differs_in": [
+    "SC-12",
+    "SC-13"
+   ],
+   "failing_tests": [
+    "SC-12",
+    "SC-13"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "breaks",
+      "R-10": "holds",
+      "R-11": "breaks"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "breaks",
+      "R-10": "holds",
+      "R-11": "breaks"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-10-call": {
+   "rule": "R-10",
+   "fault": "call",
+   "breaks": "the agent holds the table again and asks again, once",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-10"
+   ],
+   "differs_in": [
+    "SC-11",
+    "SC-16"
+   ],
+   "failing_tests": [
+    "SC-11",
+    "SC-16"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "breaks",
+      "R-11": "holds"
+     },
+     "played_out": false,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "breaks",
+      "R-11": "holds"
+     },
+     "played_out": false,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-10-message": {
+   "rule": "R-10",
+   "fault": "message",
+   "breaks": "After a second expiry it tells the visitor the table could not be booked.",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-10"
+   ],
+   "differs_in": [
+    "SC-16"
+   ],
+   "failing_tests": [
+    "SC-16"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "breaks",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-11-call": {
+   "rule": "R-11",
+   "fault": "call",
+   "breaks": "the agent sends no second booking call",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-11"
+   ],
+   "differs_in": [
+    "SC-12",
+    "SC-13"
+   ],
+   "failing_tests": [
+    "SC-12",
+    "SC-13"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "breaks"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "breaks"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  },
+  "break-R-11-message": {
+   "rule": "R-11",
+   "fault": "message",
+   "breaks": "asks them to call the café",
+   "outcome": "caught",
+   "broken_rules": [
+    "R-11"
+   ],
+   "differs_in": [
+    "SC-12",
+    "SC-13"
+   ],
+   "failing_tests": [
+    "SC-12",
+    "SC-13"
+   ],
+   "scenarios": {
+    "SC-01": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-02": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-03": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-04": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-05": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-06": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-07": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-08": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-09": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-10": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-11": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-12": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "breaks"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-13": {
+     "differs": true,
+     "status": "fail",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "breaks"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-14": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-15": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    },
+    "SC-16": {
+     "differs": false,
+     "status": "pass",
+     "verdicts": {
+      "R-01": "holds",
+      "R-02": "holds",
+      "R-03": "holds",
+      "R-04": "holds",
+      "R-05": "holds",
+      "R-06": "holds",
+      "R-07": "holds",
+      "R-08": "holds",
+      "R-09": "holds",
+      "R-10": "holds",
+      "R-11": "holds"
+     },
+     "played_out": true,
+     "unlabelled_sentences": [],
+     "llm_calls": 0
+    }
+   }
+  }
+ }
+}
