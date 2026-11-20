@@ -3,10 +3,10 @@
   "title": "Manager: three loose ends next to task 068 (hook's money wording, merge-limit sentence, merge-limit's limits.json read)",
   "item": "Make the hook's paid-command refusal name the reason permission, make SKILL.md's merge-limit entry agree with the park list, and make checks.py merge-limit fail with one line on a bad limits.json",
   "motivation": "Found by task 68's reviews (tasks/reviews/068-1.md, 068-2.md); each lies in lines task 68's branch did not change (checks.py unmerged exit 1).",
-  "status": "Proposed",
+  "status": "Dropped",
   "added": "2026-11-19",
-  "finished": "",
-  "notes": "The hook text is a change to the merge hook's file, which task 68's notes kept out of that task; the owner decides whether the refusal text may change. The merge-limit sentence matters only once task 68 merges.",
+  "finished": "2026-11-19",
+  "notes": "The hook text is a change to the merge hook's file, which task 68's notes kept out of that task; the owner decides whether the refusal text may change. The merge-limit sentence matters only once task 68 merges. Dropped by the owner on 2026-11-19. Its first two problems are wrong only because of task 68's change, so they are folded into task 68's for_retry. The third (a broken limits.json, a limit of 0 or less) is dropped: a broken file already stops the run with an error, and a limit of 0 merges nothing.",
   "depends_on": [
     {
       "id": 68,
