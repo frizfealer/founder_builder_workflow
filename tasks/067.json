@@ -14,8 +14,11 @@
     }
   ],
   "source_chat": "",
-  "done_means": "",
-  "verified_by": [],
+  "done_means": "(1) judge_cases_b.json's _about no longer says its cases are not run, and names runs/judge-test-b.json. (2) uv run python generate_features.py --help prints its usage, exits 0 and changes no file. (3) probe/money.py's summary text names the ledger it summarizes, not task 56 by fixed text, and runs/task-056-money.json is unchanged. (4) In the café folder the whole test suite passes, generate_features.py --check exits 0 and variant_results.py --check exits 0.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
   "may_edit": [],
   "runs_as": "build",
   "priority": "",
@@ -23,7 +26,7 @@
     "bdd"
   ],
   "tokens": null,
-  "draft_note": "Proposed by the manager on 2026-11-19 in task 51's merge, from the advisor's and reviewers' findings on earlier files (SKILL.md rule 2).",
+  "draft_note": "Proposed by the manager on 2026-11-19 in task 51's merge, from the advisor's and reviewers' findings on earlier files (SKILL.md rule 2). On 2026-11-19 the manager drafted done_means, verified_by, may_edit and runs_as from task 51's results; the advisor ruled FAILS (tasks/advice/067-1.md) on the line about R-04's checker and unchecked list, whose either/or leaves the owner's choice to the builder, so only the four lines it held are kept. No line covers outside_problems 1 to 3 (R-04's checker, its unchecked list, the unreachable 'asks again'): which is fixed, and how, is the owner's.",
   "outside_problems": [
     {
       "file": ".claude/skills/agent-spec-to-pytest-bdd/examples/cafe/unchecked_sentences.json",
@@ -48,6 +51,13 @@
     {
       "file": ".claude/skills/agent-spec-to-pytest-bdd/examples/cafe/probe/money.py",
       "problem": "summary() text is fixed to task 56, so a run on another ledger (task 51's) gets no money summary file."
+    }
+  ],
+  "decided_for_you": [
+    {
+      "chosen": "RULING: FAILS (advisor job d), tasks/advice/067-1.md: the line making R-04's checker and its unchecked entry agree fails, since its 'or the checker checks it' branch names no checkable behaviour and hands the owner's choice to the builder; the three tooling lines and the regression line hold. Kept those four.",
+      "rejected": "RULING: HOLDS with all five lines",
+      "would_change": "The owner picks one end state for R-04 (the entry names the case: then that line holds), or says what R-04's checker must flag at a release with no answer and whether a judge question is added; or wants the unreachable 'asks again' in this task."
     }
   ]
 }
