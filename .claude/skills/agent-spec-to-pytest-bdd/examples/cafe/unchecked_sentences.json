@@ -10,7 +10,13 @@
    }
   ],
   "R-03": [],
-  "R-04": [],
+  "R-04": [
+   {
+    "sentence": "The agent releases the old hold, holds the changed table, and asks again.",
+    "not_checked": "what the agent does when the release call gets no answer during a change: after that release the checker checks neither what the agent says nor that it holds or proposes nothing new",
+    "reason": "rules.md's table 'What the agent does' gives that row ('the release call got no answer during a change') to R-06, not to R-04, so R-04's checker stops there on purpose (harness/checkers.py r04: 'a release with no answer: R-06 says what the agent does then'). What is checked of that row is listed under rows_not_checked. That no scenario reaches 'holds the changed table, and asks again' is spec_findings.json's F2."
+   }
+  ],
   "R-05": [],
   "R-06": [],
   "R-07": [],

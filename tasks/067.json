@@ -3,9 +3,9 @@
   "title": "Slice C findings: R-04's unchecked case and small café tooling gaps",
   "item": "Make R-04's checker and its unchecked list say the same thing, and fix three small tooling problems in the café folder that task 51 met",
   "motivation": "Found by task 51 (BDD slice C) and its review; these files existed before task 51's branch and it did not change them.",
-  "status": "In progress",
+  "status": "Done",
   "added": "2026-11-19",
-  "finished": "",
+  "finished": "2026-11-20",
   "notes": "Slice C's variant break-R-04-message was caught only by R-01 (variant_results.json). The advisor (tasks/advice/051-3.md) found R-04's checker skips a release with no answer during a change, while unchecked_sentences.json gives R-04 an empty list, meaning every sentence is checked. The reviewer (tasks/reviews/051-1.md, minor 1) found R-04's 'holds the changed table, and asks again' is reached in no scenario, because the reference agent raises there. Which of these is fixed, and how, is the owner's call; task 51's notes say fixing what slice C finds is the next task.",
   "depends_on": [
     {
@@ -25,7 +25,10 @@
   "tags": [
     "bdd"
   ],
-  "tokens": null,
+  "tokens": {
+    "agents": 212320,
+    "main_session": "not recorded"
+  },
   "draft_note": "Proposed by the manager on 2026-11-19 in task 51's merge, from the advisor's and reviewers' findings on earlier files (SKILL.md rule 2). On 2026-11-19 the manager drafted done_means, verified_by, may_edit and runs_as from task 51's results; the advisor ruled FAILS (tasks/advice/067-1.md) on the line about R-04's checker and unchecked list, whose either/or leaves the owner's choice to the builder, so only the four lines it held are kept. No line covers outside_problems 1 to 3 (R-04's checker, its unchecked list, the unreachable 'asks again'): which is fixed, and how, is the owner's. On 2026-11-20 Claude in chat added lines (5) and (6) and set priority and Ready on the owner's word of 2026-11-19 (\"go\"). They settle outside_problems 1 to 3: the gap is written down and reported to the spec, not closed.",
   "outside_problems": [
     {
@@ -64,6 +67,24 @@
       "rejected": "Making R-04's checker check a release with no answer (a new judge question and paid judge calls); hand-writing the missing scenario in the test folder; moving the four broken-variant sentences to their own section of data.json.",
       "why": "None of these needs the owner: no fact only he knows, nothing hard to undo or paid, no change of direction. The part of the unanswered-release row that carries risk, 'proposes nothing new', is already caught by R-01's checker; scenarios come from the spec by DECISIONS.md; and the four sentences are already named and noted as a broken variant's.",
       "would_change": "The owner wants the gap closed by a judge question, or the scenario written in the test folder."
+    },
+    {
+      "chosen": "Builder: F2's scenario and quote fields are \"absent\", with SC-09, SC-14 and SC-15 named in its where and evidence, and the missing scenario ends with the visitor no longer answering, as SC-04 does; severity Important.",
+      "rejected": "Quoting R-04's sentence as F2's quote; ending the missing scenario at the hold's answer or with a booking; severity Nit.",
+      "why": "verification.md has a Gap quote \"absent\", and F1's reasoning on severity applies to F2 as well.",
+      "would_change": "The spec owner reads quote as the rule text that goes unrun, or wants another ending for the missing scenario."
+    },
+    {
+      "chosen": "Builder: probe/money.py names the task from a ledger file named task-<id>-usage.jsonl and keeps task 56's text word for word for the default ledger; the fix pass gave any other ledger its own sentence.",
+      "rejected": "One generic sentence for every ledger; new --ledger and --out flags.",
+      "why": "A generic sentence would have changed runs/task-056-money.json on a rerun, and line (3) asks only for the text.",
+      "would_change": "The owner wants money.py's command line to summarize any ledger into its own file."
+    },
+    {
+      "chosen": "Manager: no Proposed task from this run. The earlier problems in probe/money.py are that summary() with no out writes to runs/task-056-money.json and that cap_usd is always task 56's 2.0. Both stay in tasks/reviews/067-1.md and the run report.",
+      "rejected": "A Proposed task to give money.py a ledger and output argument and a cap per ledger.",
+      "why": "Nothing today summarizes another ledger that way (run_probe2.py uses the default ledger), so neither problem has an effect yet.",
+      "would_change": "A task summarizes another task's ledger with money.py."
     }
   ]
 }
