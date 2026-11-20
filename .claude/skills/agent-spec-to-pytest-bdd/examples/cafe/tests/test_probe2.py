@@ -214,6 +214,19 @@ def test_write_run_transcript_holds_no_probe_moment_name(tmp_path):
     assert json.loads((tmp_path / "verdicts" / "run-x.json").read_text())["moment"] == moment
 
 
+def test_write_run_raised_run_writes_error_verdict_and_no_transcript(tmp_path):
+    """Should write no transcript for a run whose agent raised, and a verdict file with status error, the failed
+    step, no LLM call and every cited rule undecided because the run raised: the reference agent has no step at
+    the probe-only M5-try-again."""
+    proc = run_moment_with_out(tmp_path, "reference", "M5-try-again")
+    assert "NotImplementedError: no reference step after the visitor's" in proc.stdout, proc.stdout
+    assert not (tmp_path / "transcripts" / "run-x.json").exists()
+    v = json.loads((tmp_path / "verdicts" / "run-x.json").read_text())
+    assert v["status"] == "error" and v["moment"] == "M5-try-again" and v["llm_calls"] == 0
+    assert v["failed_step"] is not None
+    assert v["rules"] == {r: {"verdict": "undecided", "reason": "the run raised"} for r in ("R-09", "R-11")}
+
+
 def test_check_saved_probe2_transcripts_unchanged_and_line2_holds():
     """Should find the 12 saved transcripts of runs/probe2 as committed, keeping their moment field, and the
     saved-runs check holding on them."""
