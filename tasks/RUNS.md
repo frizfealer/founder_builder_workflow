@@ -1,5 +1,25 @@
 # Manager runs
 
+## Run 2026-11-19 21:26
+
+Stopped because: no task to take.
+
+### Done
+- none merged. Task 68 built (task/068, commits 87c293a and c62470c), review 068-1 PASS, fix pass re-checked PASS (068-2), 361 manager tests pass; parked for your line 9.
+
+### Tokens
+- task 068: 353005
+- total: 353005
+
+### Decided for you
+- task 68: no for_retry, since the four minor findings on the branch's own lines were fixed in the fix pass and re-checked; would change if you find a fix in c62470c wrong.
+- task 68 (builder): merge-limit, the 16th old reason, which the notes map to no new reason, is an unknown word for consult (exit 2); a reached limit still parks as your-action through its repo condition; would change if you want a fifth reason word.
+- task 68 (builder): the hook's paid-command refusal keeps its text "(reason money)", since the notes forbid changing the hook; SKILL.md and step 4 say the task parks as permission; would change if you allow that hook text and its test to change (task 69).
+
+### Needs you
+- task 68 (parked): read the new park list in SKILL.md on task/068 ("Park, never ask", from line 116; `git show task/068:.claude/skills/manage/SKILL.md`). Recommended: if the four reasons read as agreed, set owner_verified on tasks/068.json and the next run merges it. If you veto: write the change into for_retry; the next run rebuilds on task/068-2 and fixes only that.
+- task 69 (Proposed): Manager: three loose ends next to task 068. The hook's refusal still says reason money; SKILL.md's merge-limit sentence says the run ends, against the new park list; checks.py merge-limit has no guard on a bad limits.json. The first needs your word on changing the hook's text.
+
 ## Run 2026-11-19 20:29
 
 Stopped because: no task to take.
