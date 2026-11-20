@@ -3,7 +3,7 @@
   "title": "BDD slice D: write the skill",
   "item": "Write the agent-spec-to-pytest-bdd skill from the café work, with its verify step",
   "motivation": "A slice of task 1, the BDD skill. Its content depends on what the slice before it shows.",
-  "status": "Ready",
+  "status": "In progress",
   "added": "2026-11-17",
   "finished": "",
   "notes": "Verify step: script checks, the reference agent passes, then the mutation test of slice C. The probe agent of slice A is deleted. FOR THE BUILDER'S BRIEF (tasks/advice/052-1.md): tests/test_probe.py and tests/test_probe2.py use ProbeAgent and are edited, not deleted; probe/run_part2.py and probe/run_probe2.py stop working once it is gone, and the report says so. The old untracked file pytest-bdd-skill-notes.md is not part of this task: the owner had it deleted on 2026-11-20, since it described the spec format the café work replaced.",
