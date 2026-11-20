@@ -169,3 +169,53 @@ def test_check_variant_code_imports_no_checker():
     imported += [n.module for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)]
     assert imported == ["harness.data"]
     assert all(c.__module__ == agents.__name__ for c in SLICE_C)
+
+
+# ---------------------------------------------------------------------- line 6: the judge on slice B's cases
+
+B_ARGS = ["--cases", "judge_cases_b.json", "--out", "runs/judge-test-b.json", "--needed", "17"]
+
+
+def b_cases():
+    return json.loads((HERE / "judge_cases_b.json").read_text(encoding="utf-8"))["cases"]
+
+
+def test_judge_test_b_cases_with_stub_write_given_result_file(tmp_path, monkeypatch):
+    """Should put each of the 20 cases of judge_cases_b.json to the judge 3 times, count the 18 not marked hard
+    against 17, write the result file given and record the calls in the ledger given, not task 56's."""
+    from probe import judge_test
+    from probe.llm import LLM
+    from stub_api import StubClient
+    monkeypatch.setenv("CAFE_USAGE_LEDGER", str(tmp_path / "usage.jsonl"))
+    cs = b_cases()
+    assert len(cs) == 20 and sum(c["hard"] for c in cs) == 2
+    replies = [("text", c["expected"].capitalize() + ".") for c in cs for _ in range(3)]
+    replies[0] = ("text", {"yes": "No.", "no": "Yes."}[cs[0]["expected"]])
+    out, ledger = tmp_path / "b.json", tmp_path / "usage.jsonl"
+    res = judge_test.run(LLM(client=StubClient(replies)), HERE / "judge_cases_b.json", out, 17, ledger, 0.45)
+    assert json.loads(out.read_text()) == res and len(judge_test.money.calls(ledger)) == 60
+    assert res["pass_line"] == {"cases_not_hard": 18, "as_expected_in_2_of_3": 18, "needed": 17, "holds": True}
+    assert [r["id"] for r in res["hard_cases"]] == [c["id"] for c in cs if c["hard"]]
+    assert [r["id"] for r in res["differing_repeats"]] == [cs[0]["id"]]
+    assert "judge_cases_b.json" in res["_about"]
+
+
+def test_judge_test_b_stops_at_the_given_spend(tmp_path, monkeypatch):
+    """Should start no case once the given ledger holds the given stop in USD."""
+    from probe import judge_test
+    ledger = tmp_path / "usage.jsonl"
+    monkeypatch.setattr(judge_test.money, "spent", lambda path=None: 0.45 if path == ledger else 0.0)
+    with pytest.raises(SystemExit, match="stopped before J33"):
+        judge_test.run(object(), HERE / "judge_cases_b.json", tmp_path / "b.json", 17, ledger, 0.45)
+
+
+def test_judge_test_b_report_on_saved_file_holds(capsys):
+    """Should exit 0 on runs/judge-test-b.json: at least 17 of the 18 cases not marked hard answered as expected
+    in at least 2 of 3 repeats, with the hard cases and the cases with differing repeats listed."""
+    from probe import judge_test
+    with pytest.raises(SystemExit) as e:
+        judge_test.main([*B_ARGS, "--report"])
+    out = capsys.readouterr().out
+    assert e.value.code == 0, out
+    assert "of the 18 cases not marked hard" in out and "needed 17 -> HOLDS" in out
+    assert "hard cases: J37" in out and "cases with differing repeats:" in out

@@ -496,7 +496,7 @@
       "ref": ["R-01"],
       "quote": ["When the table is taken, or the hold call gets no answer, it tells the visitor"],
       "wording": "builder's own",
-      "note": "slice B, R-01's second sentence; one question for both rows ('says the table is taken', 'says the table could not be held'). The wording is a free choice; its cases are in judge_cases_b.json, not yet run"
+      "note": "slice B, R-01's second sentence; one question for both rows ('says the table is taken', 'says the table could not be held'). The wording is a free choice; its cases are in judge_cases_b.json, run 3 times each in task 51 (runs/judge-test-b.json)"
     },
     "says_max8": {
       "value": "Does this message tell the visitor that the largest party that can be booked is {max_party} people?",
@@ -504,7 +504,7 @@
       "ref": ["R-02"],
       "quote": ["tells the visitor the maximum is 8"],
       "wording": "builder's own",
-      "note": "slice B; the wording is a free choice; its cases are in judge_cases_b.json, not yet run"
+      "note": "slice B; the wording is a free choice; its cases are in judge_cases_b.json, run 3 times each in task 51 (runs/judge-test-b.json)"
     },
     "asks_party_size": {
       "value": "Does this message ask the visitor for a new party size, that is, how many people to book for?",
@@ -512,7 +512,7 @@
       "ref": ["R-02"],
       "quote": ["asks for a new party size"],
       "wording": "builder's own",
-      "note": "slice B; the wording is a free choice; its cases are in judge_cases_b.json, not yet run"
+      "note": "slice B; the wording is a free choice; its cases are in judge_cases_b.json, run 3 times each in task 51 (runs/judge-test-b.json)"
     },
     "says_cannot_change": {
       "value": "Does this message tell the visitor that the assistant cannot change a reservation that already exists?",
@@ -520,7 +520,7 @@
       "ref": ["R-08", "C-11"],
       "quote": ["the agent says it cannot"],
       "wording": "builder's own",
-      "note": "slice B; no scenario plays it (SC-17 has no World lines, spec_findings.json), only tests/test_slice_b.py; the wording is a free choice; its cases are in judge_cases_b.json, not yet run"
+      "note": "slice B; no scenario plays it (SC-17 has no World lines, spec_findings.json), only tests/test_slice_b.py; the wording is a free choice; its cases are in judge_cases_b.json, run 3 times each in task 51 (runs/judge-test-b.json)"
     }
   },
   "action_limit": {
