@@ -1,5 +1,35 @@
 # Manager runs
 
+## Run 2026-11-19 20:29
+
+Stopped because: no task to take.
+
+### Done
+- task 51: BDD slice C: broken variants by a different builder; merge ba21f11; tokens 482018 (task total 482018; main session: not recorded). 14 new variants: 13 caught by their own rule, 1 caught only by another rule (break-R-04-message, by R-01), 0 survived. Slice B's judge cases: 18 of 18 not marked hard as expected (17 needed), 0.0162 USD. Café suite 589 passed.
+- task 52 (Proposed): fields drafted from task 51, commit be730fd; advisor ruled FAILS (tasks/advice/052-1.md), 3 of 4 lines kept.
+- task 67 (Proposed, new): fields drafted from task 51, commit 96fc131; advisor ruled FAILS (tasks/advice/067-1.md), 4 of 5 lines kept.
+- branch task/051 deleted, last commit 4b6dfb5b4bda33cdf564add398e63f187c250874; restore with `git branch task/051 4b6dfb5b4bda33cdf564add398e63f187c250874`
+
+### Tokens
+- task 51: 657251 (482018 to its merge, recorded in its file; 175233 for the two job d drafts of tasks 52 and 67 after it)
+- total: 657251
+
+### Decided for you
+- task 51: advisor job c on line 6 ruled HOLDS (tasks/advice/051-2.md): "run with no arguments" read as the default files with --report, not a paid rerun; would change if you meant a real argument-free rerun of task 56's 32 cases.
+- task 51: advisor job c on line 4 ruled HOLDS (tasks/advice/051-3.md) on the mechanical "already listed" search; would change if you read "already lists them" as "lists the situation" (then break-R-04-message is "partly, under rows_not_checked for R-06").
+- task 51: chose an R-04 message variant at a failed release during a change over one at R-04's own "holds the changed table, and asks again", which no scenario reaches; would change if a scenario holds a changed table.
+- task 51: chose four new "free choice" sentences in data.json for the message variants over a separate section; would change if you want broken variants' sentences kept apart.
+- task 51: the fix pass dropped the builder's fourth outcome ("not caught, no verdict"); variant_results.py now stops on a variant with none of line 4's three; would change if you want such a variant recorded.
+- task 51: chose one Proposed task (67) for the earlier problems over none; would change if you want them in task 52 or not at all.
+- task 52: dropped the line retiring pytest-bdd-skill-notes.md (advisor FAILS: the file is untracked, and the builder's account of its points has no verifier); would change if you commit the file, name it in may_delete and give the account a checkable place.
+- task 67: dropped the line on R-04's checker and its unchecked list (advisor FAILS: its "or the checker checks it" names no checkable behaviour and leaves your choice to the builder); would change if you pick one end state, for example that unchecked_sentences.json names the case.
+
+### Needs you
+- task 52 (Proposed): BDD slice D: write the skill. Fields drafted, 3 lines; set priority and Ready if they fit. pytest-bdd-skill-notes.md is untracked, so no task branch can see it: commit it first if the skill should take it in. The builder's brief must say tests/test_probe.py and test_probe2.py use ProbeAgent and must be edited, not deleted, and that probe/run_part2.py and run_probe2.py stop working (tasks/advice/052-1.md).
+- task 67 (Proposed): Slice C findings: R-04's unchecked case and small café tooling gaps. Fields drafted, 4 tooling lines. Its outside_problems 1 to 3 (R-04's checker skips a release with no answer during a change while its unchecked list is empty; the reference agent never reaches R-04's "asks again") have no line: which is fixed, and how, is yours. Recommended: a line that unchecked_sentences.json's R-04 entry names that case with a reason.
+- task 51 review 051-2 minor: the stop in variant_results.py is a plain assert, skipped under python -O. It stays in the review file, with no task.
+- merge limit: 1 of 10 since review/2026-11-19.
+
 ## Run 2026-11-19 19:12
 
 Stopped because: no task to take.
