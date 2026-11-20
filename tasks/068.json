@@ -26,10 +26,35 @@
       "soft": false
     }
   ],
-  "status": "In progress",
+  "status": "Needs you",
   "added": "2026-11-19",
   "finished": "",
-  "tokens": null,
+  "tokens": {
+    "agents": 353005,
+    "main_session": "not recorded"
+  },
   "source_chat": "founder_and_builder project chat, 2026-11-19",
-  "draft_note": "Drafted by Claude in chat on 2026-11-19 on the owner's yes to all six points and his word that it is high priority. It changes the manager's own rules; line 9 is his, so the task parks once for his read of the new park list before it merges."
+  "draft_note": "Drafted by Claude in chat on 2026-11-19 on the owner's yes to all six points and his word that it is high priority. It changes the manager's own rules; line 9 is his, so the task parks once for his read of the new park list before it merges.",
+  "needs_you": {
+    "question": "Line 9 waits for you: read the new park list in SKILL.md on branch task/068 (section 'Park, never ask', from line 116: `git show task/068:.claude/skills/manage/SKILL.md`). Everything else passed: review 068-1 PASS with no blocking problem, its four minor findings fixed in one pass and re-checked PASS (068-2), 361 manager tests and tasks.py lint pass, protected-path check passes.",
+    "recommendation": "If the four reasons read as you agreed on 2026-11-19, set owner_verified on tasks/068.json; the next run merges task/068 with no further park. One point to look at: merge-limit, the 16th old reason, which the notes map to no reason, is now an unknown word (consult exits 2) and the limit condition parks as your-action. The hook's paid-command refusal still says '(reason money)', because the notes forbid changing the hook.",
+    "if_vetoed": "Write what to change in the park list into for_retry; the next run cuts task/068-2 from the working branch and a fresh builder brings task/068's work over and fixes only that."
+  },
+  "decided_for_you": [
+    {
+      "chosen": "No for_retry: the four minor findings on the branch's own lines were fixed in the fix pass and the re-check passed (tasks/reviews/068-2.md), so nothing of the task's own is open.",
+      "rejected": "Listing the fixed findings in for_retry.",
+      "would_change": "The owner finds a fix in commit c62470c wrong."
+    },
+    {
+      "chosen": "Builder: merge-limit, which the notes map to no new reason, is an unknown word for consult (exit 2); a reached limit still parks as your-action through its repo condition.",
+      "rejected": "A fifth reason word.",
+      "would_change": "The owner wants merge-limit to stay a reason the manager names."
+    },
+    {
+      "chosen": "Builder: the hook's paid-command refusal keeps its text '(reason money)'; SKILL.md and step 4 say the task parks as permission.",
+      "rejected": "Editing the hook text and test_hook_gates.py.",
+      "would_change": "The owner allows that hook text and its test to change (proposed as task 69)."
+    }
+  ]
 }

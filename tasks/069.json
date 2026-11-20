@@ -1,0 +1,44 @@
+{
+  "id": 69,
+  "title": "Manager: three loose ends next to task 068 (hook's money wording, merge-limit sentence, merge-limit's limits.json read)",
+  "item": "Make the hook's paid-command refusal name the reason permission, make SKILL.md's merge-limit entry agree with the park list, and make checks.py merge-limit fail with one line on a bad limits.json",
+  "motivation": "Found by task 68's reviews (tasks/reviews/068-1.md, 068-2.md); each lies in lines task 68's branch did not change (checks.py unmerged exit 1).",
+  "status": "Proposed",
+  "added": "2026-11-19",
+  "finished": "",
+  "notes": "The hook text is a change to the merge hook's file, which task 68's notes kept out of that task; the owner decides whether the refusal text may change. The merge-limit sentence matters only once task 68 merges.",
+  "depends_on": [
+    {
+      "id": 68,
+      "soft": false
+    }
+  ],
+  "source_chat": "",
+  "done_means": "",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "",
+  "tags": [
+    "manager"
+  ],
+  "tokens": null,
+  "draft_note": "Proposed by the manager on 2026-11-19 in task 68's park, from the outside and earlier problems of its two reviews.",
+  "outside_problems": [
+    {
+      "file": ".claude/skills/manage/scripts/checks.py",
+      "problem": "The push hook's paid-command refusal (about line 974 on task/068) says the task parks with reason money, an old reason that task 68 replaces with permission."
+    },
+    {
+      "file": ".claude/skills/manage/SKILL.md",
+      "problem": "The merge-limit entry (lines 206-207 on task/068) says 'At the limit the manager merges nothing more and ends the run', which disagrees with task 68's park list, where a refused merge parks as your-action."
+    },
+    {
+      "file": ".claude/skills/manage/scripts/checks.py",
+      "problem": "check_merge_limit (about line 559 on task/068) reads limits.json without catching errors and accepts a task_merges_per_review of 0 or below."
+    }
+  ]
+}
