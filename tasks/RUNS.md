@@ -1,5 +1,40 @@
 # Manager runs
 
+## Run 2026-11-19 19:12
+
+Stopped because: no task to take.
+
+### Done
+- task 50: BDD slice B: all of the café; merge 37dd421; tokens 481813 (task total 481813; main session: not recorded)
+- task 66: Manager: one loose-ends task, and the rules that stop loose ends becoming tasks; merge 79c610f; tokens 455419 (task total 455419; main session: not recorded)
+- task 51 (Proposed): fields drafted by the advisor (job d) from task 50, commit 3992c34, reply tasks/advice/051-1.md; tokens 73230
+- branch task/050 deleted, last commit da21dbef316f790dd509a7b086b5deed6c0fe09d; restore with `git branch task/050 da21dbef316f790dd509a7b086b5deed6c0fe09d`
+- branch task/066 deleted, last commit c13d7abbd7872c01bdaf47612a29cb019f459b28; restore with `git branch task/066 c13d7abbd7872c01bdaf47612a29cb019f459b28`
+
+### Tokens
+- task 50: 481813
+- task 66: 455419
+- task 51: 73230
+- total: 1010462
+
+### Decided for you
+- task 50: chose a separate judge_cases_b.json (20 cases, J33-J52, not run) over adding them to judge_cases.json as the notes asked; would change if you order the paid run and fold them into one file (probe/judge_test.py does not read the new file yet).
+- task 50: chose a written finding (spec_findings.json F1) for SC-17 over a test; would change if agent-spec adds its World lines, a rules.md row and a claims.md claim.
+- task 50: chose R-06 read from what the agent can know over model.py's reading from what the booking system did; would change if you prefer model.py's.
+- task 50: advisor job (c) on line (5) ruled HOLDS (tasks/advice/050-1.md) on the builder's edits to slice A's tests; would change if a widened assertion with no replacement fails the line (the transcripts folder is no longer checked for stray files).
+- task 66: chose a new field outside_problems for a branch's Proposed task over free text; would change if you want it to also prove the lines are untouched.
+- task 66: chose "any named line changed" for checks.py unmerged over "all named lines"; would change if you want "all".
+- task 66: chose a new step 5a for the fix pass over renumbering; would change if you want the steps renumbered.
+- tasks 50 and 66: chose no Proposed task for their reviews' minor findings, under rule (a) (a task only for a problem older than the branch); would change if you want them as tasks.
+- task 51: advisor drafted 14 new variants, slice A's two not counted, R-08 left out, survivors reported not failed; would change if you count slice A's variants, want R-08, one variant per clause, or a survivor to fail the task.
+
+### Needs you
+- task 51 (Proposed): BDD slice C: broken variants by a different builder. Fields drafted; set priority and Ready if the draft fits. Its line (5) holds only if the brief keeps the builder away from harness/checkers.py, tests/test_slice_b.py, unchecked_sentences.json and the task 50 review files.
+- task 66 hook, now live: it refused a manager command that only named git merge inside a JSON string and held a `$`; the manager put the text in a script file. Expect this whenever a command's text mentions git merge.
+- task 66 review 066-1 minor 3: merge_check_fails catches only ValueError, RuntimeError and OSError, so a task file that crashes it with KeyError or TypeError lets the merge through. Not reachable with lint-valid tasks today.
+- tasks 50 and 66: the other minor findings stay in tasks/reviews/050-1.md, tasks/advice/050-1.md and tasks/reviews/066-1.md, with no task.
+- merge limit: 8 of 10 since review/2026-11-15-2.
+
 ## Run 2026-11-18 08:25
 
 Stopped because: no task to take.
