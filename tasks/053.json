@@ -14,8 +14,11 @@
     }
   ],
   "source_chat": "founder_and_builder project chat, 2026-11-16 and 2026-11-17",
-  "done_means": "",
-  "verified_by": [],
+  "done_means": "(1) In eval/agent-spec-to-pytest-bdd/blind-1/, each command of the BDD skill's verify step (step 11 of .claude/skills/agent-spec-to-pytest-bdd/SKILL.md), run there, exits 0. (2) The task changes no file outside eval/agent-spec-to-pytest-bdd/blind-1/: neither the skill, its café example, nor any spec.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
   "may_edit": [],
   "runs_as": "build",
   "priority": "",
@@ -23,5 +26,25 @@
     "bdd"
   ],
   "tokens": null,
-  "draft_note": "Placeholder written by Claude in chat on 2026-11-17 so the whole path of task 1 shows in the task list. done_means, verified_by and priority are left empty on purpose: Claude writes them from the results of the task this one depends on, and only then is it offered to the owner. Outline in tasks/plans/001.md, section 'Slices B to E'."
+  "draft_note": "Placeholder written by Claude in chat on 2026-11-17 so the whole path of task 1 shows in the task list. done_means, verified_by and priority are left empty on purpose: Claude writes them from the results of the task this one depends on, and only then is it offered to the owner. Outline in tasks/plans/001.md, section 'Slices B to E'. On 2026-11-20 the manager drafted done_means, verified_by, may_edit, runs_as and summary from task 52's results; the advisor ruled FAILS (tasks/advice/053-1.md): it held only the lines on the verify step and on changing nothing outside the new folder, and failed the line that named the spec and the run's report, so only those two lines are kept. Left open, as it spends money and only the owner knows whether a suite on his superseded answers is worth having (tests 1 and 2): which Harbor Goods spec the run uses, the old eval/agent-spec/results/switch-base-10/spec-final/ or a new one built first from the updated packet. The lines that need the spec named (one feature file per scenario with World lines, a broken variant per rule a feature file cites, a report of where the skill left the builder on its own) are to be written once it is.",
+  "summary": {
+    "outcome": "A new test folder for a Harbor Goods spec passes every check of the BDD skill's verify step.",
+    "scope": "Adds one new folder of tests; changes neither the BDD skill, its café example, nor any spec. Which spec it is built from is not yet written into the task.",
+    "risk": "The worst outcome is a folder that passes the checks without showing the skill works on a new spec, since these two lines would also pass on a copy of the café tests; the lines that would guard against that wait for the spec to be named.",
+    "cost": "One builder run; task 52, which wrote the skill, used 684,905 agent tokens."
+  },
+  "decided_for_you": [
+    {
+      "chosen": "RULING: FAILS (advisor job d), tasks/advice/053-1.md: the lines on the verify step and on changing nothing outside the new folder hold; the line naming the spec and the run's report fails, and the lines on feature files and variants hold only once a spec is named. Kept the two lines it held.",
+      "rejected": "RULING: HOLDS with all five lines",
+      "why": "The failed line carried a choice that spends money inside a pass line, and limited what the builder may read in a way the skill's own steps contradict and no verifier can see.",
+      "would_change": "The owner names the spec; then the spec line, the feature-file line and the variant line can be written so a verifier can check them."
+    },
+    {
+      "chosen": "Manager: the blind run writes its tests to eval/agent-spec-to-pytest-bdd/blind-1/.",
+      "rejected": "The skill's default, bdd/ beside the spec folder.",
+      "why": "A new folder that nothing reads is cheapest to undo, and bdd/ beside a spec under eval/agent-spec/results/ would land in append-only history.",
+      "would_change": "The owner wants the blind run's tests kept beside the spec or in the skill's examples."
+    }
+  ]
 }
