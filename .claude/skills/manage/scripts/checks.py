@@ -863,8 +863,8 @@ def merge_check_fails(repo, task_id, branch, base=WORKING_BRANCH):
     for name, run in checks:
         try:
             ok, msg = run()
-        except (ValueError, RuntimeError, OSError) as e:
-            ok, msg = False, str(e)
+        except Exception as e:  # a check that cannot run has not passed: refuse, never let the merge through
+            ok, msg = False, f"{type(e).__name__}: {e}"
         if not ok:
             fails.append(f"checks.py {name} fails: {' '.join(msg.split())}")
     return fails
@@ -945,8 +945,8 @@ def push_hook(event, base=WORKING_BRANCH):
             for name in deleting or ["(no branch named)"]:
                 try:
                     ok, said = check_superseded(where, name, base)
-                except (ValueError, RuntimeError) as e:
-                    ok, said = False, str(e)
+                except Exception as e:  # a check that cannot run has not passed: refuse the deletion
+                    ok, said = False, f"{type(e).__name__}: {e}"
                 if not ok:
                     why.append(said)
             why = " ".join(why) or None
@@ -958,9 +958,12 @@ def push_hook(event, base=WORKING_BRANCH):
         if "$" in command or "`" in command:
             why = ["the command holds $ or a backtick, so the hook cannot tell which branch it merges."]
         else:
-            repo = main_folder(where)
-            why = [f"task {int(TASK_BRANCH.match(b).group(1))} ({b}): {f}" for b in merging
-                   for f in merge_check_fails(repo, int(TASK_BRANCH.match(b).group(1)), b, base)]
+            try:
+                repo = main_folder(where)
+                why = [f"task {int(TASK_BRANCH.match(b).group(1))} ({b}): {f}" for b in merging
+                       for f in merge_check_fails(repo, int(TASK_BRANCH.match(b).group(1)), b, base)]
+            except Exception as e:  # the gate could not run: refuse, never let the merge through
+                why = [f"the merge checks could not run ({type(e).__name__}: {e})."]
         if why:
             code, msg = 2, ("Refused: a manager run is active, and a task branch merges only when "
                             "checks.py protected, owner, review, advice and merge-limit pass for its "

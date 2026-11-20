@@ -102,6 +102,17 @@ def test_merge_refused_when_one_check_fails(run, check, make_it_fail):
     assert sum(f"checks.py {c} fails" in err for c in ["protected", "owner", "review", "advice", "merge-limit"]) == 1
 
 
+def test_merge_refused_when_a_check_cannot_run(run):
+    """Should refuse the merge, not crash, when a check raises an error it does not expect: a task file with no may_edit."""
+    ready_to_merge(run)
+    broken = task(1)
+    del broken["may_edit"]
+    run.write_task(broken)
+    run.commit("task 1 without may_edit")
+    code, err = hook(run, MERGE)
+    assert code == 2 and "checks.py protected fails: KeyError" in err
+
+
 def test_merge_of_rebuilt_branch_reads_its_task(run):
     """Should read task/001-2 as task 1's branch and refuse it while task 1 has no review reply."""
     run.git("branch", "task/001-2", BASE)
