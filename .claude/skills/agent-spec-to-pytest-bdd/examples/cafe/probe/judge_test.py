@@ -7,11 +7,17 @@ Usage:
                                                judge_cases.json or lacks its 3 answers, and exit 1 unless
                                                the pass line holds
 
+Another cases file (task 51: slice B's judge_cases_b.json) is given with its own result file, pass line and
+ledger, so the defaults above keep task 56's files as they are:
+  uv run python probe/judge_test.py --cases judge_cases_b.json --out runs/judge-test-b.json --needed 17 \
+      --ledger runs/task-051-usage.jsonl --stop-at 0.45 [--report]
+
 Each case goes through the judge call the rule checkers use: harness.judge.MessageJudge over
 probe.agent.judge_llm, with the question data.json holds under the case's question name. A fresh
 MessageJudge per repeat, since one keeps a single answer per message and question. A reply that is
 neither yes nor no is recorded as "unclear" and does not count as the expected answer.
 """
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -45,7 +51,7 @@ def ask_case(llm, case):
     return answers, replies
 
 
-def result(cases, answered):
+def result(cases, answered, needed=NEEDED, about="Task 56 part 1: each message of judge_cases.json"):
     """The result file's content from the cases and {case id: (answers, replies)}."""
     rows = []
     for c in cases:
@@ -57,11 +63,11 @@ def result(cases, answered):
     plain = [r for r in rows if not r["hard"]]
     ok = [r for r in plain if r["as_expected"] >= AT_LEAST]
     return {
-        "_about": "Task 56 part 1: each message of judge_cases.json put to the message judge 3 times (probe/judge_test.py). "
+        "_about": f"{about} put to the message judge 3 times (probe/judge_test.py). "
                   "as_expected counts the repeats that gave the case's expected answer.",
         "cases": rows,
-        "pass_line": {"cases_not_hard": len(plain), "as_expected_in_2_of_3": len(ok), "needed": NEEDED,
-                      "holds": len(ok) >= NEEDED},
+        "pass_line": {"cases_not_hard": len(plain), "as_expected_in_2_of_3": len(ok), "needed": needed,
+                      "holds": len(ok) >= needed},
         "not_as_expected": [{"id": r["id"], "expected": r["expected"], "answers": r["answers"]}
                             for r in plain if r not in ok],
         "hard_cases": [{"id": r["id"], "expected": r["expected"], "answers": r["answers"]} for r in rows if r["hard"]],
@@ -101,30 +107,47 @@ def report(res):
     return "\n".join(lines)
 
 
-def run(llm=None):
+def run(llm=None, cases_file=None, out=None, needed=NEEDED, ledger=None, stop_at=None):
     from probe.llm import LLM
     llm = llm or LLM()
-    cases = json.loads(CASES.read_text(encoding="utf-8"))["cases"]
+    cases_file, out, stop_at = cases_file or CASES, out or OUT, money.STOP_AT if stop_at is None else stop_at
+    cases = json.loads(cases_file.read_text(encoding="utf-8"))["cases"]
     answered = {}
     for c in cases:
-        if money.spent() >= money.STOP_AT:
-            sys.exit(f"stopped before {c['id']}: {money.spent():.2f} USD spent of the task's {money.CAP} USD")
+        if money.spent(ledger) >= stop_at:
+            sys.exit(f"stopped before {c['id']}: {money.spent(ledger):.2f} USD spent, the stop is at {stop_at} USD")
         answered[c["id"]] = ask_case(llm, c)
-    res = result(cases, answered)
-    OUT.write_text(json.dumps(res, indent=1, ensure_ascii=False) + "\n")
+    about = "Task 56 part 1: each message of judge_cases.json" if cases_file == CASES else \
+        f"Each message of {cases_file.name}"
+    res = result(cases, answered, needed, about)
+    out.write_text(json.dumps(res, indent=1, ensure_ascii=False) + "\n")
     return res
 
 
 def main(args):
-    if args == ["--report"]:
-        res = json.loads(OUT.read_text(encoding="utf-8"))
-        bad = mismatches(json.loads(CASES.read_text(encoding="utf-8"))["cases"], res)
+    p = argparse.ArgumentParser(description="the message judge on a cases file, 3 times each")
+    p.add_argument("--report", action="store_true", help="report from the saved result file, no API call")
+    p.add_argument("--cases", type=Path, default=CASES, help="the cases file (default judge_cases.json)")
+    p.add_argument("--out", type=Path, default=OUT, help="the result file (default runs/judge-test.json)")
+    p.add_argument("--needed", type=int, default=NEEDED, help="cases not marked hard that must pass the 2 of 3")
+    p.add_argument("--ledger", type=Path, help="the usage ledger the calls are counted in (default task 56's, "
+                                               "only with the default cases file; required with another)")
+    p.add_argument("--stop-at", type=float, default=money.STOP_AT, help="USD in the ledger at which no case starts")
+    a = p.parse_args(args)
+    cases_file, out = (x if x.is_absolute() else HERE / x for x in (a.cases, a.out))
+    if a.ledger is None and cases_file != CASES and not a.report:
+        p.error("--ledger is required with a cases file other than judge_cases.json, so its calls stay out of "
+                "task 56's ledger")
+    ledger = money.LEDGER if a.ledger is None else a.ledger if a.ledger.is_absolute() else HERE / a.ledger
+    if a.report:
+        res = json.loads(out.read_text(encoding="utf-8"))
+        bad = mismatches(json.loads(cases_file.read_text(encoding="utf-8"))["cases"], res)
         if bad:
             print("\n".join(bad))
             sys.exit(1)
     else:
-        money.use_ledger("judge test")
-        res = run()
+        money.use_ledger("judge test", ledger)
+        res = run(cases_file=cases_file, out=out, needed=a.needed, ledger=ledger, stop_at=a.stop_at)
     print(report(res))
     sys.exit(0 if res["pass_line"]["holds"] else 1)
 

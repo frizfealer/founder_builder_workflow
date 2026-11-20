@@ -1,0 +1,413 @@
+{
+ "_about": "Each message of judge_cases_b.json put to the message judge 3 times (probe/judge_test.py). as_expected counts the repeats that gave the case's expected answer.",
+ "cases": [
+  {
+   "id": "J33",
+   "question": "says_not_held",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "Unfortunately 19:00 on the 21st is already booked by someone else, so I can't reserve it for you.",
+   "question_text": "Does this message tell the visitor that the table they asked for could not be held for them, for example because it is taken or because the booking system did not answer?"
+  },
+  {
+   "id": "J34",
+   "question": "says_not_held",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "I tried to put that table on hold but got no reply from our booking system, so I wasn't able to secure it.",
+   "question_text": "Does this message tell the visitor that the table they asked for could not be held for them, for example because it is taken or because the booking system did not answer?"
+  },
+  {
+   "id": "J35",
+   "question": "says_not_held",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Good news: that table is on hold for you at 19:00 on 21 November. Shall I book it?",
+   "question_text": "Does this message tell the visitor that the table they asked for could not be held for them, for example because it is taken or because the booking system did not answer?"
+  },
+  {
+   "id": "J36",
+   "question": "says_not_held",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Let me try to hold that table for you now.",
+   "question_text": "Does this message tell the visitor that the table they asked for could not be held for them, for example because it is taken or because the booking system did not answer?"
+  },
+  {
+   "id": "J37",
+   "question": "says_not_held",
+   "hard": true,
+   "expected": "no",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 0,
+   "message": "The hold on your table ran out before I could book it, so nothing was booked.",
+   "question_text": "Does this message tell the visitor that the table they asked for could not be held for them, for example because it is taken or because the booking system did not answer?"
+  },
+  {
+   "id": "J38",
+   "question": "says_max8",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "We can only seat groups of up to 8 here, I'm afraid.",
+   "question_text": "Does this message tell the visitor that the largest party that can be booked is 8 people?"
+  },
+  {
+   "id": "J39",
+   "question": "says_max8",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "Sorry, 9 is too many for one booking: eight guests is the most I can reserve.",
+   "question_text": "Does this message tell the visitor that the largest party that can be booked is 8 people?"
+  },
+  {
+   "id": "J40",
+   "question": "says_max8",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "How many people will be joining you?",
+   "question_text": "Does this message tell the visitor that the largest party that can be booked is 8 people?"
+  },
+  {
+   "id": "J41",
+   "question": "says_max8",
+   "hard": true,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "I'm holding a table for 8 people at 19:00 on 2026-11-21. Shall I book it?",
+   "question_text": "Does this message tell the visitor that the largest party that can be booked is 8 people?"
+  },
+  {
+   "id": "J42",
+   "question": "says_max8",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Sorry, there's no table free at 19:00 for your group.",
+   "question_text": "Does this message tell the visitor that the largest party that can be booked is 8 people?"
+  },
+  {
+   "id": "J43",
+   "question": "asks_party_size",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "Could you tell me how many guests I should reserve for instead?",
+   "question_text": "Does this message ask the visitor for a new party size, that is, how many people to book for?"
+  },
+  {
+   "id": "J44",
+   "question": "asks_party_size",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "The most I can book is 8. Would a smaller group work, and if so, how many of you will there be?",
+   "question_text": "Does this message ask the visitor for a new party size, that is, how many people to book for?"
+  },
+  {
+   "id": "J45",
+   "question": "asks_party_size",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "The largest party I can take is 8 people.",
+   "question_text": "Does this message ask the visitor for a new party size, that is, how many people to book for?"
+  },
+  {
+   "id": "J46",
+   "question": "asks_party_size",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "What time would you like the table?",
+   "question_text": "Does this message ask the visitor for a new party size, that is, how many people to book for?"
+  },
+  {
+   "id": "J47",
+   "question": "asks_party_size",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Shall I book the table for 8 at 19:00 under Dana Lee?",
+   "question_text": "Does this message ask the visitor for a new party size, that is, how many people to book for?"
+  },
+  {
+   "id": "J48",
+   "question": "says_cannot_change",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "I'm sorry, I can only make new bookings; changing your existing reservation isn't something I can do. Please call Sunrise Café for that.",
+   "question_text": "Does this message tell the visitor that the assistant cannot change a reservation that already exists?"
+  },
+  {
+   "id": "J49",
+   "question": "says_cannot_change",
+   "hard": false,
+   "expected": "yes",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "replies": [
+    "Yes",
+    "Yes",
+    "Yes"
+   ],
+   "as_expected": 3,
+   "message": "I'm not able to modify the booking you already have.",
+   "question_text": "Does this message tell the visitor that the assistant cannot change a reservation that already exists?"
+  },
+  {
+   "id": "J50",
+   "question": "says_cannot_change",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Sure, I've moved your reservation to 20:00.",
+   "question_text": "Does this message tell the visitor that the assistant cannot change a reservation that already exists?"
+  },
+  {
+   "id": "J51",
+   "question": "says_cannot_change",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "I can't hold that table: it's taken.",
+   "question_text": "Does this message tell the visitor that the assistant cannot change a reservation that already exists?"
+  },
+  {
+   "id": "J52",
+   "question": "says_cannot_change",
+   "hard": false,
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ],
+   "replies": [
+    "No",
+    "No",
+    "No"
+   ],
+   "as_expected": 3,
+   "message": "Let me look up your reservation.",
+   "question_text": "Does this message tell the visitor that the assistant cannot change a reservation that already exists?"
+  }
+ ],
+ "pass_line": {
+  "cases_not_hard": 18,
+  "as_expected_in_2_of_3": 18,
+  "needed": 17,
+  "holds": true
+ },
+ "not_as_expected": [],
+ "hard_cases": [
+  {
+   "id": "J37",
+   "expected": "no",
+   "answers": [
+    "yes",
+    "yes",
+    "yes"
+   ]
+  },
+  {
+   "id": "J41",
+   "expected": "no",
+   "answers": [
+    "no",
+    "no",
+    "no"
+   ]
+  }
+ ],
+ "differing_repeats": []
+}

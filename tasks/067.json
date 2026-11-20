@@ -1,0 +1,53 @@
+{
+  "id": 67,
+  "title": "Slice C findings: R-04's unchecked case and small café tooling gaps",
+  "item": "Make R-04's checker and its unchecked list say the same thing, and fix three small tooling problems in the café folder that task 51 met",
+  "motivation": "Found by task 51 (BDD slice C) and its review; these files existed before task 51's branch and it did not change them.",
+  "status": "Proposed",
+  "added": "2026-11-19",
+  "finished": "",
+  "notes": "Slice C's variant break-R-04-message was caught only by R-01 (variant_results.json). The advisor (tasks/advice/051-3.md) found R-04's checker skips a release with no answer during a change, while unchecked_sentences.json gives R-04 an empty list, meaning every sentence is checked. The reviewer (tasks/reviews/051-1.md, minor 1) found R-04's 'holds the changed table, and asks again' is reached in no scenario, because the reference agent raises there. Which of these is fixed, and how, is the owner's call; task 51's notes say fixing what slice C finds is the next task.",
+  "depends_on": [
+    {
+      "id": 51,
+      "soft": false
+    }
+  ],
+  "source_chat": "",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "build",
+  "priority": "",
+  "tags": [
+    "bdd"
+  ],
+  "tokens": null,
+  "draft_note": "Proposed by the manager on 2026-11-19 in task 51's merge, from the advisor's and reviewers' findings on earlier files (SKILL.md rule 2).",
+  "outside_problems": [
+    {
+      "file": ".claude/skills/agent-spec-to-pytest-bdd/examples/cafe/unchecked_sentences.json",
+      "problem": "R-04's list is empty, which its _about says means its checker checks every sentence of R-04; the checker skips a release with no answer during a change (harness/checkers.py lines 194-195), and that case sits only under rows_not_checked for R-06."
+    },
+    {
+      "file": ".claude/skills/agent-spec-to-pytest-bdd/examples/cafe/harness/checkers.py",
+      "problem": "R-04's checker skips a release with no answer during a change, so slice C's R-04 message variant is caught only by R-01."
+    },
+    {
+      "file": ".claude/skills/agent-spec-to-pytest-bdd/examples/cafe/harness/agents.py",
+      "problem": "The reference agent raises when a changed table is held (lines 56-57), so no scenario reaches R-04's 'holds the changed table, and asks again'."
+    },
+    {
+      "file": ".claude/skills/agent-spec-to-pytest-bdd/examples/cafe/generate_features.py",
+      "problem": "It has no --help; given that flag it regenerates the feature files."
+    },
+    {
+      "file": ".claude/skills/agent-spec-to-pytest-bdd/examples/cafe/judge_cases_b.json",
+      "problem": "Its _about still says the cases are not run, though task 51 ran them (runs/judge-test-b.json)."
+    },
+    {
+      "file": ".claude/skills/agent-spec-to-pytest-bdd/examples/cafe/probe/money.py",
+      "problem": "summary() text is fixed to task 56, so a run on another ledger (task 51's) gets no money summary file."
+    }
+  ]
+}
