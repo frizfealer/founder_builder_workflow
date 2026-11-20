@@ -1,0 +1,20 @@
+{
+ "_about": "Per rule of rules.md, every sentence of the rule that its checker in harness/checkers.py does not check, or checks only in part, with the part not checked and the reason. An empty list means the checker checks every sentence. The rows of 'What the agent does' that no checker checks are listed apart, under rows_not_checked.",
+ "rules": {
+  "<R-01>": [],
+  "<R-02>": [
+   {
+    "sentence": "<the sentence of the rule, word for word>",
+    "not_checked": "<the part of the sentence the checker does not check>",
+    "reason": "<why: another rule's row owns the case, no scenario reaches it, or no judge question asks it>"
+   }
+  ]
+ },
+ "rows_not_checked": [
+  {
+   "row": "<the row of 'What the agent does', word for word, cells joined with ' | '>",
+   "not_checked": "<the part no checker checks>",
+   "reason": "<why>"
+  }
+ ]
+}

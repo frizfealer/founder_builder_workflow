@@ -6,7 +6,8 @@ requires-python = ">=3.11"
 dependencies = [
     "pytest>=8",
     "pytest-bdd>=9",
-    # part 2 only: the probe agent and the message judge. 2.9 reads the owner's `ant auth login`.
+    # the message judge's LLM call only (probe/judge_test.py; the probe agent was deleted in task 52).
+    # 2.9 reads the owner's `ant auth login`.
     "anthropic>=2.9",
     # the SDK's HTTP client calls brotli's decompressor with arguments older brotli releases lack
     "brotli>=1.2",
