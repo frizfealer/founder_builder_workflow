@@ -230,7 +230,7 @@ def test_lint_summary_with_an_empty_part(part, empty):
     assert any(f"summary part(s) ['{part}'] must be non-empty text" in e for e in errs)
 
 
-@pytest.mark.parametrize("bad", ["Outcome: x. Scope: y.", ["x"], {}, SUMMARY | {"why": "x"}])
+@pytest.mark.parametrize("bad", ["Outcome: x. Scope: y.", ["x"], {}, None, SUMMARY | {"why": "x"}])
 def test_lint_summary_not_an_object_of_the_four_parts(bad):
     """Should reject a summary that is not an object, and one with a part outside the four."""
     assert any("summary" in e for e in tasks.lint(as_files(task(5) | {"summary": bad}), TAGS))

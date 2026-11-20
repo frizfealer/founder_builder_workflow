@@ -230,8 +230,8 @@ def lint_task(name, t, allowed_tags):
         and all(isinstance(p[k], str) and p[k].strip() for k in p) for p in op
     )):
         e(f"{name}: outside_problems must be a non-empty list of {{\"file\": <path>, \"problem\": <text>}}")
-    sm = t.get("summary")
-    if sm is not None:
+    if "summary" in t:
+        sm = t["summary"]
         if not isinstance(sm, dict):
             e(f"{name}: summary must be an object with the parts {SUMMARY_PARTS}")
         else:
