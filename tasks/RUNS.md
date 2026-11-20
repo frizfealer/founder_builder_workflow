@@ -1,5 +1,34 @@
 # Manager runs
 
+## Run 2026-11-20 07:56
+
+Stopped because: no task to take.
+
+### Done
+- task 68: Manager: four park reasons, no build past the task limit, clearer rulings and reports; merge cf14b89; tokens 317052 (task total 670057; main session: not recorded). Rebuilt on task/068-2 from task/068 with your five for_retry faults fixed; review 068-3 PASS, one fix pass of six minor findings re-checked PASS (068-4); 393 manager tests pass, lint passes.
+- branch task/068 deleted, last commit c62470c51ce56062efaa5c5c972282aa8ad1020f
+- branch task/068-2 deleted, last commit f08918cc5898c485eb0f9f629e2eaa2837cbe017
+- task 70 (Proposed, new): fields drafted from task 68, commit 420274f; advisor ruled FAILS (tasks/advice/070-1.md), 3 of 4 lines kept.
+
+A deleted branch is restored with `git branch <name> <id>` while git still holds the commit.
+
+### Tokens
+- task 068: 317052
+- task 070: 50604
+- total: 367656
+
+### Decided for you
+- task 68 (builder): chose writing each script name in full (`checks.py review`, not a bare `review`) over a test exemption for short names, because a bare backticked name reads as an old park reason; would change if you want the short forms kept.
+- task 68 (builder): chose to apply your fault 4 also to SKILL.md's `checks.py unmerged` entry and manage.md's two sorting passages over changing only rule 2 and reviewer.md, because those passages would still send such a finding to a Proposed task; would change if you want `checks.py unmerged` alone to decide.
+- task 68: chose to put the hook's merge-refusal text (checks.py:966-968, unchanged but made wrong by the task) on the fix list over a Proposed task, because your fault 4 makes such a finding the task's own; would change if only `checks.py unmerged` should decide.
+- task 68 (fix pass): chose one reason, permission ahead of your-action, when two repo conditions hold, over naming two, because you must allow the task before anything you do for it matters; would change if you want your-action first.
+- task 68 (fix pass): chose to refuse `--base` outside `tasks.py batch` over documenting that it is ignored, because silent ignoring was the finding; would change if another subcommand needs a base.
+- task 68: chose no advisor check of line 3 for the changed money-refusal assertion in test_hook_gates.py over consulting one, because your for_retry 1 asked for that change and the merge-gating tests are untouched; would change if line 3 was meant to cover every hook test.
+- task 68: chose to leave the re-check's three minor findings in tasks/reviews/068-4.md over a second pass, because rule 3 allows one fix pass; would change if you want them fixed (a long line at manage.md:300, a short line at SKILL.md:93, a test that reads the hook message from source).
+
+### Needs you
+- task 70 (Proposed): Manager: a park reason for a merge the hook refuses because its checks could not run. Neither the hook's message nor step 7 maps that refusal to a reason. Which of the four reasons fits is yours to name before Ready: permission or your-action always park, owner-fact or failed go to the advisor first. The advisor dropped a draft test line that tested the wrong case; add a line for your chosen reason when you set it Ready.
+
 ## Run 2026-11-19 21:26
 
 Stopped because: no task to take.
