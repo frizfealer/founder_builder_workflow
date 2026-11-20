@@ -1,0 +1,165 @@
+{
+ "_about": "Slice B (task 50): messages with known answers for the four judge questions slice B's rule checkers add (data.json judge_questions says_not_held, says_max8, asks_party_size, says_cannot_change), in the form of judge_cases.json. Not run: no LLM was called for them, and running them is the owner's decision. Kept apart from judge_cases.json, which stays as task 56 ran it, so probe/judge_test.py --report still checks runs/judge-test.json against it. Written by the builder who wrote the questions, unlike judge_cases.json, which Claude in chat wrote: a weaker test of the questions. 'hard' cases would be reported, not counted in a pass line. The café values are those of data.json: Sunrise Café, 2026-11-21, 19:00, party of 8, name Dana Lee.",
+ "cases": [
+  {
+   "id": "J33",
+   "question": "says_not_held",
+   "message": "Unfortunately 19:00 on the 21st is already booked by someone else, so I can't reserve it for you.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of taken"
+  },
+  {
+   "id": "J34",
+   "question": "says_not_held",
+   "message": "I tried to put that table on hold but got no reply from our booking system, so I wasn't able to secure it.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of a hold call with no answer"
+  },
+  {
+   "id": "J35",
+   "question": "says_not_held",
+   "message": "Good news: that table is on hold for you at 19:00 on 21 November. Shall I book it?",
+   "expected": "no",
+   "hard": false,
+   "why": "the table is held"
+  },
+  {
+   "id": "J36",
+   "question": "says_not_held",
+   "message": "Let me try to hold that table for you now.",
+   "expected": "no",
+   "hard": false,
+   "why": "an intention to hold, no outcome"
+  },
+  {
+   "id": "J37",
+   "question": "says_not_held",
+   "message": "The hold on your table ran out before I could book it, so nothing was booked.",
+   "expected": "no",
+   "hard": true,
+   "why": "a held table expired; the table was held, not refused (R-10's case, not R-01's)"
+  },
+  {
+   "id": "J38",
+   "question": "says_max8",
+   "message": "We can only seat groups of up to 8 here, I'm afraid.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of the maximum"
+  },
+  {
+   "id": "J39",
+   "question": "says_max8",
+   "message": "Sorry, 9 is too many for one booking: eight guests is the most I can reserve.",
+   "expected": "yes",
+   "hard": false,
+   "why": "the maximum in words"
+  },
+  {
+   "id": "J40",
+   "question": "says_max8",
+   "message": "How many people will be joining you?",
+   "expected": "no",
+   "hard": false,
+   "why": "asks for a size, names no maximum"
+  },
+  {
+   "id": "J41",
+   "question": "says_max8",
+   "message": "I'm holding a table for 8 people at 19:00 on 2026-11-21. Shall I book it?",
+   "expected": "no",
+   "hard": true,
+   "why": "names 8 as the party size, not as the largest party"
+  },
+  {
+   "id": "J42",
+   "question": "says_max8",
+   "message": "Sorry, there's no table free at 19:00 for your group.",
+   "expected": "no",
+   "hard": false,
+   "why": "a refusal for another reason"
+  },
+  {
+   "id": "J43",
+   "question": "asks_party_size",
+   "message": "Could you tell me how many guests I should reserve for instead?",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of asking for a new size"
+  },
+  {
+   "id": "J44",
+   "question": "asks_party_size",
+   "message": "The most I can book is 8. Would a smaller group work, and if so, how many of you will there be?",
+   "expected": "yes",
+   "hard": false,
+   "why": "the maximum and the question in one message"
+  },
+  {
+   "id": "J45",
+   "question": "asks_party_size",
+   "message": "The largest party I can take is 8 people.",
+   "expected": "no",
+   "hard": false,
+   "why": "states the maximum, asks nothing"
+  },
+  {
+   "id": "J46",
+   "question": "asks_party_size",
+   "message": "What time would you like the table?",
+   "expected": "no",
+   "hard": false,
+   "why": "asks for another part of the request"
+  },
+  {
+   "id": "J47",
+   "question": "asks_party_size",
+   "message": "Shall I book the table for 8 at 19:00 under Dana Lee?",
+   "expected": "no",
+   "hard": false,
+   "why": "asks for a yes to a proposal, not for a size"
+  },
+  {
+   "id": "J48",
+   "question": "says_cannot_change",
+   "message": "I'm sorry, I can only make new bookings; changing your existing reservation isn't something I can do. Please call Sunrise Café for that.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of cannot change"
+  },
+  {
+   "id": "J49",
+   "question": "says_cannot_change",
+   "message": "I'm not able to modify the booking you already have.",
+   "expected": "yes",
+   "hard": false,
+   "why": "free wording of cannot change"
+  },
+  {
+   "id": "J50",
+   "question": "says_cannot_change",
+   "message": "Sure, I've moved your reservation to 20:00.",
+   "expected": "no",
+   "hard": false,
+   "why": "claims to have changed it"
+  },
+  {
+   "id": "J51",
+   "question": "says_cannot_change",
+   "message": "I can't hold that table: it's taken.",
+   "expected": "no",
+   "hard": false,
+   "why": "cannot hold a new table, says nothing about a reservation that exists"
+  },
+  {
+   "id": "J52",
+   "question": "says_cannot_change",
+   "message": "Let me look up your reservation.",
+   "expected": "no",
+   "hard": false,
+   "why": "an intention to look, no refusal"
+  }
+ ]
+}

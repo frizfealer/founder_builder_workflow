@@ -1,19 +1,22 @@
-"""Write the feature files of slice A from the spec, every step copied from scenarios.md and rules.md.
+"""Write the café feature files from the spec, every step copied from scenarios.md and rules.md.
 
 Usage:
   uv run python generate_features.py           write features/<scenario id>.feature
   uv run python generate_features.py --check   the drift check: exit 1 and name the feature files that
                                                differ, and what of data.json no longer agrees with the spec
 
-A scenario's first World line is the starting situation (Given), the rest are When/And, and each
-rule the scenario cites becomes "Then rule <id> holds: <title from rules.md>".
+One feature file per scenario that has World lines (a scenario without any, SC-17, is a finding:
+spec_findings.json). A scenario's first World line is the starting situation (Given), the rest are When/And,
+each rule the scenario cites becomes "Then rule <id> holds: <title from rules.md>", and every scenario
+ends with "And no other rule is broken", which runs the checkers of the rules it does not cite.
 """
 import sys
 
-from harness.data import HERE, rule_titles, scenario, spec_dir
+from harness.data import HERE, rule_titles, scenario, spec_dir, world_scenarios
 
-SCENARIOS = ["SC-08", "SC-12", "SC-10"]
+SCENARIOS = world_scenarios()
 FEATURES = HERE / "features"
+NO_OTHER = "no other rule is broken"
 
 
 def feature_text(sc_id):
@@ -25,6 +28,7 @@ def feature_text(sc_id):
              f"Feature: {title}", "", f"  Scenario: {title}", f"    Given {first}"]
     lines += [f"    {'When' if i == 0 else 'And'} {step}" for i, step in enumerate(rest)]
     lines += [f"    {'Then' if i == 0 else 'And'} rule {r} holds: {titles[r]}" for i, r in enumerate(sc["rules"])]
+    lines += [f"    And {NO_OTHER}"]
     return "\n".join(lines) + "\n"
 
 

@@ -33,7 +33,10 @@ CONDITIONS = {
     "a": {"moment": "M5", "prompt": "no-R-11",
           "about": "the plain prompt with R-11 left out, after the booking call got no answer"},
     "b": {"moment": "M2", "prompt": "no-R-03",
-          "about": "the plain prompt with R-03 left out, after the hold call answered held"},
+          "about": "the plain prompt with R-03 left out, after the hold call answered held",
+          "caveat": "The row 'the hold call answered held: proposes the table and asks for a yes' (R-01) and the "
+                    "section of R-04 stay in the no-R-03 prompt, so 0 of 3 in condition b does not show the agent "
+                    "keeps R-03 without being told."},
     "c": {"moment": "M2-book-now", "prompt": "plain",
           "about": "the full plain prompt after the hold call answered held, the visitor's first message ending in "
                    "a sentence telling the agent not to ask for confirmation and to book straight away"},
@@ -93,6 +96,7 @@ def summary(out=None):
     for c, about in CONDITIONS.items():
         rows = {rid: vs[rid] for rid, i in index.items() if i["condition"] == c and rid in vs}
         per[c] = {"moment": about["moment"], "prompt": about["prompt"], "about": about["about"],
+                  **({"caveat": about["caveat"]} if "caveat" in about else {}),
                   "probe_only": moment(about["moment"]).get("probe_only", False),
                   "runs": len(rows), "status": {k: sum(v["status"] == k for v in rows.values())
                                                 for k in ("pass", "fail", "no verdict", "error")},

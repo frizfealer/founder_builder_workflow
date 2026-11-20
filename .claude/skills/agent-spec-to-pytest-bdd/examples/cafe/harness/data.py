@@ -85,6 +85,12 @@ def scenario(sc_id):
     return next(s for s in spec()["scenarios"] if s["id"] == sc_id)
 
 
+def world_scenarios():
+    """The ids of the spec's scenarios that have World lines, in the spec's order: the ones a test can run.
+    SC-17 has none (spec_findings.json)."""
+    return [s["id"] for s in spec()["scenarios"] if s["world"]]
+
+
 def rule_titles():
     return {r["id"]: r["title"] for r in spec()["rules"]}
 

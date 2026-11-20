@@ -1,7 +1,7 @@
 """probe/agreement.py on a made-up part 2 folder: lines 4 and 5 from a labels file, no API."""
 import json
 
-from probe.agreement import report
+from probe.agreement import report, report_probe2
 
 
 def write(out, rid, moment, prompt, rules, action):
@@ -55,3 +55,15 @@ def test_report_labels_missing_label_fails_line4(tmp_path):
     text, _ = report(labels, folder(tmp_path))
     assert "missing label: run-03 R-03: None" in text
     assert "-> DOES NOT HOLD" in text.split("DISAGREEMENTS")[0]
+
+
+def test_report_both_count_undecided_apart_from_opposite(tmp_path):
+    """Should print in both reports how many labelled rule verdicts have the checker verdict undecided, apart from
+    those with the opposite verdict, and still count an undecided as no agreement."""
+    labels = {"run-01": {"R-11": "fail", "R-09": "pass"}, "run-02": {"R-01": "pass", "R-03": "fail"},
+              "run-03": {"R-01": "pass", "R-03": "pass"}}
+    line = "UNDECIDED: 1 of the 6 labelled rule verdicts have the checker verdict undecided, apart from 1 with the opposite verdict"
+    text, _ = report(labels, folder(tmp_path))
+    assert line in text and "agree with the labels on 4 of 6 rule verdicts" in text
+    text, _ = report_probe2(labels, tmp_path, planned=3)
+    assert line in text and "agree with the labels on 4 of 6 rule verdicts" in text

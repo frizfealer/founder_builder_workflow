@@ -19,7 +19,7 @@ import pytest
 import generate_features
 from harness import datacheck
 from harness.agents import AGENTS
-from harness.checkers import BREAKS, UNDECIDED, verdict
+from harness.checkers import BREAKS, CHECKERS, UNDECIDED, verdict
 from harness.data import data, moment as moment_entry, moment_names, rule_text, rule_titles
 from harness.fake import FakeBookingSystem
 from harness.judge import MessageJudge
@@ -63,6 +63,15 @@ def moment(request):
     return None if start == "start" else start
 
 
+@pytest.fixture(autouse=True)
+def stub_calls_ledger(request, tmp_path_factory, monkeypatch):
+    """Outside a probe run, a call made with no task ledger set (a test's stub client) is recorded in a
+    temporary default ledger, so the suite leaves no file under runs/."""
+    if request.config.getoption("agent") != "probe":
+        import probe.llm
+        monkeypatch.setattr(probe.llm, "DEFAULT_LEDGER", tmp_path_factory.mktemp("ledger") / "usage.jsonl")
+
+
 @pytest.fixture
 def system():
     return FakeBookingSystem()
@@ -101,18 +110,23 @@ def judge(llm):
 
 @pytest.fixture
 def outcome(request, world, system, agent, judge, moment):
-    """Run the scenario once, at the first Then step, and judge every rule it cites. The LLM calls it makes
-    are recorded by write_run, so a run that raises keeps them."""
+    """Run the scenario once, at the first Then step, and judge every rule it cites and, for the closing
+    sentence 'no other rule is broken', every other rule that has a checker. The LLM calls it makes are
+    recorded by write_run, so a run that raises keeps them."""
     run = Driver(world, system, agent).run(moment)
-    rules = {r: verdict(r, run.events, run.over, judge) for r in request.node.stash[CITED]}
+    cited = request.node.stash[CITED]
+    rules = {r: verdict(r, run.events, run.over, judge) for r in cited}
+    others = {r: verdict(r, run.events, run.over, judge) for r in CHECKERS if r not in cited}
     played_out = moment is not None or (run.over and run.played == run.lines)
-    if any(v["verdict"] == BREAKS for v in rules.values()):
+    every = [*rules.values(), *others.values()]
+    if any(v["verdict"] == BREAKS for v in every):
         status = "fail"
-    elif any(v["verdict"] == UNDECIDED for v in rules.values()) or not played_out:
+    elif any(v["verdict"] == UNDECIDED for v in every) or not played_out:
         status = "no verdict"
     else:
         status = "pass"
-    out = {"run": run, "rules": rules, "status": status, "played_out": played_out, "judge": judge.asked}
+    out = {"run": run, "rules": rules, "other_rules": others, "status": status, "played_out": played_out,
+           "judge": judge.asked}
     request.node.stash[OUTCOME] = out
     return out
 
@@ -125,7 +139,7 @@ def pytest_bdd_before_scenario(request, feature, scenario):
     m = request.config.getoption("start")
     if m != "start" and moment_entry(m)["scenario"] != sc_id:
         pytest.skip(f"{m} is tested in {moment_entry(m)['scenario']}")
-    request.node.stash[CITED] = [s.name.split()[1] for s in scenario.steps if s.type == "then"]
+    request.node.stash[CITED] = [s.name.split()[1] for s in scenario.steps if s.type == "then" and s.name.startswith("rule ")]
     llm = request.getfixturevalue("llm")
     request.node.stash[LLM_FIRST] = len(llm.calls) if llm else 0
 
@@ -158,7 +172,7 @@ def write_run(out_dir, request, scenario):
         transcript = {
             "run_id": run_id, "scenario": title_seen(scenario.name),
             "mode": "one action from a tested moment" if m != "start" else "whole conversation from the start",
-            "moment": m if m != "start" else None,
+            "moment": m if m in data()["moments"] else None,  # a probe moment's name says its condition
             "situation": moment_entry(m)["situation"] if m != "start" else None,
             "rules_to_label": {r: rule_text(r) for r in rules},
             "after_the_run": after_the_run(run),
@@ -173,17 +187,17 @@ def write_run(out_dir, request, scenario):
     if out:
         run = out["run"]
         record |= {"over": run.over, "played": run.played, "lines": run.lines, "stopped": run.stopped,
-                   "played_out": out["played_out"], "judge": out["judge"]}
+                   "played_out": out["played_out"], "other_rules": out["other_rules"], "judge": out["judge"]}
     (out_dir / "verdicts" / f"{run_id}.json").write_text(json.dumps(record, indent=1, ensure_ascii=False))
 
 
-UNSEEN = ("ids", "means", "answer")
+UNSEEN = ("ids", "means", "answer", "change")
 
 
 def seen(event, **extra):
     """An event as the transcript shows it: what the agent saw and sent. Left out: the ids the fake issued,
     since a call with no answer issued one (a booking that went through) the agent never saw; and the
-    checkers' readings, a visitor line's 'means' and a result's 'answer', which could anchor a label."""
+    checkers' readings, a visitor line's 'means' and 'change' and a result's 'answer', which could anchor a label."""
     return {k: v for k, v in event.items() if k not in UNSEEN} | extra
 
 

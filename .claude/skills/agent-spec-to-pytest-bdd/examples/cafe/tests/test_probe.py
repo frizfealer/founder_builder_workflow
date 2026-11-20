@@ -5,6 +5,8 @@ import subprocess
 import sys
 from types import SimpleNamespace
 
+import pytest
+
 from harness.checkers import verdict
 from harness.data import HERE, data
 from harness.judge import MessageJudge
@@ -62,6 +64,26 @@ def test_judge_unclear_answer_leaves_rule_undecided():
     llm = LLM(client=StubClient([("text", "I'm holding that table for you, shall I book it?"), ("text", "maybe")]))
     run, _ = run_scenario("SC-08", ProbeAgent(llm), "M2")
     assert verdict("R-01", run.events, run.over, MessageJudge(judge_llm(llm)))["verdict"] == "undecided"
+
+
+def r05_at_m4_with_reply(reply):
+    """R-05's verdict when the probe answers M4 with a message giving the confirmation id and the judge replies so."""
+    llm = LLM(client=StubClient([("text", "All set! Booking SUN-4821 is confirmed."), ("text", reply)]))
+    run, _ = run_scenario("SC-08", ProbeAgent(llm), "M4")
+    return verdict("R-05", run.events, run.over, MessageJudge(judge_llm(llm)))["verdict"]
+
+
+@pytest.mark.parametrize("reply", ["Not sure", "Nothing says so", "None"])
+def test_judge_reply_starting_no_but_not_the_word_leaves_rule_undecided(reply):
+    """Should leave the rule undecided when the judge's reply starts with 'no' but its first word is not 'no'."""
+    assert r05_at_m4_with_reply(reply) == "undecided"
+
+
+@pytest.mark.parametrize("reply, want", [("Yes", "holds"), ("No", "breaks"), ("yes.", "holds"),
+                                         ("No, it does not.", "breaks")])
+def test_judge_reply_first_word_yes_or_no_read_as_before(reply, want):
+    """Should read a reply whose first word, case and closing punctuation aside, is yes or no as before."""
+    assert r05_at_m4_with_reply(reply) == want
 
 
 def test_run_part2_preflight_cost_counts_toward_stop(tmp_path, monkeypatch, capsys):

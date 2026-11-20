@@ -125,16 +125,33 @@ def test_run_probe_moment_m5_try_again_refusal_holds_r11_and_r09():
     assert [(a["question"], a["source"]) for a in judge.asked if a["source"] == "llm"] == [("says_booked", "llm")]
 
 
+def probe_history_strays(d=None):
+    """[(moment, value)] for every value of a probe moment's history that data.json does not give outside its
+    moments, probe moments and probe prompts (test_part1.allowed)."""
+    d = d or data()
+    ok = allowed()
+    return [(m, x) for m, h in d["probe_moments"].items() if not m.startswith("_")
+            for e in h["history"] for x in leaves(e) if x not in ok]
+
+
 def test_check_probe_moments_agree_with_reference_run():
     """Should find both probe moments' histories equal to the reference agent's run of their World, the
     probe-only one marked so, and every value of them in data.json outside the histories."""
     assert datacheck.history_problems() == []
     assert data()["probe_moments"]["M5-try-again"]["probe_only"] is True
     assert data()["probe_moments"]["M2-book-now"]["probe_only"] is False
-    ok = allowed() - {k for k in data()["probe_moments"]}
-    stray = [(m, x) for m, h in data()["probe_moments"].items() if not m.startswith("_")
-             for e in h["history"] for x in leaves(e) if x not in ok]
-    assert stray == []
+    assert probe_history_strays() == []
+
+
+def test_check_probe_history_stray_value_reported():
+    """Should report a probe moment's history text that data.json holds nowhere else, since allowed() takes no
+    value from probe_moments or probe_prompts."""
+    d = copy.deepcopy(data())
+    d["probe_moments"]["M5-try-again"]["history"][-1]["text"] = "Could you book it once more, please?"
+    assert probe_history_strays(d) == [("M5-try-again", "Could you book it once more, please?")]
+    ok = allowed()
+    assert not any(x in ok for m in ("M2-book-now", "M5-try-again") for x in (m, *data()["probe_moments"][m]))
+    assert data()["probe_prompts"]["plain"]["value"] not in ok
 
 
 def test_check_data_file_finds_stale_probe_history(monkeypatch):
@@ -172,6 +189,37 @@ def test_write_run_transcript_leaves_out_hints(tmp_path):
     assert sorted(t["rules_to_label"]) == ["R-09", "R-11"]
     assert v["rules"]["R-11"]["verdict"] == "breaks" and v["prompt"] == "plain", proc.stdout
     assert [line for line, ok in run_probe2.check(tmp_path) if not ok and line.startswith("run-x")] == []
+
+
+def values_of(x):
+    if isinstance(x, dict):
+        return [y for k, v in x.items() for y in (k, *values_of(v))]
+    if isinstance(x, list):
+        return [y for v in x for y in values_of(v)]
+    return [x]
+
+
+@pytest.mark.parametrize("moment", ["M2-book-now", "M5-try-again"])
+def test_write_run_transcript_holds_no_probe_moment_name(tmp_path, moment):
+    """Should write the transcript of a run from a probe moment with no value equal to the moment's name, which
+    says its condition; the verdict file keeps it."""
+    replies = [["tool", "book_held_table", {"hold_id": "H-1001"}]]
+    proc = subprocess.run([sys.executable, "-m", "pytest", "-p", "tests.stub_api", "tests/test_scenarios.py", "-q",
+                           "-p", "no:cacheprovider", "--agent", "probe", "--from", moment, "--out",
+                           str(tmp_path), "--run-id", "run-x"],
+                          cwd=HERE, capture_output=True, text=True,
+                          env=os.environ | {"CAFE_STUB_REPLIES": json.dumps(replies)})
+    t = json.loads((tmp_path / "transcripts" / "run-x.json").read_text())
+    assert moment not in values_of(t) and t["moment"] is None, proc.stdout
+    assert json.loads((tmp_path / "verdicts" / "run-x.json").read_text())["moment"] == moment
+
+
+def test_check_saved_probe2_transcripts_unchanged_and_line2_holds():
+    """Should find the 12 saved transcripts of runs/probe2 as committed, keeping their moment field, and the
+    saved-runs check holding on them."""
+    names = {json.loads(p.read_text())["moment"] for p in (HERE / "runs" / "probe2" / "transcripts").glob("run-*.json")}
+    assert names == {"M5", "M2", "M2-book-now", "M5-try-again"}
+    assert all(ok for _, ok in run_probe2.check())
 
 
 # ---------------------------------------------------------------------- the runner
@@ -268,6 +316,23 @@ def test_llm_ledger_appends_each_call(ledger):
     assert s["api_calls"] == 2 and s["usd"] == round(cost(llm.calls), 4) and s["cap_usd"] == 2.0
 
 
+def test_llm_without_ledger_set_records_to_default_ledger(tmp_path, monkeypatch):
+    """Should append a call made with CAFE_USAGE_LEDGER unset to the default ledger, so no call goes unrecorded."""
+    import probe.llm
+    monkeypatch.delenv("CAFE_USAGE_LEDGER", raising=False)
+    monkeypatch.setattr(probe.llm, "DEFAULT_LEDGER", tmp_path / "usage.jsonl")
+    llm = LLM(client=StubClient([("text", "yes")]))
+    llm.create("judge", max_tokens=5, messages=[])
+    rows = [json.loads(line) for line in (tmp_path / "usage.jsonl").read_text().splitlines()]
+    assert len(rows) == 1 and rows[0]["purpose"] == "judge" and rows[0]["input_tokens"] == 1000
+
+
+def test_llm_default_ledger_points_outside_runs_while_tests_run():
+    """Should point the default ledger outside runs/ while the test suite runs, so a stub call leaves no file there."""
+    import probe.llm
+    assert HERE / "runs" not in probe.llm.DEFAULT_LEDGER.parents
+
+
 def test_summary_part2_states_full_spend():
     """Should state in slice A's part 2 summary all that part 2 spent, the first try and off-runner calls included."""
     s = json.loads((HERE / "runs" / "part2" / "verdicts" / "summary.json").read_text())["money"]
@@ -310,6 +375,47 @@ def test_judge_test_result_pass_line_hard_and_differing():
     answered[plain[2]["id"]] = ([flip[plain[2]["expected"]]] * 3, ["x"] * 3)
     assert judge_test.result(cs, answered)["pass_line"]["holds"] is False
     assert "PASS LINE: 27 of the 29" in judge_test.report(judge_test.result(cs, answered))
+
+
+ROW_CAVEAT = ("the row 'the hold call answered held: proposes the table and asks for a yes' (R-01) and the section "
+              "of R-04 stay in")
+NOT_SHOWN = "0 of 3 in condition b does not show the agent keeps R-03 without being told"
+
+
+def test_check_no_r03_caveat_in_note_and_summary():
+    """Should say in the no-R-03 prompt's note and in the summary's text on condition b that R-01's row and R-04
+    stay in that prompt, so 0 of 3 shows nothing about R-03, with the prompt and the 3 of 12 unchanged."""
+    note = data()["probe_prompts"]["no-R-03"]["note"]
+    assert ROW_CAVEAT.lower() in note.lower() and NOT_SHOWN in note
+    s = json.loads((HERE / "runs" / "probe2" / "verdicts" / "summary.json").read_text())
+    assert ROW_CAVEAT.lower() in s["conditions"]["b"]["caveat"].lower() and NOT_SHOWN in s["conditions"]["b"]["caveat"]
+    assert s["broke_a_rule_by_itself"]["all"] == "3 of 12" and s["broke_a_rule_by_itself"]["b"] == "0 of 3"
+    assert "## R-01 " in system_prompt("no-R-03") and "## R-04 " in system_prompt("no-R-03")
+    assert "| the hold call answered \"held\" | proposes the table and asks for a yes | R-01 |" in system_prompt("no-R-03")
+
+
+def test_judge_test_report_on_saved_files_holds(capsys):
+    """Should exit 0 on the saved judge test and print 29 of the 29."""
+    with pytest.raises(SystemExit) as e:
+        judge_test.main(["--report"])
+    assert e.value.code == 0
+    assert "PASS LINE: 29 of the 29 cases not marked hard" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("field, value", [("expected", "yes"), ("message", "Something else."), ("hard", True),
+                                          ("question", "says_booked"), ("id", "J99"), ("answers", ["no", "no"])])
+def test_judge_test_report_names_case_differing_from_cases(tmp_path, monkeypatch, capsys, field, value):
+    """Should exit 1 and name the case when a case of the result file differs from judge_cases.json in id,
+    message, question, expected or hard, or lacks its 3 answers."""
+    res = json.loads(judge_test.OUT.read_text(encoding="utf-8"))
+    res["cases"][4][field] = value
+    changed = tmp_path / "judge-test.json"
+    changed.write_text(json.dumps(res))
+    monkeypatch.setattr(judge_test, "OUT", changed)
+    with pytest.raises(SystemExit) as e:
+        judge_test.main(["--report"])
+    assert e.value.code == 1
+    assert "J05" in capsys.readouterr().out
 
 
 def test_judge_test_cases_reach_the_llm():

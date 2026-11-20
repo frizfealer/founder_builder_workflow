@@ -3,9 +3,9 @@
   "title": "BDD slice B: all of the café",
   "item": "Extend the slice A tests to all 17 café scenarios and 11 rule checkers",
   "motivation": "Second slice of task 1. Slice A proved the test design on 3 scenarios and 6 rules; a gate needs every scenario and every rule of the spec.",
-  "status": "In progress",
+  "status": "Done",
   "added": "2026-11-17",
-  "finished": "",
+  "finished": "2026-11-19",
   "notes": "Work in .claude/skills/agent-spec-to-pytest-bdd/examples/cafe/, on top of slice A and task 56. Read tasks/plans/001.md first. Extend the data file for the new World steps (a party of 9 for 'more than 8', a changed party size, and so on), under the same script checks as slice A. Write the missing rule checkers (R-02, R-04, R-06, R-10, and R-08 if SC-17 gets a test) and complete R-01, whose second sentence slice A left unchecked. Each checker's first sentence says exactly what it checks. The feature-file script adds one closing sentence to every scenario, 'And no other rule is broken', which runs the checkers of the rules the scenario does not cite. SC-17 has no World steps and its rule R-08 is cited nowhere else: give it a test from its rule if the spec holds enough to run one, else write it up as a finding for agent-spec (which spec line is missing) and leave it out; say which in the report. If task 56 failed a line, stop and park: this task is then rewritten. Folded in on 2026-11-19 on the owner's instruction: task 063, the small fixes task 56 left in this folder. Its file stays as the list; its eight pass lines are line (6) below. The one that matters most here: harness/judge.py reads any reply starting with 'no', such as 'Not sure', as a No. Not decided, do not change: whether the no-R-03 prompt should drop the R-01 row, the tool description that hints at R-11, and whether an undecided verdict counts against 9 in 10 (tasks/advice/063-1.md). Also add the direct judge test to the suite as it grows: when a new rule checker asks the message judge a new question, add cases for that question to judge_cases.json in the same form (some that should get yes in free wording, more that should get no), and do not run them; say in the report how many were added, so the owner can decide on the paid run. OWNER'S RULING, 2026-11-19, on every rule shaped 'the agent tells the visitor X and asks Y' (R-11, R-02, R-04, R-05, R-10): one message or several is the same, as long as the meaning is there. A checker therefore looks at all the agent's messages in one turn together, a turn being everything the agent does before it waits for the visitor, and breaks the rule only when the agent ends that turn without having said both. Change R-11's checker to this, write the new checkers this way, and add a test with the two parts in two messages of one turn (holds) and a turn that ends with only one part (breaks). The saved verdicts of slice A and task 56 must not change: runs 01, 04 and 11 of runs/probe2 still break R-11.",
   "depends_on": [
     {
@@ -29,6 +29,41 @@
   "tags": [
     "bdd"
   ],
-  "tokens": null,
-  "draft_note": "Written out by Claude in chat on 2026-11-17 from slice A's results. The owner approves it by setting it to Ready, after task 56. Task 063 folded in and set to Ready on 2026-11-19 on the owner's instruction."
+  "tokens": {
+    "agents": 481813,
+    "main_session": "not recorded"
+  },
+  "draft_note": "Written out by Claude in chat on 2026-11-17 from slice A's results. The owner approves it by setting it to Ready, after task 56. Task 063 folded in and set to Ready on 2026-11-19 on the owner's instruction.",
+  "decided_for_you": [
+    {
+      "chosen": "Advisor job c on line (5): RULING: HOLDS, tasks/advice/050-1.md. The builder's edits to tests/test_part1.py (scenario list pinned to slice A's three, two assertions widened to accept 16 scenarios) do not let a slice A regression pass.",
+      "rejected": "RULING: FAILS",
+      "would_change": "FAILS if a loosened slice A assertion without an equal replacement fails the line (the transcripts folder is no longer checked for stray files), if task 49's done_means names that property, if a slice A test fails or is skipped, or if SC-08, SC-12 or SC-10 stops starting with 'The table is free'."
+    },
+    {
+      "chosen": "New judge cases J33-J52 for the four new questions go in judge_cases_b.json, not run, because tasks/063.json lines (7) and (8) require judge_cases.json unchanged and 29 of 29 on the saved files.",
+      "rejected": "Adding them to judge_cases.json, as the notes asked.",
+      "would_change": "The owner orders the paid run and folds them into one file; probe/judge_test.py would then need to read them (review 050-1 minor 1)."
+    },
+    {
+      "chosen": "SC-17 has no test; finding F1 in spec_findings.json names the missing spec lines (World lines in scenarios.md, a rules.md row, a claims.md claim). The R-08 checker is written anyway and tested on hand-made events.",
+      "rejected": "A test for SC-17 from its rule alone.",
+      "would_change": "agent-spec adds the missing lines."
+    },
+    {
+      "chosen": "R-06 judges from what the agent can know: a hold or release call with no answer counts as possibly still holding the table.",
+      "rejected": "model.py's reading, from what the booking system really did.",
+      "would_change": "The owner prefers model.py's reading."
+    },
+    {
+      "chosen": "'And no other rule is broken' fails on an undecided rule too, as the cited rules do.",
+      "rejected": "Failing on breaks only.",
+      "would_change": "Real-agent runs show many undecided uncited rules."
+    },
+    {
+      "chosen": "No Proposed task from this task run. The minor findings of review 050-1 and advice 050-1 are on lines this branch added, and the owner's rule (a) of 2026-11-17 (tasks/066.json notes) says an agent creates a task only for a problem that existed before the branch; they stay in tasks/reviews/050-1.md and tasks/advice/050-1.md and are listed in the run report.",
+      "rejected": "One Proposed task bundling them, which the manager's current text allows.",
+      "would_change": "The owner wants these fixes as a task of their own."
+    }
+  ]
 }

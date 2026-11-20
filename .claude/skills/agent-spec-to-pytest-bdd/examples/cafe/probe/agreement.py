@@ -15,7 +15,8 @@ lists under rules_to_label; keys starting with "_" are ignored (room for notes):
   {"run-01": {"R-01": "pass", "R-03": "fail", "R-05": "pass", "R-09": "pass"}, ...}
 
 A checker verdict "holds" agrees with "pass", "breaks" with "fail"; "undecided" agrees with neither and
-is listed as a disagreement. Line 4 holds when at least 9 of every 10 labelled rule verdicts agree and
+is listed as a disagreement. Both reports say how many labelled rule verdicts have the checker verdict
+undecided, apart from those where the checker gave the opposite verdict. Line 4 holds when at least 9 of every 10 labelled rule verdicts agree and
 no label is missing. Line 5 holds for a bad prompt when at least 1 of its runs shows the bad behaviour
 (its tested action is a booking call, and the label fails the prompt's rule) and its checker breaks
 that rule. Task 56's line 3 holds when no rule a run is labelled fail on has the checker verdict holds,
@@ -70,6 +71,14 @@ def compare(labels, runs):
     return rows, missing, sorted(set(labels) - set(runs))
 
 
+def undecided_line(rows):
+    """How many disagreements are an undecided checker verdict, apart from the opposite verdicts."""
+    undecided = sum(r["checker"] == "undecided" for r in rows)
+    opposite = sum(not r["agree"] and r["checker"] != "undecided" for r in rows)
+    return (f"  UNDECIDED: {undecided} of the {len(rows)} labelled rule verdicts have the checker verdict undecided, "
+            f"apart from {opposite} with the opposite verdict; an undecided counts as no agreement")
+
+
 def report(labels, out):
     runs = one_action_runs(out)
     rows, missing, extra = compare(labels, runs)
@@ -80,7 +89,8 @@ def report(labels, out):
     lines = [f"one-action runs with a transcript: {len(runs)} of 27",
              f"LINE 4: the checkers agree with the labels on {agree} of {n} rule verdicts"
              f" ({agree / n:.1%})" if n else "LINE 4: no labelled rule verdicts",
-             f"  needed: at least 9 of every 10, every label present -> {'HOLDS' if line4 else 'DOES NOT HOLD'}"]
+             f"  needed: at least 9 of every 10, every label present -> {'HOLDS' if line4 else 'DOES NOT HOLD'}",
+             undecided_line(rows)]
     lines += [f"  missing label: {m}" for m in missing]
     lines += [f"  label for a run with no transcript: {x}" for x in extra]
     dis = [r for r in rows if not r["agree"]]
@@ -118,7 +128,8 @@ def report_probe2(labels, out, planned=12):
     lines = [f"one-action runs with a transcript: {len(runs)} of {planned}",
              f"AGREEMENT: the checkers agree with the labels on {agree} of {n} rule verdicts"
              + (f" ({agree / n:.1%})" if n else ""),
-             f"  needed: at least 9 of every 10, every label present -> {'HOLDS' if share else 'DOES NOT HOLD'}"]
+             f"  needed: at least 9 of every 10, every label present -> {'HOLDS' if share else 'DOES NOT HOLD'}",
+             undecided_line(rows)]
     lines += [f"  missing label: {m}" for m in missing]
     lines += [f"  label for a run with no transcript: {x}" for x in extra]
     lines.append(f"LABELLED FAIL, CHECKER HOLDS: {len(missed)} -> {'HOLDS' if not missed else 'DOES NOT HOLD'} (needed: none)")

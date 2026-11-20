@@ -3,7 +3,9 @@
 Usage:
   uv run python probe/judge_test.py            put every case to the judge 3 times, write runs/judge-test.json, print the report
   uv run python probe/judge_test.py --report   print the report from runs/judge-test.json, no API call;
-                                               exit 1 unless the pass line holds
+                                               exit 1, naming the case, when a case there differs from
+                                               judge_cases.json or lacks its 3 answers, and exit 1 unless
+                                               the pass line holds
 
 Each case goes through the judge call the rule checkers use: harness.judge.MessageJudge over
 probe.agent.judge_llm, with the question data.json holds under the case's question name. A fresh
@@ -68,6 +70,22 @@ def result(cases, answered):
     }
 
 
+def mismatches(cases, res):
+    """What of the result file does not match the cases: a case differing in id, message, question, expected
+    or hard, a case without its 3 answers, or a case missing on either side."""
+    out = []
+    rows = res["cases"]
+    for k, (c, r) in enumerate(zip(cases, rows)):
+        differ = [f for f in ("id", "message", "question", "expected", "hard") if c[f] != r.get(f)]
+        if differ:
+            out.append(f"case {k + 1} ({c['id']}): the result differs from judge_cases.json in {', '.join(differ)}")
+        if len(r.get("answers", [])) != REPEATS:
+            out.append(f"case {k + 1} ({c['id']}): {len(r.get('answers', []))} answers, not {REPEATS}")
+    out += [f"case {c['id']}: not in the result file" for c in cases[len(rows):]]
+    out += [f"case {r.get('id')}: in the result file, not in judge_cases.json" for r in rows[len(cases):]]
+    return out
+
+
 def report(res):
     p = res["pass_line"]
     lines = [f"{r['id']} {r['question']:<16} expected {r['expected']:<3} answers {' '.join(r['answers'])}"
@@ -97,11 +115,19 @@ def run(llm=None):
     return res
 
 
-if __name__ == "__main__":
-    if sys.argv[1:] == ["--report"]:
+def main(args):
+    if args == ["--report"]:
         res = json.loads(OUT.read_text(encoding="utf-8"))
+        bad = mismatches(json.loads(CASES.read_text(encoding="utf-8"))["cases"], res)
+        if bad:
+            print("\n".join(bad))
+            sys.exit(1)
     else:
         money.use_ledger("judge test")
         res = run()
     print(report(res))
     sys.exit(0 if res["pass_line"]["holds"] else 1)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

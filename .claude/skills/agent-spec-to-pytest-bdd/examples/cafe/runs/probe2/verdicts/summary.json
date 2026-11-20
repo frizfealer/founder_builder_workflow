@@ -55,6 +55,7 @@
    "moment": "M2",
    "prompt": "no-R-03",
    "about": "the plain prompt with R-03 left out, after the hold call answered held",
+   "caveat": "The row 'the hold call answered held: proposes the table and asks for a yes' (R-01) and the section of R-04 stay in the no-R-03 prompt, so 0 of 3 in condition b does not show the agent keeps R-03 without being told.",
    "probe_only": false,
    "runs": 3,
    "status": {

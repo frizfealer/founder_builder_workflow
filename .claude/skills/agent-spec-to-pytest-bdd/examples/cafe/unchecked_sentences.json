@@ -1,0 +1,43 @@
+{
+ "_about": "Per rule of rules.md, every sentence of the rule (its section's text, as harness/data.py rule_text gives it) that its checker in harness/checkers.py does not check, or checks only in part, with the part not checked and the reason. An empty list means the checker checks every sentence. tests/test_slice_b.py checks that every rule is here, that each sentence is quoted word for word from its rule, and that R-01's list is empty. The rows of 'What the agent does' are not sentences of a rule; the ones no checker checks are listed apart, under rows_not_checked.",
+ "rules": {
+  "R-01": [],
+  "R-02": [
+   {
+    "sentence": "The agent holds and proposes a table for at most 8 people.",
+    "not_checked": "'proposes' for a party size other than the held one: a message that proposes a table for more than 8 people while the agent holds a table for 8 or fewer",
+    "reason": "the checker reads the party size of each hold call; a proposal is checked only through the hold (R-01 allows a proposal only while a table is held, and every hold is checked to be for at most 8). The message judge has no question about the party size a proposal names."
+   }
+  ],
+  "R-03": [],
+  "R-04": [],
+  "R-05": [],
+  "R-06": [],
+  "R-07": [],
+  "R-08": [],
+  "R-09": [
+   {
+    "sentence": "When it cannot tell, it says so.",
+    "not_checked": "after a hold call with no answer, that the agent says it cannot tell whether the table is held",
+    "reason": "read as 'when it cannot tell whether the table was booked', the case of the rule's first sentence; the checker asks it after a booking call with no answer. After a hold call with no answer the rules' table has the agent say 'the table could not be held' (R-01's row), which R-01's checker checks, and model.py's r09_end checks only what is said about the booking."
+   }
+  ],
+  "R-10": [],
+  "R-11": []
+ },
+ "rows_not_checked": [
+  {
+   "row": "the release call got no answer during a change | says it could not release the earlier hold, and proposes nothing new | R-06",
+   "not_checked": "says it could not release the earlier hold",
+   "reason": "not a sentence of R-06; R-06's checker checks that no new table is held while the old hold may remain, and R-01's that nothing is proposed while no table is held. No judge question asks whether a message says a release failed."
+  },
+  {
+   "row": "the visitor withdrew | releases the hold, then says nothing was booked | R-07",
+   "not_checked": "then says nothing was booked",
+   "reason": "not a sentence of R-07, whose text is 'releases its hold and books nothing'; R-09's checker checks only that 'nothing was booked' is not said after a booked answer."
+  }
+ ],
+ "notes": {
+  "R-08": "its second sentence (a visitor asking to change a reservation that exists) is checked by the checker, but no scenario plays it: SC-17 has no World lines (spec_findings.json). tests/test_slice_b.py runs it on hand-made events."
+ }
+}
