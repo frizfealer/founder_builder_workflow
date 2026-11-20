@@ -22,7 +22,7 @@ One JSON object per file, `tasks/<id>.json`, id zero-padded to 3 (`tasks/020.jso
 | `tokens` | `null`, or `{"agents": <int>, "main_session": "not recorded"}` | Manager |
 | `draft_note` | text, optional | Whoever drafted the fields |
 | `needs_you` | optional; `{"question", "recommendation", "if_vetoed"}`, required when status is Needs you | Manager |
-| `decided_for_you` | optional; list of `{"chosen", "rejected", "would_change"}` | Manager |
+| `decided_for_you` | optional; list of `{"chosen", "rejected", "why", "would_change"}`, each text; `why` is one sentence, the reason for the choice. The manager writes `why` in every new entry; an entry written before task 68 has none, so `tasks.py lint` accepts an entry without it and rejects a `why` that is not non-empty text | Manager |
 | `outside_needs` | optional; list of distinct values from a fixed set, today only `claude-api`. `checks.py needs` runs one check per value before a builder starts; a failure parks the task | Owner; manager may draft |
 | `outside_problems` | optional; for a Proposed task, a non-empty list of `{"file", "problem"}`: each file that existed before the branch that adds the task, and the problem in it the task is about. A task branch adds a Proposed task only with it (`checks.py protected`) | Whoever proposes the task, builder or manager |
 | `for_retry` | optional; list of findings, each quoted, on files that exist only on the task's branch or on lines it added or changed (`checks.py unmerged`). Written when the task parks, on the working branch only; the retry builder's brief quotes it | Manager |

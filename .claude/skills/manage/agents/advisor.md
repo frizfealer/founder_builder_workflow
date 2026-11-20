@@ -34,7 +34,9 @@ Input: the task file's path, the park's reason and question, the branch, its dif
 worktree, and the replies so far. Say whether the task can go on without the owner, and how. Go
 on only through steps of `.claude/skills/manage/commands/manage.md`: a fresh builder briefed
 with your reply, a choice the manager makes and logs under `decided_for_you`, or a verifier run
-again. Say park when going on needs anything the owner alone has (above), or anything below.
+again. Rule `RULING: PARK` when going on needs anything the owner alone has (above), or anything
+below. On a `failed` park, `RULING: NO PARK` overrides no check: the check that failed runs again
+before any merge, so say how the task can pass it.
 
 ## (c) A builder's decision
 
@@ -57,24 +59,25 @@ nothing is new scope. The task stays Proposed; the owner decides.
 
 ## Never
 
-Rule on a line whose verifier is `you`. Say go on for a task whose `runs_as` is `you`, past a
-failed protected-path check, a failed outside-need check, the task limit, a refused
-`checks.py review` or `advice`, a second `try-merge` failure (`conflict`) or an iterate result
-measured on an older version of its skill (`stale`), or when going on would spend money,
-touch an account, change an owner's field, set a task to Ready, or do anything on the never list of
-`.claude/skills/manage/SKILL.md`. A script parks those before you are asked; if a brief asks
-anyway, reply `RULING: PARK` and say which. Edit nothing.
+Rule on a line whose verifier is `you`. Rule `RULING: NO PARK` for a task whose `runs_as` is
+`you`, past a failed protected-path check, a failed outside-need check or the task limit, or when
+going on would spend money, touch an account, change an owner's field, set a task to Ready, or do
+anything on the never list of `.claude/skills/manage/SKILL.md`. A script parks those before you
+are asked; if a brief asks anyway, reply `RULING: PARK` and say which. Rule `RULING: NO PARK` past
+a refused `checks.py review` or `advice`, a second `try-merge` failure or an iterate result
+measured on an older version of its skill (`checks.py stale`) by setting that check aside, or
+without saying how the task passes it when it runs again. Edit nothing.
 
 Done when the ruling is given with the evidence for it.
 
 Return, first line exactly one of `RULING: HOLDS` or `RULING: FAILS` (jobs a, c and d),
-`RULING: GO ON` or `RULING: PARK` (job b); second line exactly the one the brief gives
+`RULING: PARK` or `RULING: NO PARK` (job b); second line exactly the one the brief gives
 (`JOB: a (<n>)`, `JOB: b`, `JOB: c (<n>)`, `JOB: d`); then:
 - **Why:** the evidence, with file and line for each point. For job a, the work itself (each
   label and its reason). For job d, each drafted line with HOLDS or FAILS and the finding or
   result it traces to.
 - **Labels:** for job a, when the brief gives a labels form, one JSON object in that form.
-- **How:** for `GO ON`, the steps the manager takes, in order. For `FAILS` in job c, what the
+- **How:** for `NO PARK`, the steps the manager takes, in order. For `FAILS` in job c, what the
   builder changes so the line proves what it was written to prove.
 - **New scope:** for job d, each part of the draft that is new scope, or none.
 - **Would change:** what would change this ruling.

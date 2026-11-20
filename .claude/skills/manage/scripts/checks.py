@@ -474,34 +474,31 @@ def check_advice(repo, task_id):
     return True, "; ".join(f"line ({line}): {ADVICE_DIR}/{latest[line][1]} {ADVICE_HOLDS}" for line in lines)
 
 
-# The reason of every park, the word commands/manage.md passes to checks.py consult. A reason in
-# ALWAYS_PARK parks without the advisor: the advisor never decides these (task 37's notes), nor
-# the owner's own stop, the task limit, nor a merge check that refused after verification passed.
-# Any other park consults the advisor first.
+# The reason of every park, the word commands/manage.md passes to checks.py consult: what the owner
+# must do (task 68's notes). A reason in ALWAYS_PARK parks without the advisor; a reason in CONSULT
+# consults the advisor first, which cannot override a check: after NO PARK the check that failed
+# runs again, and the merge hook still refuses a merge whose checks fail.
 ALWAYS_PARK = {
-    "owner": "a line whose verifier is you waits for the owner's check; the advisor never rules on it",
-    "runs-as-you": "the task runs as you; the advisor never unparks it",
-    "protected": "the protected-path check failed; the advisor never overrides it",
-    "needs": "an outside-need check failed; the advisor never overrides it",
-    "money": "finishing would spend money or touch an account",
-    "owner-field": "finishing would change an owner's field",
-    "set-ready": "finishing would set a task to Ready",
-    "never": "finishing would need something from the never list",
-    "merge-limit": "the task limit is reached; it is the owner's own control",
-    "review": "checks.py review refused the merge; the advisor never overrides a merge check",
-    "advice": "checks.py advice refused the merge; the advisor never overrides a merge check",
-    "conflict": "the task failed checks.py try-merge again after its one rebuild",
-    "stale": "the iterate result was measured on an older version of its skill",
+    "permission": "the task wants something it is not allowed; the owner allows or refuses",
+    "your-action": "only the owner can do the next step: check his line, fix a login or credit, or "
+                   "run the task himself",
 }
 CONSULT = {
     "owner-fact": "it needs a fact about the owner's product or an outside system",
-    "verification": "verification still fails after its one retry",
-    "iterate": "the iterate result is not kept, or its Needs you holds an item",
+    "failed": "the work did not pass; the owner changes the task, retries or drops it",
+}
+# The always-park conditions the repo shows: each parks under its reason, whatever reason is given.
+CONDITIONS = {
+    "protected": ("permission", "the protected-path check failed"),
+    "runs-as-you": ("your-action", "the task runs as you"),
+    "owner": ("your-action", "a line whose verifier is you waits for the owner's check"),
+    "needs": ("your-action", "an outside-need check failed"),
+    "merge-limit": ("your-action", "the task limit is reached"),
 }
 
 
 def always_park_conditions(repo, task_id, branch=None, base=WORKING_BRANCH, commands=NEED_CHECKS):
-    """{reason: message} for each always-park condition the repo shows that holds now, read from
+    """{condition: message} for each always-park condition the repo shows that holds now, read from
     the task file on base, the task's branch when there is one, and the merges since the review tag.
     Money, accounts, owner's fields, Ready and the never list have no state to read: label only."""
     held = {}
@@ -526,16 +523,17 @@ def always_park_conditions(repo, task_id, branch=None, base=WORKING_BRANCH, comm
 def check_consult(repo, task_id, reason, branch=None, base=WORKING_BRANCH, commands=NEED_CHECKS):
     """(ok, message). ok when the advisor is consulted before the park; False when the task always
     parks without it: the reason is an always-park one, or an always-park condition holds whatever
-    the reason. Raises ValueError for a reason in neither list, or a task file base does not hold."""
+    the reason, and then it parks under the condition's reason and the message names its cause.
+    Raises ValueError for a reason in neither list, or a task file base does not hold."""
     if reason not in ALWAYS_PARK and reason not in CONSULT:
         raise ValueError(f"{reason!r} is not a park reason; use one of {sorted(ALWAYS_PARK | CONSULT)}")
     held = always_park_conditions(repo, task_id, branch, base, commands)
     if held:
-        why = "; ".join(f"{ALWAYS_PARK[r]} ({m})" for r, m in held.items())
-        return False, f"task {task_id}: always park, without the advisor: {why}"
+        why = "; ".join(f"as {CONDITIONS[c][0]}: {CONDITIONS[c][1]} ({m})" for c, m in held.items())
+        return False, f"task {task_id}: always park, without the advisor, {why}"
     if reason in ALWAYS_PARK:
-        return False, f"task {task_id}: always park, without the advisor: {ALWAYS_PARK[reason]}"
-    return True, f"task {task_id}: consult the advisor (job b) before parking: {CONSULT[reason]}"
+        return False, f"task {task_id}: always park, without the advisor, as {reason}: {ALWAYS_PARK[reason]}"
+    return True, f"task {task_id}: consult the advisor (job b) before parking as {reason}: {CONSULT[reason]}"
 
 
 def drafts(repo, task_id):
@@ -739,7 +737,7 @@ def check_try_merge(repo, task_id, worktree, commands, base=WORKING_BRANCH):
     if first:
         return 1, (f"task {task_id}: {fail}\nRebuild once: a fresh builder on a branch cut from the "
                    f"updated {base}, with this output as the fault to fix.")
-    return 3, f"task {task_id}: {fail}\nIt failed once already in this run: park it (reason conflict)."
+    return 3, f"task {task_id}: {fail}\nIt failed once already in this run: park it (reason failed)."
 
 
 def check_stale(repo, skill, branch, base=WORKING_BRANCH):

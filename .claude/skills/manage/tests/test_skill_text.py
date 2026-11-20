@@ -24,12 +24,12 @@ RULES = {
     "SKILL.md": [
         "An agent creates a task in one case only: a problem that existed before the task's branch and lies outside its change.",
         "Fix it here: the minor problems on lines the task's own branch added or changed (`checks.py unmerged`) are fixed before the merge, in one fix pass.",
-        "A builder that needs a protected path its task may not edit does not propose a task either: the task parks (`never`)",
+        "A builder that needs a protected path its task may not edit does not propose a task either: the task parks (`permission`)",
     ],
     "commands/manage.md": [
         "An agent creates a task in one case only (SKILL.md rule 2): a problem that existed before the task's branch and lies outside its change.",
         "Fix it here (SKILL.md rule 3), between the review and the merge.",
-        "When it stops because `done_means` needs a protected path `may_edit` does not name, park (reason `never`) with that path in the question; it proposes no task for it.",
+        "When it stops because `done_means` needs a protected path `may_edit` does not name, park (reason `permission`) with that path in the question; it proposes no task for it.",
     ],
     "agents/builder.md": [
         "You create a task in one case only: a problem that existed before your branch and lies outside your change.",
@@ -126,7 +126,7 @@ def test_labels_against_verdicts_step():
 def test_for_retry_kept_by_early_park_and_cleared_by_merge():
     """Should keep an earlier for_retry on a park before step 5, remove it on the merge, and say a park's branch stays only when there is one."""
     park = step("commands/manage.md", "## 8. Park", "## 9. End")
-    assert "A park before step 5 (a `needs` park at step 3) leaves `for_retry` as it is" in park
+    assert "A park before step 5 (the outside-need park at step 3) leaves `for_retry` as it is" in park
     assert "The task's branches stay, when it has any." in park
     merge = step("commands/manage.md", "## 7. Merge", "## 8. Park")
     assert "remove its `for_retry`" in merge
@@ -144,7 +144,7 @@ def test_money_rule_where_each_reader_meets_it():
     """Should say who may spend money in SKILL.md, agents/builder.md and step 4 of commands/manage.md, and what the hook misses and over-refuses."""
     skill = text("SKILL.md")
     assert ("A builder spends money (`claude -p`, `ant`, a paid API call) only when its task's `outside_needs` "
-            "names the need (`claude-api`); otherwise it stops, and the task parks (`money`)") in skill
+            "names the need (`claude-api`); otherwise it stops, and the task parks (`permission`)") in skill
     assert "It misses an alias, a script, an SDK call or `gh`" in skill
     assert "a heredoc or other text that only quotes a push or a paid command is refused" in skill
     builder = text("agents/builder.md")
@@ -152,7 +152,7 @@ def test_money_rule_where_each_reader_meets_it():
     assert "stop and say so under **Blocked**" in builder
     assert "Write file text with Write or Edit, not a Bash heredoc." in builder
     four = step("commands/manage.md", "## 4. Work", "## 5. Verify")
-    assert "`outside_needs` quoted" in four and "park (reason `money`)" in four
+    assert "`outside_needs` quoted" in four and "park (reason `permission`" in four
 
 
 def test_manage_worktree_and_main_folder_wording():
@@ -169,7 +169,7 @@ def test_manage_worktree_and_main_folder_wording():
 
 
 def test_owner_note_rule_8_and_advisor_never_list():
-    """Should tell the owner his own commit ends a run with nothing lost, keep rule 8 to what tasks/advice/061-1.md records, and name conflict and stale in the advisor's Never list."""
+    """Should tell the owner his own commit ends a run with nothing lost, keep rule 8 to what tasks/advice/061-1.md records, and have the advisor's Never list forbid a NO PARK past a failed merge check that sets the check aside or does not say how to pass it when it runs again."""
     skill = text("SKILL.md")
     assert "your own commit on the working branch, or your edit to a tracked file in the main folder, ends that run" in skill
     assert "Nothing is lost" in skill and "To work meanwhile" in skill
@@ -177,7 +177,9 @@ def test_owner_note_rule_8_and_advisor_never_list():
             "in their own worktree, and their Bash still wrote to the main folder when told to") in skill
     assert "builders given either one wrote to the main folder" not in skill
     never = step("agents/advisor.md", "## Never", "Done when")
-    assert "(`conflict`)" in never and "(`stale`)" in never
+    assert "a second `try-merge` failure" in never and "(`checks.py stale`)" in never
+    assert ("by setting that check aside, or without saying how the task passes it when it runs again. "
+            "Edit nothing.") in " ".join(never.split())
 
 
 # --- (9) task 65's lines 1 and 3 to 5 --------------------------------------------------------------
@@ -205,3 +207,67 @@ def test_rule_6_count_and_hook_misses():
     assert "Two cases so far" not in skill and "Two cases came from task 49" in skill
     assert "a `-m` that sits inside another quoted string, a heredoc body or a comment, or `bash -cm`" in skill
     assert "`tasks/advice/058-2.md`" in skill
+
+
+# --- task 68: four park reasons, the task limit, rulings, why, the run report ---------------------
+
+def test_no_park_on_failed_park_runs_the_check_again():
+    """Should say in step 8 that after NO PARK on a failed park the check that failed runs again before any merge, and that the park question starts with the specific cause."""
+    park = step("commands/manage.md", "## 8. Park", "## 9. End")
+    assert "After `RULING: NO PARK` on a `failed` park, the check that failed runs again before any merge" in park
+    for check in ["`checks.py review` or `advice`", "`checks.py try-merge`", "`checks.py stale`"]:
+        assert check in park, check
+    assert "The question in `needs_you` starts with the specific cause" in park
+
+
+def test_manage_names_no_merge_limit_park():
+    """Should name no merge-limit park in commands/manage.md, and park as your-action a merge the limit refuses all the same."""
+    t = text("commands/manage.md")
+    assert "reason `merge-limit`" not in t and "(`merge-limit`)" not in t
+    merge = step("commands/manage.md", "## 7. Merge", "## 8. Park")
+    assert "`tasks.py batch` took no more tasks than the merges left" in merge
+    assert "park the task (reason `your-action`) with its output" in merge
+
+
+@pytest.mark.parametrize("doc", ["SKILL.md", "commands/manage.md", "agents/advisor.md"])
+def test_job_b_rulings_read_park_and_no_park(doc):
+    """Should give job (b)'s rulings as RULING: PARK and RULING: NO PARK."""
+    t = text(doc)
+    assert "`RULING: PARK`" in t and "`RULING: NO PARK`" in t
+
+
+def test_no_file_of_the_skill_folder_holds_the_old_ruling():
+    """Should leave no file of the skill folder holding the old ruling's words; the words are joined here so this file does not hold them either."""
+    old = " ".join(["GO", "ON"]).encode()
+    files = [p for p in SKILL.rglob("*") if p.is_file()
+             and not {"__pycache__", ".pytest_cache"} & set(p.relative_to(SKILL).parts)]
+    assert files
+    assert [str(p.relative_to(SKILL)) for p in files if old in p.read_bytes()] == []
+
+
+def test_decided_for_you_why_in_manage_fields_and_report():
+    """Should have commands/manage.md write why in every new decided_for_you entry, task-fields.md document it, and the report line give it."""
+    manage = text("commands/manage.md")
+    assert ("Every entry you add to a task's `decided_for_you` holds `chosen`, `rejected`, `why` (one sentence, "
+            "the reason for the choice) and `would_change`.") in manage
+    assert "`why` the reply's *Why* in one sentence" in manage
+    fields = text("references/task-fields.md")
+    assert '`{"chosen", "rejected", "why", "would_change"}`' in fields
+    assert "accepts an entry without it and rejects a `why` that is not non-empty text" in fields
+    report = (SKILL / "commands/manage.md").read_text().split("```markdown")[1].split("```")[0]
+    assert "- task <id>: chose <x> over <y>, because <why>; would change if <z>" in report
+
+
+def test_run_report_three_points():
+    """Should have SKILL.md point to the template for the run report's form, give a deleted branch without the restore command and say once how to restore, and give a recommendation for a worktree git refused to remove."""
+    skill = text("SKILL.md")
+    assert "three sections" not in skill
+    assert "`tasks/RUNS.md`: one report per run, newest first, in the form of the template in step 9 of `commands/manage.md`." in skill
+    report = (SKILL / "commands/manage.md").read_text().split("```markdown")[1].split("```")[0]
+    assert "- branch <name> deleted, last commit <id>\n" in report
+    assert report.count("git branch <name> <id>") == 1
+    assert "A deleted branch is restored with `git branch <name> <id>`" in report
+    assert "- worktree <path> (not removed): <git's refusal, one line>. Recommended: <remove or keep, with its reason>." in report
+    for s in ["## 7. Merge", "## 8. Park"]:
+        part = step("commands/manage.md", s, "## 8. Park" if s == "## 7. Merge" else "## 9. End")
+        assert "with git's refusal and your recommendation" in part, s

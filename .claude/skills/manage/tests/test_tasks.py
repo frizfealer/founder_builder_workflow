@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 import tasks
-from conftest import TAGS, task
+from conftest import BASE, TAGS, task
 
 
 def as_files(*ts):
@@ -191,6 +191,17 @@ def test_lint_owner_verified_date():
         assert any("owner_verified" in e for e in errs), bad
 
 
+def test_lint_decided_for_you_with_or_without_why():
+    """Should accept a decided_for_you entry with or without why, and reject a why that is not non-empty text."""
+    entry = {"chosen": "a", "rejected": "b", "would_change": "c"}
+    assert tasks.lint(as_files(task(1) | {"decided_for_you": [entry, entry | {"why": "a is simpler."}]}), TAGS) == []
+    for bad in ("", "  ", None, 3, ["a"]):
+        errs = tasks.lint(as_files(task(1) | {"decided_for_you": [entry | {"why": bad}]}), TAGS)
+        assert any("decided_for_you" in e for e in errs), bad
+    errs = tasks.lint(as_files(task(1) | {"decided_for_you": [entry | {"reason": "x"}]}), TAGS)
+    assert any("decided_for_you" in e for e in errs)
+
+
 def test_lint_for_retry_strings():
     """Should accept for_retry as a list of strings and fail anything else."""
     assert tasks.lint(as_files(task(1) | {"for_retry": ["probe/fake.py: IndexError on a 4th hold"]}), TAGS) == []
@@ -281,8 +292,8 @@ def iterate(task_id, skill):
     return task(task_id) | {"runs_as": "iterate", "title": f"Iterate {skill}: one change"}
 
 
-def batch_ids(*ts, n=2):
-    return [t["id"] for t in tasks.pick_batch(as_files(*ts), n, SKILLS)[0]]
+def batch_ids(*ts, n=2, room=10):
+    return [t["id"] for t in tasks.pick_batch(as_files(*ts), n, SKILLS, room)[0]]
 
 
 def test_batch_independent_tasks_taken_together():
@@ -347,7 +358,7 @@ def test_batch_n_caps_the_batch():
     ts = [task(1), task(2, priority="high"), task(3), task(4)]
     assert batch_ids(*ts, n=3) == [2, 1, 3]
     assert batch_ids(*ts, n=1) == [tasks.pick_next(as_files(*ts))[0]["id"]] == [2]
-    _, why = tasks.pick_batch(as_files(*ts), 3, SKILLS)
+    _, why = tasks.pick_batch(as_files(*ts), 3, SKILLS, 10)
     assert "task 4: 3 task(s) at once is the limit" in why
 
 
@@ -359,24 +370,89 @@ def test_batch_skips_conflict_and_fills_from_later_tasks():
 
 def test_batch_none_takeable():
     """Should say why when no task can be taken, as next does."""
-    assert tasks.pick_batch(as_files(task(1, status="Backlog")), 2, SKILLS) == ([], "no task is Ready")
+    assert tasks.pick_batch(as_files(task(1, status="Backlog")), 2, SKILLS, 10) == ([], "no task is Ready")
 
 
-def test_batch_cli_reads_n_from_limits(tmp_path, capsys):
+def test_batch_cli_reads_n_from_limits(repo, capsys):
     """Should take tasks_at_once from limits.json when no n is given, and an n given on the command line over it."""
-    root = Path(__file__).resolve().parents[4]
-    shutil.copytree(root / "tasks", tmp_path / "tasks", ignore=shutil.ignore_patterns("*.json"))
-    for t in (task(1), task(2), task(3)):
-        (tmp_path / "tasks" / f"{t['id']:03d}.json").write_text(json.dumps(t))
-    (tmp_path / "tasks/tags.txt").write_text("\n".join(TAGS) + "\n")
-    limits = tmp_path / tasks.LIMITS
-    limits.parent.mkdir(parents=True)
-    limits.write_text(json.dumps({"task_merges_per_review": 10, "tasks_at_once": 2}))
-    assert tasks.main(["--root", str(tmp_path), "batch"]) == 0
+    repo.write_task(task(3))
+    repo.write("tasks/tags.txt", "\n".join(TAGS) + "\n")
+    repo.commit("three tasks")  # limits.json: 10 task merges per review, 2 tasks at once
+    assert tasks.main(["--root", str(repo.path), "--base", BASE, "batch"]) == 0
     lines = capsys.readouterr().out.splitlines()
     assert lines[:2] == ["task 1: Task 1", "task 2: Task 2"] and lines[2].startswith("why: ")
-    assert tasks.main(["--root", str(tmp_path), "batch", "3"]) == 0
+    assert tasks.main(["--root", str(repo.path), "--base", BASE, "batch", "3"]) == 0
     assert capsys.readouterr().out.startswith("task 1: Task 1\ntask 2: Task 2\ntask 3: Task 3\n")
+
+
+# --- the task limit (task 68) ----------------------------------------------------------------
+
+def merges_used(repo, n):
+    """Two task merges, the review tag, then n task merges, with tasks 1 and 2 Ready and independent."""
+    repo.write("tasks/tags.txt", "\n".join(TAGS) + "\n")
+    repo.commit("tags")
+    for i in (101, 102):
+        repo.merge_task(i)
+    repo.git("tag", "review/2026-11-19")
+    for i in range(3, 3 + n):
+        repo.merge_task(i)
+
+
+@pytest.mark.parametrize("used, taken", [(9, ["task 1: Task 1"]), (10, [])])
+def test_batch_takes_no_more_than_merges_left(repo, capsys, used, taken):
+    """Should take at most the task limit minus the task merges since the latest review tag: 9 of 10 used and 2 independent Ready tasks gives 1 task, 10 of 10 gives none, and the why line names each task left out for it."""
+    merges_used(repo, used)
+    assert tasks.merges_left(repo.path, BASE) == 10 - used
+    code = tasks.main(["--root", str(repo.path), "--base", BASE, "batch"])
+    lines = capsys.readouterr().out.splitlines()
+    assert code == (0 if taken else 1)
+    assert lines[:-1] == taken
+    left = [i for i in (1, 2) if f"task {i}: Task {i}" not in taken]
+    for i in left:
+        assert (f"task {i}: the task limit leaves room for {10 - used} more task merge(s) before the next "
+                f"review tag") in lines[-1], i
+    assert lines[-1].startswith("why: " if taken else "no task to take: ")
+
+
+def test_batch_counts_every_task_merge_with_no_review_tag(repo, capsys):
+    """Should count every task merge on the working branch when it has no review tag yet: 9 task merges and 2 independent Ready tasks gives 1 task."""
+    repo.write("tasks/tags.txt", "\n".join(TAGS) + "\n")
+    repo.commit("tags")
+    for i in range(3, 12):
+        repo.merge_task(i)
+    assert tasks.merges_left(repo.path, BASE) == 1
+    assert tasks.main(["--root", str(repo.path), "--base", BASE, "batch"]) == 0
+    lines = capsys.readouterr().out.splitlines()
+    assert lines[:-1] == ["task 1: Task 1"]
+    assert "task 2: the task limit leaves room for 1 more task merge(s) before the next review tag" in lines[-1]
+
+
+def test_batch_cli_fails_when_git_cannot_count(tmp_path, capsys, monkeypatch):
+    """Should exit 2 with one FAIL line, not a traceback, when the root is not a git repo, so the task merges cannot be counted."""
+    monkeypatch.setenv("GIT_CEILING_DIRECTORIES", str(tmp_path.parent))  # no repo found above tmp_path
+    (tmp_path / "tasks").mkdir()
+    (tmp_path / "tasks/tags.txt").write_text("\n".join(TAGS) + "\n")
+    tasks.write(tmp_path, task(1))
+    (tmp_path / ".claude/skills/manage").mkdir(parents=True)
+    (tmp_path / tasks.LIMITS).write_text(json.dumps({"task_merges_per_review": 10, "tasks_at_once": 2}))
+    assert tasks.main(["--root", str(tmp_path), "--base", BASE, "batch"]) == 2
+    out = capsys.readouterr().out.splitlines()
+    assert len(out) == 1 and out[0].startswith("FAIL git")
+
+
+@pytest.mark.parametrize("limits, said", [(None, "cannot be read from"), ({"tasks_at_once": 2}, "it is missing")])
+def test_batch_cli_task_merges_per_review_missing(tmp_path, capsys, limits, said):
+    """Should exit 2 with one line naming task_merges_per_review and limits.json, with no traceback, when n is given on the command line and limits.json is missing or lacks the key."""
+    (tmp_path / "tasks").mkdir()
+    (tmp_path / "tasks/tags.txt").write_text("\n".join(TAGS) + "\n")
+    tasks.write(tmp_path, task(1))
+    if limits is not None:
+        (tmp_path / ".claude/skills/manage").mkdir(parents=True)
+        (tmp_path / tasks.LIMITS).write_text(json.dumps(limits))
+    assert tasks.main(["--root", str(tmp_path), "batch", "2"]) == 2
+    out = capsys.readouterr().out.splitlines()
+    assert len(out) == 1 and out[0].startswith("FAIL task_merges_per_review")
+    assert said in out[0] and tasks.LIMITS in out[0]
 
 
 def test_limits_keys_hold_integers_of_1_or_more():
