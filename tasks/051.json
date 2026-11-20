@@ -14,8 +14,11 @@
     }
   ],
   "source_chat": "founder_and_builder project chat, 2026-11-16 and 2026-11-17",
-  "done_means": "",
-  "verified_by": [],
+  "done_means": "(1) New broken variants written by this task's builder, each the reference agent with exactly one fault and selectable with --agent: one for each of the 10 rules a feature file cites (R-01 to R-11 without R-08), and a second for each rule whose text asks for both a tool call and a message (R-02, R-04, R-10, R-11), so each of those four has one variant with a wrong or missing tool call and one with a wrong or missing message; 14 or more in all. Three of the message variants are these: says the table is booked after a booking call with no answer (R-09), reports a booking without its confirmation id (R-05), says the booking is unknown but does not ask the visitor to call (R-11). Each variant's docstring names its rule, quotes the words of the rule it breaks and says whether the fault is a call or a message. The two variants of slice A stay unchanged and are not counted. (2) Every variant runs through all 16 feature files with 0 LLM calls, every sentence it says is a labelled entry of data.json, and the drift check, the data-file checks and the whole test suite of the café folder pass. (3) One results file lists, per variant and scenario, whether the variant's events differ from the reference agent's and the verdict of every rule; a test reruns the variants and fails when the file differs. Every variant differs from the reference agent in at least one scenario. (4) The results file gives each variant one outcome: caught (its own rule's verdict is a break in at least one scenario), caught only by another rule, or survived (every test passes). For each variant not caught it quotes the words of the rule that went unchecked and says whether unchecked_sentences.json already lists them. No variant is dropped or rewritten because it was not caught, and the branch changes neither harness/checkers.py nor unchecked_sentences.json. (5) The variants' code imports nothing from harness/checkers.py or tests/test_slice_b.py, and the builder's report lists the café files it read before it first ran the variants; harness/checkers.py, tests/test_slice_b.py and unchecked_sentences.json are not on that list.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
   "may_edit": [],
   "runs_as": "build",
   "priority": "",
@@ -23,5 +26,12 @@
     "bdd"
   ],
   "tokens": null,
-  "draft_note": "Placeholder written by Claude in chat on 2026-11-17 so the whole path of task 1 shows in the task list. done_means, verified_by and priority are left empty on purpose: Claude writes them from the results of the task this one depends on, and only then is it offered to the owner. Outline in tasks/plans/001.md, section 'Slices B to E'."
+  "draft_note": "Placeholder written by Claude in chat on 2026-11-17 so the whole path of task 1 shows in the task list. done_means, verified_by and priority are left empty on purpose: Claude writes them from the results of the task this one depends on, and only then is it offered to the owner. Outline in tasks/plans/001.md, section 'Slices B to E'. Fields drafted by the manager-advisor (job d) from task 50's results on 2026-11-19, reply in tasks/advice/051-1.md; priority left to the owner.",
+  "decided_for_you": [
+    {
+      "chosen": "Advisor job d drafted done_means, verified_by, may_edit, runs_as, depends_on and tags from task 50's results, tasks/advice/051-1.md: 14 new variants (one per cited rule, a second for R-02, R-04, R-10, R-11), slice A's two not counted, survivors reported not failed, R-08 left out.",
+      "rejected": "Counting slice A's two variants; a variant for R-08; one variant per clause; failing the task on a surviving variant.",
+      "would_change": "The owner counts slice A's variants (12 new), wants R-08 in (15), wants one variant per clause, or wants a survivor to fail the task. New scope the advisor named and did not add: fixing a weak checker, the clause map and fresh reader of tasks/plans/001.md C.1 and C.2."
+    }
+  ]
 }
