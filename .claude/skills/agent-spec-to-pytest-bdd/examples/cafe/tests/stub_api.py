@@ -1,11 +1,7 @@
 """A stub in place of the Claude API: no network, no money.
 
-In-process tests pass StubClient to probe.llm.LLM. A test that runs pytest in a subprocess loads this
-file as a plugin, `-p tests.stub_api`, with CAFE_STUB_REPLIES set to a JSON list of replies; every
-anthropic.Anthropic() in that process is then a StubClient.
+Tests pass StubClient to probe.llm.LLM.
 """
-import json
-import os
 from types import SimpleNamespace
 
 
@@ -27,16 +23,3 @@ class StubClient:
         return SimpleNamespace(content=[block], usage=SimpleNamespace(input_tokens=1000, output_tokens=100,
                                                                       cache_read_input_tokens=0,
                                                                       cache_creation_input_tokens=0))
-
-
-def pytest_configure(config):
-    replies = os.environ.get("CAFE_STUB_REPLIES")
-    if replies is not None:
-        import anthropic
-        import tempfile
-        from pathlib import Path
-
-        import probe.llm
-        anthropic.Anthropic = lambda: StubClient(json.loads(replies))
-        # stub calls cost nothing: with no task ledger set they go to a throwaway default, not to runs/
-        probe.llm.DEFAULT_LEDGER = Path(tempfile.mkdtemp()) / "usage.jsonl"

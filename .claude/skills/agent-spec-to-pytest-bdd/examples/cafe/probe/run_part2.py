@@ -9,6 +9,9 @@ step functions and checkers as the reference agent. Transcripts go to runs/part2
 verdicts to runs/part2/verdicts/. The one-action runs get shuffled ids (run-01 to run-27) so a labeller
 reading transcripts sees neither the prompt nor the verdict; verdicts/index.json maps each id back.
 Stops before a run once the money spent reaches STOP_AT, and at the first run the API refuses.
+
+Task 52 deleted the probe agent, so pytest has no --agent probe and a run not yet saved here fails at once;
+--summary reads the saved runs and still works.
 """
 import json
 import random

@@ -1,10 +1,14 @@
-"""The probe agent: one prompt holding rules.md, the four tools, and one LLM call per action.
+"""What is left of the probe agent: its prompts, how it saw a conversation, and the message judge's LLM call.
 
-It is not the product agent; slice A and task 56 use it only to measure whether the tests' verdicts are
-right on a real LLM. Its system prompts are data.json's probe_prompts, each named by its key: "plain",
-slice A's two bad prompts "retry" (R-11) and "book-when-held" (R-03), and task 56's "no-R-11" and
-"no-R-03", the plain prompt with one rule left out. build_prompt is how each text is made from rules.md;
-tests/test_probe2.py keeps the stored texts equal to it.
+The probe agent was one prompt holding rules.md, the four tools, and one LLM call per action. It was not the
+product agent; slice A and task 56 used it only to measure whether the tests' verdicts are right on a real
+LLM, and task 52 deleted it (the class ProbeAgent and pytest's --agent probe), so probe/run_part2.py and
+probe/run_probe2.py no longer run; their saved runs under runs/ stay. Its system prompts are data.json's
+probe_prompts, each named by its key: "plain", slice A's two bad prompts "retry" (R-11) and "book-when-held"
+(R-03), and task 56's "no-R-11" and "no-R-03", the plain prompt with one rule left out. build_prompt is how
+each text is made from rules.md; tests/test_probe2.py keeps the stored texts equal to it. tools and
+to_messages are the tools and the Messages API turns it was sent. judge_llm is the message judge's LLM
+call, which probe/judge_test.py uses.
 """
 import json
 import re
@@ -81,25 +85,6 @@ def to_messages(events):
             content = e["payload"] if isinstance(e["payload"], str) else json.dumps(e["payload"], ensure_ascii=False)
             add("user", {"type": "tool_result", "tool_use_id": last_id, "content": content, "is_error": e["is_error"]})
     return msgs
-
-
-class ProbeAgent:
-    name = "probe"
-
-    def __init__(self, llm, prompt="plain"):
-        self.llm, self.prompt = llm, prompt
-        self.system = system_prompt(prompt)
-
-    def act(self, events):
-        r = self.llm.create("agent", max_tokens=1024, system=self.system, tools=tools(),
-                            tool_choice={"type": "auto", "disable_parallel_tool_use": True},
-                            messages=to_messages(events))
-        text = "".join(b.text for b in r.content if b.type == "text").strip()
-        uses = [b for b in r.content if b.type == "tool_use"]
-        action = [{"kind": "message", "text": text}] if text or not uses else []
-        if uses:
-            action.append({"kind": "call", "tool": uses[0].name, "args": dict(uses[0].input)})
-        return action
 
 
 def judge_llm(llm):
