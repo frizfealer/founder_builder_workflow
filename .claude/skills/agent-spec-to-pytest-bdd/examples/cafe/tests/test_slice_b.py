@@ -160,7 +160,7 @@ def test_check_unchecked_sentences_lists_every_rule_and_not_r01():
         for item in items:
             assert item["sentence"] in sentences(rule_id), (rule_id, item["sentence"])
             assert item["not_checked"] and item["reason"]
-    assert sorted(r for r, items in f["rules"].items() if items) == ["R-02", "R-09"]
+    assert sorted(r for r, items in f["rules"].items() if items) == ["R-02", "R-04", "R-09"]
 
 
 # ---------------------------------------------------------------------- the new checkers catch a break

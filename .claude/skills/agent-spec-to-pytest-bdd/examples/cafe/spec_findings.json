@@ -1,5 +1,5 @@
 {
- "_about": "Findings for agent-spec from the café BDD tests, task 50 (slice B), against ../../../agent-spec/examples/cafe/spec/, each in the fields of the finding format of agent-spec's references/verification.md (id, class, severity, where, quote, evidence, pattern), for agent-spec's findings-file update mode. tests/test_slice_b.py checks that SC-17 is left out of the feature files and that F1 names it.",
+ "_about": "Findings for agent-spec from the café BDD tests, task 50 (slice B), against ../../../agent-spec/examples/cafe/spec/, each in the fields of the finding format of agent-spec's references/verification.md (id, class, severity, where, quote, evidence, pattern), for agent-spec's findings-file update mode. tests/test_slice_b.py checks that SC-17 is left out of the feature files and that F1 names it. F2 is task 67's, from slice C (task 51): tests/test_slice_c_findings.py checks that it names R-04 and the missing World lines.",
  "findings": [
   {
    "id": "F1",
@@ -17,6 +17,21 @@
    ],
    "pattern": "A conversational scenario cites a rule but holds no World lines, so a rule only it cites cannot be run. Check every scenario of kind 'conversational' for World lines.",
    "bdd_side_ready": "R-08's checker in harness/checkers.py checks both sentences (the second on a visitor line meaning 'change a reservation that exists'), and data.json has the judge question says_cannot_change. With the lines above, the BDD side adds one visitor sentence to data.json and generate_features.py writes features/SC-17.feature."
+  },
+  {
+   "id": "F2",
+   "class": "Gap",
+   "severity": "Important",
+   "where": "scenarios.md SC-09, SC-14, SC-15 (the scenarios with a change); rules.md R-04",
+   "scenario": "absent",
+   "rule": "R-04",
+   "quote": "absent",
+   "evidence": "The scenarios with the World line 'visitor says yes and changes the party size' are SC-09 ('release call gets no answer (released)'), SC-14 ('release call gets no answer (still held)') and SC-15 ('release call answers released', then 'hold call gets no answer (table held)'). No scenario of scenarios.md has a change in which the release call answers \"released\" and the hold call for the changed table answers \"held\", so R-04's 'holds the changed table, and asks again' (rules.md R-04: 'The agent releases the old hold, holds the changed table, and asks again.') is run by no feature file: SC-15 makes the hold call for the changed table, but no feature file has it answered \"held\", the case after which the agent asks again. The reference agent's stop for that case shows it: harness/agents.py ReferenceAgent.on_result, on a hold call answered \"held\" after the visitor's 'yes and change', raises NotImplementedError('no scenario proposes a changed table, so data.json has no sentence for it'), and no feature file reaches it. model.py has the path (after 'agent holds the changed table' the system step 'hold call answers held', then the proposal), but it was not chosen as a scenario. An agent that, with the changed table held, books it, or says nothing, or proposes the old party size, passes every feature file.",
+   "missing_lines": [
+    "scenarios.md: a model-path scenario citing R-04 and R-06, such as 'Party size changed with the yes, old hold released, changed table held', with the World lines '1. The table is free', '2. visitor asks for a table for 8 or fewer', '3. hold call answers held', '4. visitor says yes and changes the party size', '5. release call answers released', '6. hold call answers held' and '7. visitor stops answering'."
+   ],
+   "pattern": "A rule's last step follows a tool answer that no scenario gives in that place, so the step is run by no feature file. For each rule, check that some scenario's World lines reach every step the rule names, with each answer the step needs.",
+   "bdd_side_ready": "R-04's checker in harness/checkers.py already checks that a \"held\" answer to the hold call for the changed table is followed, in that turn, by a message that proposes the table. With the scenario above, the BDD side adds to data.json a sentence proposing the changed table (party of 6, data.json's changed party size), replaces the reference agent's stop in harness/agents.py with that proposal, and generate_features.py writes the new feature file."
   }
  ]
 }

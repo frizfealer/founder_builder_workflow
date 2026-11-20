@@ -1739,7 +1739,7 @@
    "unchecked": {
     "rule": "R-04",
     "words": "holds the changed table, and asks again",
-    "listed_in_unchecked_sentences": "no"
+    "listed_in_unchecked_sentences": "yes: the words are inside a string of the file"
    },
    "note": "R-04's message half is reached in no scenario: R-04's 'asks again' follows a changed table held, no scenario has one, and there the reference agent stops the test. This variant sits at a failed release instead, where the reference agent does not ask again either but says release_failed (rules.md's R-06 row). What it changes is that it re-proposes the unchanged table instead of saying the release failed; R-01 caught that.",
    "scenarios": {

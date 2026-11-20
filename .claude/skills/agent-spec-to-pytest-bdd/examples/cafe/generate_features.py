@@ -4,6 +4,7 @@ Usage:
   uv run python generate_features.py           write features/<scenario id>.feature
   uv run python generate_features.py --check   the drift check: exit 1 and name the feature files that
                                                differ, and what of data.json no longer agrees with the spec
+  uv run python generate_features.py --help    print this usage, write nothing
 
 One feature file per scenario that has World lines (a scenario without any, SC-17, is a finding:
 spec_findings.json). A scenario's first World line is the starting situation (Given), the rest are When/And,
@@ -53,6 +54,9 @@ def drift():
 
 
 def main():
+    if {"--help", "-h"} & set(sys.argv[1:]):
+        print(__doc__)
+        return
     if "--check" in sys.argv[1:]:
         from harness import datacheck
         bad = drift()

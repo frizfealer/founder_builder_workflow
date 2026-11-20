@@ -162,12 +162,13 @@ def test_check_results_one_outcome_each():
 
 
 def test_check_results_listed_answer_for_todays_variant():
-    """Should record "no" for the one variant not caught, break-R-04-message, whose words task 51's review
-    found unlisted in unchecked_sentences.json, and say that R-04's "asks again" is reached in no scenario."""
+    """Should record "yes" for the one variant not caught, break-R-04-message, whose words task 51's review
+    found unlisted in unchecked_sentences.json and task 67 listed there, and say that R-04's "asks again" is
+    reached in no scenario."""
     not_caught = {n: v for n, v in saved()["variants"].items() if v["outcome"] != "caught"}
     assert list(not_caught) == ["break-R-04-message"]
     v = not_caught["break-R-04-message"]
-    assert v["unchecked"]["listed_in_unchecked_sentences"] == "no"
+    assert v["unchecked"]["listed_in_unchecked_sentences"] == "yes: the words are inside a string of the file"
     assert "reached in no scenario" in v["note"] and "release_failed" in v["note"]
 
 
