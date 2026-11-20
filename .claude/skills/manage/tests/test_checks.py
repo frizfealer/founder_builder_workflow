@@ -746,41 +746,53 @@ def test_owner_check_no_owner_line_left(repo):
     assert checks.check_owner(repo.path, 1, base=BASE)[0]
 
 
-# The always-park cases of task 37's notes, each with the reason commands/manage.md passes for it.
-ALWAYS_PARK_CASES = {
-    "rule on a line whose verifier is you": "owner",
-    "unpark a task whose runs_as is you": "runs-as-you",
-    "override a failed protected-path check": "protected",
-    "override a failed outside-need check": "needs",
-    "spend money or touch accounts": "money",
-    "change an owner's field": "owner-field",
-    "set Ready": "set-ready",
-    "anything on the never list": "never",
+# Task 68's notes: four park reasons, each saying what the owner must do. The cases of the old
+# reasons, each with the new reason commands/manage.md passes for it.
+OLD_REASONS = {
+    "protected": "permission", "never": "permission", "money": "permission",
+    "owner-field": "permission", "set-ready": "permission",
+    "owner": "your-action", "needs": "your-action", "runs-as-you": "your-action",
+    "owner-fact": "owner-fact",
+    "verification": "failed", "iterate": "failed", "review": "failed", "advice": "failed",
+    "conflict": "failed", "stale": "failed",
+    "merge-limit": None,  # no longer a reason the manager names; the task limit parks as your-action
 }
-# Added by the owner on 2026-11-17 (task 37's for_retry): the task limit is his own control, and
-# a merge check that refuses is decided the same way.
-OWNER_ALWAYS_PARK_CASES = {
-    "the task limit reached": "merge-limit",
-    "checks.py review refuses the merge": "review",
-    "checks.py advice refuses the merge": "advice",
-}
-# Task 61's notes: a second merge failure parks it; an iterate result measured on an older version
-# of its skill parks for the owner.
-TASK_61_ALWAYS_PARK_CASES = {
-    "a second try-merge failure in the run": "conflict",
-    "an iterate result measured on an older skill": "stale",
-}
+CONSULT_EXIT = {"permission": 1, "your-action": 1, "owner-fact": 0, "failed": 0}
 
 
-@pytest.mark.parametrize("case", list(ALWAYS_PARK_CASES | OWNER_ALWAYS_PARK_CASES | TASK_61_ALWAYS_PARK_CASES))
-def test_consult_always_park_case(repo, case, monkeypatch, capsys):
-    """Should always park, without the advisor, for each always-park case of the notes and the owner's."""
-    reason = (ALWAYS_PARK_CASES | OWNER_ALWAYS_PARK_CASES | TASK_61_ALWAYS_PARK_CASES)[case]
+def test_consult_holds_exactly_the_four_reasons():
+    """Should know exactly the four reasons of task 68's notes: permission and your-action always park, owner-fact and failed consult the advisor."""
+    assert set(checks.ALWAYS_PARK) == {"permission", "your-action"}
+    assert set(checks.CONSULT) == {"owner-fact", "failed"}
+
+
+@pytest.mark.parametrize("reason", list(CONSULT_EXIT))
+def test_consult_exit_for_each_reason(repo, reason, monkeypatch, capsys):
+    """Should exit 1 for permission and your-action, without the advisor, and 0 for owner-fact and failed, with the advisor first."""
     ok, msg = checks.check_consult(repo.path, 1, reason, base=BASE)
-    assert not ok
-    assert "always park" in msg
+    assert ok == (CONSULT_EXIT[reason] == 0)
+    assert ("always park" in msg) == (CONSULT_EXIT[reason] == 1)
+    assert f"as {reason}:" in msg
     monkeypatch.chdir(repo.path)
-    assert checks.main(["consult", "1", reason, "--base", BASE]) == 1
+    assert checks.main(["consult", "1", reason, "--base", BASE]) == CONSULT_EXIT[reason]
+
+
+@pytest.mark.parametrize("old", list(OLD_REASONS))
+def test_consult_old_reason_is_another_word(repo, old, monkeypatch, capsys):
+    """Should exit 2 for each of the 16 old reasons but owner-fact, which stays, and 2 for any other word."""
+    monkeypatch.chdir(repo.path)
+    code = checks.main(["consult", "1", old, "--base", BASE])
+    assert code == (CONSULT_EXIT["owner-fact"] if old == "owner-fact" else 2)
+    if old != "owner-fact":
+        assert f"{old!r} is not a park reason" in capsys.readouterr().out
+        with pytest.raises(ValueError):
+            checks.check_consult(repo.path, 1, old, base=BASE)
+
+
+def test_consult_unknown_reason(repo, monkeypatch):
+    """Should exit 2 for a reason in neither list."""
+    monkeypatch.chdir(repo.path)
+    assert checks.main(["consult", "1", "tired", "--base", BASE]) == 2
 
 
 def hold_condition(repo, condition):
@@ -806,22 +818,47 @@ def hold_condition(repo, condition):
     return None
 
 
-CONDITIONS = ["owner", "runs-as-you", "protected", "needs", "merge-limit"]
+# Each condition the repo shows, the reason the notes park it under, and the cause the output names.
+CONDITIONS = {
+    "protected": ("permission", "checks.py protected fails on task/1: DECISIONS.md"),
+    "runs-as-you": ("your-action", "task 1 runs as you"),
+    "owner": ("your-action", "task 1 waits for the owner's check"),
+    "needs": ("your-action", "claude-api"),
+    "merge-limit": ("your-action", "10 task merge(s) on work"),
+}
 
 
-@pytest.mark.parametrize("condition", CONDITIONS)
-def test_consult_condition_holds_always_parks(repo, condition, monkeypatch):
-    """Should always park when an always-park condition the repo shows holds, whatever reason the manager passed."""
+@pytest.mark.parametrize("condition", list(CONDITIONS))
+def test_consult_condition_holds_always_parks(repo, condition, monkeypatch, capsys):
+    """Should always park when a condition the repo shows holds, whatever reason is given, under the reason the notes name for it, and name its specific cause."""
     branch = hold_condition(repo, condition)
-    for reason in sorted(checks.CONSULT):
-        ok, msg = checks.check_consult(repo.path, 1, reason, branch, base=BASE,
-                                       commands={"claude-api": stand_in(1)})
-        assert not ok, reason
-        assert checks.ALWAYS_PARK[condition] in msg, reason
+    reason, cause = CONDITIONS[condition]
+    assert checks.CONDITIONS[condition][0] == reason
+    for given in sorted(checks.ALWAYS_PARK | checks.CONSULT):
+        ok, msg = checks.check_consult(repo.path, 1, given, branch, base=BASE,
+                                       commands={"claude-api": stand_in(1, "no credit")})
+        assert not ok, given
+        assert f"always park, without the advisor, as {reason}: {checks.CONDITIONS[condition][1]}" in msg, given
+        assert cause in msg, given
+        if reason != given:
+            assert f"as {given}:" not in msg, given
     if condition != "needs":  # the CLI runs the real outside-need check
         monkeypatch.chdir(repo.path)
-        argv = ["consult", "1", "verification"] + ([branch] if branch else []) + ["--base", BASE]
+        argv = ["consult", "1", "failed"] + ([branch] if branch else []) + ["--base", BASE]
         assert checks.main(argv) == 1
+        assert cause in capsys.readouterr().out
+
+
+def test_consult_two_conditions_park_as_permission(repo):
+    """Should name one reason, permission, when a protected-path failure and an empty owner_verified hold at once, and give both causes."""
+    repo.write_task(task(1) | {"verified_by": ["reviewer", "you"]})
+    repo.commit("task 1 has a line for the owner, owner_verified empty")
+    branch = hold_condition(repo, "protected")
+    ok, msg = checks.check_consult(repo.path, 1, "failed", branch, base=BASE)
+    assert not ok
+    assert "always park, without the advisor, as permission: the protected-path check failed" in msg
+    assert "as your-action" not in msg
+    assert CONDITIONS["protected"][1] in msg and CONDITIONS["owner"][1] in msg
 
 
 def test_consult_conditions_cleared_consults_advisor(repo):
@@ -832,63 +869,64 @@ def test_consult_conditions_cleared_consults_advisor(repo):
     b = on_branch(repo)
     repo.write("work.txt", "done\n")
     repo.commit("task 1: work")
-    ok, msg = checks.check_consult(repo.path, 1, "verification", b, base=BASE,
+    ok, msg = checks.check_consult(repo.path, 1, "failed", b, base=BASE,
                                    commands={"claude-api": stand_in(0)})
     assert ok, msg
-
-
-@pytest.mark.parametrize("reason", sorted(checks.CONSULT))
-def test_consult_runs_as_you_always_parks(repo, reason):
-    """Should always park a task whose runs_as is you, whatever reason the park gives."""
-    repo.write_task(task(1) | {"runs_as": "you"})
-    repo.commit("task 1 runs as you")
-    ok, msg = checks.check_consult(repo.path, 1, reason, base=BASE)
-    assert not ok
-    assert "runs as you" in msg
-
-
-@pytest.mark.parametrize("reason", sorted(checks.CONSULT))
-def test_consult_other_park_consults_advisor(repo, reason):
-    """Should consult the advisor before any other park."""
-    ok, msg = checks.check_consult(repo.path, 1, reason, base=BASE)
-    assert ok
-    assert "consult the advisor" in msg
-
-
-def test_consult_always_park_list_is_the_notes_and_owner_cases():
-    """Should hold exactly the notes' always-park cases, the owner's three and task 61's two, so no other park skips the advisor."""
-    assert set(checks.ALWAYS_PARK) == (set(ALWAYS_PARK_CASES.values()) | set(OWNER_ALWAYS_PARK_CASES.values())
-                                       | set(TASK_61_ALWAYS_PARK_CASES.values()))
-    assert not set(checks.ALWAYS_PARK) & set(checks.CONSULT)
-
-
-def test_consult_unknown_reason(repo, monkeypatch):
-    """Should exit 2 for a reason in neither list."""
-    monkeypatch.chdir(repo.path)
-    assert checks.main(["consult", "1", "tired", "--base", BASE]) == 2
 
 
 def test_consult_missing_task_file_is_an_error(repo, monkeypatch, capsys):
     """Should exit 3 naming the missing task file, not 1 as if the task always parked, nor 2 as if the reason were unknown."""
     monkeypatch.chdir(repo.path)
-    assert checks.main(["consult", "9", "verification", "--base", BASE]) == 3
+    assert checks.main(["consult", "9", "failed", "--base", BASE]) == 3
     out = capsys.readouterr().out
     assert out.startswith("FAIL consult cannot decide") and "tasks/009.json does not exist" in out
-    r = subprocess.run([sys.executable, str(SKILL / "scripts/checks.py"), "consult", "9", "owner", "--base", BASE],
+    r = subprocess.run([sys.executable, str(SKILL / "scripts/checks.py"), "consult", "9", "your-action", "--base", BASE],
                        cwd=repo.path, capture_output=True, text=True)
     assert r.returncode == 3 and "Traceback" not in r.stderr
 
 
-def test_park_reasons_in_docs_are_known():
-    """Should name in SKILL.md's park list every reason checks.py knows, and pass only known reasons in commands/manage.md."""
+def park_list():
+    return (SKILL / "SKILL.md").read_text().split("## Park, never ask")[1].split("## Never")[0]
+
+
+def test_park_list_and_manage_use_exactly_the_four_reasons():
+    """Should name in SKILL.md's park list exactly the four reasons checks.py knows, and pass only those in commands/manage.md, with no old reason left as a park reason in either."""
     import re
     known = set(checks.ALWAYS_PARK) | set(checks.CONSULT)
-    skill = (SKILL / "SKILL.md").read_text()
-    park_list = skill.split("## Park, never ask")[1].split("## Never")[0]
-    for reason in known:
-        assert f"`{reason}`" in park_list, reason
-    used = set(re.findall(r"reason `([\w-]+)`", (SKILL / "commands/manage.md").read_text()))
-    assert used and used <= known
+    items = set(re.findall(r"^- `([\w-]+)`", park_list(), re.M))
+    assert items == known
+    in_backticks = set(re.findall(r"`([\w-]+)`", park_list()))
+    assert not in_backticks & (set(OLD_REASONS) - known)
+    manage = (SKILL / "commands/manage.md").read_text()
+    used = set(re.findall(r"reason `([\w-]+)`", manage))
+    assert used == known
+    old = set(OLD_REASONS) - known
+    assert not {w for w in re.findall(r"`([\w-]+)` park", manage)} & old
+    assert not set(re.findall(r"\(`([\w-]+)`\)", " ".join(manage.split()))) & old
+
+
+def test_park_list_maps_each_replaced_case():
+    """Should describe under each of the four reasons the cases of the old reasons the notes map to it."""
+    import re
+    items = {}
+    for item in re.split(r"^- ", park_list(), flags=re.M)[1:]:
+        items[item.split("`")[1]] = " ".join(item.split())
+    cases = {
+        "permission": ["protected-path check fails", "protected path the task's `may_edit` does not name",
+                       "spend money", "change an owner's field", "set a task to Ready", "never list"],
+        "your-action": ["`checks.py owner <id>` fails", "`checks.py needs <id>` fails", "`runs_as` is `you`",
+                        "prepares the files, the options and a recommendation first",
+                        "`checks.py merge-limit` refuses the merge"],
+        "owner-fact": ["a fact about the owner's product or an outside system"],
+        "failed": ["Verification still fails after its one fresh retry", "iterate task's result is not kept",
+                   "`checks.py review` or `checks.py advice` refuses the merge", "`checks.py try-merge` fails",
+                   "`checks.py stale` fails"],
+    }
+    for reason, texts in cases.items():
+        for x in texts:
+            assert x in items[reason], (reason, x)
+    assert "*always*" in items["permission"] and "*always*" in items["your-action"]
+    assert "*always*" not in items["owner-fact"] and "*always*" not in items["failed"]
 
 
 def test_drafts_lists_hard_dependents_with_empty_done_means(repo):

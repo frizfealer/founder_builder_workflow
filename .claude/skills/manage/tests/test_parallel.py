@@ -64,7 +64,7 @@ def snapshot(repo):
 def test_two_tasks_built_at_once_in_worktrees_then_merged_in_turn(run):
     """Should build two independent Ready tasks at the same time in two worktrees, leave the main folder on the working branch with its files unchanged, and merge both one after the other."""
     taken, _ = tasks.pick_batch(tasks.load_all(run.path), tasks.tasks_at_once(run.path),
-                                tasks.skill_names(run.path))
+                                tasks.skill_names(run.path), tasks.merges_left(run.path, BASE))
     assert [t["id"] for t in taken] == [1, 2]
     for t in taken:
         set_status(run, t["id"], "In progress", f"task {t['id']}: in progress")
@@ -183,7 +183,7 @@ def test_conflict_with_first_merge_rebuilt_once_on_updated_branch(run):
 
 
 def test_conflict_second_failure_parks(run, monkeypatch, capsys):
-    """Should park the task on a second failure in the run, a conflict or a failing check, and consult should park it without the advisor."""
+    """Should park the task on a second failure in the run, a conflict or a failing check, as failed, which consults the advisor first."""
     trees = two_tasks_on_one_line(run)
     assert checks.check_try_merge(run.path, 2, trees[2], [], base=BASE)[0] == 1
     rebuild = worktree(run, "task/002-2")
@@ -191,9 +191,9 @@ def test_conflict_second_failure_parks(run, monkeypatch, capsys):
     monkeypatch.chdir(run.path)
     assert checks.main(["try-merge", "2", str(rebuild), "grep -q 'task 3' shared.txt", "--base", BASE]) == 3
     out = capsys.readouterr().out
-    assert "exits 1" in out and "park it (reason conflict)" in out
-    ok, msg = checks.check_consult(run.path, 2, "conflict", "task/002-2", base=BASE)
-    assert not ok and "always park" in msg
+    assert "exits 1" in out and "park it (reason failed)" in out
+    ok, msg = checks.check_consult(run.path, 2, "failed", "task/002-2", base=BASE)
+    assert ok and "consult the advisor" in msg
 
 
 def test_failing_check_on_merged_branch_counts_as_first_failure(run):
@@ -264,7 +264,7 @@ def test_tokens_need_an_active_run(repo, monkeypatch, capsys):
 # --- an iterate result measured on an older skill ----------------------------------------------
 
 def test_stale_iterate_result_when_skill_changed_meanwhile(run):
-    """Should flag an iterate branch once a merge changed the skill's folder or its eval folder after the branch left, and not for other changes."""
+    """Should flag an iterate branch once a merge changed the skill's folder or its eval folder after the branch left, and not for other changes; its park, as failed, consults the advisor first."""
     tree = worktree(run, "iterate/agent-spec/it1")
     commit_in(tree, {"result.txt": "kept\n"}, "iterate: trial")
     other = worktree(run, "task/001")
@@ -277,8 +277,8 @@ def test_stale_iterate_result_when_skill_changed_meanwhile(run):
     merge(run, 2, "task/002")
     ok, msg = checks.check_stale(run.path, "agent-spec", "iterate/agent-spec/it1", base=BASE)
     assert not ok and ".claude/skills/agent-spec/SKILL.md" in msg
-    ok, _ = checks.check_consult(run.path, 1, "stale", base=BASE)
-    assert not ok
+    ok, _ = checks.check_consult(run.path, 1, "failed", base=BASE)
+    assert ok
 
 
 # --- (6) the skill text describes all of it ----------------------------------------------------

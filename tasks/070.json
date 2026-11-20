@@ -1,0 +1,37 @@
+{
+  "id": 70,
+  "title": "Manager: a park reason for a merge the hook refuses because its checks could not run",
+  "item": "Map the merge hook's refusal 'the merge checks could not run' to a park reason in commands/manage.md step 7 and in the hook's message",
+  "motivation": "Found by task 68's review (tasks/reviews/068-3.md, outside finding); the gap existed before task 68's branch and it did not change it.",
+  "status": "Proposed",
+  "added": "2026-11-20",
+  "finished": "",
+  "notes": "When the hook refuses a task merge because the merge checks could not run (scripts/checks.py, push_hook), neither its message nor commands/manage.md step 7 names a park reason, so the manager has no word to give checks.py consult. Which of the four reasons fits is the owner's call.",
+  "depends_on": [
+    {
+      "id": 68,
+      "soft": false
+    }
+  ],
+  "source_chat": "",
+  "done_means": "",
+  "verified_by": [],
+  "may_edit": [],
+  "runs_as": "",
+  "priority": "",
+  "tags": [
+    "manager"
+  ],
+  "tokens": null,
+  "draft_note": "Proposed by the manager on 2026-11-20 in task 68's merge, from the reviewer's outside finding on earlier files (SKILL.md rule 2).",
+  "outside_problems": [
+    {
+      "file": ".claude/skills/manage/scripts/checks.py",
+      "problem": "The merge hook's refusal when the merge checks could not run (around lines 963-964 of task 68's branch) names no park reason."
+    },
+    {
+      "file": ".claude/skills/manage/commands/manage.md",
+      "problem": "Step 7's mapping of hook refusals to park reasons has no case for 'the merge checks could not run'."
+    }
+  ]
+}

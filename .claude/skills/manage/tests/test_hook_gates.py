@@ -152,11 +152,11 @@ def with_needs(repo):
                                      'bash -c "ant models list"', "echo hi | claude -p", "env X=1 ant models list",
                                      "timeout 60 claude -p hi"])
 def test_paid_command_refused_for_task_without_need(run, program):
-    """Should refuse with exit 2 claude -p or ant run in the worktree of a task whose outside_needs does not name claude-api, tell the agent to stop and report, and name the park reason money."""
+    """Should refuse with exit 2 claude -p or ant run in the worktree of a task whose outside_needs does not name claude-api, tell the agent to stop and report, and name the park reason permission."""
     with_needs(run)
     code, err = hook(run, f"cd {run.path}/build/worktrees/task-001 && {program}")
     assert code == 2
-    assert "spends money" in err and "Stop" in err and "Blocked" in err and "reason money" in err
+    assert "spends money" in err and "Stop" in err and "Blocked" in err and "reason permission" in err
     assert "task 1" in err
 
 

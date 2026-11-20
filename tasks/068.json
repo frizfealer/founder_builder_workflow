@@ -26,11 +26,11 @@
       "soft": false
     }
   ],
-  "status": "In progress",
+  "status": "Done",
   "added": "2026-11-19",
-  "finished": "",
+  "finished": "2026-11-20",
   "tokens": {
-    "agents": 353005,
+    "agents": 670057,
     "main_session": "not recorded"
   },
   "source_chat": "founder_and_builder project chat, 2026-11-19",
@@ -50,14 +50,55 @@
       "chosen": "Builder: the hook's paid-command refusal keeps its text '(reason money)'; SKILL.md and step 4 say the task parks as permission.",
       "rejected": "Editing the hook text and test_hook_gates.py.",
       "would_change": "The owner allows that hook text and its test to change (proposed as task 69)."
+    },
+    {
+      "chosen": "Builder (task/068-2): write each script name in full, checks.py X, wherever the docs had shortened it to a bare backticked owner, review, advice, merge-limit or protected.",
+      "rejected": "An exemption in the old-reason test for short names after a checks.py list.",
+      "why": "A bare backticked review or owner reads as an old park reason, and an exemption for it would be fragile.",
+      "would_change": "The owner wants the short forms kept."
+    },
+    {
+      "chosen": "Builder: fault 4 also changes SKILL.md's checks.py unmerged entry and manage.md's two sorting passages, so a finding the review says this change caused goes to the fix pass or for_retry even when checks.py unmerged exits 1.",
+      "rejected": "Changing only SKILL.md rule 2 and agents/reviewer.md.",
+      "why": "Otherwise those passages still send such a finding to a Proposed task, against the new rule 2.",
+      "would_change": "The owner wants checks.py unmerged alone to decide (rule 6); then the rule 2 sentence needs a script instead."
+    },
+    {
+      "chosen": "Manager: put the review's finding on scripts/checks.py:966-968 (the hook's merge refusal) on the fix list, although checks.py unmerged exits 1 for it.",
+      "rejected": "Treating it as an earlier problem for a Proposed task.",
+      "why": "The reviewer labelled it minor because this task's change made the unchanged line wrong, which the owner's for_retry 4 makes the task's own.",
+      "would_change": "The owner rules that only checks.py unmerged decides what is the task's own."
+    },
+    {
+      "chosen": "Fix-pass builder: when two repo conditions hold, checks.py consult names one reason, permission ahead of your-action, and every cause.",
+      "rejected": "Keeping two 'as <reason>' parts and only adding a rule to manage.md.",
+      "why": "The owner must allow or refuse the task before anything he does for it matters.",
+      "would_change": "The owner wants your-action to come first."
+    },
+    {
+      "chosen": "Fix-pass builder: tasks.py refuses --base outside batch (usage, exit 2).",
+      "rejected": "Documenting that the other subcommands ignore it.",
+      "why": "Ignoring it silently at run time is the problem the review named.",
+      "would_change": "Another subcommand comes to need a base."
+    },
+    {
+      "chosen": "Manager: no advisor job (c) for the change to the money-refusal assertion in tests/test_hook_gates.py.",
+      "rejected": "Asking the advisor whether line 3 ('the merge-hook tests pass unchanged') still proves what it was written to prove.",
+      "why": "The owner's for_retry 1 asked for that text and its test to change, and the merge-gating tests are unchanged (tasks/reviews/068-3.md, part 3).",
+      "would_change": "The owner meant line 3 to cover every test in test_hook_gates.py."
+    },
+    {
+      "chosen": "Manager: the three minor findings of the fix-pass re-check (tasks/reviews/068-4.md) stay in the review file.",
+      "rejected": "A second fix pass or a task for them.",
+      "why": "Rule 3 allows one fix pass, and what it leaves open creates no task.",
+      "would_change": "The owner wants them fixed; they are a long line in manage.md:300, a short line in SKILL.md:93, and a test that reads the hook message from source."
+    },
+    {
+      "chosen": "Manager: proposed task 70 for the review's outside finding, the hook refusal 'the merge checks could not run' with no park reason mapped.",
+      "rejected": "No Proposed task.",
+      "why": "The gap existed before the branch, and an agent that meets it has no reason to give checks.py consult.",
+      "would_change": "The owner drops task 70."
     }
-  ],
-  "for_retry": [
-    "Owner, 2026-11-19: the hook's paid-command refusal in scripts/checks.py still says the task parks with '(reason money)'. Change that text to the new reason, permission, and update its test in tests/test_hook_gates.py. The note 'no change to the merge hook' meant: the hook refuses and allows the same commands as before. Its message text may change.",
-    "Owner, 2026-11-19: SKILL.md's entry for checks.py merge-limit says 'At the limit the manager merges nothing more and ends the run', which disagrees with the new park list. Make it agree: tasks.py batch takes no more tasks than the merges left, and a limit reached at a merge all the same parks the task as your-action.",
-    "Owner, 2026-11-19: add a test that no file of the skill folder outside tests/ still uses one of the 16 old reasons as a park reason (protected, never, money, owner-field, set-ready, owner, needs, runs-as-you, verification, iterate, review, advice, conflict, stale, merge-limit; owner-fact stays), in backticks or after the word 'reason'. Names of scripts and fields, such as checks.py merge-limit, checks.py owner and runs_as, are not reasons and stay.",
-    "Owner, 2026-11-19: add to SKILL.md rule 2 and agents/reviewer.md: a line the branch did not change that is wrong only because of this task's change is this task's own problem; it goes to the fix pass and never to a Proposed task. A problem counts as earlier only when it was a problem before the branch.",
-    "Owner, 2026-11-19: add one check to the advisor's review of a task draft (job d) in agents/advisor.md: every instruction in the draft's notes has a done_means line that fails if the instruction is ignored, and a rename or removal has a line saying the old thing is left nowhere."
   ],
   "owner_verified": "2026-11-19"
 }

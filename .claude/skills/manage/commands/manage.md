@@ -31,6 +31,9 @@ with "main folder check failed" and the check's output under Needs you; step 9 c
 report only while the main folder is on the working branch, and then only `tasks/RUNS.md`, never
 together with a file an agent changed.
 
+**Decided for you.** Every entry you add to a task's `decided_for_you` holds `chosen`,
+`rejected`, `why` (one sentence, the reason for the choice) and `would_change`.
+
 ## 1. Start
 
 On the working branch, with no uncommitted changes to tracked files. Run `tasks.py lint` and
@@ -44,7 +47,7 @@ under Needs you in the run report as it is.
 ## 2. Take
 
 `tasks.py batch`: up to `tasks_at_once` tasks (`limits.json`) that are independent of each other
-(SKILL.md rule 8). If it prints no task, or `merge-limit` now fails, go to step 9.
+(SKILL.md rule 8). If it prints no task, or `checks.py merge-limit` now fails, go to step 9.
 
 Steps 3 to 6 run for every task of the batch side by side: for each step, dispatch the agents of
 all the batch's tasks that are at it in one message, so they run at the same time, and take each
@@ -53,8 +56,8 @@ When every task of the batch has merged or parked, go to step 2 again.
 
 ## 3. Branch
 
-First `checks.py needs <id>`. If it fails, park the task at once (step 8, reason `needs`) with
-its one-line output as the question: no branch, no builder, no worktree.
+First `checks.py needs <id>`. If it fails, park the task at once (step 8, reason `your-action`)
+with its one-line output as the question: no branch, no builder, no worktree.
 
 On the working branch, set each remaining task of the batch to In progress and commit `task <id>:
 in progress`, one commit per task, so the board, which reads the main folder, shows it. Then
@@ -81,17 +84,17 @@ branch name exists from an earlier run, add `-2`, `-3`, to the worktree's name t
   (SKILL.md rule 2), and what it noticed outside the task. When it stops on a fact about the
   owner's product or an outside system, park (reason `owner-fact`) with its question. When it
   stops because `done_means` needs a protected path `may_edit` does not name, park (reason
-  `never`) with that path in the question; it proposes no task for it. When it stops because
-  finishing needs money the task's `outside_needs` does not name, park (reason `money`).
+  `permission`) with that path in the question; it proposes no task for it. When it stops because
+  finishing needs money the task's `outside_needs` does not name, park (reason `permission`).
 - **iterate:** follow `.claude/commands/iterate.md` for the skill the task names, with the
   task's problem, all of it in the task's worktree: every brief names `<worktree>` as for a
   builder, and its trials and grades run there. Its preconditions and stop list apply. The
   standing merge / revert question in its *Needs you* is answered here: keep the result only
-  when its report says no gated metric failed in any trial; otherwise park (reason `iterate`)
+  when its report says no gated metric failed in any trial; otherwise park (reason `failed`)
   with the report as the question (rule 4 of skill-iterate: inconclusive is a revert). Any other
   item under its *Needs you* parks the task, with the same reason.
 - **you:** prepare what the owner needs to decide or do (the files to read, the options, a
-  recommendation), commit it on the branch in its worktree, and park (reason `runs-as-you`).
+  recommendation), commit it on the branch in its worktree, and park (reason `your-action`).
 
 **The builder's decisions (advisor, job c).** After each builder returns, here and in step 5,
 read its decisions. For each one that changes what a `done_means` line proves (what the line
@@ -102,7 +105,7 @@ decision quoted (chosen, rejected, would change), `git diff <working branch>...<
 HOLDS` or `RULING: FAILS`, then `JOB: c (<n>)`. On `FAILS`, the task goes back to the builder
 once: a fresh `manager-builder` with the reply quoted, told to make the line prove what it was
 written to prove and change nothing else; then this check again on its decisions. A second
-`FAILS` on the task parks it (reason `verification`).
+`FAILS` on the task parks it (reason `failed`).
 
 ## 5. Verify, by `verified_by` and `verifier_of_line`
 
@@ -151,22 +154,22 @@ problems into that task's `outside_problems` and `notes`.
 - **metrics:** `python3 .claude/skills/skill-iterate/scripts/grade.py eval/<skill> --set <set>
   --gate` exits 0, run in the task's worktree.
 - **you:** last, once every other verifier has passed, the advisor's lines included, and after
-  step 5a's fix pass: `checks.py owner <id>`. If it fails, park (reason `owner`) with its
+  step 5a's fix pass: `checks.py owner <id>`. If it fails, park (reason `your-action`) with its
   output, which names only the owner's lines, as the question. Once the owner has set `owner_verified` it passes, and the
   task goes on to step 6 and merges with no further park for the owner. Never set
   `owner_verified`, and never read it from other text.
 
 Keep every advisor reply verbatim, in order, with the reviewer replies; step 7 or 8 saves them
 to `tasks/advice/<id>-<n>.md` and logs each ruling under `decided_for_you`: `chosen` is the
-ruling with the file it is saved in, `rejected` the other ruling, `would_change` the reply's
-*Would change*.
+ruling with the file it is saved in, `rejected` the other ruling, `why` the reply's *Why* in one
+sentence, `would_change` the reply's *Would change*.
 
 On a fail: if a blocking problem can be fixed only in a protected path the task's `may_edit`
-does not name, park at once (reason `never`) with that path in the recommendation. Otherwise,
+does not name, park at once (reason `permission`) with that path in the recommendation. Otherwise,
 one fresh retry: dispatch a new `manager-builder`, in the same worktree and branch, with only
 the blocking problems and each advisor reply that did not hold, told to fix those and change
 nothing else, then a new `manager-reviewer` and a new `manager-advisor` for each advisor line.
-If it still fails, park (reason `verification`).
+If it still fails, park (reason `failed`).
 
 Whenever the task parks, at this step or a later one, sort the findings first. A blocking
 problem still open is the task's own, by its label: it goes, quoted, into the task's `for_retry`
@@ -174,7 +177,9 @@ problem still open is the task's own, by its label: it goes, quoted, into the ta
 unmerged <branch> <path>:<lines>...` with the task's branch and the file and lines the finding
 names. When it exits 0, the finding is on a file only the branch has or on lines the branch
 added or changed: it goes, quoted, into `for_retry`, and not into the Proposed task. When it
-exits 1, it is an earlier problem, for the Proposed task as above; a finding that names no file
+exits 1, it is an earlier problem, for the Proposed task as above, unless the review says the
+lines are wrong only because of the branch's change (SKILL.md rule 2): then it goes into
+`for_retry`; a finding that names no file
 stays in the review file. When the task merges, a finding the fix pass left open stays in the
 review file and creates no task.
 
@@ -183,7 +188,9 @@ review file and creates no task.
 Fix it here (SKILL.md rule 3), between the review and the merge. Once every verifier of step 5
 but `you` has passed, sort the minor problems of the latest review: for each, `checks.py
 unmerged <branch> <path>:<lines>...` with the file and lines it names. Exit 0 puts it on the fix
-list; exit 1 makes it an earlier problem, for step 5's Proposed task. With an empty fix list, go
+list; exit 1 makes it an earlier problem, for step 5's Proposed task, unless the review says the
+lines are wrong only because of the branch's change (SKILL.md rule 2): then it goes on the fix
+list. With an empty fix list, go
 on to the `you` check and step 6.
 
 Otherwise run one fix pass, with its three limits:
@@ -201,23 +208,23 @@ Otherwise run one fix pass, with its three limits:
   in the review file and creates no task, no second pass and no `for_retry`. A blocking problem
   stays the only reason a review fails: a blocking problem in the fixes, or a failing command,
   fails step 5 (its one fresh retry when the task has not had it, else park, reason
-  `verification`).
+  `failed`).
 
 Keep the re-check's reply with the other reviewer replies; step 7 saves it last, so it is the
 reply `checks.py review` reads.
 
 ## 6. Protected paths
 
-`checks.py protected <id> <branch>`. A failure parks the task (reason `protected`). It also
+`checks.py protected <id> <branch>`. A failure parks the task (reason `permission`). It also
 fails a file the branch deleted or renamed that the task's `may_delete` does not name.
 
 ## 7. Merge
 
 One task at a time: start no merge while another task is in this step. `checks.py merge-limit`;
-at the limit park the task (reason `merge-limit`) with "merge limit reached; review and set a
-review tag"; its branch stays. For an iterate task, `checks.py stale <skill> <branch>`; if it
-fails, park (reason `stale`) with its output: the result was measured on an older version of
-the skill.
+`tasks.py batch` took no more tasks than the merges left, so it passes, but if the limit is
+reached all the same, park the task (reason `your-action`) with its output; its branch stays.
+For an iterate task, `checks.py stale <skill> <branch>`; if it fails, park (reason `failed`)
+with its output: the result was measured on an older version of the skill.
 
 Before each merge after the first of the run: `checks.py try-merge <id> <worktree> <command>...`
 with the task's check commands, the ones step 5 ran for `script` and the builder's check. It
@@ -226,29 +233,32 @@ there, and undoes the merge. On exit 1 the task goes back to its builder once: c
 `task/<id>-<n>` from the working branch in a new worktree (step 3's names), dispatch a fresh
 `manager-builder` with the failed branch as the earlier branch whose work it brings over and
 the script's output quoted as the fault to fix, then steps 4 to 7 for it again. On exit 3, or
-2, park (reason `conflict`) with its output.
+2, park (reason `failed`) with its output.
 
 Then, on the working branch in the main folder, write each reviewer reply from steps 5 and 5a
 verbatim to `tasks/reviews/<id>-<n>.md` and each advisor reply verbatim to
 `tasks/advice/<id>-<n>.md` (id zero-padded to 3; `n` counts on from the task's highest existing
 number in that folder, from 1). They stay uncommitted until the merge commit. Run `checks.py
 review <id>` and `checks.py advice <id>`; if either fails, park the task with its output (reason
-`review` or `advice`).
+`failed`).
 
 Then `git merge --no-ff --no-commit <branch>`, alone in its command. While the run is active the
-hook refuses it unless `checks.py protected`, `owner`, `review`, `advice` and `merge-limit` all
-pass for the task; if it refuses, park the task (reason `protected`, `owner`, `review`, `advice`
-or `merge-limit`, the check its output names) with that output. Then set the task file's
-`status` to Done, `finished` to today, `tokens` (its `agents` so far plus this run's count from
-`checks.py tokens`), and `decided_for_you` with each advisor ruling, remove its `for_retry`, add
-the Proposed task from step 5, and commit all of it with the subject `Merge task <id>: <title>`.
+hook refuses it unless `checks.py protected`, `checks.py owner`, `checks.py review`, `checks.py
+advice` and `checks.py merge-limit` all pass for the task; if it refuses, park the task with that
+output, under the reason for the check its output names: `permission` for `checks.py protected`,
+`your-action` for `checks.py owner` or `checks.py merge-limit`, `failed` for `checks.py review` or
+`checks.py advice`. Then set the task file's `status` to Done, `finished` to
+today, `tokens` (its `agents` so far plus this run's count from `checks.py tokens`), and
+`decided_for_you` with each advisor ruling, remove its `for_retry`, add the Proposed task from
+step 5, and commit all of it with the subject `Merge task <id>: <title>`.
 Write that subject with the Write tool to `build/merge-message-<id>.txt` in the main folder
 (git-ignored), not with echo or a heredoc, and commit with `git commit -F
 build/merge-message-<id>.txt`: bash then expands nothing in the title, whatever it holds, and the
 hook reads no title as commands.
 
 Right after that commit, remove each worktree of this task's branches with `git worktree remove
-<path>`, never `--force`; if git refuses, leave it and list it under Needs you in the run report.
+<path>`, never `--force`; if git refuses, leave it and list it under Needs you in the run report,
+with git's refusal and your recommendation.
 Then, for every branch of this task (`git branch --list 'task/<id>' 'task/<id>-*'`), run
 `checks.py superseded <name>`. Only when it exits 0, delete the branch with `git branch -D
 <name>` alone in its command: one branch, no other command, no `$` or backtick, and no `-C`,
@@ -280,30 +290,41 @@ reaches this step; when the batch is done, step 2.
 
 ## 8. Park
 
-Every park names its reason from SKILL.md's park list. First `checks.py consult <id> <reason>
-<branch>`, with the task's branch, or without it when there is none (a `needs` park). It also checks
-the always-park conditions the repo shows, whatever the reason. If it exits 1, the task always
-parks: go on below without the advisor, with its output in the question. If it exits 3, it
-could not decide: park without the advisor, with its output in the question. If it exits 0,
-dispatch a fresh `manager-advisor` for job (b) with the task file's path, the reason and the
-question, the branch, `git diff <working branch>...<branch>` and `<worktree>` as the place to
-read the branch's files when there is one, and the reviewer and advisor replies so far. Tell it
-to start its reply with `RULING: GO ON` or `RULING: PARK`, then `JOB: b`. On `GO ON`, the first in this task run, do what its *How* says, through the steps of this command only
-(a fresh builder briefed with the reply, a choice logged under `decided_for_you`, a verifier run
-again), and carry on from that step. On `PARK`, or a `GO ON` after one was already followed in this
-task run, park below with the reply's points in the recommendation.
+Every park names one of the four reasons of SKILL.md's park list: `permission`, `your-action`,
+`owner-fact` or `failed`. The question in `needs_you` starts with the specific cause: the output
+of the script that failed or of `checks.py consult`, or the name of the check that failed; then
+what the owner must decide or do. First `checks.py consult <id> <reason> <branch>`, with the
+task's branch, or without it when there is none (the outside-need park at step 3). It also
+checks the always-park conditions the repo shows, whatever the reason; when one holds, the task
+parks under the one reason its output names, `permission` when a permission condition holds
+beside a your-action one, and the question gives every cause it names. If it exits 1, the task always parks: go on below
+without the advisor, with its output in the question. If it exits 3, it could not decide: park
+without the advisor, with its output in the question. If it exits 0, dispatch a fresh
+`manager-advisor` for job (b) with the task file's path, the reason and the question, the branch,
+`git diff <working branch>...<branch>` and `<worktree>` as the place to read the branch's files
+when there is one, and the reviewer and advisor replies so far. Tell it to start its reply with
+`RULING: PARK` or `RULING: NO PARK`, then `JOB: b`. On `RULING: NO PARK`, the first in this task
+run, do what its *How* says, through the steps of this command only (a fresh builder briefed with
+the reply, a choice logged under `decided_for_you`, a verifier run again), and carry on from that
+step. After `RULING: NO PARK` on a `failed` park, the check that failed runs again before any
+merge: the review or the advisor's line of step 5, `checks.py review` or `checks.py advice`,
+`checks.py try-merge`, or `checks.py stale`; the advisor never overrides a check, and the merge hook still
+refuses a merge whose checks fail. If the check fails again, park through this step again. On
+`RULING: PARK`, or a `RULING: NO PARK` after one was already followed in this task run, park below
+with the reply's points in the recommendation.
 
 On the working branch, edit only this task's file: `status` Needs you, `needs_you`,
 `decided_for_you`, `tokens` (as in step 7), and `for_retry`. When step 5 ran in this task run,
 `for_retry` is the findings step 5 sorted into it, replacing any earlier list, and the field is
-removed when step 5 sorted none. A park before step 5 (a `needs` park at step 3) leaves
+removed when step 5 sorted none. A park before step 5 (the outside-need park at step 3) leaves
 `for_retry` as it is, so an earlier list is not lost. Write each reviewer reply
 from step 5 verbatim to `tasks/reviews/<id>-<n>.md` and each advisor reply, the job (b) one
 included, to `tasks/advice/<id>-<n>.md`, numbered as in step 7, log each advisor ruling under
 `decided_for_you`, and add the Proposed task from step 5. Commit all of it as `task <id>:
 parked`. The task's branches stay, when it has any. Remove every worktree of the task's branches
 (`git worktree list` shows them; a task rebuilt after `try-merge` has two) with `git worktree
-remove <path>`, never `--force`; if git refuses, leave it and list it under Needs you. Go on with
+remove <path>`, never `--force`; if git refuses, leave it and list it under Needs you, with
+git's refusal and your recommendation. Go on with
 the batch's other tasks; when every one has merged or parked, go to step 2.
 
 ## 9. End
@@ -321,21 +342,25 @@ Stopped because: <no task to take | merge limit | start check failed: ... | main
 
 ### Done
 - task <id>: <title>; merge <hash>; tokens <agents this run> (task total <agents>; main session: not recorded)
-- branch <name> deleted, last commit <id>; restore with `git branch <name> <id>`
+- branch <name> deleted, last commit <id>
+
+A deleted branch is restored with `git branch <name> <id>` while git still holds the commit.
 
 ### Tokens
 - task <id>: <n>, one line per task `checks.py tokens` lists, merged or parked
 - total: <n>
 
 ### Decided for you
-- task <id>: chose <x> over <y>; would change if <z>
+- task <id>: chose <x> over <y>, because <why>; would change if <z>
 
 ### Needs you
 - task <id> (parked): <question>. Recommended: <answer>. If you veto: <what changes>.
 - task <id> (Proposed): <title>. <why>.
 - branch <name> (not deleted): <checks.py superseded's output, as it is>
-- worktree <path> (not removed): <git's refusal, one line>.
+- worktree <path> (not removed): <git's refusal, one line>. Recommended: <remove or keep, with its reason>.
 ```
+
+The restore sentence appears once, under Done, when the report lists a deleted branch.
 
 Tokens: `checks.py tokens` holds every agent result counted on its task in this run, including
 judges and trials inside an iterate task.

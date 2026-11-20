@@ -7,13 +7,17 @@ Usage, from the repo root:
   tasks.py next    the task the manager should take, or why there is none; exit 1 when there is none
   tasks.py batch [<n>]   up to n takeable tasks that can run at the same time, one per line, in
                    the order next would take them; n defaults to tasks_at_once in limits.json;
-                   exit 1 when there is none, 2 when tasks_at_once is missing or not 1 or more
+                   never more than the task merges left under the task limit since the latest
+                   review tag; exit 1 when there is none, 2 when tasks_at_once is missing or not
+                   1 or more, or git cannot count the task merges
   tasks.py board [--open]   write build/task-board.html and print the number of tasks per status;
                             --open opens it in the browser
   tasks.py board --serve [--open]   serve the board at http://127.0.0.1:8765/ until Ctrl-C; it
                             reads tasks/ on every request and the page re-checks every few seconds
 
-Run with --root <dir> to read <dir>/tasks/ instead of ./tasks/.
+Run with --root <dir> to read <dir>/tasks/ instead of ./tasks/, and with --base <branch> to count
+batch's task merges on <branch> instead of the working branch (the tests use it); any other
+subcommand refuses --base with exit 2.
 """
 import json
 import re
@@ -61,6 +65,8 @@ OPTIONAL = ["draft_note", "needs_you", "decided_for_you", "outside_needs", "for_
             "verifier_of_line", "may_delete", "outside_problems"]
 NEEDS_YOU_KEYS = ["question", "recommendation", "if_vetoed"]
 DECIDED_KEYS = ["chosen", "rejected", "would_change"]
+# why: one sentence, the reason for the choice. Optional, since entries written before task 68 have none.
+DECIDED_WHY = "why"
 
 
 def task_path(root, task_id):
@@ -201,10 +207,13 @@ def lint_task(name, t, allowed_tags):
         e(f"{name}: a Needs you task needs needs_you (question, recommendation, if_vetoed)")
     dfy = t.get("decided_for_you")
     if dfy is not None and not (isinstance(dfy, list) and all(
-        isinstance(d, dict) and set(d) == set(DECIDED_KEYS) and all(isinstance(d[k], str) for k in d)
+        isinstance(d, dict) and set(d) - {DECIDED_WHY} == set(DECIDED_KEYS)
+        and all(isinstance(d[k], str) for k in DECIDED_KEYS)
+        and (DECIDED_WHY not in d or isinstance(d[DECIDED_WHY], str) and d[DECIDED_WHY].strip())
         for d in dfy
     )):
-        e(f"{name}: decided_for_you must be a list of {DECIDED_KEYS}")
+        e(f"{name}: decided_for_you must be a list of {DECIDED_KEYS}, each with an optional "
+          f"{DECIDED_WHY!r} of non-empty text")
     needs = t.get("outside_needs", [])
     if not _is_str_list(needs) or not set(needs) <= set(OUTSIDE_NEEDS) or len(set(needs)) != len(needs):
         e(f"{name}: outside_needs must be a list of distinct values from {OUTSIDE_NEEDS}")
@@ -311,9 +320,10 @@ def conflict(a, b, skills):
     return None
 
 
-def pick_batch(tasks, n, skills):
+def pick_batch(tasks, n, skills, room):
     """(tasks to take now, why). Goes down ranked(): a task joins when it conflicts with none
-    already taken, up to n. Assumes the tasks lint clean."""
+    already taken, up to n and up to room, the task merges left under the task limit, so no task
+    is built that cannot merge. Assumes the tasks lint clean."""
     takeable, why = ranked(tasks)
     if not takeable:
         return [], why
@@ -322,6 +332,10 @@ def pick_batch(tasks, n, skills):
         if len(taken) == n:
             left.append(f"task {t['id']}: {n} task(s) at once is the limit")
             continue
+        if len(taken) >= room:
+            left.append(f"task {t['id']}: the task limit leaves room for {max(room, 0)} more task "
+                        f"merge(s) before the next review tag")
+            continue
         clash = next((c for c in (conflict(t, o, skills) for o in taken) if c), None)
         if clash:
             left.append(f"task {t['id']}: {clash}")
@@ -329,6 +343,22 @@ def pick_batch(tasks, n, skills):
             taken.append(t)
     return taken, (f"{len(taken)} of {len(takeable)} takeable task(s), at most {n} at once"
                    + ("; left for later: " + "; ".join(left) if left else ""))
+
+
+def merges_left(root, base=None):
+    """task_merges_per_review in limits.json minus the task merges on base (the working branch when
+    None) since the latest review tag, counted as checks.py merge-limit counts them. Raises
+    RuntimeError when git cannot count, and ValueError, with one line naming the key and the file,
+    when the file cannot be read or the key is missing or not an integer."""
+    import checks  # checks imports this module, so it cannot be imported at the top
+    try:
+        limit = json.loads((Path(root) / LIMITS).read_text()).get("task_merges_per_review")
+    except (OSError, ValueError, AttributeError) as e:
+        raise ValueError(f"task_merges_per_review cannot be read from {LIMITS}: {' '.join(str(e).split())}")
+    if not isinstance(limit, int) or isinstance(limit, bool):
+        raise ValueError(f"task_merges_per_review in {LIMITS} must be an integer; it is "
+                         f"{'missing' if limit is None else repr(limit)}")
+    return limit - checks.task_merges_since_review(root, base or checks.WORKING_BRANCH)[0]
 
 
 def skill_names(root):
@@ -431,6 +461,11 @@ def main(argv):
         i = argv.index("--root")
         root = argv[i + 1]
         argv = argv[:i] + argv[i + 2:]
+    base = None
+    if "--base" in argv:
+        i = argv.index("--base")
+        base = argv[i + 1]
+        argv = argv[:i] + argv[i + 2:]
     flags = set(argv[1:])
     if argv[:1] == ["board"] and len(flags) == len(argv) - 1 and flags <= {"--open", "--serve"}:
         argv = argv[:1]
@@ -439,7 +474,8 @@ def main(argv):
     n = None
     if argv[:1] == ["batch"] and len(argv) == 2 and argv[1].isdigit() and int(argv[1]) > 0:
         n, argv = int(argv[1]), argv[:1]
-    if len(argv) != 1 or argv[0] not in {"lint", "list", "next", "batch", "board"}:
+    if (len(argv) != 1 or argv[0] not in {"lint", "list", "next", "batch", "board"}
+            or (base is not None and argv[0] != "batch")):
         print(__doc__)
         return 2
     if "--serve" in flags:
@@ -487,10 +523,11 @@ def main(argv):
     if argv[0] == "batch":
         try:
             n = n or tasks_at_once(root)
-        except ValueError as e:
+            room = merges_left(root, base)
+        except (ValueError, RuntimeError) as e:
             print(f"FAIL {e}")
             return 2
-        taken, why = pick_batch(tasks, n, skill_names(root))
+        taken, why = pick_batch(tasks, n, skill_names(root), room)
         for t in taken:
             print(f"task {t['id']}: {t['title']}")
         print(f"why: {why}" if taken else f"no task to take: {why}")
