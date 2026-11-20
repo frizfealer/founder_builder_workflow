@@ -1,0 +1,35 @@
+{
+  "id": 68,
+  "title": "Manager: four park reasons, no build past the task limit, clearer rulings and reports",
+  "item": "Replace the 16 park reasons with 4, make the batch respect the merges left under the task limit, rename the advisor's park rulings to PARK and NO PARK, add a why to every decided_for_you entry, and tidy three points of the run report",
+  "motivation": "The owner read the park list on 2026-11-18 and 2026-11-19 and asked whether each reason is needed. The 16 reasons say what went wrong; what he needs is what he must do, and there are four answers. Fewer labels also means fewer for the manager to get wrong, since checks.py consult trusts the label for the cases the repo does not show. Separately: with 9 of 10 merges used and 2 tasks Ready, the manager builds both and parks the second at the limit, so its build is spent on work that cannot merge. He could not tell that GO ON means no park. A decided_for_you entry does not say why the choice was made, so he cannot judge it without asking.",
+  "notes": "THE FOUR REASONS (owner, 2026-11-19: yes). permission, always parks: replaces protected, never, money, owner-field, set-ready. The task wants something it is not allowed; the owner allows or refuses. your-action, always parks: replaces owner, needs, runs-as-you. Only the owner can do the next step: check his line, fix a login or credit, or run the task himself. For runs_as you the manager still prepares the files, the options and a recommendation first, as today. owner-fact, advisor first: unchanged. failed, advisor first: replaces verification, iterate, review, advice, conflict, stale. The work did not pass; the owner changes the task, retries or drops it. Review, advice, conflict and stale move from always park to advisor first. That is safe only because the advisor cannot override a check: after NO PARK the check that failed runs again, and the merge hook still refuses a merge whose checks fail. The specific cause is not lost: the park question starts with it (the script's output or the name of the check that failed). The conditions the repo shows keep forcing a park whatever the reason: a failed protected-path check parks as permission; runs_as you, an owner's line with owner_verified empty, a failed outside need, and the task limit reached park as your-action. THE TASK LIMIT. merge-limit stops being a reason the manager names. tasks.py batch takes no more tasks than the merges left since the latest review tag, so nothing is built that cannot merge. checks.py merge-limit and the merge hook stay as they are; if the limit is ever reached at a merge all the same, the condition above parks the task as your-action. RULINGS. Job (b) replies start RULING: PARK or RULING: NO PARK. One NO PARK per task run is followed, as one GO ON is today. WHY. decided_for_you entries gain why: one sentence, the reason for the choice. Entries written before this task have no why and must keep passing lint. REPORT. SKILL.md does not say how many sections the run report has; it points to the template in commands/manage.md. A deleted-branch line gives the branch and its last commit id, without the restore command; the template says once how to restore. The line for a worktree git refused to remove carries a recommendation, like the leftover-branch line. NOT IN THIS TASK: no change to which checks run, to the merge hook, to the task limit's number, or to an owner's commit ending a run.",
+  "done_means": "(1) SKILL.md's park list, commands/manage.md and checks.py consult use exactly the four reasons of the notes, with the replaced reasons mapped as written there. consult exits 1 for permission and your-action, 0 for owner-fact and failed, and 2 for any other word, each of the 16 old reasons included; tests cover every one. (2) Each condition the repo shows still forces a park whatever reason is given, under the reason the notes name for it, and consult's output names the specific cause; tests cover the five conditions. (3) commands/manage.md says that after NO PARK on a failed park the check that failed runs again before any merge (review, advice, try-merge, stale), and that the park question starts with the specific cause. The merge-hook tests pass unchanged. (4) tasks.py batch takes at most the task limit minus the task merges since the latest review tag, and its why line names each task left out for that reason. Tests: 9 of 10 merges used and 2 independent Ready tasks gives 1 task; 10 of 10 gives none. commands/manage.md no longer names a merge-limit park. (5) Job (b) rulings read RULING: PARK and RULING: NO PARK in SKILL.md, commands/manage.md and agents/advisor.md, and a test shows no file of the skill folder still holds GO ON. (6) tasks.py lint accepts a decided_for_you entry with or without why, and rejects a why that is not non-empty text; references/task-fields.md documents it; commands/manage.md writes why in every new entry; the run report template's line reads: task <id>: chose <x> over <y>, because <why>; would change if <z>. (7) The three report points of the notes hold in SKILL.md and the template in commands/manage.md. (8) The manager tests pass, all of them, and tasks.py lint passes. (9) The owner has read the new park list in SKILL.md.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "verifier_of_line": {
+    "9": "you"
+  },
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "runs_as": "build",
+  "priority": "high",
+  "tags": [
+    "manager"
+  ],
+  "depends_on": [
+    {
+      "id": 66,
+      "soft": false
+    }
+  ],
+  "status": "Backlog",
+  "added": "2026-11-19",
+  "finished": "",
+  "tokens": null,
+  "source_chat": "founder_and_builder project chat, 2026-11-19",
+  "draft_note": "Drafted by Claude in chat on 2026-11-19 on the owner's yes to all six points and his word that it is high priority. It changes the manager's own rules; line 9 is his, so the task parks once for his read of the new park list before it merges."
+}
