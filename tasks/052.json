@@ -3,13 +3,17 @@
   "title": "BDD slice D: write the skill",
   "item": "Write the agent-spec-to-pytest-bdd skill from the café work, with its verify step",
   "motivation": "A slice of task 1, the BDD skill. Its content depends on what the slice before it shows.",
-  "status": "Proposed",
+  "status": "Ready",
   "added": "2026-11-17",
   "finished": "",
-  "notes": "Verify step: script checks, the reference agent passes, then the mutation test of slice C. Old pytest-bdd-skill-notes.md is retired into the skill. The probe agent of slice A is deleted.",
+  "notes": "Verify step: script checks, the reference agent passes, then the mutation test of slice C. The probe agent of slice A is deleted. FOR THE BUILDER'S BRIEF (tasks/advice/052-1.md): tests/test_probe.py and tests/test_probe2.py use ProbeAgent and are edited, not deleted; probe/run_part2.py and probe/run_probe2.py stop working once it is gone, and the report says so. The old untracked file pytest-bdd-skill-notes.md is not part of this task: the owner had it deleted on 2026-11-20, since it described the spec format the café work replaced.",
   "depends_on": [
     {
       "id": 51,
+      "soft": false
+    },
+    {
+      "id": 67,
       "soft": false
     }
   ],
@@ -21,12 +25,12 @@
   ],
   "may_edit": [],
   "runs_as": "build",
-  "priority": "",
+  "priority": "high",
   "tags": [
     "bdd"
   ],
   "tokens": null,
-  "draft_note": "Placeholder written by Claude in chat on 2026-11-17 so the whole path of task 1 shows in the task list. done_means, verified_by and priority are left empty on purpose: Claude writes them from the results of the task this one depends on, and only then is it offered to the owner. Outline in tasks/plans/001.md, section 'Slices B to E'. On 2026-11-19 the manager drafted done_means, verified_by, may_edit and runs_as from task 51's results; the advisor ruled FAILS (tasks/advice/052-1.md) on a line retiring pytest-bdd-skill-notes.md, which no verifier can check while that file is untracked, so only the three lines it held are kept.",
+  "draft_note": "Placeholder written by Claude in chat on 2026-11-17 so the whole path of task 1 shows in the task list. done_means, verified_by and priority are left empty on purpose: Claude writes them from the results of the task this one depends on, and only then is it offered to the owner. Outline in tasks/plans/001.md, section 'Slices B to E'. On 2026-11-19 the manager drafted done_means, verified_by, may_edit and runs_as from task 51's results; the advisor ruled FAILS (tasks/advice/052-1.md) on a line retiring pytest-bdd-skill-notes.md, which no verifier can check while that file is untracked, so only the three lines it held are kept. On 2026-11-20 Claude in chat set priority and Ready on the owner's word of 2026-11-19 (\"go\"), and added the hard dependency on task 67, since both tasks edit the probe folder.",
   "decided_for_you": [
     {
       "chosen": "RULING: FAILS (advisor job d), tasks/advice/052-1.md: lines on the skill's verify step, its commands passing, and deleting the probe agent hold; the line retiring pytest-bdd-skill-notes.md fails, since the file is untracked (no branch has it) and the builder's point-by-point account has no verifier. Kept the three lines it held.",

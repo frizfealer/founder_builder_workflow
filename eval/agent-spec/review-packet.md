@@ -88,7 +88,7 @@ User answer (verbatim):
 
 | Tool | Effect | Source |
 |---|---|---|
-| list_orders() | read-only | proposed, confirmed (includes cancelled orders; reads retried without limit) |
+| list_orders() | read-only | proposed, confirmed (includes cancelled orders; a timeout or an error is a failed try, 3 tries in total: owner answers of 2026-11-19, rows 1 and 2, which replace "reads retried without limit") |
 | cancel_order(order_number) | state-changing | proposed, confirmed with the user's change 1 |
 | issue_refund(order_number) | state-changing | supplied by the user; outcome OrderNotCancelled added by the user |
 | request_staff_followup(order_number, reason) | state-changing | proposed, confirmed with the user's change 3 |
@@ -96,3 +96,20 @@ User answer (verbatim):
 Supporting-actor guarantees: SG-01 refund idempotent (user), SG-02 staff work tasks (proposed, confirmed), SG-03 follow-up idempotent (user), SG-04 cancellation idempotent (user's change 1).
 
 Default trial count 5, message cap 12; no metric changes requested.
+
+## Owner answers, 2026-11-19 (task 29)
+
+The owner answered the open product questions in the founder_and_builder project chat on 2026-11-19, each as a recommendation he accepted or changed, and closed with "yes to all". Where a row differs from the interview above, the row is his answer now: row 1 replaces "Reads may be retried on timeout without limit" (tool confirmation turn, change 4), and row 9 settles "handoff timeout not retried" against "On timeout, retry once" in favour of the retry. A lookup is a list_orders call. A hand-off is a request_staff_followup call.
+
+1. The lookup keeps timing out. The agent tries 3 times in total. Then it tells the customer the order cannot be checked right now, changes nothing, and asks the customer to try later or contact Harbor Goods support. If a cancel or refund call is already unanswered, it hands off instead.
+2. The lookup returns an error. An error counts as a failed try under the same limit of 3.
+3. A refund fails at the customer's bank after the order system returned it as issued or pending, and the conversation is over. This is not the agent's job: the order system learns of the failure from the payment provider and creates the staff task. The agent promises nothing about when the money arrives.
+4. The order has shipped, been delivered or is cancelled, and the customer asks to cancel only some items or to send the refund elsewhere. The order's status comes first: the agent gives only the shipped or already-cancelled message.
+5. The lookup shows the order cancelled with no refund pending or issued. The agent knows this from the lookup, never from what the customer says. With no refund on the order, the agent says the order is already cancelled and proposes the refund, with the amount and payment method from the order record; on the customer's yes it issues the refund. With a refund whose status is failed, the agent hands off as refund_not_issued.
+6. The second cancel call also timed out, then a lookup answers. A timed-out call never answers later, so the agent does not wait for it; it acts on the lookup. Cancelled: it goes on to the refund. Shipped: it tells the customer the order shipped and was not cancelled, and that is final, since the store rejects a cancel on a shipped order and a cancelled order never ships. Still placed or processing: it hands off as cancellation_unknown and tells the customer the cancellation is not confirmed and store staff will check.
+7. An order can ship at any moment while it is placed or processing, including while a proposal waits for the customer's answer and while a call is in flight. Nothing else changes an order: no staff cancellation, no other channel.
+8. A timed-out cancel can take effect later, at any moment, even after the conversation ends. The agent never tells the customer the order was not cancelled after an unanswered cancel unless a later cancel call answered. cancel_order returns OrderNotFound only for a number that is not among the customer's orders, never for an order the lookup listed.
+9. The staff follow-up call times out. The agent retries once; if that times out too, it tells the customer to contact Harbor Goods support.
+10. A rule of its own, from the discussion of row 6: when two answers from the order system contradict each other (for example the cancel call answered cancelled and a lookup shows the order shipped), the agent makes no further cancel or refund call, tells the customer the order's state is not confirmed, and hands off as cancellation_unknown.
+
+Not a decision: a customer with three or more open orders. The rule already says "more than one".

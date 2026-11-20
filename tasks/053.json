@@ -6,7 +6,7 @@
   "status": "Proposed",
   "added": "2026-11-17",
   "finished": "",
-  "notes": "Candidate spec: eval/agent-spec/results/switch-base-10/spec-final/. The session may read the café example.",
+  "notes": "Candidate spec: eval/agent-spec/results/switch-base-10/spec-final/. The session may read the café example. ADDED 2026-11-20 (Claude in chat, from task 29): the owner's answers changed on 2026-11-19 (eval/agent-spec/review-packet.md, last section), so the specs under eval/agent-spec/results/switch-base-10 to -12 carry the old answers. Recommended to him: build one new Harbor Goods spec from the updated packet for this slice (one trial; the baseline trials cost 3.42 to 4.06 USD each in subagent spend) and leave the three-trial rebaseline until an agent-spec change needs it.",
   "depends_on": [
     {
       "id": 52,

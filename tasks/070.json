@@ -6,7 +6,7 @@
   "status": "Proposed",
   "added": "2026-11-20",
   "finished": "",
-  "notes": "When the hook refuses a task merge because the merge checks could not run (scripts/checks.py, push_hook), neither its message nor commands/manage.md step 7 names a park reason, so the manager has no word to give checks.py consult. Which of the four reasons fits is the owner's call.",
+  "notes": "When the hook refuses a task merge because the merge checks could not run (scripts/checks.py, push_hook), neither its message nor commands/manage.md step 7 names a park reason, so the manager has no word to give checks.py consult. The reason is failed (Claude in chat, 2026-11-20; see decided_for_you).",
   "depends_on": [
     {
       "id": 68,
@@ -14,7 +14,7 @@
     }
   ],
   "source_chat": "",
-  "done_means": "(1) commands/manage.md step 7 names one of the four park reasons (permission, your-action, owner-fact, failed) for a task merge the hook refuses because the merge checks could not run, and the hook's refusal message in scripts/checks.py names the same reason for that case. (2) The hook refuses and allows the same commands as before: no assertion in tests/test_hook_gates.py about which commands are refused or allowed changes, and they pass. (3) The manager tests pass, all of them, and tasks.py lint passes.",
+  "done_means": "(1) commands/manage.md step 7 names the park reason failed for a task merge the hook refuses because the merge checks could not run, and the hook's refusal message in scripts/checks.py names the same reason for that case. (2) The hook refuses and allows the same commands as before: no assertion in tests/test_hook_gates.py about which commands are refused or allowed changes, and they pass. (3) The manager tests pass, all of them, and tasks.py lint passes.",
   "verified_by": [
     "script",
     "reviewer"
@@ -45,6 +45,12 @@
       "rejected": "RULING: HOLDS.",
       "why": "The dropped line tested the per-check error case, not the 'merge checks could not run' refusal, and the owner's choice of reason has no line.",
       "would_change": "A line that names the 'could not run' refusal and cannot pass on today's message, and the reason the owner chooses."
+    },
+    {
+      "chosen": "Claude in chat: the reason is failed, so the advisor is asked first and the check runs again before any merge.",
+      "rejected": "permission or your-action (always park), and owner-fact.",
+      "why": "The choice needs no owner: nothing only he knows, nothing hard to undo, no change of direction. SKILL.md already puts the same case for another check under failed ('checks.py try-merge ... cannot run (exit 2)'), and the merge hook still refuses the merge while the checks cannot run.",
+      "would_change": "The owner wants a check that cannot run to stop for him at once."
     }
   ]
 }
