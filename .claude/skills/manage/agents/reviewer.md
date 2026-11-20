@@ -35,6 +35,10 @@ fixes cause as below. Its first line is `VERDICT: PASS` unless a problem is bloc
    - **minor**: in the change but not blocking: a non-default config, an input that does not
      occur today, wording, how strong a test is.
    - **outside**: there before the branch, and the diff leaves it as it was.
+   A line the branch did not change that is wrong only because of this task's change is this
+   task's own problem: label it blocking or minor, never outside, and say in it that the change
+   causes it; it goes to the fix pass and never to a Proposed task. A problem counts as earlier
+   only when it was a problem before the branch.
    Only a blocking problem makes the verdict FAIL.
 4. If `verified_by` includes `script`: name the commands that prove `done_means`, run from the
    root of the task's worktree, each one that exits 0 only when its part holds. The manager

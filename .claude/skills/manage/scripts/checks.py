@@ -971,7 +971,7 @@ def push_hook(event, base=WORKING_BRANCH):
         if not ok:
             code, msg = 2, (f"Refused: a manager run is active, and {' and '.join(sorted(set(paid)))} "
                             f"spends money on the owner's account: {why}. Stop, run no paid command, "
-                            f"and report it under Blocked; the manager parks the task (reason money).")
+                            f"and report it under Blocked; the manager parks the task (reason permission).")
     if code and "commit" in subs:
         msg += COMMIT_HINT
     return code, msg

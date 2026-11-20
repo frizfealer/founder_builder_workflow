@@ -48,7 +48,10 @@ alone.
    manager's together; `checks.py protected` fails a branch that adds one without
    `outside_problems` naming a file that existed when the branch left, or adds two. A problem in
    lines the task's own branch added or changed is the task's to fix (rule 3), in its fix pass
-   or, when it parks, through its `for_retry`, and never becomes a task. A builder that needs a
+   or, when it parks, through its `for_retry`, and never becomes a task. A line the branch did
+   not change that is wrong only because of this task's change is this task's own problem too;
+   it goes to the fix pass and never to a Proposed task. A problem counts as earlier only when it
+   was a problem before the branch. A builder that needs a
    protected path its task may not edit does not propose a task either: the task parks
    (`permission`) with that path in the question. A rule of this skill that is broken with no script
    to check it is an earlier problem too, and the manager proposes a task to build that check.
@@ -90,8 +93,9 @@ alone.
    proves what it was written to prove; (d) after a merge, review the manager's draft of the
    fields of a Proposed task that hard-depends on the merged one and has an empty `done_means`:
    it rules HOLDS or FAILS on whether each pass line can be checked and traces back to a finding
-   or a result, and lists anything in the draft that is new scope, which it names and does not
-   add. The advisor writes no field; the task stays Proposed. What it never
+   or a result, and whether every instruction in the draft's notes has a line that fails if the
+   instruction is ignored, and lists anything in the draft that is new scope, which it names and
+   does not add. The advisor writes no field; the task stays Proposed. What it never
    decides is decided by a script, `checks.py consult`: the always-park cases below. Every advisor
    reply is saved verbatim in `tasks/advice/<id>-<n>.md` and its ruling is logged under
    `decided_for_you` with why and what would change it.
@@ -204,7 +208,9 @@ All from the repo root, all with `python3`:
   Exit 2 when the name is not a branch. A branch of a task that is not Done, or one not named
   for a task, never passes.
 - `scripts/checks.py merge-limit`: task merges since the latest review tag, against
-  `limits.json`. At the limit the manager merges nothing more and ends the run.
+  `limits.json`. `tasks.py batch` takes no more tasks than the merges left, and none at the
+  limit, so nothing is built that cannot merge; a limit reached at a merge all the same parks the
+  task as `your-action`.
 - `scripts/checks.py review <id>`: the task's highest-numbered reply in
   `tasks/reviews/<id>-<n>.md`, in the working tree during the merge. It refuses the merge when
   no reply is saved or the latest's first line is not `VERDICT: PASS`. A task verified by
@@ -219,7 +225,8 @@ All from the repo root, all with `python3`:
   branch added or changed (its diff against the fork point; a deletion counts the lines on either
   side). Those go to the task's fix pass, or its `for_retry` when it parks. Exits 1 otherwise: a
   finding on lines the branch left as they were, or on an earlier file with no line named, is an
-  earlier problem.
+  earlier problem, unless the review says those lines are wrong only because of the branch's
+  change (rule 2).
 - `scripts/checks.py owner <id>`: exits 1 while a line of `done_means` is verified by `you`
   (`verified_by` and `verifier_of_line`) and `owner_verified` is empty on the working branch. Its
   output names only the owner's lines.
@@ -249,13 +256,13 @@ All from the repo root, all with `python3`:
     one `git branch` call, or that points git at another repository (`-C`, `--git-dir`, a
     `GIT_DIR=` prefix), even for a confirmed branch;
   - a `git merge` of a task branch (`task/<id>`, `task/<id>-<n>`) unless `checks.py protected`,
-    `owner`, `review`, `advice` and `merge-limit` all pass for its task, read in the main folder,
+    `checks.py owner`, `checks.py review`, `checks.py advice` and `checks.py merge-limit` all pass
+    for its task, read in the main folder,
     and any `git merge` whose text holds `$` or a backtick;
   - `claude -p` (`--print`) or `ant`, unless the command's text or its folder names the worktree
     of a task (`build/worktrees/task-<id>`, a rebuild's `-<n>` included) whose file on the
     working branch has `claude-api` in `outside_needs`. The refusal tells the agent to stop and
-    report it, and the task parks (`permission`; the refusal's text still gives the reason's old
-    name, money).
+    report it, and the task parks (`permission`).
 
   When a refused command also runs `git commit`, the refusal ends by saying that a message that
   only names the refused command goes in single quotes or in a file given with `-F`.

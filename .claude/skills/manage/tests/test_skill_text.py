@@ -1,5 +1,7 @@
 """Task 66: the skill text states each rule where its reader meets it. String checks: they show the
 sentence is there, not that an agent follows it; the reviewer reads the text for that."""
+import re
+
 import pytest
 
 from conftest import SKILL
@@ -215,7 +217,7 @@ def test_no_park_on_failed_park_runs_the_check_again():
     """Should say in step 8 that after NO PARK on a failed park the check that failed runs again before any merge, and that the park question starts with the specific cause."""
     park = step("commands/manage.md", "## 8. Park", "## 9. End")
     assert "After `RULING: NO PARK` on a `failed` park, the check that failed runs again before any merge" in park
-    for check in ["`checks.py review` or `advice`", "`checks.py try-merge`", "`checks.py stale`"]:
+    for check in ["`checks.py review` or `checks.py advice`", "`checks.py try-merge`", "`checks.py stale`"]:
         assert check in park, check
     assert "The question in `needs_you` starts with the specific cause" in park
 
@@ -271,3 +273,92 @@ def test_run_report_three_points():
     for s in ["## 7. Merge", "## 8. Park"]:
         part = step("commands/manage.md", s, "## 8. Park" if s == "## 7. Merge" else "## 9. End")
         assert "with git's refusal and your recommendation" in part, s
+
+
+# --- task 68's retry: the owner's five faults of 2026-11-19 ----------------------------------------
+
+OLD_REASONS = ["protected", "never", "money", "owner-field", "set-ready", "owner", "needs", "runs-as-you",
+               "verification", "iterate", "review", "advice", "conflict", "stale", "merge-limit"]
+_OLD = "|".join(re.escape(r) for r in sorted(OLD_REASONS, key=len, reverse=True))
+# An old reason alone in backticks, or right after the word "reason" (with backticks, quotes or a
+# bracket between). `checks.py review`, `owner_verified`, `runs_as` and owner-fact are other words.
+OLD_IN_BACKTICKS = re.compile(rf"`({_OLD})`")
+OLD_AFTER_REASON = re.compile(rf"\breasons?[\s`'\"(:]*({_OLD})(?![\w-])", re.IGNORECASE)
+# A row of the fields table (`| \`runs_as\` | \`build\`, \`iterate\`, ...`) holds a field and its values.
+FIELD_ROW = re.compile(r"^\|\s*`[a-z_]+`\s*\|.*$", re.MULTILINE)
+
+
+def old_reason_uses(raw):
+    """Each old reason the text uses as a park reason, with the words around it."""
+    t = " ".join(FIELD_ROW.sub("", raw).split())
+    return [t[max(0, m.start() - 40):m.end() + 10]
+            for r in (OLD_IN_BACKTICKS, OLD_AFTER_REASON) for m in r.finditer(t)]
+
+
+@pytest.mark.parametrize("sample", ["park (reason `review`) with its output", "the task parks (reason money).",
+                                    "it parks (`stale`)", "under the reason merge-limit", "reason: owner",
+                                    "parks it as `runs-as-you`", "Reason `iterate`"])
+def test_old_reason_check_catches_a_park_reason(sample):
+    """Should flag an old reason in backticks or right after the word reason, so the folder check below can fail."""
+    assert old_reason_uses(sample)
+
+
+@pytest.mark.parametrize("sample", ["`checks.py review` or `checks.py advice`", "`checks.py merge-limit`",
+                                    "`checks.py owner <id>`", "`runs_as` is `you`", "`owner_verified` is empty",
+                                    "the reason for the choice", "after a review, the stale check", "reason `owner-fact`",
+                                    "| `runs_as` | `build`, `iterate`, `measurement`, `you` | Owner |",
+                                    "`checks.py needs`, `checks.py protected` and `checks.py stale`"])
+def test_old_reason_check_passes_script_and_field_names(sample):
+    """Should not flag script names, field names and values, owner-fact, or ordinary prose."""
+    assert old_reason_uses(sample) == []
+
+
+def test_no_file_outside_tests_uses_an_old_park_reason():
+    """Should leave no file of the skill folder outside tests/ using one of the old reasons as a park reason."""
+    files = [p for p in SKILL.rglob("*") if p.is_file()
+             and not {"tests", "__pycache__", ".pytest_cache"} & set(p.relative_to(SKILL).parts)]
+    assert len(files) > 5
+    found = {str(p.relative_to(SKILL)): old_reason_uses(p.read_text()) for p in files}
+    assert {k: v for k, v in found.items() if v} == {}
+
+
+def test_hook_paid_refusal_names_permission():
+    """Should have the hook's paid-command refusal name the reason permission, and no doc still give the old name."""
+    checks = (SKILL / "scripts/checks.py").read_text()
+    assert "the manager parks the task (reason permission)." in checks
+    for doc in ["SKILL.md", "commands/manage.md"]:
+        assert "old name" not in text(doc), doc
+
+
+def test_merge_limit_entry_agrees_with_park_list():
+    """Should have SKILL.md's merge-limit entry say batch takes no more tasks than the merges left and a limit reached at a merge parks as your-action."""
+    skill = text("SKILL.md")
+    assert "At the limit the manager merges nothing more and ends the run" not in skill
+    entry = skill[skill.index("- `scripts/checks.py merge-limit`"):skill.index("- `scripts/checks.py review <id>`")]
+    assert "`tasks.py batch` takes no more tasks than the merges left" in entry
+    assert "a limit reached at a merge all the same parks the task as `your-action`" in entry
+
+
+@pytest.mark.parametrize("doc", ["SKILL.md", "agents/reviewer.md"])
+def test_line_wrong_because_of_the_change_is_the_tasks_own(doc):
+    """Should say in SKILL.md rule 2 and agents/reviewer.md that an unchanged line wrong only because of the task's change goes to the fix pass, and what counts as earlier."""
+    t = step("SKILL.md", "2. An agent creates a task", "3. The builder") if doc == "SKILL.md" else text(doc)
+    assert "A line the branch did not change that is wrong only because of this task's change is this task's own problem" in t
+    assert "it goes to the fix pass and never to a Proposed task" in t
+    assert "A problem counts as earlier only when it was a problem before the branch." in t
+
+
+def test_unmerged_exit_1_yields_to_a_line_wrong_because_of_the_change():
+    """Should send a finding on unchanged lines that the review says the change made wrong to the fix list or for_retry, not to the Proposed task."""
+    fix = step("commands/manage.md", "## 5a. One fix pass", "## 6. Protected paths")
+    assert ("unless the review says the lines are wrong only because of the branch's change (SKILL.md rule 2): "
+            "then it goes on the fix list") in fix
+    park_sort = step("commands/manage.md", "Whenever the task parks", "## 5a. One fix pass")
+    assert "(SKILL.md rule 2): then it goes into `for_retry`" in park_sort
+
+
+def test_job_d_checks_every_instruction_has_a_line():
+    """Should have job (d) check that every instruction in the draft's notes has a failing line, and a rename or removal a line that the old thing is left nowhere."""
+    d = step("agents/advisor.md", "## (d)", "## Never")
+    assert ("every instruction in the draft's notes has a `done_means` line that fails if the instruction is "
+            "ignored, and that a rename or removal has a line saying the old thing is left nowhere") in d

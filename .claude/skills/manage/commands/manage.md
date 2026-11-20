@@ -47,7 +47,7 @@ under Needs you in the run report as it is.
 ## 2. Take
 
 `tasks.py batch`: up to `tasks_at_once` tasks (`limits.json`) that are independent of each other
-(SKILL.md rule 8). If it prints no task, or `merge-limit` now fails, go to step 9.
+(SKILL.md rule 8). If it prints no task, or `checks.py merge-limit` now fails, go to step 9.
 
 Steps 3 to 6 run for every task of the batch side by side: for each step, dispatch the agents of
 all the batch's tasks that are at it in one message, so they run at the same time, and take each
@@ -85,8 +85,7 @@ branch name exists from an earlier run, add `-2`, `-3`, to the worktree's name t
   owner's product or an outside system, park (reason `owner-fact`) with its question. When it
   stops because `done_means` needs a protected path `may_edit` does not name, park (reason
   `permission`) with that path in the question; it proposes no task for it. When it stops because
-  finishing needs money the task's `outside_needs` does not name, park (reason `permission`; the
-  hook's refusal still gives the reason's old name, money).
+  finishing needs money the task's `outside_needs` does not name, park (reason `permission`).
 - **iterate:** follow `.claude/commands/iterate.md` for the skill the task names, with the
   task's problem, all of it in the task's worktree: every brief names `<worktree>` as for a
   builder, and its trials and grades run there. Its preconditions and stop list apply. The
@@ -178,7 +177,9 @@ problem still open is the task's own, by its label: it goes, quoted, into the ta
 unmerged <branch> <path>:<lines>...` with the task's branch and the file and lines the finding
 names. When it exits 0, the finding is on a file only the branch has or on lines the branch
 added or changed: it goes, quoted, into `for_retry`, and not into the Proposed task. When it
-exits 1, it is an earlier problem, for the Proposed task as above; a finding that names no file
+exits 1, it is an earlier problem, for the Proposed task as above, unless the review says the
+lines are wrong only because of the branch's change (SKILL.md rule 2): then it goes into
+`for_retry`; a finding that names no file
 stays in the review file. When the task merges, a finding the fix pass left open stays in the
 review file and creates no task.
 
@@ -187,7 +188,9 @@ review file and creates no task.
 Fix it here (SKILL.md rule 3), between the review and the merge. Once every verifier of step 5
 but `you` has passed, sort the minor problems of the latest review: for each, `checks.py
 unmerged <branch> <path>:<lines>...` with the file and lines it names. Exit 0 puts it on the fix
-list; exit 1 makes it an earlier problem, for step 5's Proposed task. With an empty fix list, go
+list; exit 1 makes it an earlier problem, for step 5's Proposed task, unless the review says the
+lines are wrong only because of the branch's change (SKILL.md rule 2): then it goes on the fix
+list. With an empty fix list, go
 on to the `you` check and step 6.
 
 Otherwise run one fix pass, with its three limits:
@@ -240,10 +243,11 @@ review <id>` and `checks.py advice <id>`; if either fails, park the task with it
 `failed`).
 
 Then `git merge --no-ff --no-commit <branch>`, alone in its command. While the run is active the
-hook refuses it unless `checks.py protected`, `owner`, `review`, `advice` and `merge-limit` all
-pass for the task; if it refuses, park the task with that output, under the reason for the check
-its output names: `permission` for `protected`, `your-action` for `owner` or `merge-limit`,
-`failed` for `review` or `advice`. Then set the task file's `status` to Done, `finished` to
+hook refuses it unless `checks.py protected`, `checks.py owner`, `checks.py review`, `checks.py
+advice` and `checks.py merge-limit` all pass for the task; if it refuses, park the task with that
+output, under the reason for the check its output names: `permission` for `checks.py protected`,
+`your-action` for `checks.py owner` or `checks.py merge-limit`, `failed` for `checks.py review` or
+`checks.py advice`. Then set the task file's `status` to Done, `finished` to
 today, `tokens` (its `agents` so far plus this run's count from `checks.py tokens`), and
 `decided_for_you` with each advisor ruling, remove its `for_retry`, add the Proposed task from
 step 5, and commit all of it with the subject `Merge task <id>: <title>`.
@@ -302,8 +306,8 @@ when there is one, and the reviewer and advisor replies so far. Tell it to start
 run, do what its *How* says, through the steps of this command only (a fresh builder briefed with
 the reply, a choice logged under `decided_for_you`, a verifier run again), and carry on from that
 step. After `RULING: NO PARK` on a `failed` park, the check that failed runs again before any
-merge: the review or the advisor's line of step 5, `checks.py review` or `advice`, `checks.py
-try-merge`, or `checks.py stale`; the advisor never overrides a check, and the merge hook still
+merge: the review or the advisor's line of step 5, `checks.py review` or `checks.py advice`,
+`checks.py try-merge`, or `checks.py stale`; the advisor never overrides a check, and the merge hook still
 refuses a merge whose checks fail. If the check fails again, park through this step again. On
 `RULING: PARK`, or a `RULING: NO PARK` after one was already followed in this task run, park below
 with the reply's points in the recommendation.
