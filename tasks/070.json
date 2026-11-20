@@ -3,10 +3,10 @@
   "title": "Manager: a park reason for a merge the hook refuses because its checks could not run",
   "item": "Map the merge hook's refusal 'the merge checks could not run' to a park reason in commands/manage.md step 7 and in the hook's message",
   "motivation": "Found by task 68's review (tasks/reviews/068-3.md, outside finding); the gap existed before task 68's branch and it did not change it.",
-  "status": "Proposed",
+  "status": "Dropped",
   "added": "2026-11-20",
-  "finished": "",
-  "notes": "When the hook refuses a task merge because the merge checks could not run (scripts/checks.py, push_hook), neither its message nor commands/manage.md step 7 names a park reason, so the manager has no word to give checks.py consult. The reason is failed (Claude in chat, 2026-11-20; see decided_for_you).",
+  "finished": "2026-11-20",
+  "notes": "When the hook refuses a task merge because the merge checks could not run (scripts/checks.py, push_hook), neither its message nor commands/manage.md step 7 names a park reason, so the manager has no word to give checks.py consult. The reason is failed (Claude in chat, 2026-11-20; see decided_for_you). Dropped on 2026-11-20 on the owner's word (\"add\", with task 70 folded in): its one change is line 5 of task 71, which edits the same files, so it does not get a builder run of its own.",
   "depends_on": [
     {
       "id": 68,

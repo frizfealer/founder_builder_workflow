@@ -1,0 +1,32 @@
+{
+  "id": 71,
+  "title": "Manager: three tests for what reaches the owner, and a four-part summary on every drafted task",
+  "item": "The manager settles by itself every open choice that passes none of three tests, and describes each task it drafts by outcome, scope, risk and cost",
+  "motivation": "Across the runs of task 51 and task 68 the manager put 7 items to the owner, and 1 needed him (the deletion of a file). He could not judge the others: they were shown as pass lines, which are written for builders, and they were choices about test bookkeeping or the manager's own wording. He wants the worker close to the work to keep writing follow-on tasks, with its context, and to describe them so he can say Ready, change or drop without reading pass lines.",
+  "notes": "SUMMARY (the form this task introduces). Outcome: every task the manager drafts carries a four-part summary, the run report shows that summary and no pass line, and the manager settles choices that need no owner and logs why. Scope: changes the manager's written rules and the layout of its run report, and adds one slot to every task file for the summary, with a script that rejects a draft missing it; does not change who writes or reviews tasks, how tasks are built and merged, when a task parks, or what the hooks refuse. Risk: a summary can read better than the pass lines behind it, and the manager may settle something the owner wanted to see; the log of its decisions is the safeguard. Cost: one builder run; task 66, a manager task of similar size, used 455,419 agent tokens. THE THREE TESTS (owner, 2026-11-19 and 2026-11-20). An item reaches the owner only when one holds: (1) only he knows the answer, a fact about his product or what he wants; (2) it is hard to undo or spends money, a deletion included; (3) it changes direction, what gets built next, which includes a task growing past its stated scope. THE SUMMARY. Four parts, each one or two sentences. Outcome: what is true when the task is done. Scope: what it changes and what it leaves alone, in words the owner already knows, with no file name or field name unless the same sentence explains it; a scope line that needs explaining is badly written. Risk: the worst outcome if it goes wrong, and what guards against it. Cost: builder runs, and the agent tokens of a named earlier task of similar size. WHO DOES WHAT (owner, 2026-11-20). The manager keeps drafting follow-on tasks and the advisor keeps reviewing its drafts. Vision, product answers, new wishes, what runs next and setting Ready stay with the owner and Claude in chat, which reads the run report from the repo. FOLDED IN: task 70, as line 5; the reason is failed, decided in chat on 2026-11-20 (tasks/070.json, decided_for_you). NOT IN THIS TASK: no change to the four park reasons or when a task parks, to the merge checks, to what the hooks refuse or allow, to the task limit, or to the advisor's other jobs.",
+  "done_means": "(1) SKILL.md states the three tests of the notes under a heading of their own, and says an open choice or a finding reaches the owner only when one test holds, named with the item. The park list and its four reasons are unchanged. (2) commands/manage.md says, for every task the manager drafts (after a merge, and a Proposed task for an earlier problem): a choice the draft would leave open is put to the three tests; when none holds the manager takes the option that is cheapest to undo and logs it in decided_for_you with its why; when one holds the choice goes under Needs you with the test named. agents/advisor.md says that in its review of a draft a line that leaves a choice to the owner fails only when the choice passes one of the three tests, and that it checks the summary against the pass lines. (3) A task file may hold summary, with the four parts outcome, scope, risk and cost. references/task-fields.md documents it with the standard of the notes for each part. tasks.py lint rejects a summary that lacks a part or holds an empty one, and rejects a Proposed or Ready task with an id above 71 that has no summary; tasks with lower ids pass with or without one. Tests cover each case. commands/manage.md has the manager write the summary in every draft. (4) The run report template in commands/manage.md shows each Proposed task by its four-part summary and no pass line, puts under Needs you only items that pass a test, each with the test named, and says the manager's closing message to the owner uses the same split and calls nothing his call that sits under Decided for you. (5) commands/manage.md step 7 names the park reason failed for a task merge the hook refuses because the merge checks could not run, and the hook's refusal message in scripts/checks.py names the same reason for that case. The hook refuses and allows the same commands as before: no assertion in tests/test_hook_gates.py about which commands are refused or allowed changes. (6) The manager tests pass, all of them, and tasks.py lint passes.",
+  "verified_by": [
+    "script",
+    "reviewer"
+  ],
+  "may_edit": [
+    ".claude/skills/manage/"
+  ],
+  "runs_as": "build",
+  "priority": "high",
+  "tags": [
+    "manager"
+  ],
+  "depends_on": [
+    {
+      "id": 68,
+      "soft": false
+    }
+  ],
+  "status": "Ready",
+  "added": "2026-11-20",
+  "finished": "",
+  "tokens": null,
+  "source_chat": "founder_and_builder project chat, 2026-11-19 and 2026-11-20",
+  "draft_note": "Drafted by Claude in chat on 2026-11-20 and set Ready on the owner's word (\"add\") after he read its four-part summary. No line is his to verify: he approved the summary, and the reviewer checks the lines."
+}
